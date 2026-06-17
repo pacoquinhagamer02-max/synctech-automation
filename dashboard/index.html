@@ -6,518 +6,588 @@
 <title>Dashboard — SyncTech Automation</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root {
-  --primary: #7C3AED; --primary-light: #A78BFA;
-  --secondary: #06B6D4; --accent: #10B981; --warn: #F59E0B; --danger: #EF4444;
-  --dark: #0A0A0F; --dark2: #111118; --dark3: #1A1A27; --dark4: #222235;
-  --border: rgba(124,58,237,0.2); --text: #E2E8F0; --text-muted: #94A3B8;
-  --gradient: linear-gradient(135deg,#7C3AED 0%,#06B6D4 100%);
-  --sidebar-w: 240px;
-}
-* { margin:0; padding:0; box-sizing:border-box; }
-body { font-family:'Inter',sans-serif; background:var(--dark); color:var(--text); display:flex; min-height:100vh; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; }
 
-/* SIDEBAR */
+:root {
+  --bg:       #0D1117;
+  --s1:       #161B27;
+  --s2:       #1C2333;
+  --s3:       #222A3A;
+  --border:   rgba(255,255,255,0.07);
+  --border-s: rgba(255,255,255,0.12);
+  --primary:  #6366F1;
+  --pl:       #818CF8;
+  --pd:       #4F46E5;
+  --text:     #F1F5F9;
+  --muted:    #94A3B8;
+  --faint:    #4B5563;
+  --green:    #22C55E;
+  --yellow:   #F59E0B;
+  --red:      #EF4444;
+  --cyan:     #06B6D4;
+  --sidebar:  240px;
+  --topbar:   56px;
+  --r:        10px;
+}
+
+body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; }
+
+/* ── SIDEBAR ── */
 .sidebar {
-  width:var(--sidebar-w); background:var(--dark2); border-right:1px solid var(--border);
-  display:flex; flex-direction:column; position:fixed; top:0; left:0; height:100vh; z-index:50;
+  width: var(--sidebar); background: var(--s1); border-right: 1px solid var(--border);
+  position: fixed; top: 0; left: 0; bottom: 0; z-index: 40;
+  display: flex; flex-direction: column; overflow-y: auto;
+  transition: transform 0.2s;
 }
 .sidebar-logo {
-  padding:20px; border-bottom:1px solid var(--border);
-  font-size:1.1rem; font-weight:800;
-  background:var(--gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  height: var(--topbar); display: flex; align-items: center; gap: 9px;
+  padding: 0 16px; border-bottom: 1px solid var(--border); flex-shrink: 0;
 }
-.sidebar-biz { padding:16px 20px; border-bottom:1px solid var(--border); }
-.biz-name { font-size:0.88rem; font-weight:700; }
-.biz-plan { font-size:0.72rem; color:var(--primary-light); margin-top:2px; }
+.logo-mark {
+  width: 26px; height: 26px; border-radius: 6px; background: var(--primary);
+  display: grid; place-items: center; flex-shrink: 0;
+}
+.logo-mark svg { width: 13px; height: 13px; fill: #fff; }
+.logo-text { font-size: 0.88rem; font-weight: 700; }
 
-.sidebar-nav { padding:12px 0; flex:1; overflow-y:auto; }
-.nav-section { padding:8px 20px 4px; font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; color:rgba(148,163,184,0.4); }
+.sidebar-biz {
+  padding: 12px 16px; border-bottom: 1px solid var(--border);
+}
+.biz-name { font-size: 0.82rem; font-weight: 600; }
+.biz-plan { font-size: 0.7rem; color: var(--pl); margin-top: 2px; display: flex; align-items: center; gap: 4px; }
+.plan-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--pl); }
+
+.sidebar-nav { flex: 1; padding: 8px 0; }
+.nav-section {
+  padding: 12px 16px 4px; font-size: 0.65rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.1em; color: var(--faint);
+}
 .nav-item {
-  padding:10px 20px; display:flex; align-items:center; gap:10px;
-  cursor:pointer; transition:all 0.15s; font-size:0.85rem; color:var(--text-muted);
-  border-left:3px solid transparent;
+  display: flex; align-items: center; gap: 9px;
+  padding: 8px 16px; cursor: pointer; font-size: 0.82rem; color: var(--muted);
+  border-left: 2px solid transparent; transition: all 0.12s;
+  user-select: none;
 }
-.nav-item:hover { color:var(--text); background:rgba(124,58,237,0.05); }
-.nav-item.active { color:var(--primary-light); background:rgba(124,58,237,0.1); border-left-color:var(--primary); }
-.nav-icon { font-size:1rem; width:20px; text-align:center; }
+.nav-item:hover { color: var(--text); background: rgba(255,255,255,0.03); }
+.nav-item.active { color: var(--text); background: rgba(99,102,241,0.08); border-left-color: var(--primary); }
+.nav-icon { width: 16px; height: 16px; flex-shrink: 0; opacity: 0.7; }
+.nav-item.active .nav-icon { opacity: 1; }
 
-.sidebar-bottom {
-  padding:16px 20px; border-top:1px solid var(--border);
-  font-size:0.78rem; color:var(--text-muted);
+.sidebar-footer {
+  padding: 12px 16px; border-top: 1px solid var(--border); flex-shrink: 0;
 }
-.status-dot { display:inline-block; width:8px; height:8px; background:var(--accent); border-radius:50%; margin-right:6px; animation:pulse 2s infinite; }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+.online-badge { display: flex; align-items: center; gap: 7px; font-size: 0.72rem; color: var(--muted); }
+.online-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
 
-/* MAIN */
-.main { margin-left:var(--sidebar-w); flex:1; display:flex; flex-direction:column; min-height:100vh; }
+/* ── MOBILE OVERLAY ── */
+.sidebar-overlay {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+  z-index: 39; backdrop-filter: blur(2px);
+}
+.sidebar-overlay.open { display: block; }
 
+/* ── MAIN ── */
+.main { margin-left: var(--sidebar); flex: 1; display: flex; flex-direction: column; min-width: 0; }
+
+/* ── TOPBAR ── */
 .topbar {
-  height:60px; background:var(--dark2); border-bottom:1px solid var(--border);
-  display:flex; align-items:center; justify-content:space-between; padding:0 24px;
-  position:sticky; top:0; z-index:40;
+  height: var(--topbar); background: rgba(13,17,23,0.9); backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 30;
+  display: flex; align-items: center; padding: 0 20px; gap: 12px;
 }
-.topbar-title { font-size:1rem; font-weight:700; }
-.topbar-right { display:flex; align-items:center; gap:16px; }
-.topbar-notif {
-  width:36px; height:36px; border-radius:50%; background:var(--dark3);
-  border:1px solid var(--border); display:flex; align-items:center; justify-content:center;
-  cursor:pointer; position:relative; font-size:1rem;
+.menu-btn {
+  display: none; width: 34px; height: 34px; border-radius: 8px;
+  background: none; border: 1px solid var(--border-s); color: var(--muted);
+  cursor: pointer; place-items: center;
 }
+.topbar-title { font-size: 0.9rem; font-weight: 700; }
+.topbar-right { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+.topbar-date { font-size: 0.75rem; color: var(--muted); }
+.icon-btn {
+  width: 32px; height: 32px; border-radius: 8px; background: none;
+  border: 1px solid var(--border); color: var(--muted); cursor: pointer;
+  display: grid; place-items: center; position: relative; transition: all 0.15s;
+}
+.icon-btn:hover { border-color: var(--border-s); color: var(--text); }
 .notif-badge {
-  position:absolute; top:-4px; right:-4px; width:16px; height:16px;
-  background:var(--danger); border-radius:50%; font-size:0.6rem; font-weight:700;
-  display:flex; align-items:center; justify-content:center; color:#fff;
+  position: absolute; top: -5px; right: -5px;
+  width: 15px; height: 15px; border-radius: 50%; background: var(--red);
+  font-size: 0.55rem; font-weight: 700; color: #fff; display: grid; place-items: center;
 }
-.topbar-avatar {
-  width:36px; height:36px; border-radius:50%;
-  background:var(--gradient); display:flex; align-items:center; justify-content:center;
-  font-weight:700; font-size:0.9rem; cursor:pointer;
+.user-btn {
+  width: 32px; height: 32px; border-radius: 50%; background: var(--primary);
+  display: grid; place-items: center; font-size: 0.75rem; font-weight: 700; cursor: pointer;
 }
-.topbar-date { font-size:0.78rem; color:var(--text-muted); }
+.topbar-back {
+  font-size: 0.75rem; color: var(--muted); text-decoration: none;
+  display: flex; align-items: center; gap: 4px; transition: color 0.15s;
+}
+.topbar-back:hover { color: var(--text); }
 
-.content { padding:24px; flex:1; }
-.page { display:none; }
-.page.active { display:block; }
+/* ── CONTENT ── */
+.content { padding: 20px; flex: 1; }
+.page { display: none; }
+.page.active { display: block; }
 
-/* KPI CARDS */
-.kpi-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; margin-bottom:24px; }
-.kpi {
-  background:var(--dark2); border:1px solid var(--border); border-radius:16px;
-  padding:20px; position:relative; overflow:hidden;
+/* ── KPI GRID ── */
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px; margin-bottom: 20px; }
+.kpi-card {
+  background: var(--s1); border: 1px solid var(--border); border-radius: var(--r); padding: 18px;
 }
-.kpi::before {
-  content:''; position:absolute; top:0; right:0; width:80px; height:80px;
-  border-radius:50%; opacity:0.05;
-}
-.kpi.purple::before { background:#7C3AED; }
-.kpi.cyan::before { background:#06B6D4; }
-.kpi.green::before { background:#10B981; }
-.kpi.yellow::before { background:#F59E0B; }
+.kpi-label { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+.kpi-val { font-size: 1.9rem; font-weight: 800; color: var(--text); letter-spacing: -0.025em; margin-bottom: 5px; }
+.kpi-delta { font-size: 0.72rem; font-weight: 500; display: flex; align-items: center; gap: 4px; }
+.kpi-delta.up { color: var(--green); }
+.kpi-delta.down { color: var(--red); }
 
-.kpi-label { font-size:0.75rem; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
-.kpi-value { font-size:2rem; font-weight:800; margin-bottom:4px; }
-.kpi-change { font-size:0.75rem; display:flex; align-items:center; gap:4px; }
-.kpi-change.up { color:var(--accent); }
-.kpi-change.down { color:var(--danger); }
-.kpi-icon { position:absolute; top:16px; right:16px; font-size:1.5rem; opacity:0.6; }
-
-/* CHARTS AREA */
-.charts-row { display:grid; grid-template-columns:2fr 1fr; gap:16px; margin-bottom:24px; }
-.chart-card {
-  background:var(--dark2); border:1px solid var(--border); border-radius:16px; padding:20px;
+/* ── CHART CARDS ── */
+.charts-row { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; margin-bottom: 20px; }
+.card {
+  background: var(--s1); border: 1px solid var(--border); border-radius: var(--r); padding: 18px;
 }
-.chart-title { font-size:0.9rem; font-weight:700; margin-bottom:4px; }
-.chart-sub { font-size:0.75rem; color:var(--text-muted); margin-bottom:16px; }
+.card-title { font-size: 0.85rem; font-weight: 700; margin-bottom: 3px; }
+.card-sub { font-size: 0.72rem; color: var(--muted); margin-bottom: 16px; }
 
 /* Bar chart */
-.bar-chart { display:flex; align-items:flex-end; gap:8px; height:120px; }
-.bar-group { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; }
-.bar {
-  width:100%; border-radius:4px 4px 0 0; background:rgba(124,58,237,0.3);
-  transition:all 0.3s; cursor:pointer; position:relative;
+.bar-chart { display: flex; align-items: flex-end; gap: 6px; height: 100px; }
+.bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.bar-fill { width: 100%; border-radius: 4px 4px 0 0; min-height: 4px; transition: height 0.3s; position: relative; cursor: pointer; }
+.bar-fill:hover::after {
+  content: attr(data-tip);
+  position: absolute; bottom: calc(100% + 4px); left: 50%; transform: translateX(-50%);
+  background: var(--s3); border: 1px solid var(--border-s); border-radius: 5px;
+  padding: 3px 8px; font-size: 0.68rem; white-space: nowrap; color: var(--text); z-index: 10;
 }
-.bar:hover { background:var(--primary); }
-.bar-tooltip {
-  position:absolute; top:-28px; left:50%; transform:translateX(-50%);
-  background:var(--dark); border:1px solid var(--border); border-radius:6px;
-  padding:3px 8px; font-size:0.7rem; white-space:nowrap; display:none;
-}
-.bar:hover .bar-tooltip { display:block; }
-.bar-label { font-size:0.65rem; color:var(--text-muted); }
+.bar-lbl { font-size: 0.62rem; color: var(--faint); }
 
-/* Donut chart */
-.donut-wrap { display:flex; flex-direction:column; align-items:center; }
-.donut-svg { width:120px; height:120px; }
-.donut-legend { width:100%; margin-top:12px; display:flex; flex-direction:column; gap:6px; }
-.legend-item { display:flex; align-items:center; gap:8px; font-size:0.78rem; }
-.legend-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
-.legend-label { flex:1; color:var(--text-muted); }
-.legend-val { font-weight:700; }
+/* Donut */
+.donut-wrap { display: flex; flex-direction: column; align-items: center; }
+.donut-svg { width: 110px; height: 110px; }
+.donut-legend { width: 100%; margin-top: 12px; display: flex; flex-direction: column; gap: 6px; }
+.leg-row { display: flex; align-items: center; gap: 7px; font-size: 0.74rem; }
+.leg-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.leg-name { flex: 1; color: var(--muted); }
+.leg-val { font-weight: 600; }
 
-/* TABLES */
-.table-card {
-  background:var(--dark2); border:1px solid var(--border); border-radius:16px;
-  padding:20px; margin-bottom:16px;
-}
-.table-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
-.table-title { font-size:0.9rem; font-weight:700; }
-.table-action { font-size:0.78rem; color:var(--primary-light); cursor:pointer; background:none; border:none; font-family:inherit; }
+/* ── TABLE ── */
+.table-card { background: var(--s1); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; margin-bottom: 12px; }
+.table-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--border); }
+.table-title { font-size: 0.85rem; font-weight: 700; }
+.table-link { font-size: 0.75rem; color: var(--pl); background: none; border: none; cursor: pointer; font-family: inherit; transition: color 0.15s; }
+.table-link:hover { color: var(--text); }
+table { width: 100%; border-collapse: collapse; }
+th { font-size: 0.68rem; font-weight: 600; color: var(--faint); text-transform: uppercase; letter-spacing: 0.06em; padding: 10px 18px; text-align: left; }
+td { padding: 11px 18px; border-top: 1px solid var(--border); font-size: 0.8rem; }
+tr:hover td { background: rgba(255,255,255,0.015); }
+.td-name { font-weight: 600; }
+.td-sub { font-size: 0.7rem; color: var(--muted); margin-top: 1px; }
 
-table { width:100%; border-collapse:collapse; }
-th { font-size:0.72rem; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.5px; padding:0 12px 10px; text-align:left; }
-td { padding:12px; border-top:1px solid var(--border); font-size:0.85rem; }
-tr:hover td { background:rgba(124,58,237,0.03); }
-
+/* Badges */
 .badge {
-  display:inline-block; padding:3px 10px; border-radius:20px; font-size:0.72rem; font-weight:600;
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 9px; border-radius: 20px; font-size: 0.68rem; font-weight: 600;
 }
-.badge.confirmed { background:rgba(16,185,129,0.15); color:var(--accent); }
-.badge.pending { background:rgba(245,158,11,0.15); color:var(--warn); }
-.badge.cancelled { background:rgba(239,68,68,0.15); color:var(--danger); }
-.badge.done { background:rgba(148,163,184,0.15); color:var(--text-muted); }
+.badge-green { background: rgba(34,197,94,0.1);  color: var(--green); border: 1px solid rgba(34,197,94,0.2); }
+.badge-yellow{ background: rgba(245,158,11,0.1); color: var(--yellow);border: 1px solid rgba(245,158,11,0.2);}
+.badge-red   { background: rgba(239,68,68,0.1);  color: var(--red);   border: 1px solid rgba(239,68,68,0.2); }
+.badge-muted { background: rgba(148,163,184,0.08);color: var(--muted); border: 1px solid var(--border); }
+.badge-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
 
-/* AGENDA VIEW */
-.agenda-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
-.time-block { display:flex; gap:12px; padding:10px 0; border-bottom:1px solid var(--border); }
-.time-block:last-child { border:none; }
-.tb-time { font-size:0.78rem; color:var(--text-muted); width:50px; flex-shrink:0; padding-top:2px; }
-.tb-event {
-  flex:1; background:rgba(124,58,237,0.1); border-left:3px solid var(--primary);
-  border-radius:0 8px 8px 0; padding:8px 12px;
-}
-.tb-empty { flex:1; border-left:3px solid var(--border); border-radius:0 8px 8px 0; padding:8px 12px; color:rgba(148,163,184,0.3); font-size:0.8rem; }
-.tb-name { font-size:0.85rem; font-weight:700; }
-.tb-service { font-size:0.75rem; color:var(--text-muted); }
-.tb-status { display:flex; justify-content:space-between; margin-top:4px; }
+/* ── AGENDA ── */
+.agenda-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.agenda-block { display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.agenda-block:last-child { border-bottom: none; }
+.ab-time { font-size: 0.72rem; color: var(--muted); width: 44px; flex-shrink: 0; padding-top: 3px; font-weight: 500; }
+.ab-event { flex: 1; background: rgba(99,102,241,0.07); border-left: 2px solid var(--primary); border-radius: 0 6px 6px 0; padding: 7px 10px; }
+.ab-event.done { opacity: 0.5; }
+.ab-empty { flex: 1; border-left: 2px solid var(--border); border-radius: 0 6px 6px 0; padding: 7px 10px; font-size: 0.75rem; color: var(--faint); }
+.ab-name { font-size: 0.82rem; font-weight: 600; }
+.ab-svc { font-size: 0.72rem; color: var(--muted); margin-top: 1px; }
+.ab-row { display: flex; justify-content: space-between; align-items: center; }
 
-/* CRM */
-.client-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:12px; }
-.client-card {
-  background:var(--dark3); border:1px solid var(--border); border-radius:12px; padding:16px;
-  transition:all 0.2s; cursor:pointer;
-}
-.client-card:hover { border-color:var(--primary); transform:translateY(-2px); }
-.client-head { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
-.client-avatar { width:40px; height:40px; border-radius:50%; background:var(--gradient); display:flex; align-items:center; justify-content:center; font-weight:700; flex-shrink:0; }
-.client-name { font-size:0.9rem; font-weight:700; }
-.client-meta { font-size:0.75rem; color:var(--text-muted); }
-.client-stats { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
-.cs-item { text-align:center; background:var(--dark2); border-radius:8px; padding:6px; }
-.cs-val { font-size:0.85rem; font-weight:700; color:var(--primary-light); }
-.cs-lbl { font-size:0.65rem; color:var(--text-muted); }
+/* ── CRM ── */
+.crm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+.client-card { background: var(--s2); border: 1px solid var(--border); border-radius: var(--r); padding: 14px; transition: border-color 0.15s; cursor: pointer; }
+.client-card:hover { border-color: var(--border-s); }
+.cc-head { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; }
+.cc-av { width: 36px; height: 36px; border-radius: 50%; background: var(--primary); display: grid; place-items: center; font-size: 0.72rem; font-weight: 700; flex-shrink: 0; }
+.cc-name { font-size: 0.85rem; font-weight: 600; }
+.cc-meta { font-size: 0.7rem; color: var(--muted); }
+.cc-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+.cc-stat { background: var(--s3); border-radius: 6px; padding: 6px 4px; text-align: center; }
+.cc-val { font-size: 0.8rem; font-weight: 700; color: var(--text); }
+.cc-lbl { font-size: 0.6rem; color: var(--muted); margin-top: 1px; }
 
-/* SEARCH + FILTER */
-.search-bar { display:flex; gap:10px; margin-bottom:16px; }
+/* ── BOT FLOWS ── */
+.flow-list { display: flex; flex-direction: column; gap: 8px; }
+.flow-row { background: var(--s2); border: 1px solid var(--border); border-radius: var(--r); padding: 13px 16px; display: flex; align-items: center; gap: 12px; }
+.flow-icon { font-size: 1.2rem; width: 32px; text-align: center; }
+.flow-info { flex: 1; min-width: 0; }
+.flow-name { font-size: 0.83rem; font-weight: 600; }
+.flow-desc { font-size: 0.72rem; color: var(--muted); margin-top: 1px; }
+.toggle { width: 38px; height: 21px; border-radius: 11px; background: var(--border-s); cursor: pointer; position: relative; transition: background 0.2s; flex-shrink: 0; }
+.toggle.on { background: var(--primary); }
+.toggle::after { content: ''; position: absolute; top: 2.5px; left: 2.5px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: transform 0.2s; }
+.toggle.on::after { transform: translateX(17px); }
+
+/* ── SEARCH BAR ── */
+.search-bar { display: flex; gap: 8px; margin-bottom: 14px; }
 .search-input {
-  flex:1; background:var(--dark3); border:1px solid var(--border); border-radius:10px;
-  padding:10px 14px; color:var(--text); font-size:0.85rem; outline:none; font-family:'Inter',sans-serif;
+  flex: 1; background: var(--s2); border: 1px solid var(--border-s); border-radius: var(--r);
+  padding: 8px 13px; color: var(--text); font-size: 0.82rem; outline: none;
+  font-family: 'Inter', sans-serif; transition: border-color 0.15s;
 }
-.search-input:focus { border-color:var(--primary); }
+.search-input:focus { border-color: var(--primary); }
+.search-input::placeholder { color: var(--faint); }
 .filter-btn {
-  background:var(--dark3); border:1px solid var(--border); color:var(--text-muted);
-  border-radius:10px; padding:10px 16px; cursor:pointer; font-size:0.82rem; font-family:'Inter',sans-serif;
-  transition:all 0.2s;
+  padding: 8px 14px; border-radius: var(--r); background: var(--s2);
+  border: 1px solid var(--border-s); color: var(--muted); cursor: pointer;
+  font-size: 0.78rem; font-family: 'Inter', sans-serif; transition: all 0.15s;
 }
-.filter-btn:hover { border-color:var(--primary); color:var(--primary-light); }
+.filter-btn:hover { border-color: var(--primary); color: var(--pl); }
+.filter-btn.primary { background: rgba(99,102,241,0.1); color: var(--pl); border-color: rgba(99,102,241,0.3); }
 
-/* BOT CONFIG */
-.bot-flows { display:flex; flex-direction:column; gap:12px; }
-.flow-card {
-  background:var(--dark3); border:1px solid var(--border); border-radius:12px; padding:16px;
-  display:flex; align-items:center; gap:14px;
+/* ── METRICS ── */
+.metrics-3col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+
+/* ── INTEGRATIONS ── */
+.integ-row { background: var(--s2); border: 1px solid var(--border); border-radius: var(--r); padding: 13px 16px; display: flex; align-items: center; gap: 12px; }
+.integ-icon { font-size: 1.3rem; width: 36px; text-align: center; }
+.integ-info { flex: 1; }
+.integ-name { font-size: 0.83rem; font-weight: 600; }
+.integ-desc { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .main { margin-left: 0; }
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); }
+  .menu-btn { display: grid; }
+  .charts-row { grid-template-columns: 1fr; }
+  .agenda-cols { grid-template-columns: 1fr; }
+  .metrics-3col { grid-template-columns: 1fr; }
+  .kpi-grid { grid-template-columns: 1fr 1fr; }
 }
-.flow-icon { font-size:1.5rem; width:40px; text-align:center; }
-.flow-info { flex:1; }
-.flow-name { font-size:0.9rem; font-weight:700; }
-.flow-desc { font-size:0.78rem; color:var(--text-muted); }
-.toggle {
-  width:44px; height:24px; border-radius:12px; background:var(--border);
-  cursor:pointer; position:relative; transition:background 0.2s; flex-shrink:0;
-}
-.toggle.on { background:var(--accent); }
-.toggle::after {
-  content:''; position:absolute; top:2px; left:2px;
-  width:20px; height:20px; border-radius:50%; background:#fff; transition:transform 0.2s;
-}
-.toggle.on::after { transform:translateX(20px); }
-
-/* METRICS */
-.metrics-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-bottom:24px; }
-
-/* BACK LINK */
-.back-link { color:var(--text-muted); text-decoration:none; font-size:0.82rem; display:flex; align-items:center; gap:4px; transition:color 0.2s; }
-.back-link:hover { color:var(--primary-light); }
-
-/* RESPONSIVE */
-@media (max-width:768px) {
-  .sidebar { display:none; }
-  .main { margin-left:0; }
-  .charts-row { grid-template-columns:1fr; }
-  .agenda-grid { grid-template-columns:1fr; }
-  .metrics-row { grid-template-columns:1fr; }
+@media (max-width: 440px) {
+  .kpi-grid { grid-template-columns: 1fr; }
 }
 </style>
 </head>
 <body>
 
+<!-- Sidebar overlay (mobile) -->
+<div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
+
 <!-- SIDEBAR -->
-<aside class="sidebar">
-  <div class="sidebar-logo">⚡ SyncTech</div>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark"><svg viewBox="0 0 13 13"><path d="M6.5 1L12 4V9L6.5 12L1 9V4L6.5 1Z"/></svg></div>
+    <span class="logo-text">SyncTech</span>
+  </div>
   <div class="sidebar-biz">
     <div class="biz-name">Barbearia Exemplo</div>
-    <div class="biz-plan">⭐ Plano Negócio</div>
+    <div class="biz-plan"><div class="plan-dot"></div> Plano Negócio</div>
   </div>
   <nav class="sidebar-nav">
     <div class="nav-section">Principal</div>
-    <div class="nav-item active" onclick="showPage('overview')"><span class="nav-icon">📊</span> Visão Geral</div>
-    <div class="nav-item" onclick="showPage('agenda')"><span class="nav-icon">📅</span> Agenda Hoje</div>
-    <div class="nav-item" onclick="showPage('agendamentos')"><span class="nav-icon">📋</span> Agendamentos</div>
-    <div class="nav-item" onclick="showPage('clientes')"><span class="nav-icon">👥</span> Clientes (CRM)</div>
-
+    <div class="nav-item active" onclick="showPage('overview',this,'Visão Geral')">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>
+      Visão Geral
+    </div>
+    <div class="nav-item" onclick="showPage('agenda',this,'Agenda Hoje')">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1.5" y="2.5" width="13" height="12" rx="1.5"/><path d="M1.5 6.5H14.5M5 1.5V3.5M11 1.5V3.5"/></svg>
+      Agenda Hoje
+    </div>
+    <div class="nav-item" onclick="showPage('agendamentos',this,'Agendamentos')">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12M2 8h8M2 12h5"/></svg>
+      Agendamentos
+    </div>
+    <div class="nav-item" onclick="showPage('clientes',this,'Clientes (CRM)')">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="5" r="3"/><path d="M1 14c0-3 2.24-4 5-4s5 1 5 4"/><circle cx="12.5" cy="5.5" r="2"/><path d="M15 14c0-2-1-3.2-2.5-3.5"/></svg>
+      Clientes (CRM)
+    </div>
     <div class="nav-section">Automação</div>
-    <div class="nav-item" onclick="showPage('whatsapp')"><span class="nav-icon">🟢</span> WhatsApp Bot</div>
-    <div class="nav-item" onclick="showPage('instagram')"><span class="nav-icon">📸</span> Instagram Auto</div>
-    <div class="nav-item" onclick="showPage('metricas')"><span class="nav-icon">📈</span> Métricas</div>
-
-    <div class="nav-section">Config</div>
-    <div class="nav-item" onclick="showPage('servicos')"><span class="nav-icon">✂️</span> Meus Serviços</div>
-    <div class="nav-item" onclick="showPage('config')"><span class="nav-icon">⚙️</span> Configurações</div>
-    <div class="nav-item" onclick="window.location.href='../index.html'"><span class="nav-icon">🌐</span> Ver Site</div>
-    <div class="nav-item" onclick="window.location.href='../agendamento/index.html'"><span class="nav-icon">📱</span> App Agendamento</div>
+    <div class="nav-item" onclick="showPage('whatsapp',this,'WhatsApp Bot')">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2.5 2.5A.5.5 0 013 2h10a.5.5 0 01.5.5v7a.5.5 0 01-.5.5H8.5l-3 3V10H3a.5.5 0 01-.5-.5v-7z"/></svg>
+      WhatsApp Bot
+    </div>
+    <div class="nav-item" onclick="showPage('instagram',this,'Instagram Auto')">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="12" rx="3"/><circle cx="8" cy="8" r="2.5"/><circle cx="11.5" cy="4.5" r="0.5" fill="currentColor"/></svg>
+      Instagram Auto
+    </div>
+    <div class="nav-item" onclick="showPage('metricas',this,'Métricas')">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="1.5,12 5,7.5 8,9.5 12,4 14.5,6"/></svg>
+      Métricas
+    </div>
+    <div class="nav-section">Configurações</div>
+    <div class="nav-item" onclick="showPage('servicos',this,'Meus Serviços')">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 2.5H4a1.5 1.5 0 00-1.5 1.5v8A1.5 1.5 0 004 13.5h8A1.5 1.5 0 0013.5 12V9"/><path d="M10 2L14 2L14 6M14 2L8 8"/></svg>
+      Meus Serviços
+    </div>
+    <div class="nav-item" onclick="showPage('config',this,'Configurações')">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="2"/><path d="M8 1.5V3M8 13V14.5M1.5 8H3M13 8H14.5M3.4 3.4L4.4 4.4M11.6 11.6L12.6 12.6M12.6 3.4L11.6 4.4M4.4 11.6L3.4 12.6"/></svg>
+      Configurações
+    </div>
+    <div class="nav-item" onclick="window.open('../','_blank')">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.5"/><path d="M8 1.5S6 4 6 8s2 6.5 2 6.5M8 1.5S10 4 10 8s-2 6.5-2 6.5M1.5 8H14.5"/></svg>
+      Ver Site
+    </div>
+    <div class="nav-item" onclick="window.open('../agendamento/','_blank')">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="1" width="9" height="14" rx="1.5"/><path d="M11 4.5L14.5 8L11 11.5"/></svg>
+      App Agendamento
+    </div>
   </nav>
-  <div class="sidebar-bottom">
-    <div><span class="status-dot"></span> Todos os sistemas online</div>
-    <div style="margin-top:4px; font-size:0.7rem">Última sync: agora</div>
+  <div class="sidebar-footer">
+    <div class="online-badge"><div class="online-dot"></div> Todos os sistemas online</div>
   </div>
 </aside>
 
 <!-- MAIN -->
 <div class="main">
-  <div class="topbar">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <button class="menu-btn" onclick="openSidebar()" aria-label="Menu">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4H14M2 8H14M2 12H14"/></svg>
+    </button>
     <div class="topbar-title" id="page-title">Visão Geral</div>
     <div class="topbar-right">
-      <div class="topbar-date" id="topbar-date"></div>
-      <a href="../index.html" class="back-link">← Site</a>
-      <div class="topbar-notif">🔔<div class="notif-badge">3</div></div>
-      <div class="topbar-avatar">BR</div>
+      <span class="topbar-date" id="top-date"></span>
+      <a href="../" class="topbar-back">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2L4 6L8 10"/></svg>
+        Site
+      </a>
+      <div class="icon-btn">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 1.5C5.07 1.5 3.5 3.07 3.5 5v3.5L2 10h10L10.5 8.5V5c0-1.93-1.57-3.5-3.5-3.5zM5.5 10v.5a1.5 1.5 0 003 0V10"/></svg>
+        <div class="notif-badge">3</div>
+      </div>
+      <div class="user-btn">BR</div>
     </div>
-  </div>
+  </header>
 
+  <!-- CONTENT -->
   <div class="content">
 
-    <!-- PAGE: OVERVIEW -->
+    <!-- ── OVERVIEW ── -->
     <div class="page active" id="page-overview">
       <div class="kpi-grid">
-        <div class="kpi purple">
-          <div class="kpi-label">Agendamentos Hoje</div>
-          <div class="kpi-value">12</div>
-          <div class="kpi-change up">↑ +3 vs ontem</div>
-          <div class="kpi-icon">📅</div>
+        <div class="kpi-card">
+          <div class="kpi-label">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="var(--muted)" stroke-width="1.5"><rect x="1" y="2" width="11" height="10" rx="1.5"/><path d="M1 5.5H12M4.5 1.5V3M8.5 1.5V3"/></svg>
+            Agendamentos hoje
+          </div>
+          <div class="kpi-val">12</div>
+          <div class="kpi-delta up">↑ +3 vs ontem</div>
         </div>
-        <div class="kpi cyan">
-          <div class="kpi-label">Receita do Mês</div>
-          <div class="kpi-value">R$3.840</div>
-          <div class="kpi-change up">↑ +22% vs mês anterior</div>
-          <div class="kpi-icon">💰</div>
+        <div class="kpi-card">
+          <div class="kpi-label">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="var(--muted)" stroke-width="1.5"><path d="M6.5 1.5v11M3 4.5h5.5a2 2 0 010 4H3.5a2 2 0 000 4H10"/></svg>
+            Receita do mês
+          </div>
+          <div class="kpi-val">R$3.840</div>
+          <div class="kpi-delta up">↑ +22% vs mês anterior</div>
         </div>
-        <div class="kpi green">
-          <div class="kpi-label">Novos Clientes (mês)</div>
-          <div class="kpi-value">47</div>
-          <div class="kpi-change up">↑ +8 vs mês anterior</div>
-          <div class="kpi-icon">👥</div>
+        <div class="kpi-card">
+          <div class="kpi-label">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="var(--muted)" stroke-width="1.5"><circle cx="5" cy="4.5" r="2.5"/><path d="M1 12c0-2.5 1.8-3.5 4-3.5s4 1 4 3.5"/><circle cx="10" cy="5" r="1.5"/><path d="M13 12c0-1.5-.8-2.5-2-3"/></svg>
+            Novos clientes
+          </div>
+          <div class="kpi-val">47</div>
+          <div class="kpi-delta up">↑ +8 vs mês anterior</div>
         </div>
-        <div class="kpi yellow">
-          <div class="kpi-label">Taxa de Retorno</div>
-          <div class="kpi-value">68%</div>
-          <div class="kpi-change up">↑ +5% vs mês anterior</div>
-          <div class="kpi-icon">🔄</div>
+        <div class="kpi-card">
+          <div class="kpi-label">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="var(--muted)" stroke-width="1.5"><path d="M1 9.5L4 6l3 2 4-5.5 2 2.5"/></svg>
+            Taxa de retorno
+          </div>
+          <div class="kpi-val">68%</div>
+          <div class="kpi-delta up">↑ +5% vs mês anterior</div>
         </div>
-        <div class="kpi purple">
-          <div class="kpi-label">Msgs WhatsApp (hoje)</div>
-          <div class="kpi-value">89</div>
-          <div class="kpi-change up">↑ Bot respondeu 94%</div>
-          <div class="kpi-icon">🤖</div>
+        <div class="kpi-card">
+          <div class="kpi-label">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="var(--muted)" stroke-width="1.5"><path d="M2 2.5A.5.5 0 012.5 2h8a.5.5 0 01.5.5v6a.5.5 0 01-.5.5H7l-2.5 2V9H2.5a.5.5 0 01-.5-.5v-6z"/></svg>
+            Msgs WhatsApp hoje
+          </div>
+          <div class="kpi-val">89</div>
+          <div class="kpi-delta up">↑ Bot respondeu 94%</div>
         </div>
-        <div class="kpi green">
-          <div class="kpi-label">Avaliação Google</div>
-          <div class="kpi-value">4.9★</div>
-          <div class="kpi-change up">↑ +0.2 este mês</div>
-          <div class="kpi-icon">⭐</div>
+        <div class="kpi-card">
+          <div class="kpi-label">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="var(--muted)" stroke-width="1.5"><polygon points="6.5,1 8,4.5 12,5 9.5,7.5 10,11 6.5,9.3 3,11 3.5,7.5 1,5 5,4.5"/></svg>
+            Avaliação Google
+          </div>
+          <div class="kpi-val">4.9★</div>
+          <div class="kpi-delta up">↑ +0.2 este mês</div>
         </div>
       </div>
 
       <div class="charts-row">
-        <div class="chart-card">
-          <div class="chart-title">Agendamentos — Últimos 7 dias</div>
-          <div class="chart-sub">Confirmados vs Cancelados</div>
-          <div class="bar-chart" id="bar-chart"></div>
-          <div style="display:flex; gap:16px; margin-top:12px">
-            <span style="font-size:0.75rem; color:var(--text-muted); display:flex; gap:6px; align-items:center">
-              <span style="width:10px;height:10px;background:var(--primary);border-radius:2px;display:inline-block"></span> Confirmados
-            </span>
-            <span style="font-size:0.75rem; color:var(--text-muted); display:flex; gap:6px; align-items:center">
-              <span style="width:10px;height:10px;background:var(--danger);border-radius:2px;display:inline-block;opacity:0.5"></span> Cancelados
-            </span>
+        <div class="card">
+          <div class="card-title">Agendamentos — últimos 7 dias</div>
+          <div class="card-sub">Confirmados por dia da semana</div>
+          <div class="bar-chart" id="bc-weekly"></div>
+          <div style="display:flex;gap:14px;margin-top:10px">
+            <span style="font-size:0.7rem;color:var(--muted);display:flex;gap:5px;align-items:center"><span style="width:8px;height:8px;border-radius:2px;background:var(--primary);display:inline-block"></span>Confirmados</span>
           </div>
         </div>
-        <div class="chart-card">
-          <div class="chart-title">Serviços mais agendados</div>
-          <div class="chart-sub">Este mês</div>
+        <div class="card">
+          <div class="card-title">Serviços mais agendados</div>
+          <div class="card-sub">Este mês</div>
           <div class="donut-wrap">
-            <svg class="donut-svg" viewBox="0 0 120 120">
-              <circle cx="60" cy="60" r="48" fill="none" stroke="var(--dark3)" stroke-width="18"/>
-              <circle cx="60" cy="60" r="48" fill="none" stroke="#7C3AED" stroke-width="18"
-                stroke-dasharray="120 181.6" stroke-dashoffset="0" transform="rotate(-90 60 60)"/>
-              <circle cx="60" cy="60" r="48" fill="none" stroke="#06B6D4" stroke-width="18"
-                stroke-dasharray="73 228.6" stroke-dashoffset="-120" transform="rotate(-90 60 60)"/>
-              <circle cx="60" cy="60" r="48" fill="none" stroke="#10B981" stroke-width="18"
-                stroke-dasharray="42 259.6" stroke-dashoffset="-193" transform="rotate(-90 60 60)"/>
-              <circle cx="60" cy="60" r="48" fill="none" stroke="#F59E0B" stroke-width="18"
-                stroke-dasharray="28 273.6" stroke-dashoffset="-235" transform="rotate(-90 60 60)"/>
-              <text x="60" y="64" text-anchor="middle" fill="var(--text)" font-size="13" font-weight="800" font-family="Inter">148</text>
-              <text x="60" y="76" text-anchor="middle" fill="var(--text-muted)" font-size="7" font-family="Inter">serviços</text>
+            <svg class="donut-svg" viewBox="0 0 110 110">
+              <circle cx="55" cy="55" r="42" fill="none" stroke="var(--s2)" stroke-width="16"/>
+              <circle cx="55" cy="55" r="42" fill="none" stroke="#6366F1" stroke-width="16" stroke-dasharray="108 155.8" stroke-dashoffset="0" transform="rotate(-90 55 55)"/>
+              <circle cx="55" cy="55" r="42" fill="none" stroke="#06B6D4" stroke-width="16" stroke-dasharray="65 199" stroke-dashoffset="-108" transform="rotate(-90 55 55)"/>
+              <circle cx="55" cy="55" r="42" fill="none" stroke="#22C55E" stroke-width="16" stroke-dasharray="40 224" stroke-dashoffset="-173" transform="rotate(-90 55 55)"/>
+              <circle cx="55" cy="55" r="42" fill="none" stroke="#F59E0B" stroke-width="16" stroke-dasharray="25 239" stroke-dashoffset="-213" transform="rotate(-90 55 55)"/>
+              <text x="55" y="59" text-anchor="middle" fill="var(--text)" font-size="13" font-weight="800" font-family="Inter">148</text>
             </svg>
             <div class="donut-legend">
-              <div class="legend-item"><div class="legend-dot" style="background:#7C3AED"></div><span class="legend-label">Corte + Barba</span><span class="legend-val">41%</span></div>
-              <div class="legend-item"><div class="legend-dot" style="background:#06B6D4"></div><span class="legend-label">Corte Masculino</span><span class="legend-val">25%</span></div>
-              <div class="legend-item"><div class="legend-dot" style="background:#10B981"></div><span class="legend-label">Barba</span><span class="legend-val">14%</span></div>
-              <div class="legend-item"><div class="legend-dot" style="background:#F59E0B"></div><span class="legend-label">Hidratação</span><span class="legend-val">10%</span></div>
+              <div class="leg-row"><div class="leg-dot" style="background:#6366F1"></div><span class="leg-name">Corte + Barba</span><span class="leg-val">41%</span></div>
+              <div class="leg-row"><div class="leg-dot" style="background:#06B6D4"></div><span class="leg-name">Corte Masculino</span><span class="leg-val">25%</span></div>
+              <div class="leg-row"><div class="leg-dot" style="background:#22C55E"></div><span class="leg-name">Barba</span><span class="leg-val">14%</span></div>
+              <div class="leg-row"><div class="leg-dot" style="background:#F59E0B"></div><span class="leg-name">Outros</span><span class="leg-val">20%</span></div>
             </div>
           </div>
         </div>
       </div>
 
       <div class="table-card">
-        <div class="table-header">
-          <div class="table-title">Próximos Agendamentos de Hoje</div>
-          <button class="table-action" onclick="showPage('agenda')">Ver agenda completa →</button>
+        <div class="table-head">
+          <div class="table-title">Próximos agendamentos</div>
+          <button class="table-link" onclick="showPage('agenda',null,'Agenda Hoje')">Ver agenda completa →</button>
         </div>
-        <table>
-          <thead><tr>
-            <th>Horário</th><th>Cliente</th><th>Serviço</th><th>Valor</th><th>Status</th><th>WhatsApp</th>
-          </tr></thead>
-          <tbody id="next-appointments"></tbody>
-        </table>
+        <table><thead><tr><th>Horário</th><th>Cliente</th><th>Serviço</th><th>Valor</th><th>Status</th><th>Ação</th></tr></thead>
+        <tbody id="tb-upcoming"></tbody></table>
       </div>
     </div>
 
-    <!-- PAGE: AGENDA -->
+    <!-- ── AGENDA ── -->
     <div class="page" id="page-agenda">
-      <div class="table-header" style="margin-bottom:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
         <div>
-          <div style="font-size:1.1rem; font-weight:700">📅 Agenda de Hoje</div>
-          <div style="font-size:0.8rem; color:var(--text-muted)" id="today-date"></div>
+          <div style="font-size:1rem;font-weight:700">Agenda de hoje</div>
+          <div style="font-size:0.78rem;color:var(--muted)" id="today-lbl"></div>
         </div>
-        <a href="../agendamento/index.html" class="table-action" target="_blank">+ Novo agendamento</a>
+        <a href="../agendamento/" target="_blank" style="font-size:0.78rem;color:var(--pl);text-decoration:none;display:flex;align-items:center;gap:5px;border:1px solid rgba(99,102,241,0.3);padding:7px 13px;border-radius:8px">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 1.5V10.5M1.5 6H10.5"/></svg>
+          Novo agendamento
+        </a>
       </div>
-      <div class="agenda-grid">
-        <div class="chart-card">
-          <div class="chart-title">Manhã</div>
-          <div id="agenda-manha"></div>
-        </div>
-        <div class="chart-card">
-          <div class="chart-title">Tarde</div>
-          <div id="agenda-tarde"></div>
-        </div>
+      <div class="agenda-cols">
+        <div class="card"><div class="card-title" style="margin-bottom:12px">Manhã</div><div id="agenda-manha"></div></div>
+        <div class="card"><div class="card-title" style="margin-bottom:12px">Tarde</div><div id="agenda-tarde"></div></div>
       </div>
     </div>
 
-    <!-- PAGE: AGENDAMENTOS -->
+    <!-- ── AGENDAMENTOS ── -->
     <div class="page" id="page-agendamentos">
       <div class="search-bar">
-        <input class="search-input" placeholder="🔍 Buscar cliente, serviço...">
-        <button class="filter-btn">📅 Esta semana</button>
-        <button class="filter-btn">Status ↓</button>
+        <input class="search-input" placeholder="Buscar cliente, serviço...">
+        <button class="filter-btn">Esta semana</button>
+        <button class="filter-btn">Status</button>
+        <button class="filter-btn primary">Exportar CSV</button>
       </div>
       <div class="table-card">
-        <div class="table-header">
-          <div class="table-title">Todos os Agendamentos</div>
-          <button class="table-action">Exportar CSV</button>
-        </div>
-        <table>
-          <thead><tr><th>Data/Hora</th><th>Cliente</th><th>Serviço</th><th>Valor</th><th>Origem</th><th>Status</th></tr></thead>
-          <tbody id="all-appointments"></tbody>
-        </table>
+        <div class="table-head"><div class="table-title">Todos os agendamentos</div></div>
+        <table><thead><tr><th>Data/Hora</th><th>Cliente</th><th>Serviço</th><th>Valor</th><th>Origem</th><th>Status</th></tr></thead>
+        <tbody id="tb-all"></tbody></table>
       </div>
     </div>
 
-    <!-- PAGE: CLIENTES -->
+    <!-- ── CLIENTES ── -->
     <div class="page" id="page-clientes">
       <div class="search-bar">
-        <input class="search-input" placeholder="🔍 Buscar cliente por nome ou telefone...">
-        <button class="filter-btn">Filtrar ↓</button>
-        <button class="filter-btn" style="background:rgba(124,58,237,0.15);border-color:var(--primary);color:var(--primary-light)">+ Adicionar</button>
+        <input class="search-input" placeholder="Buscar por nome ou telefone...">
+        <button class="filter-btn">Filtrar</button>
+        <button class="filter-btn primary">+ Adicionar</button>
       </div>
-      <div class="client-grid" id="client-grid"></div>
+      <div class="crm-grid" id="crm-grid"></div>
     </div>
 
-    <!-- PAGE: WHATSAPP -->
+    <!-- ── WHATSAPP ── -->
     <div class="page" id="page-whatsapp">
-      <div class="kpi-grid" style="margin-bottom:20px">
-        <div class="kpi green"><div class="kpi-label">Mensagens Hoje</div><div class="kpi-value">89</div><div class="kpi-change up">↑ Bot resolveu 84</div><div class="kpi-icon">💬</div></div>
-        <div class="kpi purple"><div class="kpi-label">Taxa Automação</div><div class="kpi-value">94%</div><div class="kpi-change up">↑ Sem intervenção humana</div><div class="kpi-icon">🤖</div></div>
-        <div class="kpi cyan"><div class="kpi-label">Leads Captados</div><div class="kpi-value">12</div><div class="kpi-change up">↑ Este mês: 47 leads</div><div class="kpi-icon">🎯</div></div>
+      <div class="kpi-grid" style="margin-bottom:16px">
+        <div class="kpi-card"><div class="kpi-label">Mensagens hoje</div><div class="kpi-val">89</div><div class="kpi-delta up">↑ 84 resolvidas pelo bot</div></div>
+        <div class="kpi-card"><div class="kpi-label">Taxa de automação</div><div class="kpi-val">94%</div><div class="kpi-delta up">↑ Sem intervenção humana</div></div>
+        <div class="kpi-card"><div class="kpi-label">Leads captados (mês)</div><div class="kpi-val">47</div><div class="kpi-delta up">↑ +8 vs mês anterior</div></div>
       </div>
-      <div class="chart-card" style="margin-bottom:16px">
-        <div class="chart-title">Fluxos do Bot</div>
-        <div class="chart-sub">Ative ou desative cada fluxo automaticamente</div>
-        <div class="bot-flows" id="bot-flows"></div>
+      <div class="card">
+        <div class="card-title">Fluxos do Bot</div>
+        <div class="card-sub">Ative ou desative cada automação individualmente</div>
+        <div class="flow-list" id="fl-wa"></div>
       </div>
     </div>
 
-    <!-- PAGE: INSTAGRAM -->
+    <!-- ── INSTAGRAM ── -->
     <div class="page" id="page-instagram">
-      <div class="kpi-grid" style="margin-bottom:20px">
-        <div class="kpi purple"><div class="kpi-label">DMs automáticos</div><div class="kpi-value">34</div><div class="kpi-change up">↑ Hoje</div><div class="kpi-icon">📸</div></div>
-        <div class="kpi cyan"><div class="kpi-label">Comentários respondidos</div><div class="kpi-value">56</div><div class="kpi-change up">↑ Última publicação</div><div class="kpi-icon">💬</div></div>
-        <div class="kpi green"><div class="kpi-label">Leads do Instagram</div><div class="kpi-value">8</div><div class="kpi-change up">↑ Hoje</div><div class="kpi-icon">🎯</div></div>
+      <div class="kpi-grid" style="margin-bottom:16px">
+        <div class="kpi-card"><div class="kpi-label">DMs automáticos hoje</div><div class="kpi-val">34</div><div class="kpi-delta up">↑ Respondidos em &lt;1s</div></div>
+        <div class="kpi-card"><div class="kpi-label">Comentários respondidos</div><div class="kpi-val">56</div><div class="kpi-delta up">↑ Última publicação</div></div>
+        <div class="kpi-card"><div class="kpi-label">Leads do Instagram</div><div class="kpi-val">8</div><div class="kpi-delta up">↑ Hoje</div></div>
       </div>
-      <div class="chart-card">
-        <div class="chart-title">Automações do Instagram</div>
-        <div class="chart-sub">Configurar palavras-chave e respostas automáticas</div>
-        <div class="bot-flows" id="ig-flows"></div>
+      <div class="card">
+        <div class="card-title">Automações do Instagram</div>
+        <div class="card-sub">Configure palavras-chave e respostas automáticas</div>
+        <div class="flow-list" id="fl-ig"></div>
       </div>
     </div>
 
-    <!-- PAGE: METRICAS -->
+    <!-- ── MÉTRICAS ── -->
     <div class="page" id="page-metricas">
-      <div class="metrics-row">
-        <div class="chart-card"><div class="chart-title">Faturamento Mensal</div><div class="chart-sub">Últimos 6 meses</div><div class="bar-chart" id="revenue-chart"></div></div>
-        <div class="chart-card"><div class="chart-title">Novos Clientes</div><div class="chart-sub">Últimos 6 meses</div><div class="bar-chart" id="clients-chart"></div></div>
-        <div class="chart-card"><div class="chart-title">Taxa de Retorno</div><div class="chart-sub">Clientes que voltaram</div><div class="bar-chart" id="return-chart"></div></div>
+      <div class="metrics-3col">
+        <div class="card"><div class="card-title">Faturamento mensal</div><div class="card-sub">Últimos 6 meses</div><div class="bar-chart" id="bc-rev"></div></div>
+        <div class="card"><div class="card-title">Novos clientes</div><div class="card-sub">Últimos 6 meses</div><div class="bar-chart" id="bc-cli"></div></div>
+        <div class="card"><div class="card-title">Taxa de retorno</div><div class="card-sub">Clientes que voltaram</div><div class="bar-chart" id="bc-ret"></div></div>
       </div>
       <div class="table-card">
-        <div class="table-header"><div class="table-title">Resumo do Mês</div></div>
-        <table>
-          <thead><tr><th>Métrica</th><th>Este Mês</th><th>Mês Anterior</th><th>Variação</th></tr></thead>
-          <tbody>
-            <tr><td>Total de agendamentos</td><td>148</td><td>121</td><td style="color:var(--accent)">↑ +22%</td></tr>
-            <tr><td>Faturamento total</td><td>R$3.840</td><td>R$3.146</td><td style="color:var(--accent)">↑ +22%</td></tr>
-            <tr><td>Novos clientes</td><td>47</td><td>39</td><td style="color:var(--accent)">↑ +21%</td></tr>
-            <tr><td>Mensagens WhatsApp</td><td>1.847</td><td>1.420</td><td style="color:var(--accent)">↑ +30%</td></tr>
-            <tr><td>Taxa de cancelamento</td><td>8%</td><td>11%</td><td style="color:var(--accent)">↓ -3pp</td></tr>
-            <tr><td>Ticket médio</td><td>R$55</td><td>R$52</td><td style="color:var(--accent)">↑ +6%</td></tr>
-          </tbody>
-        </table>
+        <div class="table-head"><div class="table-title">Resumo do mês</div></div>
+        <table><thead><tr><th>Métrica</th><th>Este mês</th><th>Mês anterior</th><th>Variação</th></tr></thead>
+        <tbody>
+          <tr><td>Agendamentos totais</td><td>148</td><td>121</td><td style="color:var(--green)">↑ +22%</td></tr>
+          <tr><td>Faturamento total</td><td>R$3.840</td><td>R$3.146</td><td style="color:var(--green)">↑ +22%</td></tr>
+          <tr><td>Novos clientes</td><td>47</td><td>39</td><td style="color:var(--green)">↑ +21%</td></tr>
+          <tr><td>Mensagens WhatsApp</td><td>1.847</td><td>1.420</td><td style="color:var(--green)">↑ +30%</td></tr>
+          <tr><td>Taxa de cancelamento</td><td>8%</td><td>11%</td><td style="color:var(--green)">↓ -3pp</td></tr>
+          <tr><td>Ticket médio</td><td>R$55</td><td>R$52</td><td style="color:var(--green)">↑ +6%</td></tr>
+        </tbody></table>
       </div>
     </div>
 
-    <!-- PAGE: SERVICOS -->
+    <!-- ── SERVIÇOS ── -->
     <div class="page" id="page-servicos">
       <div class="table-card">
-        <div class="table-header">
+        <div class="table-head">
           <div class="table-title">Meus Serviços</div>
-          <button class="table-action">+ Adicionar Serviço</button>
+          <button class="filter-btn primary" style="font-size:0.75rem">+ Novo serviço</button>
         </div>
-        <table>
-          <thead><tr><th>Serviço</th><th>Duração</th><th>Preço</th><th>Agendamentos (mês)</th><th>Ativo</th></tr></thead>
-          <tbody>
-            <tr><td>✂️ Corte Masculino</td><td>45 min</td><td>R$45</td><td>37</td><td><div class="toggle on" onclick="this.classList.toggle('on')"></div></td></tr>
-            <tr><td>🪒 Barba</td><td>30 min</td><td>R$35</td><td>21</td><td><div class="toggle on" onclick="this.classList.toggle('on')"></div></td></tr>
-            <tr><td>💈 Corte + Barba</td><td>75 min</td><td>R$70</td><td>61</td><td><div class="toggle on" onclick="this.classList.toggle('on')"></div></td></tr>
-            <tr><td>💧 Hidratação Capilar</td><td>60 min</td><td>R$55</td><td>15</td><td><div class="toggle on" onclick="this.classList.toggle('on')"></div></td></tr>
-            <tr><td>🎨 Pigmentação</td><td>90 min</td><td>R$80</td><td>14</td><td><div class="toggle" onclick="this.classList.toggle('on')"></div></td></tr>
-          </tbody>
-        </table>
+        <table><thead><tr><th>Serviço</th><th>Duração</th><th>Preço</th><th>Agend. mês</th><th>Ativo</th></tr></thead>
+        <tbody>
+          <tr><td class="td-name">✂️ Corte Masculino</td><td>45 min</td><td>R$45</td><td>37</td><td><div class="toggle on" onclick="this.classList.toggle('on')"></div></td></tr>
+          <tr><td class="td-name">🪒 Barba</td><td>30 min</td><td>R$35</td><td>21</td><td><div class="toggle on" onclick="this.classList.toggle('on')"></div></td></tr>
+          <tr><td class="td-name">💈 Corte + Barba</td><td>75 min</td><td>R$70</td><td>61</td><td><div class="toggle on" onclick="this.classList.toggle('on')"></div></td></tr>
+          <tr><td class="td-name">💧 Hidratação Capilar</td><td>60 min</td><td>R$55</td><td>15</td><td><div class="toggle on" onclick="this.classList.toggle('on')"></div></td></tr>
+          <tr><td class="td-name">🎨 Pigmentação</td><td>90 min</td><td>R$80</td><td>14</td><td><div class="toggle" onclick="this.classList.toggle('on')"></div></td></tr>
+        </tbody></table>
       </div>
     </div>
 
-    <!-- PAGE: CONFIG -->
+    <!-- ── CONFIG ── -->
     <div class="page" id="page-config">
-      <div class="chart-card" style="margin-bottom:16px">
-        <div class="chart-title" style="margin-bottom:16px">⚙️ Configurações do Negócio</div>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px">
-          <div><label style="font-size:0.78rem;color:var(--text-muted);display:block;margin-bottom:6px">Nome do negócio</label><input class="search-input" style="width:100%" value="Barbearia Exemplo"></div>
-          <div><label style="font-size:0.78rem;color:var(--text-muted);display:block;margin-bottom:6px">WhatsApp</label><input class="search-input" style="width:100%" value="(11) 99999-9999"></div>
-          <div><label style="font-size:0.78rem;color:var(--text-muted);display:block;margin-bottom:6px">Endereço</label><input class="search-input" style="width:100%" value="Rua das Flores, 123 — Centro"></div>
-          <div><label style="font-size:0.78rem;color:var(--text-muted);display:block;margin-bottom:6px">Instagram</label><input class="search-input" style="width:100%" value="@barbearia.exemplo"></div>
-          <div style="grid-column:1/-1"><button style="background:var(--gradient);color:#fff;border:none;padding:12px 24px;border-radius:10px;font-weight:700;cursor:pointer;font-size:0.9rem">Salvar Alterações</button></div>
+      <div class="card" style="margin-bottom:12px">
+        <div class="card-title" style="margin-bottom:16px">Dados do negócio</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div><label style="font-size:0.72rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px">Nome do negócio</label><input class="search-input" style="width:100%" value="Barbearia Exemplo"></div>
+          <div><label style="font-size:0.72rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px">WhatsApp</label><input class="search-input" style="width:100%" value="(11) 99999-9999"></div>
+          <div><label style="font-size:0.72rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px">Endereço</label><input class="search-input" style="width:100%" value="Rua das Flores, 123 — Centro"></div>
+          <div><label style="font-size:0.72rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px">Instagram</label><input class="search-input" style="width:100%" value="@barbearia.exemplo"></div>
+          <div style="grid-column:1/-1"><button style="background:var(--primary);color:#fff;border:none;padding:9px 20px;border-radius:8px;font-weight:600;cursor:pointer;font-size:0.85rem;font-family:Inter,sans-serif">Salvar alterações</button></div>
         </div>
       </div>
-      <div class="chart-card">
-        <div class="chart-title" style="margin-bottom:16px">🔗 Integrações</div>
-        <div class="bot-flows" id="integrations"></div>
+      <div class="card">
+        <div class="card-title" style="margin-bottom:14px">Integrações</div>
+        <div class="flow-list" id="fl-integ"></div>
       </div>
     </div>
 
@@ -525,206 +595,214 @@ tr:hover td { background:rgba(124,58,237,0.03); }
 </div><!-- /main -->
 
 <script>
-// ===== DATA =====
-const appointments = [
-  {time:'09:00',client:'Carlos Silva',service:'Corte + Barba',price:70,status:'confirmed',origin:'WhatsApp',phone:'11999111111'},
-  {time:'09:30',client:'Pedro Alves',service:'Corte Masculino',price:45,status:'confirmed',origin:'Instagram',phone:'11999222222'},
-  {time:'10:30',client:'Lucas Ferreira',service:'Barba',price:35,status:'pending',origin:'App',phone:'11999333333'},
-  {time:'11:00',client:'Rafael Costa',service:'Hidratação',price:55,status:'confirmed',origin:'WhatsApp',phone:'11999444444'},
-  {time:'13:00',client:'Diego Santos',service:'Corte + Barba',price:70,status:'confirmed',origin:'WhatsApp',phone:'11999555555'},
-  {time:'13:30',client:'Mateus Lima',service:'Corte Masculino',price:45,status:'cancelled',origin:'App',phone:'11999666666'},
-  {time:'14:00',client:'Bruno Rocha',service:'Pigmentação',price:80,status:'confirmed',origin:'Google',phone:'11999777777'},
-  {time:'14:30',client:'André Oliveira',service:'Corte + Barba',price:70,status:'confirmed',origin:'WhatsApp',phone:'11999888888'},
-  {time:'15:00',client:'Vitor Mendes',service:'Barba',price:35,status:'pending',origin:'Instagram',phone:'11999999999'},
-  {time:'16:00',client:'Felipe Torres',service:'Corte Masculino',price:45,status:'confirmed',origin:'WhatsApp',phone:'11988111111'},
-  {time:'16:30',client:'Gustavo Pinto',service:'Corte + Barba',price:70,status:'confirmed',origin:'App',phone:'11988222222'},
-  {time:'17:00',client:'Henrique Dias',service:'Hidratação',price:55,status:'done',origin:'WhatsApp',phone:'11988333333'},
+// ── DATA ──
+const appts = [
+  {time:'09:00',client:'Carlos Silva',  phone:'11999111111',svc:'Corte + Barba',  price:70,status:'confirmed',origin:'WhatsApp'},
+  {time:'09:30',client:'Pedro Alves',   phone:'11999222222',svc:'Corte Masculino',price:45,status:'confirmed',origin:'Instagram'},
+  {time:'10:30',client:'Lucas Ferreira',phone:'11999333333',svc:'Barba',          price:35,status:'pending',  origin:'App'},
+  {time:'11:00',client:'Rafael Costa',  phone:'11999444444',svc:'Hidratação',     price:55,status:'confirmed',origin:'WhatsApp'},
+  {time:'13:00',client:'Diego Santos',  phone:'11999555555',svc:'Corte + Barba',  price:70,status:'confirmed',origin:'WhatsApp'},
+  {time:'13:30',client:'Mateus Lima',   phone:'11999666666',svc:'Corte Masculino',price:45,status:'cancelled',origin:'App'},
+  {time:'14:00',client:'Bruno Rocha',   phone:'11999777777',svc:'Pigmentação',    price:80,status:'confirmed',origin:'Google'},
+  {time:'14:30',client:'André Oliveira',phone:'11999888888',svc:'Corte + Barba',  price:70,status:'confirmed',origin:'WhatsApp'},
+  {time:'15:00',client:'Vitor Mendes',  phone:'11999999999',svc:'Barba',          price:35,status:'pending',  origin:'Instagram'},
+  {time:'16:00',client:'Felipe Torres', phone:'11988111111',svc:'Corte Masculino',price:45,status:'confirmed',origin:'WhatsApp'},
+  {time:'16:30',client:'Gustavo Pinto', phone:'11988222222',svc:'Corte + Barba',  price:70,status:'confirmed',origin:'App'},
+  {time:'17:00',client:'Henrique Dias', phone:'11988333333',svc:'Hidratação',     price:55,status:'done',     origin:'WhatsApp'},
 ];
 
 const clients = [
-  {name:'Carlos Silva',phone:'11999111111',visits:8,spent:560,last:'10/06/2026'},
-  {name:'Pedro Alves',phone:'11999222222',visits:5,spent:225,last:'08/06/2026'},
-  {name:'Lucas Ferreira',phone:'11999333333',visits:12,spent:840,last:'15/06/2026'},
-  {name:'Diego Santos',phone:'11999555555',visits:3,spent:210,last:'17/06/2026'},
-  {name:'Bruno Rocha',phone:'11999777777',visits:6,spent:480,last:'12/06/2026'},
-  {name:'André Oliveira',phone:'11999888888',visits:15,spent:1050,last:'17/06/2026'},
-  {name:'Felipe Torres',phone:'11988111111',visits:4,spent:180,last:'05/06/2026'},
-  {name:'Gustavo Pinto',phone:'11988222222',visits:9,spent:630,last:'17/06/2026'},
+  {name:'Carlos Silva',  phone:'11999111111',visits:8, spent:560, last:'10/06'},
+  {name:'Pedro Alves',   phone:'11999222222',visits:5, spent:225, last:'08/06'},
+  {name:'Lucas Ferreira',phone:'11999333333',visits:12,spent:840, last:'15/06'},
+  {name:'Diego Santos',  phone:'11999555555',visits:3, spent:210, last:'17/06'},
+  {name:'Bruno Rocha',   phone:'11999777777',visits:6, spent:480, last:'12/06'},
+  {name:'André Oliveira',phone:'11999888888',visits:15,spent:1050,last:'17/06'},
+  {name:'Felipe Torres', phone:'11988111111',visits:4, spent:180, last:'05/06'},
+  {name:'Gustavo Pinto', phone:'11988222222',visits:9, spent:630, last:'17/06'},
 ];
 
 const botFlows = [
-  {icon:'👋', name:'Mensagem de boas-vindas', desc:'Responde automaticamente quando alguém manda o 1º contato', on:true},
-  {icon:'📅', name:'Agendamento pelo WhatsApp', desc:'Cliente pode marcar horário direto pelo bot', on:true},
-  {icon:'⏰', name:'Lembrete 1h antes', desc:'Envia mensagem automática 1h antes do horário marcado', on:true},
-  {icon:'⭐', name:'Pedido de avaliação', desc:'Após o serviço, pede avaliação no Google automaticamente', on:true},
-  {icon:'🎁', name:'Mensagem de aniversário', desc:'Envia cupom especial no aniversário do cliente', on:false},
-  {icon:'💰', name:'Promoções automáticas', desc:'Envia promoção para clientes que não aparecem há 30 dias', on:false},
+  {icon:'👋',name:'Boas-vindas automáticas',   desc:'Responde o primeiro contato de novos clientes automaticamente',on:true},
+  {icon:'📅',name:'Agendamento pelo WhatsApp', desc:'Cliente pode marcar horário direto pelo bot',                   on:true},
+  {icon:'⏰',name:'Lembrete 1h antes',         desc:'Envia mensagem automática 1 hora antes do horário marcado',    on:true},
+  {icon:'⭐',name:'Pedido de avaliação',       desc:'Após o serviço, pede avaliação no Google automaticamente',     on:true},
+  {icon:'🎁',name:'Mensagem de aniversário',   desc:'Envia cupom especial no aniversário do cliente',               on:false},
+  {icon:'💰',name:'Reativação de clientes',    desc:'Envia promoção para quem não aparece há 30 dias',              on:false},
 ];
 
 const igFlows = [
-  {icon:'💬', name:'Resposta automática no DM', desc:'Responde DMs com mensagem personalizada + link de agendamento', on:true},
-  {icon:'💡', name:'Palavra-chave "preço"', desc:'Quando comentar "preço", envia tabela de preços no DM', on:true},
-  {icon:'📅', name:'Palavra-chave "agendar"', desc:'Quando comentar "agendar", envia link de agendamento no DM', on:true},
-  {icon:'❤️', name:'Resposta em comentários', desc:'Responde comentários automaticamente com emoji e CTA', on:false},
+  {icon:'💬',name:'Resposta automática no DM', desc:'Responde DMs com mensagem personalizada + link de agendamento',on:true},
+  {icon:'💡',name:'Palavra-chave "preço"',     desc:'Envia tabela de preços no DM quando comentar "preço"',        on:true},
+  {icon:'📅',name:'Palavra-chave "agendar"',  desc:'Envia link de agendamento no DM quando comentar "agendar"',   on:true},
+  {icon:'❤️',name:'Resposta em comentários',  desc:'Responde comentários com CTA automático',                      on:false},
 ];
 
 const integrations = [
-  {icon:'🟢', name:'WhatsApp Business API', desc:'Conectado — pacoquinhagamer02@gmail.com', on:true},
-  {icon:'📸', name:'Instagram Business', desc:'Conectado — @barbearia.exemplo', on:true},
-  {icon:'📅', name:'Google Calendar', desc:'Sincronização de agenda em tempo real', on:true},
-  {icon:'⭐', name:'Google Meu Negócio', desc:'Desconectado — clique para conectar', on:false},
-  {icon:'💳', name:'Mercado Pago (PIX)', desc:'Desconectado — aceitar pagamentos online', on:false},
+  {icon:'🟢',name:'WhatsApp Business API',  desc:'Conectado — pacoquinhagamer02@gmail.com',on:true},
+  {icon:'📸',name:'Instagram Business',     desc:'Conectado — @barbearia.exemplo',         on:true},
+  {icon:'📅',name:'Google Calendar',        desc:'Sincronização de agenda em tempo real',  on:true},
+  {icon:'⭐',name:'Google Meu Negócio',     desc:'Desconectado — clique para conectar',    on:false},
+  {icon:'💳',name:'Mercado Pago (PIX)',     desc:'Desconectado — aceitar pagamentos online',on:false},
 ];
 
-// ===== RENDER =====
-function showPage(id) {
+// ── BADGE ──
+function badge(s) {
+  const map = {
+    confirmed: ['badge-green','Confirmado'],
+    pending:   ['badge-yellow','Pendente'],
+    cancelled: ['badge-red','Cancelado'],
+    done:      ['badge-muted','Realizado'],
+  };
+  const [cls, lbl] = map[s] || ['badge-muted', s];
+  return `<span class="badge ${cls}"><span class="badge-dot"></span>${lbl}</span>`;
+}
+
+// ── NAV ──
+function showPage(id, el, title) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('page-' + id).classList.add('active');
-
-  const navMap = {overview:'Visão Geral',agenda:'Agenda Hoje',agendamentos:'Agendamentos',clientes:'Clientes (CRM)',whatsapp:'WhatsApp Bot',instagram:'Instagram Auto',metricas:'Métricas',servicos:'Meus Serviços',config:'Configurações'};
-  document.getElementById('page-title').textContent = navMap[id] || id;
-
-  // Mark active nav
-  document.querySelectorAll('.nav-item').forEach(n => {
-    if (n.getAttribute('onclick') && n.getAttribute('onclick').includes(id)) n.classList.add('active');
-  });
-}
-
-function renderTable(tbodyId, rows) {
-  const tbody = document.getElementById(tbodyId);
-  if (!tbody) return;
-  tbody.innerHTML = rows.map(a => `
-    <tr>
-      <td>${a.time}</td>
-      <td>
-        <div style="font-weight:600">${a.client}</div>
-        <div style="font-size:0.72rem;color:var(--text-muted)">📱 ${a.phone}</div>
-      </td>
-      <td>${a.service}</td>
-      <td style="font-weight:700;color:var(--primary-light)">R$${a.price}</td>
-      <td><span class="badge ${a.status}">${{confirmed:'✅ Confirmado',pending:'⏳ Pendente',cancelled:'❌ Cancelado',done:'✓ Realizado'}[a.status]}</span></td>
-      <td><a href="https://wa.me/55${a.phone}?text=Ol%C3%A1+${encodeURIComponent(a.client)}%2C+lembrete+do+seu+hor%C3%A1rio+%C3%A0s+${a.time}" target="_blank" style="color:var(--accent);font-size:0.78rem;text-decoration:none">💬 Enviar msg</a></td>
-    </tr>
-  `).join('');
-}
-
-function renderAllAppointments() {
-  const tbody = document.getElementById('all-appointments');
-  if (!tbody) return;
-  const today = new Date();
-  const fmt = d => `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}`;
-  tbody.innerHTML = appointments.map((a,i) => {
-    const d = new Date(today); d.setDate(d.getDate() - Math.floor(i/4));
-    return `<tr>
-      <td>${fmt(d)} ${a.time}</td>
-      <td style="font-weight:600">${a.client}</td>
-      <td>${a.service}</td>
-      <td style="font-weight:700;color:var(--primary-light)">R$${a.price}</td>
-      <td><span style="font-size:0.78rem;color:var(--text-muted)">${a.origin}</span></td>
-      <td><span class="badge ${a.status}">${{confirmed:'✅ Confirmado',pending:'⏳ Pendente',cancelled:'❌ Cancelado',done:'✓ Realizado'}[a.status]}</span></td>
-    </tr>`;
-  }).join('');
-}
-
-function renderAgenda() {
-  const manha = appointments.filter(a => parseInt(a.time) < 13);
-  const tarde = appointments.filter(a => parseInt(a.time) >= 13);
-
-  function renderBlock(arr) {
-    return arr.map(a => `
-      <div class="time-block">
-        <div class="tb-time">${a.time}</div>
-        ${a.status === 'cancelled' ?
-          `<div class="tb-empty">Horário disponível</div>` :
-          `<div class="tb-event" style="${a.status==='done'?'opacity:0.5':''}">
-            <div class="tb-status">
-              <span class="tb-name">${a.client}</span>
-              <span class="badge ${a.status}" style="font-size:0.65rem">${{confirmed:'✅',pending:'⏳',done:'✓'}[a.status]}</span>
-            </div>
-            <div class="tb-service">${a.service} • R$${a.price}</div>
-          </div>`}
-      </div>
-    `).join('');
+  if (el) el.classList.add('active');
+  else {
+    document.querySelectorAll('.nav-item').forEach(n => {
+      if (n.getAttribute('onclick') && n.getAttribute('onclick').includes("'"+id+"'")) n.classList.add('active');
+    });
   }
-
-  document.getElementById('agenda-manha').innerHTML = renderBlock(manha);
-  document.getElementById('agenda-tarde').innerHTML = renderBlock(tarde);
-
-  const today = new Date();
-  document.getElementById('today-date').textContent = today.toLocaleDateString('pt-BR', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
+  document.getElementById('page-title').textContent = title;
+  closeSidebar();
 }
 
-function renderClients() {
-  document.getElementById('client-grid').innerHTML = clients.map(c => `
-    <div class="client-card">
-      <div class="client-head">
-        <div class="client-avatar">${c.name.split(' ').map(n=>n[0]).join('').slice(0,2)}</div>
-        <div>
-          <div class="client-name">${c.name}</div>
-          <div class="client-meta">📱 ${c.phone}</div>
-        </div>
-      </div>
-      <div class="client-stats">
-        <div class="cs-item"><div class="cs-val">${c.visits}x</div><div class="cs-lbl">Visitas</div></div>
-        <div class="cs-item"><div class="cs-val">R$${c.spent}</div><div class="cs-lbl">Gasto total</div></div>
-        <div class="cs-item"><div class="cs-val">${c.last.slice(0,5)}</div><div class="cs-lbl">Última vez</div></div>
-      </div>
-    </div>
-  `).join('');
+function openSidebar() {
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('overlay').classList.add('open');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
 }
 
-function renderBotFlows(containerId, flows) {
-  const el = document.getElementById(containerId);
+// ── BAR CHART ──
+function barChart(id, data, color) {
+  const el = document.getElementById(id);
   if (!el) return;
-  el.innerHTML = flows.map((f,i) => `
-    <div class="flow-card">
+  const max = Math.max(...data.map(d => d.v));
+  el.innerHTML = data.map(d => `
+    <div class="bar-col">
+      <div class="bar-fill" style="height:${(d.v/max)*96}%;background:${color||'rgba(99,102,241,0.5)'}" data-tip="${d.l}: ${d.d||d.v}"></div>
+      <div class="bar-lbl">${d.l}</div>
+    </div>`).join('');
+}
+
+// ── FLOWS ──
+function renderFlows(id, flows) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.innerHTML = flows.map(f => `
+    <div class="flow-row">
       <div class="flow-icon">${f.icon}</div>
       <div class="flow-info">
         <div class="flow-name">${f.name}</div>
         <div class="flow-desc">${f.desc}</div>
       </div>
       <div class="toggle ${f.on?'on':''}" onclick="this.classList.toggle('on')"></div>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
-function renderBarChart(id, data, color) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  const max = Math.max(...data.map(d=>d.val));
-  el.innerHTML = data.map(d => `
-    <div class="bar-group">
-      <div class="bar" style="height:${(d.val/max)*100}%; background:${color||'rgba(124,58,237,0.4)'}">
-        <div class="bar-tooltip">${d.label}: ${d.display||d.val}</div>
+// ── TABLES ──
+function renderUpcoming() {
+  document.getElementById('tb-upcoming').innerHTML = appts.slice(0,6).map(a => `
+    <tr>
+      <td style="font-weight:600">${a.time}</td>
+      <td><div class="td-name">${a.client}</div><div class="td-sub">📱 ${a.phone}</div></td>
+      <td>${a.svc}</td>
+      <td style="font-weight:600">R$${a.price}</td>
+      <td>${badge(a.status)}</td>
+      <td><a href="https://wa.me/55${a.phone}" target="_blank" style="font-size:0.72rem;color:var(--green);text-decoration:none">Enviar msg</a></td>
+    </tr>`).join('');
+}
+
+function renderAll() {
+  const today = new Date();
+  const f = d => `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}`;
+  document.getElementById('tb-all').innerHTML = appts.map((a,i) => {
+    const d = new Date(today); d.setDate(d.getDate() - Math.floor(i/3));
+    return `<tr>
+      <td>${f(d)} ${a.time}</td>
+      <td style="font-weight:600">${a.client}</td>
+      <td>${a.svc}</td>
+      <td style="font-weight:600">R$${a.price}</td>
+      <td style="color:var(--muted);font-size:0.75rem">${a.origin}</td>
+      <td>${badge(a.status)}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderAgenda() {
+  const m = appts.filter(a => parseInt(a.time) < 13);
+  const t = appts.filter(a => parseInt(a.time) >= 13);
+  const block = arr => arr.map(a => `
+    <div class="agenda-block">
+      <div class="ab-time">${a.time}</div>
+      ${a.status === 'cancelled'
+        ? '<div class="ab-empty">Disponível</div>'
+        : `<div class="ab-event ${a.status==='done'?'done':''}">
+            <div class="ab-row">
+              <div class="ab-name">${a.client}</div>
+              ${badge(a.status)}
+            </div>
+            <div class="ab-svc">${a.svc} · R$${a.price}</div>
+          </div>`}
+    </div>`).join('');
+  document.getElementById('agenda-manha').innerHTML = block(m);
+  document.getElementById('agenda-tarde').innerHTML = block(t);
+
+  const d = new Date();
+  document.getElementById('today-lbl').textContent = d.toLocaleDateString('pt-BR', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
+}
+
+function renderCRM() {
+  document.getElementById('crm-grid').innerHTML = clients.map(c => {
+    const initials = c.name.split(' ').slice(0,2).map(n=>n[0]).join('');
+    return `<div class="client-card">
+      <div class="cc-head">
+        <div class="cc-av">${initials}</div>
+        <div>
+          <div class="cc-name">${c.name}</div>
+          <div class="cc-meta">📱 ${c.phone}</div>
+        </div>
       </div>
-      <div class="bar-label">${d.label}</div>
-    </div>
-  `).join('');
+      <div class="cc-stats">
+        <div class="cc-stat"><div class="cc-val">${c.visits}x</div><div class="cc-lbl">Visitas</div></div>
+        <div class="cc-stat"><div class="cc-val">R$${c.spent}</div><div class="cc-lbl">Total</div></div>
+        <div class="cc-stat"><div class="cc-val">${c.last}</div><div class="cc-lbl">Última</div></div>
+      </div>
+    </div>`;
+  }).join('');
 }
 
-// ===== INIT =====
+// ── INIT ──
 function init() {
-  const now = new Date();
-  document.getElementById('topbar-date').textContent = now.toLocaleDateString('pt-BR', {weekday:'short', day:'2-digit', month:'short'});
+  const d = new Date();
+  document.getElementById('top-date').textContent = d.toLocaleDateString('pt-BR', {weekday:'short', day:'2-digit', month:'short'});
 
-  renderTable('next-appointments', appointments.slice(0,6));
-  renderAllAppointments();
+  renderUpcoming();
+  renderAll();
   renderAgenda();
-  renderClients();
-  renderBotFlows('bot-flows', botFlows);
-  renderBotFlows('ig-flows', igFlows);
-  renderBotFlows('integrations', integrations);
+  renderCRM();
+  renderFlows('fl-wa', botFlows);
+  renderFlows('fl-ig', igFlows);
+  renderFlows('fl-integ', integrations);
 
-  // Weekly chart
-  const days = ['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'];
-  renderBarChart('bar-chart', days.map((l,i) => ({label:l, val:[9,12,8,15,11,14,7][i], display:[9,12,8,15,11,14,7][i]+' agend.'})), 'rgba(124,58,237,0.6)');
+  const days6 = [{l:'Jan',v:2400,d:'R$2.400'},{l:'Fev',v:2800,d:'R$2.800'},{l:'Mar',v:3100,d:'R$3.100'},{l:'Abr',v:2950,d:'R$2.950'},{l:'Mai',v:3450,d:'R$3.450'},{l:'Jun',v:3840,d:'R$3.840'}];
+  const week7  = [{l:'Seg',v:9},{l:'Ter',v:12},{l:'Qua',v:8},{l:'Qui',v:15},{l:'Sex',v:11},{l:'Sáb',v:14},{l:'Dom',v:7}];
+  const cli6   = [{l:'Jan',v:28},{l:'Fev',v:35},{l:'Mar',v:39},{l:'Abr',v:37},{l:'Mai',v:43},{l:'Jun',v:47}];
+  const ret6   = [{l:'Jan',v:55,d:'55%'},{l:'Fev',v:59,d:'59%'},{l:'Mar',v:62,d:'62%'},{l:'Abr',v:60,d:'60%'},{l:'Mai',v:65,d:'65%'},{l:'Jun',v:68,d:'68%'}];
 
-  // Revenue chart
-  const months6 = ['Jan','Fev','Mar','Abr','Mai','Jun'];
-  renderBarChart('revenue-chart', months6.map((l,i) => ({label:l, val:[2400,2800,3100,2950,3450,3840][i], display:'R$'+[2400,2800,3100,2950,3450,3840][i]})), 'rgba(6,182,212,0.5)');
-  renderBarChart('clients-chart', months6.map((l,i) => ({label:l, val:[28,35,39,37,43,47][i], display:[28,35,39,37,43,47][i]+' clientes'})), 'rgba(16,185,129,0.5)');
-  renderBarChart('return-chart', months6.map((l,i) => ({label:l, val:[55,59,62,60,65,68][i], display:[55,59,62,60,65,68][i]+'%'})), 'rgba(245,158,11,0.5)');
+  barChart('bc-weekly', week7, 'rgba(99,102,241,0.55)');
+  barChart('bc-rev',    days6, 'rgba(6,182,212,0.5)');
+  barChart('bc-cli',    cli6,  'rgba(34,197,94,0.5)');
+  barChart('bc-ret',    ret6,  'rgba(245,158,11,0.5)');
 }
 
 init();
