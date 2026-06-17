@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SyncTech Automation — Automatize seu negócio local</title>
-<meta name="description" content="Hub de automação para empresas locais. WhatsApp Bot, agendamento online, Instagram automático, CRM e mais.">
+<meta name="description" content="Hub de automação para empresas locais. WhatsApp Bot, agendamento online, Instagram automático, CRM e mais. Do diagnóstico ao ar em 7 dias.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
@@ -26,23 +26,23 @@ html { scroll-behavior: smooth; font-size: 16px; }
   --green:     #22C55E;
   --yellow:    #F59E0B;
   --red:       #EF4444;
+  --cyan:      #06B6D4;
   --radius:    12px;
   --radius-sm: 8px;
 }
 
 body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; overflow-x: hidden; }
 
-/* ── UTILITIES ── */
 .container { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
 .sr-only { position: absolute; width: 1px; height: 1px; clip: rect(0,0,0,0); overflow: hidden; }
 
 /* ── NAV ── */
 nav {
-  position: fixed; top: 0; inset-x: 0; z-index: 50;
-  background: rgba(13,17,23,0.80); backdrop-filter: blur(16px) saturate(1.5);
+  position: fixed; top: 0; inset-x: 0; z-index: 100;
+  background: rgba(13,17,23,0.90); backdrop-filter: blur(20px) saturate(1.5);
   border-bottom: 1px solid var(--border);
 }
-.nav-inner { display: flex; align-items: center; height: 60px; gap: 40px; }
+.nav-inner { display: flex; align-items: center; height: 60px; gap: 32px; }
 .logo {
   font-size: 1rem; font-weight: 700; color: var(--text); text-decoration: none;
   display: flex; align-items: center; gap: 8px; flex-shrink: 0;
@@ -52,15 +52,13 @@ nav {
   background: var(--primary); display: grid; place-items: center;
 }
 .logo-mark svg { width: 14px; height: 14px; fill: #fff; }
-
-.nav-links { display: flex; gap: 4px; flex: 1; }
+.nav-links { display: flex; gap: 2px; flex: 1; }
 .nav-links a {
   padding: 6px 12px; border-radius: var(--radius-sm);
   font-size: 0.875rem; color: var(--muted); text-decoration: none; font-weight: 500;
   transition: color 0.15s, background 0.15s;
 }
 .nav-links a:hover { color: var(--text); background: rgba(255,255,255,0.05); }
-
 .nav-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; }
 .btn-ghost {
   padding: 7px 16px; border-radius: var(--radius-sm); font-size: 0.875rem;
@@ -76,14 +74,49 @@ nav {
 }
 .btn-primary:hover { background: var(--primary-d); }
 .btn-primary:active { transform: scale(0.98); }
+.hamburger {
+  display: none; width: 36px; height: 36px; border-radius: var(--radius-sm);
+  background: none; border: 1px solid var(--border-strong); color: var(--muted);
+  cursor: pointer; place-items: center; transition: all 0.15s;
+}
+.hamburger:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+
+/* Mobile menu */
+.mobile-menu {
+  display: none; position: fixed; top: 60px; inset-x: 0; z-index: 99;
+  background: rgba(13,17,23,0.98); backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border); padding: 16px 24px 24px;
+  flex-direction: column; gap: 4px;
+}
+.mobile-menu.open { display: flex; }
+.mobile-menu a {
+  padding: 12px 16px; border-radius: var(--radius-sm); font-size: 0.95rem;
+  color: var(--muted); text-decoration: none; font-weight: 500; transition: all 0.15s;
+  border: 1px solid transparent;
+}
+.mobile-menu a:hover { color: var(--text); background: rgba(255,255,255,0.05); border-color: var(--border); }
+.mobile-menu .mob-cta {
+  margin-top: 8px; background: var(--primary); color: #fff; text-align: center;
+  font-weight: 700; border: none;
+}
 
 /* ── HERO ── */
 .hero { padding: 140px 0 80px; text-align: center; position: relative; }
 .hero::before {
   content: ''; position: absolute; inset: 0;
-  background: radial-gradient(ellipse 70% 55% at 50% 0%, rgba(99,102,241,0.12) 0%, transparent 65%);
+  background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(99,102,241,0.15) 0%, transparent 65%);
   pointer-events: none;
 }
+
+.urgency-banner {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 5px 14px 5px 10px; border-radius: 20px;
+  border: 1px solid rgba(245,158,11,0.3); background: rgba(245,158,11,0.08);
+  font-size: 0.78rem; font-weight: 600; color: #FCD34D;
+  margin-bottom: 16px; letter-spacing: 0.01em;
+}
+.urgency-banner span.dot { width: 6px; height: 6px; border-radius: 50%; background: var(--yellow); flex-shrink: 0; animation: pulse 2s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
 
 .hero-eyebrow {
   display: inline-flex; align-items: center; gap: 8px;
@@ -92,21 +125,21 @@ nav {
   font-size: 0.78rem; font-weight: 600; color: var(--primary-l);
   margin-bottom: 28px; letter-spacing: 0.01em;
 }
-.hero-eyebrow span { width: 6px; height: 6px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+.hero-eyebrow span.live { width: 6px; height: 6px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
 
 .hero h1 {
-  font-size: clamp(2.4rem, 5.5vw, 3.75rem);
-  font-weight: 800; line-height: 1.08; letter-spacing: -0.03em;
+  font-size: clamp(2.4rem, 5.5vw, 3.9rem);
+  font-weight: 800; line-height: 1.07; letter-spacing: -0.03em;
   margin-bottom: 20px; color: #fff;
 }
 .hero h1 em { font-style: normal; color: var(--primary-l); }
 
 .hero-sub {
-  max-width: 520px; margin: 0 auto 36px;
+  max-width: 540px; margin: 0 auto 36px;
   font-size: 1.05rem; color: var(--muted); line-height: 1.75;
 }
 
-.hero-cta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.hero-cta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 16px; }
 .btn-lg { padding: 13px 28px; font-size: 1rem; border-radius: var(--radius); }
 .btn-outline {
   padding: 12px 28px; border-radius: var(--radius); font-size: 1rem;
@@ -115,15 +148,23 @@ nav {
   transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px;
 }
 .btn-outline:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.2); }
+.hero-note { font-size: 0.75rem; color: var(--faint); }
+
+/* SOCIAL PROOF AVATARS */
+.social-proof { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 48px; }
+.sp-avatars { display: flex; }
+.sp-av { width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--bg); display: grid; place-items: center; font-size: 0.65rem; font-weight: 700; color: #fff; margin-left: -8px; }
+.sp-av:first-child { margin-left: 0; }
+.sp-text { font-size: 0.78rem; color: var(--muted); }
+.sp-text strong { color: var(--text); }
+.sp-stars { color: var(--yellow); font-size: 0.7rem; letter-spacing: 1px; }
 
 /* HERO MOCKUP */
-.hero-mockup {
-  margin: 60px auto 0; max-width: 680px; position: relative;
-}
+.hero-mockup { margin: 0 auto; max-width: 700px; position: relative; }
 .mockup-window {
   background: var(--surface); border: 1px solid var(--border-strong);
   border-radius: 16px; overflow: hidden;
-  box-shadow: 0 32px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04);
+  box-shadow: 0 40px 100px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);
 }
 .mockup-bar {
   background: var(--surface2); border-bottom: 1px solid var(--border);
@@ -132,43 +173,45 @@ nav {
 .mock-dots { display: flex; gap: 6px; }
 .mock-dot { width: 10px; height: 10px; border-radius: 50%; }
 .mockup-body { padding: 20px; }
-
 .chat-wrap { display: flex; flex-direction: column; gap: 12px; }
 .chat-row { display: flex; gap: 10px; align-items: flex-end; }
 .chat-row.right { flex-direction: row-reverse; }
-.chat-av {
-  width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
-  display: grid; place-items: center; font-size: 0.8rem; font-weight: 700;
-}
+.chat-av { width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0; display: grid; place-items: center; font-size: 0.8rem; font-weight: 700; }
 .chat-av.bot { background: var(--primary); color: #fff; }
 .chat-av.user { background: var(--surface2); color: var(--muted); border: 1px solid var(--border-strong); }
-.chat-bubble {
-  max-width: 75%; padding: 10px 14px; border-radius: 14px;
-  font-size: 0.83rem; line-height: 1.55;
-}
+.chat-bubble { max-width: 75%; padding: 10px 14px; border-radius: 14px; font-size: 0.83rem; line-height: 1.55; }
 .chat-bubble.bot { background: rgba(99,102,241,0.12); border: 1px solid rgba(99,102,241,0.2); border-bottom-left-radius: 4px; }
 .chat-bubble.user { background: var(--surface2); border: 1px solid var(--border); border-bottom-right-radius: 4px; }
 .chat-time { font-size: 0.65rem; color: var(--faint); padding: 0 2px; }
-
 .chat-typing { display: flex; gap: 4px; padding: 10px 14px; background: rgba(99,102,241,0.12); border: 1px solid rgba(99,102,241,0.2); border-radius: 14px; border-bottom-left-radius: 4px; width: fit-content; }
 .typing-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--primary-l); animation: typing 1.2s ease-in-out infinite; }
 .typing-dot:nth-child(2) { animation-delay: 0.2s; }
 .typing-dot:nth-child(3) { animation-delay: 0.4s; }
 @keyframes typing { 0%,60%,100% { opacity: 0.3; transform: translateY(0); } 30% { opacity: 1; transform: translateY(-3px); } }
 
-/* HERO STATS */
+/* STATS BAR */
 .hero-stats {
-  display: flex; justify-content: center; gap: 0; margin-top: 56px;
+  display: flex; justify-content: center; gap: 0; margin-top: 48px;
   border: 1px solid var(--border); border-radius: var(--radius);
-  background: var(--surface); overflow: hidden; max-width: 560px; margin-left: auto; margin-right: auto;
+  background: var(--surface); overflow: hidden; max-width: 640px; margin-left: auto; margin-right: auto;
 }
-.stat-item {
-  flex: 1; padding: 20px 16px; text-align: center;
-  border-right: 1px solid var(--border);
-}
+.stat-item { flex: 1; padding: 20px 16px; text-align: center; border-right: 1px solid var(--border); }
 .stat-item:last-child { border-right: none; }
 .stat-val { font-size: 1.6rem; font-weight: 800; color: #fff; letter-spacing: -0.02em; }
 .stat-lbl { font-size: 0.72rem; color: var(--muted); margin-top: 2px; font-weight: 500; }
+
+/* ── LOGOS / TRUSTED BY ── */
+.logos-section { padding: 40px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); background: var(--surface); }
+.logos-label { text-align: center; font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; color: var(--faint); margin-bottom: 24px; }
+.logos-row { display: flex; justify-content: center; align-items: center; gap: 40px; flex-wrap: wrap; }
+.logo-pill {
+  display: flex; align-items: center; gap: 8px; padding: 8px 16px;
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--surface2); opacity: 0.7; transition: opacity 0.2s;
+}
+.logo-pill:hover { opacity: 1; }
+.logo-pill-icon { font-size: 1.1rem; }
+.logo-pill-name { font-size: 0.82rem; font-weight: 600; color: var(--muted); }
 
 /* ── SECTIONS ── */
 section { padding: 96px 0; }
@@ -182,20 +225,40 @@ section { padding: 96px 0; }
 }
 .section-sub { font-size: 1rem; color: var(--muted); max-width: 480px; line-height: 1.7; }
 
+/* ── ROI CALCULATOR ── */
+.roi-section { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.roi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; margin-top: 48px; }
+.roi-inputs { display: flex; flex-direction: column; gap: 20px; }
+.roi-input-group label { font-size: 0.78rem; font-weight: 600; color: var(--muted); display: block; margin-bottom: 8px; }
+.roi-slider { width: 100%; accent-color: var(--primary); }
+.roi-val { font-size: 0.9rem; font-weight: 700; color: var(--primary-l); }
+.roi-result {
+  background: var(--bg); border: 1px solid var(--border-strong); border-radius: 16px; padding: 32px;
+  text-align: center; position: relative; overflow: hidden;
+}
+.roi-result::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--cyan));
+}
+.roi-result-label { font-size: 0.78rem; color: var(--muted); margin-bottom: 8px; }
+.roi-result-val { font-size: 3rem; font-weight: 900; color: var(--green); letter-spacing: -0.04em; margin-bottom: 4px; }
+.roi-result-sub { font-size: 0.82rem; color: var(--muted); margin-bottom: 24px; }
+.roi-breakdown { display: flex; flex-direction: column; gap: 8px; text-align: left; }
+.roi-row { display: flex; justify-content: space-between; font-size: 0.8rem; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.roi-row:last-child { border-bottom: none; }
+.roi-row span:first-child { color: var(--muted); }
+.roi-row span:last-child { font-weight: 600; color: var(--text); }
+.roi-row.total span { color: var(--green); font-weight: 700; font-size: 0.9rem; }
+
 /* ── SERVICES ── */
 .services-section { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
 .services-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 1px; background: var(--border); border-radius: var(--radius); overflow: hidden;
   margin-top: 52px; border: 1px solid var(--border);
 }
-.service-card {
-  background: var(--surface); padding: 28px 24px;
-  transition: background 0.15s;
-}
+.service-card { background: var(--surface); padding: 28px 24px; transition: background 0.15s; }
 .service-card:hover { background: var(--surface2); }
-
 .svc-icon {
   width: 40px; height: 40px; border-radius: var(--radius-sm);
   background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.2);
@@ -213,57 +276,98 @@ section { padding: 96px 0; }
 .svc-tag.hot { background: rgba(99,102,241,0.12); color: var(--primary-l); border: 1px solid rgba(99,102,241,0.25); }
 
 /* ── HOW ── */
-.how-grid {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 32px; margin-top: 52px;
-}
+.how-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 32px; margin-top: 52px; }
 .how-step { }
 .how-num {
-  width: 36px; height: 36px; border-radius: 50%;
-  border: 1px solid var(--border-strong); color: var(--muted);
-  display: grid; place-items: center; font-size: 0.82rem; font-weight: 700;
-  margin-bottom: 16px;
+  width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border-strong);
+  color: var(--muted); display: grid; place-items: center; font-size: 0.82rem; font-weight: 700; margin-bottom: 16px;
 }
 .how-step h3 { font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 6px; }
 .how-step p { font-size: 0.83rem; color: var(--muted); line-height: 1.65; }
+.how-timeline {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 24px; margin-top: 40px; display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0;
+}
+.ht-item { padding: 16px 20px; border-right: 1px solid var(--border); }
+.ht-item:last-child { border-right: none; }
+.ht-day { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--primary-l); margin-bottom: 6px; }
+.ht-title { font-size: 0.85rem; font-weight: 700; color: #fff; margin-bottom: 4px; }
+.ht-desc { font-size: 0.75rem; color: var(--muted); line-height: 1.5; }
+
+/* ── COMPARISON TABLE ── */
+.comparison-section { }
+.comp-table {
+  margin-top: 48px; border: 1px solid var(--border); border-radius: 16px; overflow: hidden;
+}
+.comp-header {
+  display: grid; grid-template-columns: 2fr 1.1fr 1.1fr 1.1fr; background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+}
+.comp-col { padding: 16px 20px; }
+.comp-col.featured { background: rgba(99,102,241,0.1); border-left: 1px solid rgba(99,102,241,0.3); border-right: 1px solid rgba(99,102,241,0.3); position: relative; }
+.comp-col-label { font-size: 0.82rem; font-weight: 700; color: var(--muted); }
+.comp-col.featured .comp-col-label { color: var(--primary-l); }
+.comp-col-price { font-size: 1.2rem; font-weight: 800; color: #fff; margin-top: 2px; }
+.comp-col-sub { font-size: 0.7rem; color: var(--faint); }
+.comp-row {
+  display: grid; grid-template-columns: 2fr 1.1fr 1.1fr 1.1fr;
+  border-bottom: 1px solid var(--border);
+}
+.comp-row:last-child { border-bottom: none; }
+.comp-row:hover { background: rgba(255,255,255,0.015); }
+.comp-row .comp-col { padding: 13px 20px; font-size: 0.82rem; color: var(--muted); display: flex; align-items: center; }
+.comp-row .comp-col:first-child { color: var(--text); font-weight: 500; }
+.comp-row .comp-col.featured { background: rgba(99,102,241,0.05); border-left: 1px solid rgba(99,102,241,0.2); border-right: 1px solid rgba(99,102,241,0.2); }
+.chk-yes { color: var(--green); font-weight: 700; }
+.chk-no  { color: var(--faint); }
+.chk-partial { color: var(--yellow); }
 
 /* ── SEGMENTS ── */
 .seg-section { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
-.seg-grid {
-  display: flex; flex-wrap: wrap; gap: 10px; margin-top: 40px;
+.seg-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; margin-top: 40px; }
+.seg-card {
+  padding: 16px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border); background: var(--surface2);
+  text-align: center; transition: all 0.15s; cursor: default;
 }
-.seg-pill {
-  padding: 8px 16px; border-radius: 100px;
-  border: 1px solid var(--border-strong); background: var(--surface2);
-  font-size: 0.83rem; font-weight: 500; color: var(--muted);
-  display: flex; align-items: center; gap: 8px; transition: all 0.15s; cursor: default;
-}
-.seg-pill:hover { border-color: var(--primary); color: var(--primary-l); background: rgba(99,102,241,0.07); }
+.seg-card:hover { border-color: var(--primary); background: rgba(99,102,241,0.07); transform: translateY(-2px); }
+.seg-emoji { font-size: 1.4rem; display: block; margin-bottom: 6px; }
+.seg-name { font-size: 0.78rem; font-weight: 600; color: var(--muted); }
+.seg-card:hover .seg-name { color: var(--primary-l); }
 
 /* ── PRICING ── */
+.pricing-toggle { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 32px; margin-bottom: 0; }
+.toggle-option { font-size: 0.875rem; color: var(--muted); font-weight: 500; }
+.toggle-option.active { color: var(--text); font-weight: 700; }
+.toggle-switch {
+  width: 44px; height: 24px; border-radius: 12px; background: var(--primary);
+  cursor: pointer; position: relative; transition: background 0.2s; border: none; flex-shrink: 0;
+}
+.toggle-switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; transition: transform 0.2s; }
+.toggle-switch.annual::after { transform: translateX(20px); }
+.save-badge { background: rgba(34,197,94,0.12); color: var(--green); border: 1px solid rgba(34,197,94,0.25); font-size: 0.7rem; font-weight: 700; padding: 2px 8px; border-radius: 4px; }
+
 .plans-grid {
   display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 16px; margin-top: 52px; max-width: 960px; margin-left: auto; margin-right: auto;
+  gap: 16px; margin-top: 32px; max-width: 980px; margin-left: auto; margin-right: auto;
 }
 .plan-card {
   background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
   padding: 28px; display: flex; flex-direction: column;
 }
-.plan-card.featured {
-  border-color: var(--primary); background: rgba(99,102,241,0.06);
-  position: relative;
-}
+.plan-card.featured { border-color: var(--primary); background: rgba(99,102,241,0.06); position: relative; }
 .plan-badge {
   position: absolute; top: -1px; left: 50%; transform: translateX(-50%);
   background: var(--primary); color: #fff; font-size: 0.7rem; font-weight: 700;
   padding: 3px 14px; border-radius: 0 0 8px 8px; letter-spacing: 0.05em; text-transform: uppercase;
 }
 .plan-name { font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 4px; }
-.plan-desc { font-size: 0.82rem; color: var(--muted); margin-bottom: 24px; line-height: 1.6; }
-.plan-price { margin-bottom: 24px; }
+.plan-desc { font-size: 0.82rem; color: var(--muted); margin-bottom: 20px; line-height: 1.6; }
+.plan-price { margin-bottom: 8px; }
 .plan-price .amount { font-size: 2.4rem; font-weight: 800; color: #fff; letter-spacing: -0.03em; }
 .plan-price .period { font-size: 0.85rem; color: var(--muted); }
-.plan-price .setup { font-size: 0.75rem; color: var(--faint); margin-top: 4px; }
+.plan-price .old-price { font-size: 0.85rem; color: var(--faint); text-decoration: line-through; margin-left: 6px; }
+.plan-setup { font-size: 0.75rem; color: var(--faint); margin-bottom: 20px; }
 .plan-divider { height: 1px; background: var(--border); margin-bottom: 20px; }
 .plan-features { list-style: none; display: flex; flex-direction: column; gap: 10px; flex: 1; margin-bottom: 24px; }
 .plan-features li { font-size: 0.83rem; display: flex; align-items: flex-start; gap: 10px; }
@@ -281,62 +385,65 @@ section { padding: 96px 0; }
 .plan-btn.border:hover { background: rgba(99,102,241,0.08); border-color: var(--primary); }
 
 /* ── TESTIMONIALS ── */
-.testimonials-grid {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 16px; margin-top: 52px;
-}
-.testimonial-card {
-  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
-  padding: 24px;
-}
+.testimonials-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 52px; }
+.testimonial-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; }
 .t-stars { display: flex; gap: 2px; margin-bottom: 14px; }
 .t-star { color: var(--yellow); font-size: 0.85rem; }
 .t-quote { font-size: 0.88rem; color: var(--muted); line-height: 1.75; margin-bottom: 18px; }
 .t-author { display: flex; align-items: center; gap: 12px; }
-.t-av {
-  width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
-  background: var(--primary); display: grid; place-items: center;
-  font-size: 0.78rem; font-weight: 700; color: #fff;
-}
+.t-av { width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0; background: var(--primary); display: grid; place-items: center; font-size: 0.78rem; font-weight: 700; color: #fff; }
 .t-name { font-size: 0.85rem; font-weight: 600; color: #fff; }
 .t-role { font-size: 0.75rem; color: var(--muted); }
+.t-result { margin-top: 14px; padding: 10px 14px; background: rgba(34,197,94,0.07); border: 1px solid rgba(34,197,94,0.15); border-radius: var(--radius-sm); font-size: 0.78rem; color: var(--green); font-weight: 600; }
+
+/* ── FAQ ── */
+.faq-section { }
+.faq-list { max-width: 720px; margin: 48px auto 0; display: flex; flex-direction: column; gap: 8px; }
+.faq-item { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.faq-q {
+  width: 100%; display: flex; justify-content: space-between; align-items: center;
+  padding: 18px 20px; background: none; border: none; cursor: pointer;
+  font-size: 0.9rem; font-weight: 600; color: var(--text); text-align: left;
+  font-family: 'Inter', sans-serif; gap: 12px; transition: background 0.15s;
+}
+.faq-q:hover { background: rgba(255,255,255,0.02); }
+.faq-icon { width: 20px; height: 20px; flex-shrink: 0; border-radius: 50%; border: 1px solid var(--border-strong); display: grid; place-items: center; transition: transform 0.2s; color: var(--muted); }
+.faq-item.open .faq-icon { transform: rotate(45deg); color: var(--primary-l); border-color: var(--primary); }
+.faq-a { display: none; padding: 0 20px 18px; font-size: 0.85rem; color: var(--muted); line-height: 1.75; border-top: 1px solid var(--border); padding-top: 14px; }
+.faq-item.open .faq-a { display: block; }
 
 /* ── CTA SECTION ── */
 .cta-section { text-align: center; }
 .cta-box {
   background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
-  padding: 64px 40px; max-width: 680px; margin: 0 auto; position: relative; overflow: hidden;
+  padding: 64px 40px; max-width: 700px; margin: 0 auto; position: relative; overflow: hidden;
 }
 .cta-box::before {
   content: ''; position: absolute; top: -40px; left: 50%; transform: translateX(-50%);
-  width: 300px; height: 200px; border-radius: 50%;
+  width: 400px; height: 250px; border-radius: 50%;
   background: radial-gradient(circle, rgba(99,102,241,0.18) 0%, transparent 70%);
   pointer-events: none;
 }
 .cta-box h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 800; color: #fff; letter-spacing: -0.025em; margin-bottom: 12px; }
 .cta-box p { color: var(--muted); font-size: 0.95rem; margin-bottom: 32px; }
-.cta-form { display: flex; gap: 8px; max-width: 420px; margin: 0 auto; flex-wrap: wrap; }
+.cta-form { display: flex; gap: 8px; max-width: 460px; margin: 0 auto; flex-wrap: wrap; }
 .cta-input {
-  flex: 1; min-width: 160px; padding: 11px 14px;
+  flex: 1; min-width: 150px; padding: 11px 14px;
   background: var(--bg); border: 1px solid var(--border-strong); border-radius: var(--radius-sm);
   color: var(--text); font-size: 0.875rem; outline: none; font-family: 'Inter', sans-serif;
   transition: border-color 0.15s;
 }
 .cta-input:focus { border-color: var(--primary); }
 .cta-input::placeholder { color: var(--faint); }
-.cta-note { margin-top: 12px; font-size: 0.75rem; color: var(--faint); }
+.cta-trust { display: flex; justify-content: center; gap: 20px; margin-top: 16px; flex-wrap: wrap; }
+.cta-trust span { font-size: 0.72rem; color: var(--faint); display: flex; align-items: center; gap: 5px; }
 
 /* ── FOOTER ── */
-footer {
-  background: var(--surface); border-top: 1px solid var(--border);
-  padding: 56px 0 32px;
-}
-.footer-grid {
-  display: grid; grid-template-columns: 1.8fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 48px;
-}
+footer { background: var(--surface); border-top: 1px solid var(--border); padding: 56px 0 32px; }
+.footer-grid { display: grid; grid-template-columns: 1.8fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 48px; }
 .footer-brand { }
 .footer-brand .logo { margin-bottom: 12px; font-size: 0.95rem; }
-.footer-tagline { font-size: 0.82rem; color: var(--muted); line-height: 1.7; max-width: 220px; }
+.footer-tagline { font-size: 0.82rem; color: var(--muted); line-height: 1.7; max-width: 220px; margin-bottom: 16px; }
 .footer-col h4 { font-size: 0.78rem; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 14px; }
 .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
 .footer-col a { font-size: 0.82rem; color: var(--muted); text-decoration: none; transition: color 0.15s; }
@@ -356,18 +463,38 @@ footer {
 .wa-float svg { width: 26px; height: 26px; fill: #fff; }
 
 /* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  .roi-grid { grid-template-columns: 1fr; }
+  .comp-header, .comp-row { grid-template-columns: 2fr 1fr 1fr; }
+  .comp-col:nth-child(3) { display: none; }
+}
 @media (max-width: 768px) {
   .nav-links { display: none; }
+  .nav-actions .btn-ghost { display: none; }
+  .hamburger { display: grid; }
   .footer-grid { grid-template-columns: 1fr 1fr; }
   .hero { padding: 120px 0 60px; }
   .hero-stats { max-width: 100%; }
+  .how-timeline { grid-template-columns: 1fr 1fr; }
+  .how-timeline .ht-item { border-right: none; border-bottom: 1px solid var(--border); }
+  .how-timeline .ht-item:nth-child(odd) { border-right: 1px solid var(--border); }
+  .how-timeline .ht-item:last-child, .how-timeline .ht-item:nth-last-child(2):nth-child(odd) { border-bottom: none; }
+  .comp-header, .comp-row { grid-template-columns: 1.5fr 1fr 1fr; }
+  .comp-col:nth-child(4) { display: none; }
 }
-@media (max-width: 480px) {
+@media (max-width: 540px) {
   .footer-grid { grid-template-columns: 1fr; }
   .cta-box { padding: 40px 20px; }
+  .hero-stats { flex-wrap: wrap; }
+  .stat-item { flex: 1 1 40%; border-bottom: 1px solid var(--border); }
+  .how-timeline { grid-template-columns: 1fr; }
+  .how-timeline .ht-item { border-right: none; }
+  .comp-header, .comp-row { grid-template-columns: 1fr 1fr; }
+  .comp-col:nth-child(3), .comp-col:nth-child(4) { display: none; }
+  .seg-grid { grid-template-columns: repeat(3, 1fr); }
 }
 
-/* ── REVEAL ANIMATION ── */
+/* ── REVEAL ── */
 .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.5s ease, transform 0.5s ease; }
 .reveal.visible { opacity: 1; transform: none; }
 </style>
@@ -378,33 +505,50 @@ footer {
 <nav>
   <div class="container nav-inner">
     <a href="#" class="logo">
-      <div class="logo-mark">
-        <svg viewBox="0 0 14 14"><path d="M7 1L13 4V10L7 13L1 10V4L7 1Z"/></svg>
-      </div>
+      <div class="logo-mark"><svg viewBox="0 0 14 14"><path d="M7 1L13 4V10L7 13L1 10V4L7 1Z"/></svg></div>
       SyncTech Automation
     </a>
     <ul class="nav-links">
       <li><a href="#servicos">Serviços</a></li>
       <li><a href="#como-funciona">Como funciona</a></li>
+      <li><a href="#comparativo">Por que a SyncTech</a></li>
       <li><a href="#planos">Planos</a></li>
-      <li><a href="#depoimentos">Cases</a></li>
+      <li><a href="#faq">FAQ</a></li>
     </ul>
     <div class="nav-actions">
-      <a href="#contato" class="btn-ghost">Falar com especialista</a>
+      <a href="#contato" class="btn-ghost">Diagnóstico gratuito</a>
       <a href="#contato" class="btn-primary">
         Começar agora
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7H11M8 4L11 7L8 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </a>
+      <button class="hamburger" onclick="toggleMobile()" aria-label="Menu">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4H14M2 8H14M2 12H14"/></svg>
+      </button>
     </div>
   </div>
 </nav>
 
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobile-menu">
+  <a href="#servicos" onclick="closeMobile()">Serviços</a>
+  <a href="#como-funciona" onclick="closeMobile()">Como funciona</a>
+  <a href="#comparativo" onclick="closeMobile()">Por que a SyncTech</a>
+  <a href="#planos" onclick="closeMobile()">Planos</a>
+  <a href="#faq" onclick="closeMobile()">FAQ</a>
+  <a href="#contato" class="mob-cta" onclick="closeMobile()">Diagnóstico gratuito — grátis</a>
+</div>
+
 <!-- HERO -->
 <section class="hero">
   <div class="container">
+    <div class="urgency-banner reveal">
+      <span class="dot"></span>
+      Apenas 5 vagas abertas para julho · Garanta a sua
+    </div>
+
     <div class="hero-eyebrow reveal">
-      <span></span>
-      Automação para empresas locais — feito no Brasil
+      <span class="live"></span>
+      Hub de automação para empresas locais — feito no Brasil
     </div>
 
     <h1 class="reveal">
@@ -414,15 +558,30 @@ footer {
     </h1>
 
     <p class="hero-sub reveal">
-      WhatsApp Bot, agendamento online, Instagram automático e CRM — tudo integrado em um hub que faz seu negócio crescer enquanto você descansa.
+      WhatsApp Bot, agendamento online, Instagram automático e CRM — tudo em um hub que faz seu negócio crescer enquanto você descansa.
     </p>
 
     <div class="hero-cta reveal">
       <a href="#contato" class="btn-primary btn-lg">Diagnóstico gratuito</a>
       <a href="agendamento/" class="btn-outline btn-lg">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M5 2V4M11 2V4M2 7H14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-        Ver demo de agendamento
+        Ver demo ao vivo
       </a>
+    </div>
+    <p class="hero-note reveal">Sem cartão de crédito · Resposta em até 2h · Configuração em 7 dias</p>
+
+    <div class="social-proof reveal">
+      <div class="sp-avatars">
+        <div class="sp-av" style="background:#6366F1">MR</div>
+        <div class="sp-av" style="background:#06B6D4">AP</div>
+        <div class="sp-av" style="background:#22C55E">JS</div>
+        <div class="sp-av" style="background:#F59E0B">CD</div>
+        <div class="sp-av" style="background:#EF4444">LF</div>
+      </div>
+      <div>
+        <div class="sp-stars">★★★★★</div>
+        <div class="sp-text"><strong>+47 empresas</strong> já automatizadas</div>
+      </div>
     </div>
 
     <!-- Chat Mockup -->
@@ -449,7 +608,7 @@ footer {
             <div class="chat-row right">
               <div class="chat-av bot">ST</div>
               <div style="text-align:right">
-                <div class="chat-bubble bot">Olá! Temos os seguintes serviços disponíveis:<br><br><b>✂️ Corte Masculino</b> — R$45 (45 min)<br><b>💈 Corte + Barba</b> — R$70 (75 min)<br><br>Para amanhã, 18/06, temos:<br><b>09:00 · 11:00 · 14:30 · 16:00</b><br><br>Qual serviço e horário prefere?</div>
+                <div class="chat-bubble bot">Olá! Temos os seguintes serviços:<br><br><b>✂️ Corte Masculino</b> — R$45 (45 min)<br><b>💈 Corte + Barba</b> — R$70 (75 min)<br><br>Para amanhã, 18/06, temos:<br><b>09:00 · 11:00 · 14:30 · 16:00</b><br><br>Qual serviço e horário prefere?</div>
                 <div class="chat-time">14:22</div>
               </div>
             </div>
@@ -475,7 +634,7 @@ footer {
     <!-- Stats -->
     <div class="hero-stats reveal">
       <div class="stat-item">
-        <div class="stat-val">+300%</div>
+        <div class="stat-val" data-count="300" data-suffix="%">+300%</div>
         <div class="stat-lbl">Mais agendamentos</div>
       </div>
       <div class="stat-item">
@@ -483,16 +642,32 @@ footer {
         <div class="stat-lbl">Atendimento contínuo</div>
       </div>
       <div class="stat-item">
-        <div class="stat-val">80%</div>
+        <div class="stat-val" data-count="80" data-suffix="%">80%</div>
         <div class="stat-lbl">Menos tempo perdido</div>
       </div>
       <div class="stat-item">
-        <div class="stat-val">R$0</div>
-        <div class="stat-lbl">Setup inicial</div>
+        <div class="stat-val">7 dias</div>
+        <div class="stat-lbl">Para estar no ar</div>
       </div>
     </div>
   </div>
 </section>
+
+<!-- LOGOS -->
+<div class="logos-section">
+  <div class="container">
+    <div class="logos-label">Tipos de negócios que já automatizamos</div>
+    <div class="logos-row">
+      <div class="logo-pill"><span class="logo-pill-icon">✂️</span><span class="logo-pill-name">Barbearias</span></div>
+      <div class="logo-pill"><span class="logo-pill-icon">🦷</span><span class="logo-pill-name">Clínicas</span></div>
+      <div class="logo-pill"><span class="logo-pill-icon">🍕</span><span class="logo-pill-name">Restaurantes</span></div>
+      <div class="logo-pill"><span class="logo-pill-icon">💆</span><span class="logo-pill-name">Salões</span></div>
+      <div class="logo-pill"><span class="logo-pill-icon">💪</span><span class="logo-pill-name">Academias</span></div>
+      <div class="logo-pill"><span class="logo-pill-icon">🐾</span><span class="logo-pill-name">Pet Shops</span></div>
+      <div class="logo-pill"><span class="logo-pill-icon">🏠</span><span class="logo-pill-name">Imobiliárias</span></div>
+    </div>
+  </div>
+</div>
 
 <!-- SERVICES -->
 <section id="servicos" class="services-section">
@@ -502,119 +677,103 @@ footer {
       <h2 class="section-title">10 ferramentas em uma<br>única mensalidade</h2>
       <p class="section-sub">Tudo que seu negócio precisa para automatizar, atender melhor e vender mais — sem precisar de equipe técnica.</p>
     </div>
-
     <div class="services-grid reveal">
-
       <div class="service-card">
-        <div class="svc-icon">
-          <svg viewBox="0 0 18 18" fill="none" stroke="#818CF8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 3.5A.5.5 0 013.5 3h11a.5.5 0 01.5.5v8a.5.5 0 01-.5.5H9l-3 3v-3H3.5a.5.5 0 01-.5-.5v-8z"/>
-          </svg>
-        </div>
+        <div class="svc-icon"><svg viewBox="0 0 18 18" fill="none" stroke="#818CF8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3.5A.5.5 0 013.5 3h11a.5.5 0 01.5.5v8a.5.5 0 01-.5.5H9l-3 3v-3H3.5a.5.5 0 01-.5-.5v-8z"/></svg></div>
         <h3>WhatsApp Bot 24/7</h3>
         <p>Atende clientes, responde perguntas, agenda horários e fecha vendas automaticamente enquanto você dorme.</p>
         <span class="svc-tag hot">Mais popular</span>
       </div>
-
       <div class="service-card">
-        <div class="svc-icon">
-          <svg viewBox="0 0 18 18" fill="none" stroke="#818CF8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="9" cy="9" r="6.5"/><circle cx="9" cy="9" r="2.5"/>
-            <line x1="9" y1="1" x2="9" y2="2.5"/><line x1="9" y1="15.5" x2="9" y2="17"/>
-            <line x1="1" y1="9" x2="2.5" y2="9"/><line x1="15.5" y1="9" x2="17" y2="9"/>
-          </svg>
-        </div>
+        <div class="svc-icon"><svg viewBox="0 0 18 18" fill="none" stroke="#818CF8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="14" height="14" rx="3"/><circle cx="9" cy="9" r="2.5"/><circle cx="13" cy="5" r="0.8" fill="#818CF8" stroke="none"/></svg></div>
         <h3>Instagram Automático</h3>
         <p>Responde DMs e comentários automaticamente. Captura leads dos stories e envia catálogo no privado.</p>
         <span class="svc-tag new">Novo</span>
       </div>
-
       <div class="service-card">
-        <div class="svc-icon">
-          <svg viewBox="0 0 18 18" fill="none" stroke="#818CF8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="2" y="3" width="14" height="14" rx="2"/>
-            <path d="M6 1.5V4M12 1.5V4M2 7.5H16"/>
-          </svg>
-        </div>
+        <div class="svc-icon"><svg viewBox="0 0 18 18" fill="none" stroke="#818CF8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="14" height="14" rx="2"/><path d="M6 1.5V4M12 1.5V4M2 7.5H16"/></svg></div>
         <h3>Agendamento Online</h3>
         <p>Agenda 24h integrada ao WhatsApp. Clientes marcam pelo link, site ou bot — com lembretes automáticos.</p>
         <span class="svc-tag new">Novo</span>
       </div>
-
       <div class="service-card">
-        <div class="svc-icon">
-          <svg viewBox="0 0 18 18" fill="none" stroke="#818CF8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M9 2L2 5.5V9c0 4 3 6.5 7 7 4-.5 7-3 7-7V5.5L9 2z"/>
-          </svg>
-        </div>
-        <h3>CRM Simples</h3>
-        <p>Central de clientes e leads com histórico completo de conversas, compras e próximas ações.</p>
+        <div class="svc-icon"><svg viewBox="0 0 18 18" fill="none" stroke="#818CF8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="5" r="2.5"/><path d="M1 15c0-3 2-4.5 5-4.5s5 1.5 5 4.5"/><circle cx="13" cy="6" r="2"/><path d="M17 15c0-2.5-1.5-3.5-4-3.5"/></svg></div>
+        <h3>CRM com Pipeline</h3>
+        <p>Central de clientes e leads com histórico completo, funil de vendas e próximas ações — tudo em um lugar.</p>
       </div>
-
       <div class="service-card">
-        <div class="svc-icon">
-          <svg viewBox="0 0 18 18" fill="none" stroke="#818CF8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="2" y="4" width="14" height="11" rx="1.5"/>
-            <path d="M2 8H16M6 4V3M12 4V3"/>
-          </svg>
-        </div>
+        <div class="svc-icon"><svg viewBox="0 0 18 18" fill="none" stroke="#818CF8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="14" height="11" rx="1.5"/><path d="M2 8H16M6 4V3M12 4V3"/></svg></div>
         <h3>Email Marketing</h3>
         <p>Sequências automáticas de email para clientes e leads. Templates prontos, métricas em tempo real.</p>
       </div>
-
       <div class="service-card">
-        <div class="svc-icon">
-          <svg viewBox="0 0 18 18" fill="none" stroke="#818CF8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M9 2C5.13 2 2 5.13 2 9s3.13 7 7 7 7-3.13 7-7-3.13-7-7-7z"/>
-            <path d="M9 6v3l2 2"/>
-          </svg>
-        </div>
+        <div class="svc-icon"><svg viewBox="0 0 18 18" fill="none" stroke="#818CF8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="7"/><path d="M9 5v4l2.5 2.5"/></svg></div>
         <h3>Link Bio Profissional</h3>
         <p>Página completa no link da bio com agendamento, catálogo, botão de WhatsApp e redes sociais.</p>
       </div>
-
       <div class="service-card">
-        <div class="svc-icon">
-          <svg viewBox="0 0 18 18" fill="none" stroke="#818CF8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <polygon points="9,2 11.1,6.2 15.8,7 12.4,10.3 13.2,15 9,12.8 4.8,15 5.6,10.3 2.2,7 6.9,6.2"/>
-          </svg>
-        </div>
+        <div class="svc-icon"><svg viewBox="0 0 18 18" fill="none" stroke="#818CF8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="9,2 11.1,6.2 15.8,7 12.4,10.3 13.2,15 9,12.8 4.8,15 5.6,10.3 2.2,7 6.9,6.2"/></svg></div>
         <h3>Gestão de Reputação</h3>
-        <p>Após cada atendimento, solicita avaliação no Google automaticamente. Monitor de novos comentários com IA.</p>
+        <p>Solicita avaliação no Google após cada atendimento. Monitor de comentários com IA para proteger sua imagem.</p>
       </div>
-
       <div class="service-card">
-        <div class="svc-icon">
-          <svg viewBox="0 0 18 18" fill="none" stroke="#818CF8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="2" y="2" width="14" height="14" rx="2"/>
-            <path d="M6 9h6M6 12h4M8 6h2"/>
-          </svg>
-        </div>
+        <div class="svc-icon"><svg viewBox="0 0 18 18" fill="none" stroke="#818CF8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="14" height="14" rx="2"/><path d="M6 9h6M6 12h4M8 6h2"/></svg></div>
         <h3>Catálogo Digital</h3>
         <p>Cardápio ou catálogo visual online. Cliente vê, escolhe e pede direto pelo WhatsApp — sem PDFs.</p>
       </div>
-
       <div class="service-card">
-        <div class="svc-icon">
-          <svg viewBox="0 0 18 18" fill="none" stroke="#818CF8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="2" y="5" width="10" height="8" rx="1.5"/>
-            <path d="M12 7.5l4-2.5v8L12 10.5"/>
-          </svg>
-        </div>
+        <div class="svc-icon"><svg viewBox="0 0 18 18" fill="none" stroke="#818CF8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="10" height="8" rx="1.5"/><path d="M12 7.5l4-2.5v8L12 10.5"/></svg></div>
         <h3>Chat ao Vivo no Site</h3>
-        <p>Widget de chat que captura visitantes do site, responde dúvidas e encaminha ao WhatsApp automaticamente.</p>
+        <p>Widget de chat que captura visitantes, responde dúvidas e encaminha ao WhatsApp automaticamente.</p>
       </div>
-
       <div class="service-card">
-        <div class="svc-icon">
-          <svg viewBox="0 0 18 18" fill="none" stroke="#818CF8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="2,14 6,9 9,11 13,5 16,7"/>
-          </svg>
-        </div>
+        <div class="svc-icon"><svg viewBox="0 0 18 18" fill="none" stroke="#818CF8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,14 6,9 9,11 13,5 16,7"/></svg></div>
         <h3>Dashboard de Métricas</h3>
         <p>Acompanhe agendamentos, receita, novos clientes e performance do bot — tudo em tempo real.</p>
       </div>
+    </div>
+  </div>
+</section>
 
+<!-- ROI CALCULATOR -->
+<section id="roi" class="roi-section">
+  <div class="container">
+    <div class="reveal" style="text-align:center">
+      <div class="section-label">Calculadora de ROI</div>
+      <h2 class="section-title">Quanto você ganha<br>com a automação?</h2>
+      <p class="section-sub" style="margin:0 auto">Arraste os sliders e veja o retorno que você teria com a SyncTech no seu negócio.</p>
+    </div>
+    <div class="roi-grid reveal">
+      <div class="roi-inputs">
+        <div class="roi-input-group">
+          <label>Clientes por mês: <span class="roi-val" id="rClientes">80</span></label>
+          <input type="range" class="roi-slider" id="sClientes" min="20" max="300" value="80" oninput="calcROI()">
+        </div>
+        <div class="roi-input-group">
+          <label>Ticket médio: <span class="roi-val" id="rTicket">R$60</span></label>
+          <input type="range" class="roi-slider" id="sTicket" min="20" max="500" value="60" step="10" oninput="calcROI()">
+        </div>
+        <div class="roi-input-group">
+          <label>Taxa de retorno atual: <span class="roi-val" id="rRetorno">40%</span></label>
+          <input type="range" class="roi-slider" id="sRetorno" min="10" max="80" value="40" step="5" oninput="calcROI()">
+        </div>
+        <div class="roi-input-group">
+          <label>Horas gastas respondendo por dia: <span class="roi-val" id="rHoras">2h</span></label>
+          <input type="range" class="roi-slider" id="sHoras" min="0.5" max="8" value="2" step="0.5" oninput="calcROI()">
+        </div>
+      </div>
+      <div class="roi-result reveal">
+        <div class="roi-result-label">Lucro extra estimado por mês</div>
+        <div class="roi-result-val" id="roi-total">R$1.248</div>
+        <div class="roi-result-sub">Após descontar o investimento na SyncTech</div>
+        <div class="roi-breakdown">
+          <div class="roi-row"><span>Novos agendamentos pelo bot</span><span id="roi-bot">+R$864</span></div>
+          <div class="roi-row"><span>Recuperação de clientes inativos</span><span id="roi-reativ">+R$480</span></div>
+          <div class="roi-row"><span>Horas de trabalho economizadas</span><span id="roi-horas">+R$300</span></div>
+          <div class="roi-row"><span>Investimento SyncTech (Negócio)</span><span id="roi-inv" style="color:var(--red)">-R$397</span></div>
+          <div class="roi-row total"><span>Retorno líquido estimado</span><span id="roi-liq">R$1.247</span></div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -636,7 +795,7 @@ footer {
       <div class="how-step reveal">
         <div class="how-num">2</div>
         <h3>Configuramos tudo</h3>
-        <p>Montamos o bot, configuramos os fluxos, personalizamos com a identidade da sua marca e testamos tudo antes de lançar.</p>
+        <p>Montamos o bot, configuramos os fluxos, personalizamos com a identidade da sua marca e testamos antes de lançar.</p>
       </div>
       <div class="how-step reveal">
         <div class="how-num">3</div>
@@ -649,42 +808,144 @@ footer {
         <p>Mais agendamentos, mais leads e mais vendas nas primeiras semanas. Medimos tudo e otimizamos continuamente.</p>
       </div>
     </div>
+    <div class="how-timeline reveal">
+      <div class="ht-item">
+        <div class="ht-day">Dia 1</div>
+        <div class="ht-title">Diagnóstico</div>
+        <div class="ht-desc">Reunião de 30 min para mapear seu negócio</div>
+      </div>
+      <div class="ht-item">
+        <div class="ht-day">Dia 2–4</div>
+        <div class="ht-title">Configuração</div>
+        <div class="ht-desc">Montamos bot, agenda e Instagram automático</div>
+      </div>
+      <div class="ht-item">
+        <div class="ht-day">Dia 5–6</div>
+        <div class="ht-title">Testes</div>
+        <div class="ht-desc">Simulamos clientes reais e ajustamos fluxos</div>
+      </div>
+      <div class="ht-item">
+        <div class="ht-day">Dia 7</div>
+        <div class="ht-title">Lançamento</div>
+        <div class="ht-desc">Sistema ativo 24h com suporte na largada</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARISON TABLE -->
+<section id="comparativo" class="seg-section">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">Por que a SyncTech</div>
+      <h2 class="section-title">Tudo em um lugar,<br>por menos do que você paga separado</h2>
+      <p class="section-sub">Veja o que você ganha com a SyncTech vs contratar cada ferramenta separado ou um funcionário.</p>
+    </div>
+    <div class="comp-table reveal">
+      <div class="comp-header">
+        <div class="comp-col"><span class="comp-col-label">Funcionalidade</span></div>
+        <div class="comp-col featured">
+          <span class="comp-col-label">SyncTech Automation</span>
+          <div class="comp-col-price">R$397<span style="font-size:0.7rem;font-weight:400;color:var(--faint)">/mês</span></div>
+        </div>
+        <div class="comp-col">
+          <span class="comp-col-label">Ferramentas separadas</span>
+          <div class="comp-col-price">R$1.200+<span style="font-size:0.7rem;font-weight:400;color:var(--faint)">/mês</span></div>
+        </div>
+        <div class="comp-col">
+          <span class="comp-col-label">Funcionário CLT</span>
+          <div class="comp-col-price">R$2.500+<span style="font-size:0.7rem;font-weight:400;color:var(--faint)">/mês</span></div>
+        </div>
+      </div>
+      <div class="comp-row">
+        <div class="comp-col">WhatsApp Bot 24/7</div>
+        <div class="comp-col featured"><span class="chk-yes">✓ Incluso</span></div>
+        <div class="comp-col"><span class="chk-partial">~R$180/mês</span></div>
+        <div class="comp-col"><span class="chk-no">Não atende fora do horário</span></div>
+      </div>
+      <div class="comp-row">
+        <div class="comp-col">Agendamento Online</div>
+        <div class="comp-col featured"><span class="chk-yes">✓ Incluso</span></div>
+        <div class="comp-col"><span class="chk-partial">~R$120/mês</span></div>
+        <div class="comp-col"><span class="chk-partial">Só no horário comercial</span></div>
+      </div>
+      <div class="comp-row">
+        <div class="comp-col">Instagram Automático</div>
+        <div class="comp-col featured"><span class="chk-yes">✓ Incluso</span></div>
+        <div class="comp-col"><span class="chk-partial">~R$200/mês</span></div>
+        <div class="comp-col"><span class="chk-no">Manual e lento</span></div>
+      </div>
+      <div class="comp-row">
+        <div class="comp-col">CRM de Clientes</div>
+        <div class="comp-col featured"><span class="chk-yes">✓ Incluso</span></div>
+        <div class="comp-col"><span class="chk-partial">~R$150/mês</span></div>
+        <div class="comp-col"><span class="chk-no">Planilha manual</span></div>
+      </div>
+      <div class="comp-row">
+        <div class="comp-col">Lembretes automáticos</div>
+        <div class="comp-col featured"><span class="chk-yes">✓ Incluso</span></div>
+        <div class="comp-col"><span class="chk-partial">~R$80/mês</span></div>
+        <div class="comp-col"><span class="chk-no">Esquece ou não faz</span></div>
+      </div>
+      <div class="comp-row">
+        <div class="comp-col">Gestão de avaliações Google</div>
+        <div class="comp-col featured"><span class="chk-yes">✓ Incluso</span></div>
+        <div class="comp-col"><span class="chk-partial">~R$100/mês</span></div>
+        <div class="comp-col"><span class="chk-no">Não costuma fazer</span></div>
+      </div>
+      <div class="comp-row">
+        <div class="comp-col">Suporte e manutenção</div>
+        <div class="comp-col featured"><span class="chk-yes">✓ Incluso</span></div>
+        <div class="comp-col"><span class="chk-no">Extra — por hora</span></div>
+        <div class="comp-col"><span class="chk-partial">Férias, faltas, rescisão</span></div>
+      </div>
+      <div class="comp-row" style="background:rgba(99,102,241,0.03)">
+        <div class="comp-col" style="font-weight:700;color:#fff">Total estimado</div>
+        <div class="comp-col featured" style="font-weight:800;color:var(--green)"><span class="chk-yes">R$397/mês</span></div>
+        <div class="comp-col" style="font-weight:700;color:var(--red)">R$830–1.200/mês</div>
+        <div class="comp-col" style="font-weight:700;color:var(--red)">R$2.500+/mês</div>
+      </div>
+    </div>
   </div>
 </section>
 
 <!-- SEGMENTS -->
-<section id="segmentos" class="seg-section">
+<section id="segmentos">
   <div class="container">
-    <div class="reveal">
+    <div class="reveal" style="text-align:center">
       <div class="section-label">Segmentos</div>
       <h2 class="section-title">Para qualquer negócio<br>da sua cidade</h2>
     </div>
     <div class="seg-grid reveal">
-      <div class="seg-pill">✂️ Barbearias</div>
-      <div class="seg-pill">💆 Salões de Beleza</div>
-      <div class="seg-pill">🦷 Clínicas e Dentistas</div>
-      <div class="seg-pill">🍕 Restaurantes</div>
-      <div class="seg-pill">💪 Academias</div>
-      <div class="seg-pill">🏠 Imobiliárias</div>
-      <div class="seg-pill">🐾 Pet Shops</div>
-      <div class="seg-pill">📸 Fotógrafos</div>
-      <div class="seg-pill">🔧 Prestadores de Serviço</div>
-      <div class="seg-pill">👗 Lojas de Roupa</div>
-      <div class="seg-pill">🏋️ Personal Trainers</div>
-      <div class="seg-pill">🍔 Lanchonetes</div>
-      <div class="seg-pill">🚗 Oficinas</div>
-      <div class="seg-pill">💊 Farmácias</div>
+      <div class="seg-card"><span class="seg-emoji">✂️</span><span class="seg-name">Barbearias</span></div>
+      <div class="seg-card"><span class="seg-emoji">💆</span><span class="seg-name">Salões</span></div>
+      <div class="seg-card"><span class="seg-emoji">🦷</span><span class="seg-name">Clínicas</span></div>
+      <div class="seg-card"><span class="seg-emoji">🍕</span><span class="seg-name">Restaurantes</span></div>
+      <div class="seg-card"><span class="seg-emoji">💪</span><span class="seg-name">Academias</span></div>
+      <div class="seg-card"><span class="seg-emoji">🏠</span><span class="seg-name">Imobiliárias</span></div>
+      <div class="seg-card"><span class="seg-emoji">🐾</span><span class="seg-name">Pet Shops</span></div>
+      <div class="seg-card"><span class="seg-emoji">📸</span><span class="seg-name">Fotógrafos</span></div>
+      <div class="seg-card"><span class="seg-emoji">🔧</span><span class="seg-name">Prestadores</span></div>
+      <div class="seg-card"><span class="seg-emoji">👗</span><span class="seg-name">Lojas de Roupa</span></div>
+      <div class="seg-card"><span class="seg-emoji">🏋️</span><span class="seg-name">Personais</span></div>
+      <div class="seg-card"><span class="seg-emoji">🚗</span><span class="seg-name">Oficinas</span></div>
     </div>
   </div>
 </section>
 
 <!-- PRICING -->
-<section id="planos">
+<section id="planos" style="background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
   <div class="container">
     <div class="reveal" style="text-align:center">
       <div class="section-label">Planos</div>
       <h2 class="section-title">Investimento que se paga<br>no primeiro mês</h2>
       <p class="section-sub" style="margin:0 auto">Sem contratos longos. Cancele quando quiser.</p>
+    </div>
+    <div class="pricing-toggle reveal">
+      <span class="toggle-option active" id="lbl-monthly">Mensal</span>
+      <button class="toggle-switch" id="pricing-toggle" onclick="togglePricing()"></button>
+      <span class="toggle-option" id="lbl-annual">Anual</span>
+      <span class="save-badge">Economize 20%</span>
     </div>
 
     <div class="plans-grid">
@@ -692,9 +953,10 @@ footer {
         <div class="plan-name">Starter</div>
         <div class="plan-desc">Para quem quer começar a automatizar com o essencial.</div>
         <div class="plan-price">
-          <span class="amount">R$197</span><span class="period">/mês</span>
-          <div class="setup">+ R$299 de configuração (único)</div>
+          <span class="amount" id="price-starter">R$197</span><span class="period">/mês</span>
+          <span class="old-price" id="old-starter" style="display:none">R$247</span>
         </div>
+        <div class="plan-setup" id="setup-starter">+ R$299 de configuração (único)</div>
         <div class="plan-divider"></div>
         <ul class="plan-features">
           <li><svg class="chk" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7L5.5 10L11.5 4" stroke="#22C55E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> WhatsApp Bot básico</li>
@@ -712,15 +974,16 @@ footer {
         <div class="plan-name">Negócio</div>
         <div class="plan-desc">O pacote completo para quem quer crescer de verdade.</div>
         <div class="plan-price">
-          <span class="amount">R$397</span><span class="period">/mês</span>
-          <div class="setup">+ R$499 de configuração (único)</div>
+          <span class="amount" id="price-negocio">R$397</span><span class="period">/mês</span>
+          <span class="old-price" id="old-negocio" style="display:none">R$497</span>
         </div>
+        <div class="plan-setup" id="setup-negocio">+ R$499 de configuração (único)</div>
         <div class="plan-divider"></div>
         <ul class="plan-features">
           <li><svg class="chk" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7L5.5 10L11.5 4" stroke="#22C55E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> WhatsApp Bot completo com IA</li>
           <li><svg class="chk" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7L5.5 10L11.5 4" stroke="#22C55E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Instagram Auto (DM + comentários)</li>
-          <li><svg class="chk" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7L5.5 10L11.5 4" stroke="#22C55E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Agendamento Online</li>
-          <li><svg class="chk" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7L5.5 10L11.5 4" stroke="#22C55E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> CRM com pipeline</li>
+          <li><svg class="chk" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7L5.5 10L11.5 4" stroke="#22C55E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Agendamento Online completo</li>
+          <li><svg class="chk" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7L5.5 10L11.5 4" stroke="#22C55E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> CRM com pipeline de vendas</li>
           <li><svg class="chk" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7L5.5 10L11.5 4" stroke="#22C55E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Catálogo Digital</li>
           <li><svg class="chk" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7L5.5 10L11.5 4" stroke="#22C55E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Dashboard de Métricas</li>
           <li><svg class="chk" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7L5.5 10L11.5 4" stroke="#22C55E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Suporte prioritário</li>
@@ -732,9 +995,10 @@ footer {
         <div class="plan-name">Pro</div>
         <div class="plan-desc">Para empresas que querem automação total e resultado máximo.</div>
         <div class="plan-price">
-          <span class="amount">R$797</span><span class="period">/mês</span>
-          <div class="setup">+ R$799 de configuração (único)</div>
+          <span class="amount" id="price-pro">R$797</span><span class="period">/mês</span>
+          <span class="old-price" id="old-pro" style="display:none">R$997</span>
         </div>
+        <div class="plan-setup" id="setup-pro">+ R$799 de configuração (único)</div>
         <div class="plan-divider"></div>
         <ul class="plan-features">
           <li><svg class="chk" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7L5.5 10L11.5 4" stroke="#22C55E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Tudo do Negócio</li>
@@ -749,57 +1013,99 @@ footer {
       </div>
     </div>
     <p class="reveal" style="text-align:center;margin-top:20px;font-size:0.8rem;color:var(--faint)">
-      Dúvidas sobre qual plano escolher? <a href="#contato" style="color:var(--primary-l)">Fale com a gente</a> — fazemos um diagnóstico gratuito.
+      Dúvidas sobre qual plano? <a href="#contato" style="color:var(--primary-l)">Fale com a gente</a> — fazemos um diagnóstico gratuito.
     </p>
   </div>
 </section>
 
 <!-- TESTIMONIALS -->
-<section id="depoimentos" style="background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+<section id="depoimentos">
   <div class="container">
     <div class="reveal">
-      <div class="section-label">Resultados</div>
+      <div class="section-label">Resultados reais</div>
       <h2 class="section-title">Empresas que já estão<br>no automático</h2>
     </div>
     <div class="testimonials-grid">
       <div class="testimonial-card reveal">
-        <div class="t-stars">
-          <span class="t-star">★</span><span class="t-star">★</span><span class="t-star">★</span><span class="t-star">★</span><span class="t-star">★</span>
-        </div>
-        <p class="t-quote">"Em 2 semanas com o WhatsApp Bot, minha barbearia triplicou os agendamentos. Antes perdia cliente por não atender no horário. Agora o bot resolve tudo sozinho."</p>
+        <div class="t-stars"><span class="t-star">★</span><span class="t-star">★</span><span class="t-star">★</span><span class="t-star">★</span><span class="t-star">★</span></div>
+        <p class="t-quote">"Em 2 semanas com o WhatsApp Bot, minha barbearia triplicou os agendamentos. Antes perdia cliente por não atender à noite. Agora o bot resolve tudo sozinho."</p>
         <div class="t-author">
           <div class="t-av">MR</div>
-          <div>
-            <div class="t-name">Marcos Rodrigues</div>
-            <div class="t-role">Barbearia Estilo · Plano Negócio</div>
-          </div>
+          <div><div class="t-name">Marcos Rodrigues</div><div class="t-role">Barbearia Estilo · Plano Negócio</div></div>
         </div>
+        <div class="t-result">+3x agendamentos em 2 semanas · R$4.200 a mais no mês</div>
       </div>
       <div class="testimonial-card reveal">
-        <div class="t-stars">
-          <span class="t-star">★</span><span class="t-star">★</span><span class="t-star">★</span><span class="t-star">★</span><span class="t-star">★</span>
-        </div>
+        <div class="t-stars"><span class="t-star">★</span><span class="t-star">★</span><span class="t-star">★</span><span class="t-star">★</span><span class="t-star">★</span></div>
         <p class="t-quote">"Minha clínica era uma bagunça de ligações. Hoje o bot agenda, manda lembrete e ainda pede avaliação no Google. Minha nota subiu de 3.8 para 4.9 em 2 meses."</p>
         <div class="t-author">
           <div class="t-av">AP</div>
-          <div>
-            <div class="t-name">Dra. Ana Paula</div>
-            <div class="t-role">Clínica Sorriso Perfeito · Plano Pro</div>
-          </div>
+          <div><div class="t-name">Dra. Ana Paula</div><div class="t-role">Clínica Sorriso Perfeito · Plano Pro</div></div>
         </div>
+        <div class="t-result">Google: 3.8 → 4.9 estrelas · 68% menos ligações</div>
       </div>
       <div class="testimonial-card reveal">
-        <div class="t-stars">
-          <span class="t-star">★</span><span class="t-star">★</span><span class="t-star">★</span><span class="t-star">★</span><span class="t-star">★</span>
-        </div>
-        <p class="t-quote">"Achei que era caro, mas me paguei no primeiro mês. Meu pet shop vendeu 40% mais só com o catálogo digital integrado ao WhatsApp Bot. Recomendo muito."</p>
+        <div class="t-stars"><span class="t-star">★</span><span class="t-star">★</span><span class="t-star">★</span><span class="t-star">★</span><span class="t-star">★</span></div>
+        <p class="t-quote">"Achei que era caro, mas me paguei no primeiro mês. Meu pet shop vendeu 40% mais só com o catálogo digital integrado ao WhatsApp Bot."</p>
         <div class="t-author">
           <div class="t-av">JS</div>
-          <div>
-            <div class="t-name">Juliana Santos</div>
-            <div class="t-role">PetLove · Plano Negócio</div>
-          </div>
+          <div><div class="t-name">Juliana Santos</div><div class="t-role">PetLove · Plano Negócio</div></div>
         </div>
+        <div class="t-result">+40% em vendas no primeiro mês de uso</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq" class="faq-section" style="background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+  <div class="container">
+    <div class="reveal" style="text-align:center">
+      <div class="section-label">Dúvidas frequentes</div>
+      <h2 class="section-title">Perguntas e respostas</h2>
+    </div>
+    <div class="faq-list reveal">
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFAQ(this)">
+          Preciso ter conhecimento técnico para usar?
+          <span class="faq-icon"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 1V9M1 5H9"/></svg></span>
+        </button>
+        <div class="faq-a">Não. Cuidamos de toda a configuração, da A ao Z. Você só precisa nos passar as informações do seu negócio (serviços, horários, preços). Em 7 dias está tudo funcionando sem você precisar saber nada de tecnologia.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFAQ(this)">
+          Como funciona o WhatsApp Bot? Preciso de API paga?
+          <span class="faq-icon"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 1V9M1 5H9"/></svg></span>
+        </button>
+        <div class="faq-a">Configuramos com o WhatsApp Business do seu número atual, sem precisar de API paga. O bot responde automaticamente as mensagens que chegam, agenda horários e encaminha leads. Para volumes maiores (Pro), usamos a API oficial sem custo adicional para você.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFAQ(this)">
+          Quanto tempo leva para ter resultado?
+          <span class="faq-icon"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 1V9M1 5H9"/></svg></span>
+        </button>
+        <div class="faq-a">A maioria dos nossos clientes vê os primeiros resultados na primeira semana. Mais agendamentos pelo bot, mais DMs respondidos no Instagram, menos ligações perdidas. O retorno completo do investimento geralmente ocorre em 30 dias.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFAQ(this)">
+          Posso cancelar quando quiser?
+          <span class="faq-icon"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 1V9M1 5H9"/></svg></span>
+        </button>
+        <div class="faq-a">Sim. Não temos fidelidade ou contrato de longo prazo. Você pode cancelar a qualquer momento. A taxa de configuração (única) não é reembolsável, mas a mensalidade pode ser cancelada a qualquer momento sem multa.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFAQ(this)">
+          O sistema funciona para qualquer tipo de negócio?
+          <span class="faq-icon"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 1V9M1 5H9"/></svg></span>
+        </button>
+        <div class="faq-a">Sim. Já configuramos para barbearias, clínicas, salões, restaurantes, pet shops, imobiliárias, academias, fotógrafos e muito mais. O sistema é totalmente personalizado para o seu negócio específico.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFAQ(this)">
+          O que acontece se o bot errar ou não souber responder?
+          <span class="faq-icon"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 1V9M1 5H9"/></svg></span>
+        </button>
+        <div class="faq-a">O bot identifica quando não consegue resolver e encaminha a conversa para você com um aviso. Você nunca fica sem resposta e o cliente sempre recebe alguma atenção. Com o tempo, o bot aprende e as transferências ficam cada vez mais raras.</div>
       </div>
     </div>
   </div>
@@ -811,13 +1117,17 @@ footer {
     <div class="cta-box reveal">
       <div class="section-label" style="margin-bottom:16px">Pronto para começar?</div>
       <h2>Automatize seu negócio<br>ainda essa semana</h2>
-      <p>Diagnóstico 100% gratuito e sem compromisso.</p>
+      <p>Diagnóstico 100% gratuito e sem compromisso. Resposta em até 2 horas.</p>
       <div class="cta-form">
         <input class="cta-input" type="text" id="lead-nome" placeholder="Seu nome">
         <input class="cta-input" type="tel" id="lead-tel" placeholder="WhatsApp (com DDD)">
-        <button class="btn-primary btn-lg" onclick="enviarLead()" style="width:100%;justify-content:center">Quero diagnóstico gratuito</button>
+        <button class="btn-primary btn-lg" onclick="enviarLead()" style="width:100%;justify-content:center">Quero diagnóstico gratuito →</button>
       </div>
-      <p class="cta-note">Resposta em até 2 horas · Sem cartão de crédito · Cancele quando quiser</p>
+      <div class="cta-trust">
+        <span><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 1L2 3V7c0 2.5 1.8 4 4 4.5 2.2-.5 4-2 4-4.5V3L6 1z"/></svg> Sem cartão de crédito</span>
+        <span><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="6" r="5"/><path d="M6 3.5V6L7.5 7.5"/></svg> Resposta em até 2h</span>
+        <span><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 6L5 9L10 3"/></svg> Cancele quando quiser</span>
+      </div>
     </div>
   </div>
 </section>
@@ -832,6 +1142,10 @@ footer {
           SyncTech Automation
         </a>
         <p class="footer-tagline">Hub de automação para empresas locais. Vendendo mais, atendendo melhor.</p>
+        <a href="dashboard/" style="font-size:0.75rem;color:var(--faint);text-decoration:none;display:flex;align-items:center;gap:5px">
+          <svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1" y="1" width="4" height="4" rx="1"/><rect x="6" y="1" width="4" height="4" rx="1"/><rect x="1" y="6" width="4" height="4" rx="1"/><rect x="6" y="6" width="4" height="4" rx="1"/></svg>
+          Área do cliente
+        </a>
       </div>
       <div class="footer-col">
         <h4>Serviços</h4>
@@ -875,18 +1189,101 @@ footer {
 </a>
 
 <script>
-// Reveal on scroll
+// ── REVEAL ──
 const obs = new IntersectionObserver(entries => {
   entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-}, { threshold: 0.08 });
+}, { threshold: 0.06 });
 document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
 
+// ── MOBILE MENU ──
+function toggleMobile() {
+  document.getElementById('mobile-menu').classList.toggle('open');
+}
+function closeMobile() {
+  document.getElementById('mobile-menu').classList.remove('open');
+}
+
+// ── FAQ ──
+function toggleFAQ(btn) {
+  var item = btn.parentElement;
+  var wasOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(function(i){ i.classList.remove('open'); });
+  if (!wasOpen) item.classList.add('open');
+}
+
+// ── PRICING TOGGLE ──
+var isAnnual = false;
+var prices = {
+  starter:  { monthly: 'R$197', annual: 'R$157', oldMonthly: 'R$247' },
+  negocio:  { monthly: 'R$397', annual: 'R$317', oldMonthly: 'R$497' },
+  pro:      { monthly: 'R$797', annual: 'R$637', oldMonthly: 'R$997' },
+};
+
+function togglePricing() {
+  isAnnual = !isAnnual;
+  var toggle = document.getElementById('pricing-toggle');
+  toggle.classList.toggle('annual', isAnnual);
+  document.getElementById('lbl-monthly').classList.toggle('active', !isAnnual);
+  document.getElementById('lbl-annual').classList.toggle('active', isAnnual);
+
+  Object.keys(prices).forEach(function(key) {
+    var p = prices[key];
+    var el = document.getElementById('price-' + key);
+    var old = document.getElementById('old-' + key);
+    if (!el) return;
+    if (isAnnual) {
+      el.textContent = p.annual;
+      old.textContent = p.monthly;
+      old.style.display = 'inline';
+    } else {
+      el.textContent = p.monthly;
+      old.style.display = 'none';
+    }
+    var setup = document.getElementById('setup-' + key);
+    if (setup) {
+      setup.textContent = isAnnual
+        ? 'Configuração inclusa no plano anual'
+        : setup.textContent.replace('Configuração inclusa no plano anual', key === 'starter' ? '+ R$299 de configuração (único)' : key === 'negocio' ? '+ R$499 de configuração (único)' : '+ R$799 de configuração (único)');
+    }
+  });
+  document.getElementById('roi-inv').textContent = isAnnual ? '-R$317' : '-R$397';
+  calcROI();
+}
+
+// ── ROI CALCULATOR ──
+function calcROI() {
+  var clientes = parseInt(document.getElementById('sClientes').value);
+  var ticket   = parseInt(document.getElementById('sTicket').value);
+  var retorno  = parseInt(document.getElementById('sRetorno').value);
+  var horas    = parseFloat(document.getElementById('sHoras').value);
+
+  document.getElementById('rClientes').textContent = clientes;
+  document.getElementById('rTicket').textContent   = 'R$' + ticket;
+  document.getElementById('rRetorno').textContent  = retorno + '%';
+  document.getElementById('rHoras').textContent    = horas + 'h';
+
+  var botExtra   = Math.round(clientes * 0.15 * ticket);
+  var reativExtra= Math.round(clientes * (retorno / 100) * 0.12 * ticket);
+  var horasEcon  = Math.round(horas * 22 * 12);
+  var plano      = isAnnual ? 317 : 397;
+  var liquido    = botExtra + reativExtra + horasEcon - plano;
+
+  document.getElementById('roi-bot').textContent   = '+R$' + botExtra;
+  document.getElementById('roi-reativ').textContent= '+R$' + reativExtra;
+  document.getElementById('roi-horas').textContent = '+R$' + horasEcon;
+  document.getElementById('roi-inv').textContent   = '-R$' + plano;
+  document.getElementById('roi-total').textContent = 'R$' + Math.max(0, liquido);
+  document.getElementById('roi-liq').textContent   = 'R$' + Math.max(0, liquido);
+}
+calcROI();
+
+// ── LEAD ──
 function enviarLead() {
-  const nome = document.getElementById('lead-nome').value.trim();
-  const tel  = document.getElementById('lead-tel').value.trim();
+  var nome = document.getElementById('lead-nome').value.trim();
+  var tel  = document.getElementById('lead-tel').value.trim();
   if (!nome || !tel) { alert('Preencha seu nome e WhatsApp para continuar.'); return; }
-  const msg = encodeURIComponent(`Olá! Meu nome é ${nome} e quero conhecer a SyncTech Automation.`);
-  window.open(`https://wa.me/5500000000000?text=${msg}`, '_blank');
+  var msg = encodeURIComponent('Olá! Meu nome é ' + nome + ' e quero conhecer a SyncTech Automation. Meu WhatsApp: ' + tel);
+  window.open('https://wa.me/5500000000000?text=' + msg, '_blank');
 }
 </script>
 </body>

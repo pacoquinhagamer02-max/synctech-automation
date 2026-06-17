@@ -3,743 +3,450 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Agendamento Online — SyncTech Automation</title>
+<title>Agendamento Online — SyncTech</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { font-size: 16px; }
-
 :root {
-  --bg:        #0D1117;
-  --surface:   #161B27;
-  --surface2:  #1C2333;
-  --border:    rgba(255,255,255,0.07);
-  --border-s:  rgba(255,255,255,0.12);
-  --primary:   #6366F1;
-  --primary-l: #818CF8;
-  --primary-d: #4F46E5;
-  --text:      #F1F5F9;
-  --muted:     #94A3B8;
-  --faint:     #4B5563;
-  --green:     #22C55E;
-  --yellow:    #F59E0B;
-  --red:       #EF4444;
-  --radius:    10px;
+  --bg:     #0D1117;
+  --s1:     #161B27;
+  --s2:     #1C2333;
+  --s3:     #222A3A;
+  --border: rgba(255,255,255,0.07);
+  --bord2:  rgba(255,255,255,0.12);
+  --primary: #6366F1;
+  --pl:     #818CF8;
+  --pd:     #4F46E5;
+  --text:   #F1F5F9;
+  --muted:  #94A3B8;
+  --faint:  #4B5563;
+  --green:  #22C55E;
+  --yellow: #F59E0B;
+  --red:    #EF4444;
+  --r:      12px;
 }
+body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
 
-body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+.header { padding: 18px 24px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); background: var(--s1); }
+.logo { display: flex; align-items: center; gap: 9px; }
+.logo-mark { width: 28px; height: 28px; border-radius: 7px; background: var(--primary); display: grid; place-items: center; }
+.logo-mark svg { width: 14px; height: 14px; fill: #fff; }
+.logo-text { font-size: 0.92rem; font-weight: 700; }
+.biz-name { font-size: 0.82rem; color: var(--muted); }
 
-/* ── HEADER ── */
-.app-header {
-  position: sticky; top: 0; z-index: 50;
-  background: rgba(13,17,23,0.9); backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--border);
-  height: 56px; display: flex; align-items: center;
-  padding: 0 20px; gap: 16px;
-}
-.back-btn {
-  display: flex; align-items: center; gap: 6px;
-  font-size: 0.82rem; color: var(--muted); text-decoration: none;
-  padding: 5px 8px; border-radius: 6px; transition: all 0.15s; border: 1px solid transparent;
-}
-.back-btn:hover { color: var(--text); background: rgba(255,255,255,0.05); border-color: var(--border-s); }
-.back-btn svg { width: 14px; height: 14px; }
+.progress-wrap { padding: 20px 24px 0; max-width: 540px; margin: 0 auto; width: 100%; }
+.step-row { display: flex; align-items: center; }
+.step-item { display: flex; flex-direction: column; align-items: center; gap: 5px; flex: 1; }
+.step-circle { width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--border); display: grid; place-items: center; font-size: 0.72rem; font-weight: 700; color: var(--faint); background: var(--s1); transition: all 0.3s; position: relative; z-index: 2; }
+.step-circle.done { background: var(--primary); border-color: var(--primary); color: #fff; }
+.step-circle.active { border-color: var(--primary); color: var(--primary); background: rgba(99,102,241,0.08); }
+.step-label { font-size: 0.64rem; font-weight: 500; color: var(--faint); text-align: center; }
+.step-label.active { color: var(--pl); }
+.step-label.done { color: var(--muted); }
+.step-line { flex: 1; height: 2px; background: var(--border); margin-top: -20px; transition: background 0.3s; }
+.step-line.done { background: var(--primary); }
 
-.header-center { flex: 1; text-align: center; }
-.header-logo { font-size: 0.9rem; font-weight: 700; color: var(--text); }
-.header-sub { font-size: 0.7rem; color: var(--muted); margin-top: 1px; }
+.booking-main { flex: 1; padding: 24px; max-width: 540px; margin: 0 auto; width: 100%; }
+.step { display: none; }
+.step.active { display: block; }
+.step-title { font-size: 1.15rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 4px; }
+.step-sub { font-size: 0.78rem; color: var(--muted); margin-bottom: 20px; }
 
-.status-pill {
-  display: flex; align-items: center; gap: 5px;
-  font-size: 0.72rem; color: var(--green); font-weight: 500;
-}
-.status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+.svc-grid { display: flex; flex-direction: column; gap: 8px; }
+.svc-card { background: var(--s1); border: 2px solid var(--border); border-radius: var(--r); padding: 14px 16px; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 14px; }
+.svc-card:hover { border-color: rgba(99,102,241,0.4); }
+.svc-card.selected { border-color: var(--primary); background: rgba(99,102,241,0.07); }
+.svc-icon { font-size: 1.5rem; width: 40px; text-align: center; flex-shrink: 0; }
+.svc-name { font-size: 0.9rem; font-weight: 700; }
+.svc-meta { font-size: 0.73rem; color: var(--muted); margin-top: 2px; }
+.svc-price { font-size: 1rem; font-weight: 800; }
+.svc-duration { font-size: 0.7rem; color: var(--faint); text-align: right; }
+.svc-popular { background: rgba(245,158,11,0.12); color: var(--yellow); border: 1px solid rgba(245,158,11,0.3); font-size: 0.62rem; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
 
-/* ── LAYOUT ── */
-.app-wrap { max-width: 740px; margin: 0 auto; padding: 24px 16px 80px; }
+.prof-section { margin-top: 20px; }
+.prof-title { font-size: 0.72rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+.prof-grid { display: flex; gap: 8px; flex-wrap: wrap; }
+.prof-card { flex: 1; min-width: 110px; background: var(--s1); border: 2px solid var(--border); border-radius: 10px; padding: 12px; text-align: center; cursor: pointer; transition: all 0.15s; }
+.prof-card:hover { border-color: rgba(99,102,241,0.35); }
+.prof-card.selected { border-color: var(--primary); background: rgba(99,102,241,0.07); }
+.prof-av { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; font-size: 0.85rem; font-weight: 700; margin: 0 auto 8px; }
+.prof-name { font-size: 0.8rem; font-weight: 700; margin-bottom: 2px; }
+.prof-stars { font-size: 0.7rem; color: var(--yellow); }
+.prof-count { font-size: 0.64rem; color: var(--faint); }
 
-/* ── BUSINESS CARD ── */
-.biz-card {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: 14px; padding: 20px; margin-bottom: 24px;
-  display: flex; gap: 16px; align-items: center;
-}
-.biz-avatar {
-  width: 56px; height: 56px; border-radius: 12px; flex-shrink: 0;
-  background: rgba(99,102,241,0.12); border: 1px solid rgba(99,102,241,0.2);
-  display: grid; place-items: center; font-size: 1.6rem;
-}
-.biz-name { font-size: 1.15rem; font-weight: 700; color: var(--text); margin-bottom: 2px; }
-.biz-desc { font-size: 0.78rem; color: var(--muted); margin-bottom: 8px; }
-.biz-meta { display: flex; flex-wrap: wrap; gap: 12px; }
-.meta-tag { font-size: 0.72rem; color: var(--muted); display: flex; align-items: center; gap: 5px; }
-.meta-tag svg { width: 12px; height: 12px; opacity: 0.6; }
-.rating-val { color: var(--yellow); font-weight: 600; }
+.cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.cal-nav { width: 32px; height: 32px; border-radius: 8px; background: none; border: 1px solid var(--border); color: var(--muted); cursor: pointer; font-size: 1rem; font-family: 'Inter',sans-serif; transition: all 0.15s; }
+.cal-nav:hover { border-color: var(--bord2); color: var(--text); }
+.cal-month { font-size: 0.9rem; font-weight: 700; }
+.weekdays { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; margin-bottom: 4px; }
+.wd { text-align: center; font-size: 0.62rem; font-weight: 600; color: var(--faint); padding: 4px 0; }
+.days-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 3px; margin-bottom: 20px; }
+.day-btn { aspect-ratio: 1; border-radius: 8px; background: none; border: none; color: var(--muted); font-size: 0.8rem; font-weight: 500; cursor: pointer; transition: all 0.15s; font-family: 'Inter',sans-serif; }
+.day-btn:hover:not(:disabled) { background: rgba(99,102,241,0.1); color: var(--pl); }
+.day-btn.selected { background: var(--primary); color: #fff; font-weight: 700; }
+.day-btn.today { border: 1px solid rgba(99,102,241,0.4); color: var(--pl); }
+.day-btn:disabled { color: var(--faint); cursor: not-allowed; opacity: 0.35; }
+.day-btn.empty { cursor: default; }
 
-/* ── STEPS ── */
-.steps-bar {
-  display: flex; align-items: center; margin-bottom: 28px;
-}
-.step-item { display: flex; align-items: center; gap: 7px; }
-.step-num {
-  width: 28px; height: 28px; border-radius: 50%; font-size: 0.75rem; font-weight: 700;
-  display: grid; place-items: center; border: 1.5px solid var(--border-s); color: var(--faint);
-  transition: all 0.2s; flex-shrink: 0;
-}
-.step-num.active { border-color: var(--primary); color: var(--primary-l); background: rgba(99,102,241,0.1); }
-.step-num.done { border-color: var(--green); background: var(--green); color: #fff; }
-.step-label { font-size: 0.75rem; color: var(--faint); font-weight: 500; white-space: nowrap; }
-.step-label.active { color: var(--text); }
-.step-line { flex: 1; height: 1px; background: var(--border); margin: 0 8px; }
+.slots-title { font-size: 0.72rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+.slots-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 6px; }
+.slot-btn { padding: 9px 4px; border-radius: 8px; border: 1.5px solid var(--border); background: var(--s1); color: var(--muted); font-size: 0.78rem; font-weight: 500; cursor: pointer; transition: all 0.15s; font-family: 'Inter',sans-serif; position: relative; }
+.slot-btn:hover:not(:disabled) { border-color: rgba(99,102,241,0.4); color: var(--pl); }
+.slot-btn.selected { border-color: var(--primary); background: rgba(99,102,241,0.1); color: var(--pl); font-weight: 700; }
+.slot-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.slot-btn.popular::after { content:'↑'; position:absolute; top:-8px; right:3px; font-size:0.58rem; color:var(--yellow); }
 
-/* ── PANELS ── */
-.panel { display: none; }
-.panel.active { display: block; }
+.form-group { margin-bottom: 14px; }
+.form-label { font-size: 0.72rem; font-weight: 600; color: var(--muted); display: block; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.06em; }
+.form-input { width: 100%; background: var(--s1); border: 1.5px solid var(--border); border-radius: 10px; padding: 11px 14px; color: var(--text); font-size: 0.88rem; outline: none; font-family: 'Inter',sans-serif; transition: border-color 0.15s; }
+.form-input:focus { border-color: var(--primary); }
+.form-input::placeholder { color: var(--faint); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-note { font-size: 0.7rem; color: var(--faint); margin-top: 4px; }
 
-.panel-title { font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
-.panel-sub { font-size: 0.82rem; color: var(--muted); margin-bottom: 20px; }
+.payment-section { background: var(--s1); border: 1px solid var(--border); border-radius: var(--r); padding: 14px 16px; margin-top: 20px; }
+.payment-title { font-size: 0.8rem; font-weight: 700; margin-bottom: 4px; }
+.payment-body { font-size: 0.76rem; color: var(--muted); line-height: 1.5; }
+.payment-badge { display: inline-flex; align-items: center; gap: 5px; background: rgba(34,197,94,0.1); color: var(--green); border: 1px solid rgba(34,197,94,0.25); font-size: 0.7rem; font-weight: 600; padding: 3px 10px; border-radius: 20px; margin-top: 6px; }
 
-/* ── SERVICE LIST ── */
-.service-list { display: flex; flex-direction: column; gap: 8px; }
-.svc-row {
-  background: var(--surface); border: 1.5px solid var(--border);
-  border-radius: var(--radius); padding: 16px 18px; cursor: pointer;
-  display: flex; align-items: center; gap: 14px; transition: all 0.15s;
-}
-.svc-row:hover { border-color: rgba(99,102,241,0.4); background: var(--surface2); }
-.svc-row.selected { border-color: var(--primary); background: rgba(99,102,241,0.07); }
+.confirm-wrap { text-align: center; padding: 12px 0; }
+.confirm-icon { width: 72px; height: 72px; border-radius: 50%; background: rgba(34,197,94,0.12); border: 2px solid rgba(34,197,94,0.3); display: grid; place-items: center; margin: 0 auto 18px; font-size: 2rem; }
+.confirm-title { font-size: 1.4rem; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.025em; }
+.confirm-sub { font-size: 0.85rem; color: var(--muted); margin-bottom: 20px; line-height: 1.6; }
+.confirm-card { background: var(--s1); border: 1px solid var(--border); border-radius: var(--r); padding: 16px; text-align: left; margin-bottom: 20px; }
+.confirm-card-row { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.confirm-card-row:last-child { border-bottom: none; }
+.cc-icon { font-size: 1.1rem; width: 24px; text-align: center; flex-shrink: 0; }
+.cc-text { font-size: 0.83rem; font-weight: 600; }
+.cc-sub { font-size: 0.72rem; color: var(--muted); margin-top: 1px; }
+.share-row { display: flex; gap: 8px; }
+.share-btn { flex: 1; padding: 10px; border-radius: 10px; border: 1.5px solid var(--border); background: none; color: var(--muted); font-size: 0.76rem; font-weight: 600; cursor: pointer; font-family: 'Inter',sans-serif; transition: all 0.15s; }
+.share-btn:hover { border-color: var(--bord2); color: var(--text); }
+.share-btn.wa { border-color: rgba(37,211,102,0.35); color: #25D366; }
+.share-btn.wa:hover { background: rgba(37,211,102,0.05); }
 
-.svc-icon-box {
-  width: 40px; height: 40px; border-radius: 8px; flex-shrink: 0;
-  background: var(--surface2); border: 1px solid var(--border-s);
-  display: grid; place-items: center; font-size: 1.2rem;
-}
-.svc-info { flex: 1; }
-.svc-name { font-size: 0.9rem; font-weight: 600; color: var(--text); }
-.svc-meta { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
-.svc-right { text-align: right; flex-shrink: 0; }
-.svc-price { font-size: 0.95rem; font-weight: 700; color: var(--text); }
-.svc-dur { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
-.svc-check {
-  width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid var(--border-s);
-  display: grid; place-items: center; flex-shrink: 0; transition: all 0.15s;
-}
-.svc-row.selected .svc-check { background: var(--primary); border-color: var(--primary); }
-.svc-check svg { display: none; }
-.svc-row.selected .svc-check svg { display: block; }
+.btn-row { display: flex; gap: 10px; margin-top: 24px; }
+.btn { padding: 12px 24px; border-radius: 10px; font-size: 0.88rem; font-weight: 700; cursor: pointer; font-family: 'Inter',sans-serif; transition: all 0.2s; border: none; }
+.btn-primary { background: var(--primary); color: #fff; flex: 1; }
+.btn-primary:hover { background: var(--pd); transform: translateY(-1px); }
+.btn-primary:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+.btn-back { background: none; border: 1.5px solid var(--border); color: var(--muted); font-family: 'Inter',sans-serif; }
+.btn-back:hover { border-color: var(--bord2); color: var(--text); }
 
-/* ── SUMMARY BAR ── */
-.summary-bar {
-  background: var(--surface2); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 12px 16px; margin-bottom: 20px;
-  display: flex; flex-wrap: wrap; gap: 16px;
-}
-.sum-item { font-size: 0.78rem; }
-.sum-label { color: var(--muted); }
-.sum-val { color: var(--text); font-weight: 600; }
+.booking-footer { text-align: center; padding: 18px; border-top: 1px solid var(--border); }
+.footer-text { font-size: 0.72rem; color: var(--faint); }
+.footer-text a { color: var(--pl); text-decoration: none; }
 
-/* ── CALENDAR + TIMES ── */
-.booking-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-@media (max-width: 540px) { .booking-cols { grid-template-columns: 1fr; } }
-
-.cal-card, .times-card {
-  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px;
+@media (max-width: 480px) {
+  .slots-grid { grid-template-columns: repeat(3,1fr); }
+  .form-row { grid-template-columns: 1fr; }
+  .share-row { flex-direction: column; }
+  .prof-card { min-width: 80px; }
 }
-.cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-.cal-month-label { font-size: 0.9rem; font-weight: 700; }
-.cal-nav-btn {
-  width: 28px; height: 28px; border-radius: 6px; background: none;
-  border: 1px solid var(--border-s); color: var(--muted); cursor: pointer;
-  display: grid; place-items: center; transition: all 0.15s; font-size: 0.9rem;
-}
-.cal-nav-btn:hover { border-color: var(--primary); color: var(--primary-l); }
-
-.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
-.cal-day-hdr { text-align: center; font-size: 0.65rem; font-weight: 600; color: var(--faint); padding: 4px 0; text-transform: uppercase; }
-.cal-cell {
-  aspect-ratio: 1; display: grid; place-items: center; border-radius: 7px;
-  font-size: 0.78rem; cursor: pointer; transition: all 0.15s; position: relative;
-  color: var(--muted); border: 1px solid transparent;
-}
-.cal-cell:hover:not(.empty):not(.past) { background: var(--surface2); color: var(--text); border-color: var(--border-s); }
-.cal-cell.empty { cursor: default; }
-.cal-cell.past { color: var(--faint); cursor: not-allowed; }
-.cal-cell.today { color: var(--primary-l); font-weight: 700; }
-.cal-cell.has-slots::after {
-  content: ''; position: absolute; bottom: 3px; left: 50%; transform: translateX(-50%);
-  width: 3px; height: 3px; border-radius: 50%; background: var(--green);
-}
-.cal-cell.selected { background: var(--primary) !important; color: #fff !important; font-weight: 700; border-color: var(--primary) !important; }
-
-.times-header { font-size: 0.8rem; font-weight: 600; color: var(--muted); margin-bottom: 12px; }
-.times-empty { text-align: center; padding: 32px 0; color: var(--faint); font-size: 0.82rem; line-height: 1.6; }
-.times-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-.time-chip {
-  padding: 9px 4px; border-radius: 7px; text-align: center;
-  font-size: 0.78rem; font-weight: 500; cursor: pointer;
-  background: var(--surface2); border: 1px solid var(--border-s);
-  color: var(--muted); transition: all 0.15s;
-}
-.time-chip:hover:not(.busy) { border-color: var(--primary); color: var(--primary-l); }
-.time-chip.selected { background: var(--primary); border-color: var(--primary); color: #fff; font-weight: 700; }
-.time-chip.busy { color: var(--faint); cursor: not-allowed; text-decoration: line-through; opacity: 0.5; }
-
-/* ── FORM ── */
-.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-@media (max-width: 480px) { .form-grid { grid-template-columns: 1fr; } }
-.form-full { grid-column: 1 / -1; }
-.form-group { display: flex; flex-direction: column; gap: 5px; }
-.form-label { font-size: 0.75rem; font-weight: 600; color: var(--muted); letter-spacing: 0.02em; }
-.form-input, .form-select, .form-textarea {
-  background: var(--surface2); border: 1px solid var(--border-s);
-  border-radius: var(--radius); padding: 10px 13px; color: var(--text);
-  font-size: 0.875rem; outline: none; transition: border-color 0.15s;
-  font-family: 'Inter', sans-serif;
-}
-.form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--primary); }
-.form-input::placeholder, .form-textarea::placeholder { color: var(--faint); }
-.form-select { appearance: none; cursor: pointer; }
-.form-select option { background: var(--surface2); }
-.form-textarea { resize: vertical; min-height: 72px; }
-
-.wa-notice {
-  margin-top: 16px; padding: 14px 16px;
-  background: rgba(37,211,102,0.05); border: 1px solid rgba(37,211,102,0.15);
-  border-radius: var(--radius); font-size: 0.8rem; color: var(--muted); line-height: 1.6;
-  display: flex; gap: 10px; align-items: flex-start;
-}
-.wa-notice svg { width: 16px; height: 16px; fill: #25D366; flex-shrink: 0; margin-top: 1px; }
-
-.form-error {
-  padding: 10px 14px; border-radius: var(--radius); font-size: 0.8rem;
-  background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2);
-  color: #F87171; margin-bottom: 14px; display: none;
-}
-.form-error.show { display: block; }
-
-/* ── ACTIONS ── */
-.panel-actions { display: flex; gap: 10px; margin-top: 24px; }
-.btn-back {
-  padding: 11px 18px; border-radius: var(--radius); font-size: 0.875rem;
-  font-weight: 500; color: var(--muted); background: none; cursor: pointer;
-  border: 1px solid var(--border-s); transition: all 0.15s; font-family: 'Inter', sans-serif;
-}
-.btn-back:hover { border-color: var(--border-s); color: var(--text); }
-.btn-next {
-  flex: 1; padding: 11px; border-radius: var(--radius); font-size: 0.9rem;
-  font-weight: 600; color: #fff; background: var(--primary); cursor: pointer;
-  border: none; transition: all 0.15s; font-family: 'Inter', sans-serif;
-}
-.btn-next:hover { background: var(--primary-d); }
-.btn-next:disabled { opacity: 0.35; cursor: not-allowed; }
-
-/* ── CONFIRMATION ── */
-.confirm-box {
-  max-width: 440px; margin: 0 auto;
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: 16px; padding: 36px 28px; text-align: center;
-}
-.confirm-icon {
-  width: 64px; height: 64px; border-radius: 50%; background: rgba(34,197,94,0.1);
-  border: 1px solid rgba(34,197,94,0.25); margin: 0 auto 20px;
-  display: grid; place-items: center;
-}
-.confirm-icon svg { width: 28px; height: 28px; }
-.confirm-title { font-size: 1.3rem; font-weight: 800; color: var(--text); margin-bottom: 6px; }
-.confirm-sub { font-size: 0.85rem; color: var(--muted); margin-bottom: 24px; }
-.confirm-details {
-  background: var(--surface2); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 0; margin-bottom: 24px; overflow: hidden;
-}
-.confirm-row { display: flex; justify-content: space-between; align-items: center; padding: 11px 16px; border-bottom: 1px solid var(--border); }
-.confirm-row:last-child { border-bottom: none; }
-.cr-label { font-size: 0.78rem; color: var(--muted); }
-.cr-val { font-size: 0.85rem; font-weight: 600; color: var(--text); }
-
-.confirm-actions { display: flex; flex-direction: column; gap: 8px; }
-.btn-wa {
-  display: block; width: 100%; padding: 11px; border-radius: var(--radius);
-  font-size: 0.9rem; font-weight: 600; color: #fff; background: #25D366;
-  cursor: pointer; border: none; text-align: center; transition: opacity 0.15s;
-  font-family: 'Inter', sans-serif;
-}
-.btn-wa:hover { opacity: 0.88; }
-.btn-cal {
-  display: block; width: 100%; padding: 11px; border-radius: var(--radius);
-  font-size: 0.875rem; font-weight: 500; color: var(--primary-l);
-  background: none; cursor: pointer; border: 1px solid rgba(99,102,241,0.3);
-  text-align: center; transition: all 0.15s; font-family: 'Inter', sans-serif;
-}
-.btn-cal:hover { background: rgba(99,102,241,0.08); border-color: var(--primary); }
-.btn-new {
-  font-size: 0.8rem; color: var(--muted); background: none; border: none;
-  cursor: pointer; padding: 8px; font-family: 'Inter', sans-serif;
-  transition: color 0.15s;
-}
-.btn-new:hover { color: var(--text); }
-
-.powered {
-  text-align: center; padding: 24px 16px 8px;
-  font-size: 0.72rem; color: var(--faint);
-}
-.powered a { color: var(--primary-l); text-decoration: none; }
 </style>
 </head>
 <body>
 
-<header class="app-header">
-  <a href="../" class="back-btn">
-    <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M9 2L4 7L9 12"/>
-    </svg>
-    Voltar
-  </a>
-  <div class="header-center">
-    <div class="header-logo">SyncTech Agendamento</div>
-    <div class="header-sub">Sistema de agendamento online</div>
+<header class="header">
+  <div class="logo">
+    <div class="logo-mark"><svg viewBox="0 0 14 14"><path d="M7 1L13 4.5V9.5L7 13L1 9.5V4.5L7 1Z"/></svg></div>
+    <span class="logo-text">SyncTech</span>
   </div>
-  <div class="status-pill">
-    <div class="status-dot"></div>
-    Online
-  </div>
+  <div class="biz-name" id="hdr-bizname"></div>
 </header>
 
-<div class="app-wrap">
+<div class="progress-wrap">
+  <div class="step-row">
+    <div class="step-item"><div class="step-circle active" id="sc1">1</div><div class="step-label active" id="sl1">Serviço</div></div>
+    <div class="step-line" id="ln1"></div>
+    <div class="step-item"><div class="step-circle" id="sc2">2</div><div class="step-label" id="sl2">Data &amp; Hora</div></div>
+    <div class="step-line" id="ln2"></div>
+    <div class="step-item"><div class="step-circle" id="sc3">3</div><div class="step-label" id="sl3">Seus Dados</div></div>
+    <div class="step-line" id="ln3"></div>
+    <div class="step-item"><div class="step-circle" id="sc4">4</div><div class="step-label" id="sl4">Confirmação</div></div>
+  </div>
+</div>
 
-  <!-- Business Card -->
-  <div class="biz-card">
-    <div class="biz-avatar" id="biz-emoji">✂️</div>
-    <div>
-      <div class="biz-name" id="biz-name">Barbearia Exemplo</div>
-      <div class="biz-desc" id="biz-desc">Cortes modernos e barba · Atendimento premium</div>
-      <div class="biz-meta">
-        <span class="meta-tag">
-          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 1C4.07 1 2.5 2.57 2.5 4.5c0 3 3.5 6.5 3.5 6.5s3.5-3.5 3.5-6.5C9.5 2.57 7.93 1 6 1z"/></svg>
-          <span id="biz-addr">Rua das Flores, 123 — Centro</span>
-        </span>
-        <span class="meta-tag">
-          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="6" r="5"/><path d="M6 3.5V6L7.5 7.5"/></svg>
-          Seg–Sáb: 09h–20h
-        </span>
-        <span class="meta-tag">
-          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="6,1 7.5,4.5 11,5 8.5,7.5 9.2,11 6,9.3 2.8,11 3.5,7.5 1,5 4.5,4.5"/></svg>
-          <span class="rating-val">4.9</span>&nbsp;(127 avaliações)
-        </span>
-      </div>
+<main class="booking-main">
+
+  <!-- STEP 1 -->
+  <div class="step active" id="step1">
+    <div class="step-title">Escolha o serviço</div>
+    <div class="step-sub">Selecione o que você quer agendar hoje</div>
+    <div class="svc-grid" id="svc-grid"></div>
+    <div class="prof-section">
+      <div class="prof-title">Escolha o profissional</div>
+      <div class="prof-grid" id="prof-grid"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" id="btn1" onclick="goTo(2)" disabled>Escolher data →</button>
     </div>
   </div>
 
-  <!-- Steps -->
-  <div class="steps-bar">
-    <div class="step-item">
-      <div class="step-num active" id="sn1">1</div>
-      <span class="step-label active" id="sl1">Serviço</span>
+  <!-- STEP 2 -->
+  <div class="step" id="step2">
+    <div class="step-title">Escolha data e horário</div>
+    <div class="step-sub">Selecione quando você quer ser atendido</div>
+    <div class="cal-header">
+      <button class="cal-nav" onclick="changeMonth(-1)">‹</button>
+      <span class="cal-month" id="cal-month"></span>
+      <button class="cal-nav" onclick="changeMonth(1)">›</button>
     </div>
-    <div class="step-line"></div>
-    <div class="step-item">
-      <div class="step-num" id="sn2">2</div>
-      <span class="step-label" id="sl2">Data & Hora</span>
-    </div>
-    <div class="step-line"></div>
-    <div class="step-item">
-      <div class="step-num" id="sn3">3</div>
-      <span class="step-label" id="sl3">Seus Dados</span>
-    </div>
-    <div class="step-line"></div>
-    <div class="step-item">
-      <div class="step-num" id="sn4">4</div>
-      <span class="step-label" id="sl4">Confirmação</span>
+    <div class="weekdays"><div class="wd">Dom</div><div class="wd">Seg</div><div class="wd">Ter</div><div class="wd">Qua</div><div class="wd">Qui</div><div class="wd">Sex</div><div class="wd">Sáb</div></div>
+    <div class="days-grid" id="days-grid"></div>
+    <div class="slots-title" id="slots-title">Selecione um dia para ver os horários</div>
+    <div class="slots-grid" id="slots-grid"></div>
+    <div class="btn-row">
+      <button class="btn btn-back" onclick="goTo(1)">← Voltar</button>
+      <button class="btn btn-primary" id="btn2" onclick="goTo(3)" disabled>Próximo →</button>
     </div>
   </div>
 
-  <!-- Panel 1: Service -->
-  <div class="panel active" id="panel1">
-    <div class="panel-title">Qual serviço deseja agendar?</div>
-    <div class="panel-sub">Selecione um serviço para continuar</div>
-    <div class="service-list" id="svc-list"></div>
-    <div class="panel-actions">
-      <button class="btn-next" id="btn1" disabled onclick="goTo(2)">Escolher data e horário →</button>
+  <!-- STEP 3 -->
+  <div class="step" id="step3">
+    <div class="step-title">Seus dados</div>
+    <div class="step-sub" id="step3-sub"></div>
+    <div class="form-group">
+      <label class="form-label">Nome completo *</label>
+      <input class="form-input" id="f-name" placeholder="Seu nome completo" type="text">
     </div>
-  </div>
-
-  <!-- Panel 2: Date & Time -->
-  <div class="panel" id="panel2">
-    <div class="summary-bar" id="sum2">
-      <div class="sum-item"><span class="sum-label">Serviço: </span><span class="sum-val" id="s-svc">—</span></div>
-      <div class="sum-item"><span class="sum-label">Duração: </span><span class="sum-val" id="s-dur">—</span></div>
-      <div class="sum-item"><span class="sum-label">Valor: </span><span class="sum-val" id="s-price">—</span></div>
-    </div>
-    <div class="panel-title">Escolha a data e o horário</div>
-    <div class="panel-sub">Apenas datas com horários disponíveis estão habilitadas</div>
-    <div class="booking-cols">
-      <div class="cal-card">
-        <div class="cal-header">
-          <button class="cal-nav-btn" onclick="changeMonth(-1)">‹</button>
-          <div class="cal-month-label" id="cal-title">—</div>
-          <button class="cal-nav-btn" onclick="changeMonth(1)">›</button>
-        </div>
-        <div class="cal-grid" id="cal-grid"></div>
-      </div>
-      <div class="times-card">
-        <div class="times-header" id="times-hdr">Selecione um dia</div>
-        <div id="times-body"><div class="times-empty">Escolha uma data no calendário para ver os horários disponíveis.</div></div>
-      </div>
-    </div>
-    <div class="panel-actions">
-      <button class="btn-back" onclick="goTo(1)">← Voltar</button>
-      <button class="btn-next" id="btn2" disabled onclick="goTo(3)">Preencher meus dados →</button>
-    </div>
-  </div>
-
-  <!-- Panel 3: Client Data -->
-  <div class="panel" id="panel3">
-    <div class="summary-bar">
-      <div class="sum-item"><span class="sum-label">Serviço: </span><span class="sum-val" id="s2-svc">—</span></div>
-      <div class="sum-item"><span class="sum-label">Data: </span><span class="sum-val" id="s2-date">—</span></div>
-      <div class="sum-item"><span class="sum-label">Horário: </span><span class="sum-val" id="s2-time">—</span></div>
-      <div class="sum-item"><span class="sum-label">Valor: </span><span class="sum-val" id="s2-price">—</span></div>
-    </div>
-    <div class="panel-title">Seus dados</div>
-    <div class="panel-sub">Você receberá a confirmação pelo WhatsApp informado</div>
-    <div class="form-error" id="form-err">Por favor, preencha o nome e o WhatsApp.</div>
-    <div class="form-grid">
-      <div class="form-group">
-        <label class="form-label">Nome completo *</label>
-        <input class="form-input" type="text" id="f-nome" placeholder="Seu nome completo">
-      </div>
+    <div class="form-row">
       <div class="form-group">
         <label class="form-label">WhatsApp *</label>
-        <input class="form-input" type="tel" id="f-tel" placeholder="(00) 00000-0000">
+        <input class="form-input" id="f-wpp" placeholder="(11) 99999-9999" type="tel">
       </div>
       <div class="form-group">
         <label class="form-label">E-mail</label>
-        <input class="form-input" type="email" id="f-email" placeholder="email@exemplo.com">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Como nos conheceu?</label>
-        <select class="form-select" id="f-origem">
-          <option value="">Selecione...</option>
-          <option>Instagram</option>
-          <option>WhatsApp</option>
-          <option>Indicação de amigo</option>
-          <option>Google</option>
-          <option>Passando na rua</option>
-          <option>Outro</option>
-        </select>
-      </div>
-      <div class="form-group form-full">
-        <label class="form-label">Observações (opcional)</label>
-        <textarea class="form-textarea" id="f-obs" placeholder="Alguma informação importante para o profissional..."></textarea>
+        <input class="form-input" id="f-email" placeholder="seu@email.com" type="email">
+        <div class="form-note">Para receber confirmação por e-mail</div>
       </div>
     </div>
-    <div class="wa-notice">
-      <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-      <span>Você receberá uma <strong>confirmação</strong> e um <strong>lembrete 1h antes</strong> do horário pelo WhatsApp. Certifique-se que o número está correto.</span>
+    <div class="form-group">
+      <label class="form-label">Observações (opcional)</label>
+      <input class="form-input" id="f-obs" placeholder="Ex: primeira vez, alergias, preferências...">
     </div>
-    <div class="panel-actions">
-      <button class="btn-back" onclick="goTo(2)">← Voltar</button>
-      <button class="btn-next" onclick="confirmar()">Confirmar agendamento →</button>
+    <div class="payment-section">
+      <div class="payment-title">💳 Pagamento</div>
+      <div class="payment-body">O pagamento é feito presencialmente no atendimento. Aceitamos Pix, dinheiro, cartão de débito e crédito.</div>
+      <div class="payment-badge">✓ Sem cobrança antecipada</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-back" onclick="goTo(2)">← Voltar</button>
+      <button class="btn btn-primary" onclick="confirmBooking()">Confirmar agendamento →</button>
     </div>
   </div>
 
-  <!-- Panel 4: Confirmation -->
-  <div class="panel" id="panel4">
-    <div class="confirm-box">
-      <div class="confirm-icon">
-        <svg viewBox="0 0 28 28" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M5 14L10 19L23 8"/>
-        </svg>
-      </div>
+  <!-- STEP 4 -->
+  <div class="step" id="step4">
+    <div class="confirm-wrap">
+      <div class="confirm-icon">✅</div>
       <div class="confirm-title">Agendamento confirmado!</div>
-      <div class="confirm-sub">Sua confirmação foi enviada para o WhatsApp. Até lá!</div>
-      <div class="confirm-details">
-        <div class="confirm-row"><span class="cr-label">Serviço</span><span class="cr-val" id="c-svc">—</span></div>
-        <div class="confirm-row"><span class="cr-label">Data</span><span class="cr-val" id="c-date">—</span></div>
-        <div class="confirm-row"><span class="cr-label">Horário</span><span class="cr-val" id="c-time">—</span></div>
-        <div class="confirm-row"><span class="cr-label">Cliente</span><span class="cr-val" id="c-nome">—</span></div>
-        <div class="confirm-row"><span class="cr-label">WhatsApp</span><span class="cr-val" id="c-tel">—</span></div>
-        <div class="confirm-row"><span class="cr-label">Valor</span><span class="cr-val" id="c-price">—</span></div>
+      <div class="confirm-sub" id="conf-sub"></div>
+      <div class="confirm-card" id="conf-card"></div>
+      <div class="share-row">
+        <button class="share-btn wa" id="btn-wa">📱 Chamar no WhatsApp</button>
+        <button class="share-btn" onclick="addToCalendar()">📅 Salvar no calendário</button>
       </div>
-      <div class="confirm-actions">
-        <button class="btn-wa" onclick="sendWA()">Abrir no WhatsApp</button>
-        <button class="btn-cal" onclick="addCal()">Adicionar ao Google Calendar</button>
-        <button class="btn-new" onclick="reset()">+ Fazer novo agendamento</button>
+      <div class="btn-row" style="margin-top:16px">
+        <button class="btn btn-primary" onclick="location.reload()">Fazer outro agendamento</button>
       </div>
-    </div>
-
-    <div class="wa-notice" style="max-width:440px;margin:20px auto 0">
-      <svg viewBox="0 0 24 24" fill="#6366F1"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-      <span>Sistema de agendamento feito pela <strong>SyncTech Automation</strong>. Quer isso na sua empresa? <a href="../" style="color:var(--primary-l)">Saiba mais →</a></span>
     </div>
   </div>
 
-</div>
+</main>
 
-<div class="powered">Powered by <a href="../">SyncTech Automation</a></div>
+<footer class="booking-footer">
+  <div class="footer-text">Agendamento online por <a href="../" target="_blank">SyncTech Automation</a></div>
+</footer>
 
 <script>
-// ── CONFIG (editável por negócio) ──
-const CONFIG = {
-  business: {
-    name: 'Barbearia Exemplo',
-    emoji: '✂️',
-    desc: 'Cortes modernos e barba · Atendimento premium',
-    address: 'Rua das Flores, 123 — Centro',
-    whatsapp: '5511999999999'
-  },
-  services: [
-    { id:1, name:'Corte Masculino',    desc:'Corte moderno com navalha e finalização',   price:45, duration:45, emoji:'✂️' },
-    { id:2, name:'Barba',              desc:'Aparar e modelar a barba com navalha',       price:35, duration:30, emoji:'🪒' },
-    { id:3, name:'Corte + Barba',      desc:'Combo completo com desconto especial',       price:70, duration:75, emoji:'💈' },
-    { id:4, name:'Hidratação Capilar', desc:'Tratamento profissional para o cabelo',      price:55, duration:60, emoji:'💧' },
-    { id:5, name:'Pigmentação',        desc:'Coloração e pigmentação da barba',           price:80, duration:90, emoji:'🎨' },
+var CONFIG = {
+  bizName: 'Barbearia Exemplo',
+  bizWpp: '5511999990000',
+  professionals: [
+    { id:0, name:'Qualquer', emoji:'⭐', color:'#6366F1', rating:null, reviews:null },
+    { id:1, name:'João M.',  initials:'JM', color:'#06B6D4', rating:4.9, reviews:128 },
+    { id:2, name:'Carlos A.',initials:'CA', color:'#22C55E', rating:4.8, reviews:89  },
+    { id:3, name:'Pedro R.', initials:'PR', color:'#F59E0B', rating:4.7, reviews:64  },
   ],
-  // Horários por dia da semana (0=Dom…6=Sáb)
-  slots: {
-    1: ['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00'],
-    2: ['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00'],
-    3: ['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00'],
-    4: ['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00'],
-    5: ['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00'],
-    6: ['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30'],
-  },
-  busySlots: {} // 'YYYY-MM-DD': ['HH:MM']
+  services: [
+    { id:1, icon:'✂️', name:'Corte Masculino',   desc:'Tesoura ou máquina, qualquer estilo',  price:45, duration:45, durationStr:'45 min', popular:false },
+    { id:2, icon:'🪒', name:'Barba',             desc:'Navalha, toalha quente e hidratação',   price:35, duration:30, durationStr:'30 min', popular:false },
+    { id:3, icon:'💈', name:'Corte + Barba',     desc:'Combo completo com desconto',           price:70, duration:75, durationStr:'75 min', popular:true  },
+    { id:4, icon:'💧', name:'Hidratação Capilar',desc:'Tratamento profundo com máscara',       price:55, duration:60, durationStr:'60 min', popular:false },
+    { id:5, icon:'🎨', name:'Pigmentação',       desc:'Para disfarçar os fios brancos',        price:80, duration:90, durationStr:'90 min', popular:false },
+  ],
+  morningSlots:   ['08:30','09:00','09:30','10:00','10:30','11:00','11:30'],
+  afternoonSlots: ['13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00'],
+  popularSlots:   ['09:00','14:00','15:00'],
+  bookedSlots:    ['09:00','10:00','13:30','15:30'],
 };
 
-// ── STATE ──
-const now = new Date();
-let S = { service: null, date: null, time: null, yr: now.getFullYear(), mo: now.getMonth(), nome:'', tel:'' };
+var S = { svc:null, prof:0, day:null, slot:null, month:new Date().getMonth(), year:new Date().getFullYear() };
+var MONTHS = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
 
-const MONTHS = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-const DNAMES = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
-
-// ── INIT ──
-function init() {
-  document.getElementById('biz-name').textContent = CONFIG.business.name;
-  document.getElementById('biz-emoji').textContent = CONFIG.business.emoji;
-  document.getElementById('biz-desc').textContent  = CONFIG.business.desc;
-  document.getElementById('biz-addr').textContent  = CONFIG.business.address;
-  renderServices();
-  renderCal();
-}
-
-// ── SERVICES ──
+// Services
 function renderServices() {
-  const list = document.getElementById('svc-list');
-  list.innerHTML = '';
-  CONFIG.services.forEach(function(s) {
-    var row = document.createElement('div');
-    row.className = 'svc-row';
-    row.id = 'row-' + s.id;
-    row.innerHTML =
-      '<div class="svc-icon-box">' + s.emoji + '</div>' +
-      '<div class="svc-info">' +
-        '<div class="svc-name">' + s.name + '</div>' +
-        '<div class="svc-meta">' + s.desc + ' &middot; ' + s.duration + ' min</div>' +
+  document.getElementById('svc-grid').innerHTML = CONFIG.services.map(function(s) {
+    return '<div class="svc-card" id="svc-'+s.id+'" onclick="pickSvc('+s.id+')">' +
+      '<div class="svc-icon">'+s.icon+'</div>' +
+      '<div style="flex:1;min-width:0">' +
+        '<div style="display:flex;align-items:center;gap:7px">' +
+          '<div class="svc-name">'+s.name+'</div>' +
+          (s.popular ? '<span class="svc-popular">Mais popular</span>' : '') +
+        '</div>' +
+        '<div class="svc-meta">'+s.desc+'</div>' +
       '</div>' +
-      '<div class="svc-right">' +
-        '<div class="svc-price">R$' + s.price + '</div>' +
-        '<div class="svc-dur">' + s.duration + ' min</div>' +
+      '<div style="text-align:right;flex-shrink:0">' +
+        '<div class="svc-price">R$'+s.price+'</div>' +
+        '<div class="svc-duration">⏱ '+s.durationStr+'</div>' +
       '</div>' +
-      '<div class="svc-check" id="chk-' + s.id + '">' +
-        '<svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 5L4 7.5L8.5 2.5"/></svg>' +
-      '</div>';
-    row.addEventListener('click', function() { selectSvc(s.id); });
-    list.appendChild(row);
-  });
+    '</div>';
+  }).join('');
 }
 
-function selectSvc(id) {
-  CONFIG.services.forEach(function(s) {
-    var r = document.getElementById('row-' + s.id);
-    if (r) r.classList.remove('selected');
-  });
-  document.getElementById('row-' + id).classList.add('selected');
-  S.service = CONFIG.services.find(function(s) { return s.id === id; });
+function pickSvc(id) {
+  S.svc = id;
+  document.querySelectorAll('.svc-card').forEach(function(c){ c.classList.remove('selected'); });
+  document.getElementById('svc-'+id).classList.add('selected');
   document.getElementById('btn1').disabled = false;
 }
 
-// ── CALENDAR ──
-function renderCal() {
-  var yr = S.yr, mo = S.mo;
-  document.getElementById('cal-title').textContent = MONTHS[mo] + ' ' + yr;
-  var grid = document.getElementById('cal-grid');
-  grid.innerHTML = DNAMES.map(function(d) { return '<div class="cal-day-hdr">' + d + '</div>'; }).join('');
-
-  var first = new Date(yr, mo, 1).getDay();
-  var days  = new Date(yr, mo + 1, 0).getDate();
-  var today = new Date(); today.setHours(0,0,0,0);
-
-  for (var i = 0; i < first; i++) {
-    var empty = document.createElement('div');
-    empty.className = 'cal-cell empty';
-    grid.appendChild(empty);
-  }
-
-  for (var d = 1; d <= days; d++) {
-    var date = new Date(yr, mo, d);
-    var dow  = date.getDay();
-    var past = date < today;
-    var has  = CONFIG.slots[dow] && !past;
-    var str  = yr + '-' + pad(mo + 1) + '-' + pad(d);
-    var sel  = S.date === str;
-    var tod  = date.getTime() === today.getTime();
-
-    var cell = document.createElement('div');
-    cell.className = 'cal-cell';
-    if (past) cell.classList.add('past');
-    else if (has) cell.classList.add('has-slots');
-    if (tod) cell.classList.add('today');
-    if (sel) cell.classList.add('selected');
-    cell.textContent = d;
-
-    if (has) {
-      (function(s) {
-        cell.addEventListener('click', function() { pickDate(s); });
-      })(str);
-    }
-    grid.appendChild(cell);
-  }
+// Professionals
+function renderProfs() {
+  document.getElementById('prof-grid').innerHTML = CONFIG.professionals.map(function(p) {
+    var av = p.emoji
+      ? '<div class="prof-av" style="background:'+p.color+'22;font-size:1.4rem">'+p.emoji+'</div>'
+      : '<div class="prof-av" style="background:'+p.color+'33;color:'+p.color+'">'+p.initials+'</div>';
+    var info = p.rating
+      ? '<div class="prof-stars">★ '+p.rating+'</div><div class="prof-count">'+p.reviews+' avaliações</div>'
+      : '<div class="prof-count" style="margin-top:4px">Disponível</div>';
+    return '<div class="prof-card'+(p.id===0?' selected':'')+'" id="prof-'+p.id+'" onclick="pickProf('+p.id+')">'+av+'<div class="prof-name">'+p.name+'</div>'+info+'</div>';
+  }).join('');
 }
 
-function changeMonth(dir) {
-  S.mo += dir;
-  if (S.mo > 11) { S.mo = 0; S.yr++; }
-  if (S.mo < 0)  { S.mo = 11; S.yr--; }
-  S.date = null; S.time = null;
+function pickProf(id) {
+  S.prof = id;
+  document.querySelectorAll('.prof-card').forEach(function(c){ c.classList.remove('selected'); });
+  document.getElementById('prof-'+id).classList.add('selected');
+}
+
+// Calendar
+function changeMonth(d) {
+  S.month += d;
+  if (S.month > 11){ S.month=0; S.year++; }
+  if (S.month < 0) { S.month=11; S.year--; }
+  S.day=null; S.slot=null;
+  renderCalendar(); renderSlots();
   document.getElementById('btn2').disabled = true;
-  renderCal();
-  document.getElementById('times-body').innerHTML = '<div class="times-empty">Escolha uma data no calendário.</div>';
-  document.getElementById('times-hdr').textContent = 'Selecione um dia';
 }
 
-function pickDate(str) {
-  S.date = str; S.time = null;
+function renderCalendar() {
+  document.getElementById('cal-month').textContent = MONTHS[S.month]+' '+S.year;
+  var first = new Date(S.year, S.month, 1).getDay();
+  var total = new Date(S.year, S.month+1, 0).getDate();
+  var today = new Date();
+  var html = '';
+  for (var i=0; i<first; i++) html += '<div class="day-btn empty"></div>';
+  for (var d=1; d<=total; d++) {
+    var dt   = new Date(S.year, S.month, d);
+    var past = dt < new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    var isSun = dt.getDay()===0;
+    var isTod = d===today.getDate() && S.month===today.getMonth() && S.year===today.getFullYear();
+    var isSel = S.day===d;
+    html += '<button class="day-btn'+(isSel?' selected':'')+(isTod&&!isSel?' today':'')+'"'+(past||isSun?' disabled':' onclick="pickDay('+d+')"')+'>'+d+'</button>';
+  }
+  document.getElementById('days-grid').innerHTML = html;
+}
+
+function pickDay(d) {
+  S.day=d; S.slot=null;
+  renderCalendar(); renderSlots();
   document.getElementById('btn2').disabled = true;
-  renderCal();
-  renderTimes(str);
 }
 
-function renderTimes(str) {
-  var parts = str.split('-');
-  var y = parts[0], m = parts[1], d = parts[2];
-  var date  = new Date(str + 'T00:00:00');
-  var dow   = date.getDay();
-  var slots = CONFIG.slots[dow] || [];
-  var busy  = CONFIG.busySlots[str] || [];
-
-  document.getElementById('times-hdr').textContent = 'Horários — ' + d + '/' + m + '/' + y;
-
-  if (!slots.length) {
-    document.getElementById('times-body').innerHTML = '<div class="times-empty">Sem horários disponíveis neste dia.</div>';
+function renderSlots() {
+  if (!S.day) {
+    document.getElementById('slots-title').textContent = 'Selecione um dia para ver os horários';
+    document.getElementById('slots-grid').innerHTML = '';
     return;
   }
-
-  var grid = document.createElement('div');
-  grid.className = 'times-grid';
-  slots.forEach(function(t) {
-    var isBusy = busy.indexOf(t) !== -1;
-    var chip = document.createElement('div');
-    chip.className = 'time-chip' + (isBusy ? ' busy' : '') + (S.time === t ? ' selected' : '');
-    chip.textContent = t;
-    if (!isBusy) {
-      (function(time) {
-        chip.addEventListener('click', function() { pickTime(time); });
-      })(t);
-    }
-    grid.appendChild(chip);
-  });
-  document.getElementById('times-body').innerHTML = '';
-  document.getElementById('times-body').appendChild(grid);
+  var dt = new Date(S.year, S.month, S.day);
+  var dn = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'][dt.getDay()];
+  document.getElementById('slots-title').textContent = 'Horários — '+dn+', '+S.day+'/'+(S.month+1);
+  var all = CONFIG.morningSlots.concat(CONFIG.afternoonSlots);
+  document.getElementById('slots-grid').innerHTML = all.map(function(t) {
+    var booked  = CONFIG.bookedSlots.indexOf(t) !== -1;
+    var popular = CONFIG.popularSlots.indexOf(t) !== -1;
+    return '<button class="slot-btn'+(S.slot===t?' selected':'')+(popular?' popular':'')+'"'+(booked?' disabled':' onclick="pickSlot(\''+t+'\')"')+'>'+t+'</button>';
+  }).join('');
 }
 
-function pickTime(t) {
-  S.time = t;
-  renderTimes(S.date);
+function pickSlot(t) {
+  S.slot=t; renderSlots();
   document.getElementById('btn2').disabled = false;
 }
 
-// ── NAV ──
-function goTo(step) {
-  if (step === 2) {
-    document.getElementById('s-svc').textContent   = S.service.name;
-    document.getElementById('s-dur').textContent   = S.service.duration + ' min';
-    document.getElementById('s-price').textContent = 'R$' + S.service.price;
-  }
-  if (step === 3) {
-    document.getElementById('s2-svc').textContent   = S.service.name;
-    document.getElementById('s2-date').textContent  = fmtDate(S.date);
-    document.getElementById('s2-time').textContent  = S.time;
-    document.getElementById('s2-price').textContent = 'R$' + S.service.price;
-    document.getElementById('form-err').classList.remove('show');
-  }
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.getElementById('panel' + step).classList.add('active');
-  updateSteps(step);
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+// Step 3 summary header
+function renderSummaryHeader() {
+  var svc = CONFIG.services.filter(function(s){ return s.id===S.svc; })[0];
+  document.getElementById('step3-sub').textContent = svc.name+' · '+S.day+'/'+(S.month+1)+'/'+S.year+' às '+S.slot;
 }
 
-function updateSteps(active) {
-  for (let i = 1; i <= 4; i++) {
-    const n = document.getElementById('sn' + i);
-    const l = document.getElementById('sl' + i);
-    n.classList.remove('active','done');
-    l.classList.remove('active');
-    if (i < active)      { n.classList.add('done'); n.innerHTML = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6L5 9L10 3"/></svg>'; }
-    else if (i === active){ n.classList.add('active'); n.textContent = i; l.classList.add('active'); }
-    else                  { n.textContent = i; }
-  }
-}
+// Confirm
+function confirmBooking() {
+  var name  = document.getElementById('f-name').value.trim();
+  var phone = document.getElementById('f-wpp').value.trim();
+  if (!name || !phone) { alert('Preencha nome e WhatsApp!'); return; }
+  var svc  = CONFIG.services.filter(function(s){ return s.id===S.svc; })[0];
+  var prof = CONFIG.professionals.filter(function(p){ return p.id===S.prof; })[0];
+  var dateStr = S.day+'/'+(S.month+1)+'/'+S.year;
 
-function confirmar() {
-  const nome = document.getElementById('f-nome').value.trim();
-  const tel  = document.getElementById('f-tel').value.trim();
-  if (!nome || !tel) { document.getElementById('form-err').classList.add('show'); return; }
-  S.nome = nome; S.tel = tel;
-  document.getElementById('c-svc').textContent   = S.service.name;
-  document.getElementById('c-date').textContent  = fmtDate(S.date);
-  document.getElementById('c-time').textContent  = S.time;
-  document.getElementById('c-nome').textContent  = nome;
-  document.getElementById('c-tel').textContent   = tel;
-  document.getElementById('c-price').textContent = 'R$' + S.service.price;
+  document.getElementById('conf-sub').textContent = 'Olá, '+name.split(' ')[0]+'! Enviaremos confirmação no WhatsApp ('+phone+') e um lembrete 1h antes.';
+  document.getElementById('conf-card').innerHTML = [
+    { icon:'💈', text:svc.name,         sub:svc.icon+' '+svc.durationStr+' · R$'+svc.price },
+    { icon:'📅', text:dateStr+' às '+S.slot, sub:'Confirmado' },
+    { icon:'👤', text:prof.name,        sub:prof.id===0?'Primeiro disponível':(prof.rating?'★ '+prof.rating:'Profissional') },
+    { icon:'📍', text:CONFIG.bizName,   sub:'Local confirmado via WhatsApp' },
+  ].map(function(r){
+    return '<div class="confirm-card-row"><div class="cc-icon">'+r.icon+'</div><div><div class="cc-text">'+r.text+'</div><div class="cc-sub">'+r.sub+'</div></div></div>';
+  }).join('');
+
+  var msg = encodeURIComponent('✅ *Agendamento Confirmado!*\n\n👤 *Nome:* '+name+'\n💈 *Serviço:* '+svc.name+'\n📅 *Data:* '+dateStr+' às '+S.slot+'\n💰 *Valor:* R$'+svc.price+'\n\n_Agendado via SyncTech Automation_');
+  document.getElementById('btn-wa').onclick = function(){ window.open('https://wa.me/'+CONFIG.bizWpp+'?text='+msg,'_blank'); };
   goTo(4);
 }
 
-function sendWA() {
-  const msg = `Olá! Agendamento confirmado:\n\n*${S.service.name}*\n📅 ${fmtDate(S.date)} às ${S.time}\n💰 R$${S.service.price}\n👤 ${S.nome}\n\nConfirmado via SyncTech Automation!`;
-  window.open(`https://wa.me/${CONFIG.business.whatsapp}?text=${encodeURIComponent(msg)}`, '_blank');
+function addToCalendar() {
+  var svc = CONFIG.services.filter(function(s){ return s.id===S.svc; })[0];
+  var parts = S.slot.split(':');
+  var start = new Date(S.year, S.month, S.day, parseInt(parts[0]), parseInt(parts[1]));
+  var end   = new Date(start.getTime() + svc.duration*60000);
+  var f = function(d){ return d.toISOString().replace(/-|:|\.\d{3}/g,''); };
+  window.open('https://calendar.google.com/calendar/r/eventedit?text='+encodeURIComponent(svc.name+' — '+CONFIG.bizName)+'&dates='+f(start)+'/'+f(end)+'&details='+encodeURIComponent('Agendado via SyncTech Automation'),'_blank');
 }
 
-function addCal() {
-  const start = S.date.replace(/-/g,'') + 'T' + S.time.replace(':','') + '00';
-  const e = new Date(S.date + 'T' + S.time + ':00');
-  e.setMinutes(e.getMinutes() + S.service.duration);
-  const end = e.toISOString().replace(/[-:]/g,'').slice(0,15);
-  const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(S.service.name+' — '+CONFIG.business.name)}&dates=${start}/${end}&location=${encodeURIComponent(CONFIG.business.address)}`;
-  window.open(url, '_blank');
+// Navigation
+function goTo(n) {
+  if (n===3) renderSummaryHeader();
+  for (var i=1; i<=4; i++) {
+    document.getElementById('step'+i).classList.toggle('active', i===n);
+    var sc = document.getElementById('sc'+i);
+    var sl = document.getElementById('sl'+i);
+    sc.className = 'step-circle'+(i<n?' done':i===n?' active':'');
+    sl.className = 'step-label'+(i<n?' done':i===n?' active':'');
+    sc.innerHTML = i<n ? '✓' : String(i);
+    if (i<4) document.getElementById('ln'+i).className = 'step-line'+(i<n?' done':'');
+  }
+  window.scrollTo(0,0);
 }
 
-function reset() {
-  S = { service:null, date:null, time:null, yr:now.getFullYear(), mo:now.getMonth(), nome:'', tel:'' };
-  document.querySelectorAll('.svc-row').forEach(r => r.classList.remove('selected'));
-  document.getElementById('btn1').disabled = true;
-  document.getElementById('btn2').disabled = true;
-  ['f-nome','f-tel','f-email','f-obs'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('f-origem').value = '';
-  renderCal();
-  goTo(1);
-}
-
-function fmtDate(str) {
-  if (!str) return '—';
-  const [y,m,d] = str.split('-');
-  const date = new Date(+y, +m-1, +d);
-  return `${DNAMES[date.getDay()]}, ${d}/${m}/${y}`;
-}
-
-function pad(n) { return String(n).padStart(2, '0'); }
-
-init();
+// Init
+document.getElementById('hdr-bizname').textContent = CONFIG.bizName;
+renderServices();
+renderProfs();
+renderCalendar();
 </script>
 </body>
 </html>
