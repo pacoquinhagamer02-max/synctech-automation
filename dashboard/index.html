@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — SyncTech Automation</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #7C3AED; --primary-light: #A78BFA;
+  --secondary: #06B6D4; --accent: #10B981; --warn: #F59E0B; --danger: #EF4444;
+  --dark: #0A0A0F; --dark2: #111118; --dark3: #1A1A27; --dark4: #222235;
+  --border: rgba(124,58,237,0.2); --text: #E2E8F0; --text-muted: #94A3B8;
+  --gradient: linear-gradient(135deg,#7C3AED 0%,#06B6D4 100%);
+  --sidebar-w: 240px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Inter',sans-serif; background:var(--dark); color:var(--text); display:flex; min-height:100vh; }
+
+/* SIDEBAR */
+.sidebar {
+  width:var(--sidebar-w); background:var(--dark2); border-right:1px solid var(--border);
+  display:flex; flex-direction:column; position:fixed; top:0; left:0; height:100vh; z-index:50;
+}
+.sidebar-logo {
+  padding:20px; border-bottom:1px solid var(--border);
+  font-size:1.1rem; font-weight:800;
+  background:var(--gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+}
+.sidebar-biz { padding:16px 20px; border-bottom:1px solid var(--border); }
+.biz-name { font-size:0.88rem; font-weight:700; }
+.biz-plan { font-size:0.72rem; color:var(--primary-light); margin-top:2px; }
+
+.sidebar-nav { padding:12px 0; flex:1; overflow-y:auto; }
+.nav-section { padding:8px 20px 4px; font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; color:rgba(148,163,184,0.4); }
+.nav-item {
+  padding:10px 20px; display:flex; align-items:center; gap:10px;
+  cursor:pointer; transition:all 0.15s; font-size:0.85rem; color:var(--text-muted);
+  border-left:3px solid transparent;
+}
+.nav-item:hover { color:var(--text); background:rgba(124,58,237,0.05); }
+.nav-item.active { color:var(--primary-light); background:rgba(124,58,237,0.1); border-left-color:var(--primary); }
+.nav-icon { font-size:1rem; width:20px; text-align:center; }
+
+.sidebar-bottom {
+  padding:16px 20px; border-top:1px solid var(--border);
+  font-size:0.78rem; color:var(--text-muted);
+}
+.status-dot { display:inline-block; width:8px; height:8px; background:var(--accent); border-radius:50%; margin-right:6px; animation:pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+/* MAIN */
+.main { margin-left:var(--sidebar-w); flex:1; display:flex; flex-direction:column; min-height:100vh; }
+
+.topbar {
+  height:60px; background:var(--dark2); border-bottom:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between; padding:0 24px;
+  position:sticky; top:0; z-index:40;
+}
+.topbar-title { font-size:1rem; font-weight:700; }
+.topbar-right { display:flex; align-items:center; gap:16px; }
+.topbar-notif {
+  width:36px; height:36px; border-radius:50%; background:var(--dark3);
+  border:1px solid var(--border); display:flex; align-items:center; justify-content:center;
+  cursor:pointer; position:relative; font-size:1rem;
+}
+.notif-badge {
+  position:absolute; top:-4px; right:-4px; width:16px; height:16px;
+  background:var(--danger); border-radius:50%; font-size:0.6rem; font-weight:700;
+  display:flex; align-items:center; justify-content:center; color:#fff;
+}
+.topbar-avatar {
+  width:36px; height:36px; border-radius:50%;
+  background:var(--gradient); display:flex; align-items:center; justify-content:center;
+  font-weight:700; font-size:0.9rem; cursor:pointer;
+}
+.topbar-date { font-size:0.78rem; color:var(--text-muted); }
+
+.content { padding:24px; flex:1; }
+.page { display:none; }
+.page.active { display:block; }
+
+/* KPI CARDS */
+.kpi-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; margin-bottom:24px; }
+.kpi {
+  background:var(--dark2); border:1px solid var(--border); border-radius:16px;
+  padding:20px; position:relative; overflow:hidden;
+}
+.kpi::before {
+  content:''; position:absolute; top:0; right:0; width:80px; height:80px;
+  border-radius:50%; opacity:0.05;
+}
+.kpi.purple::before { background:#7C3AED; }
+.kpi.cyan::before { background:#06B6D4; }
+.kpi.green::before { background:#10B981; }
+.kpi.yellow::before { background:#F59E0B; }
+
+.kpi-label { font-size:0.75rem; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
+.kpi-value { font-size:2rem; font-weight:800; margin-bottom:4px; }
+.kpi-change { font-size:0.75rem; display:flex; align-items:center; gap:4px; }
+.kpi-change.up { color:var(--accent); }
+.kpi-change.down { color:var(--danger); }
+.kpi-icon { position:absolute; top:16px; right:16px; font-size:1.5rem; opacity:0.6; }
+
+/* CHARTS AREA */
+.charts-row { display:grid; grid-template-columns:2fr 1fr; gap:16px; margin-bottom:24px; }
+.chart-card {
+  background:var(--dark2); border:1px solid var(--border); border-radius:16px; padding:20px;
+}
+.chart-title { font-size:0.9rem; font-weight:700; margin-bottom:4px; }
+.chart-sub { font-size:0.75rem; color:var(--text-muted); margin-bottom:16px; }
+
+/* Bar chart */
+.bar-chart { display:flex; align-items:flex-end; gap:8px; height:120px; }
+.bar-group { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; }
+.bar {
+  width:100%; border-radius:4px 4px 0 0; background:rgba(124,58,237,0.3);
+  transition:all 0.3s; cursor:pointer; position:relative;
+}
+.bar:hover { background:var(--primary); }
+.bar-tooltip {
+  position:absolute; top:-28px; left:50%; transform:translateX(-50%);
+  background:var(--dark); border:1px solid var(--border); border-radius:6px;
+  padding:3px 8px; font-size:0.7rem; white-space:nowrap; display:none;
+}
+.bar:hover .bar-tooltip { display:block; }
+.bar-label { font-size:0.65rem; color:var(--text-muted); }
+
+/* Donut chart */
+.donut-wrap { display:flex; flex-direction:column; align-items:center; }
+.donut-svg { width:120px; height:120px; }
+.donut-legend { width:100%; margin-top:12px; display:flex; flex-direction:column; gap:6px; }
+.legend-item { display:flex; align-items:center; gap:8px; font-size:0.78rem; }
+.legend-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+.legend-label { flex:1; color:var(--text-muted); }
+.legend-val { font-weight:700; }
+
+/* TABLES */
+.table-card {
+  background:var(--dark2); border:1px solid var(--border); border-radius:16px;
+  padding:20px; margin-bottom:16px;
+}
+.table-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+.table-title { font-size:0.9rem; font-weight:700; }
+.table-action { font-size:0.78rem; color:var(--primary-light); cursor:pointer; background:none; border:none; font-family:inherit; }
+
+table { width:100%; border-collapse:collapse; }
+th { font-size:0.72rem; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.5px; padding:0 12px 10px; text-align:left; }
+td { padding:12px; border-top:1px solid var(--border); font-size:0.85rem; }
+tr:hover td { background:rgba(124,58,237,0.03); }
+
+.badge {
+  display:inline-block; padding:3px 10px; border-radius:20px; font-size:0.72rem; font-weight:600;
+}
+.badge.confirmed { background:rgba(16,185,129,0.15); color:var(--accent); }
+.badge.pending { background:rgba(245,158,11,0.15); color:var(--warn); }
+.badge.cancelled { background:rgba(239,68,68,0.15); color:var(--danger); }
+.badge.done { background:rgba(148,163,184,0.15); color:var(--text-muted); }
+
+/* AGENDA VIEW */
+.agenda-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.time-block { display:flex; gap:12px; padding:10px 0; border-bottom:1px solid var(--border); }
+.time-block:last-child { border:none; }
+.tb-time { font-size:0.78rem; color:var(--text-muted); width:50px; flex-shrink:0; padding-top:2px; }
+.tb-event {
+  flex:1; background:rgba(124,58,237,0.1); border-left:3px solid var(--primary);
+  border-radius:0 8px 8px 0; padding:8px 12px;
+}
+.tb-empty { flex:1; border-left:3px solid var(--border); border-radius:0 8px 8px 0; padding:8px 12px; color:rgba(148,163,184,0.3); font-size:0.8rem; }
+.tb-name { font-size:0.85rem; font-weight:700; }
+.tb-service { font-size:0.75rem; color:var(--text-muted); }
+.tb-status { display:flex; justify-content:space-between; margin-top:4px; }
+
+/* CRM */
+.client-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:12px; }
+.client-card {
+  background:var(--dark3); border:1px solid var(--border); border-radius:12px; padding:16px;
+  transition:all 0.2s; cursor:pointer;
+}
+.client-card:hover { border-color:var(--primary); transform:translateY(-2px); }
+.client-head { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+.client-avatar { width:40px; height:40px; border-radius:50%; background:var(--gradient); display:flex; align-items:center; justify-content:center; font-weight:700; flex-shrink:0; }
+.client-name { font-size:0.9rem; font-weight:700; }
+.client-meta { font-size:0.75rem; color:var(--text-muted); }
+.client-stats { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
+.cs-item { text-align:center; background:var(--dark2); border-radius:8px; padding:6px; }
+.cs-val { font-size:0.85rem; font-weight:700; color:var(--primary-light); }
+.cs-lbl { font-size:0.65rem; color:var(--text-muted); }
+
+/* SEARCH + FILTER */
+.search-bar { display:flex; gap:10px; margin-bottom:16px; }
+.search-input {
+  flex:1; background:var(--dark3); border:1px solid var(--border); border-radius:10px;
+  padding:10px 14px; color:var(--text); font-size:0.85rem; outline:none; font-family:'Inter',sans-serif;
+}
+.search-input:focus { border-color:var(--primary); }
+.filter-btn {
+  background:var(--dark3); border:1px solid var(--border); color:var(--text-muted);
+  border-radius:10px; padding:10px 16px; cursor:pointer; font-size:0.82rem; font-family:'Inter',sans-serif;
+  transition:all 0.2s;
+}
+.filter-btn:hover { border-color:var(--primary); color:var(--primary-light); }
+
+/* BOT CONFIG */
+.bot-flows { display:flex; flex-direction:column; gap:12px; }
+.flow-card {
+  background:var(--dark3); border:1px solid var(--border); border-radius:12px; padding:16px;
+  display:flex; align-items:center; gap:14px;
+}
+.flow-icon { font-size:1.5rem; width:40px; text-align:center; }
+.flow-info { flex:1; }
+.flow-name { font-size:0.9rem; font-weight:700; }
+.flow-desc { font-size:0.78rem; color:var(--text-muted); }
+.toggle {
+  width:44px; height:24px; border-radius:12px; background:var(--border);
+  cursor:pointer; position:relative; transition:background 0.2s; flex-shrink:0;
+}
+.toggle.on { background:var(--accent); }
+.toggle::after {
+  content:''; position:absolute; top:2px; left:2px;
+  width:20px; height:20px; border-radius:50%; background:#fff; transition:transform 0.2s;
+}
+.toggle.on::after { transform:translateX(20px); }
+
+/* METRICS */
+.metrics-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-bottom:24px; }
+
+/* BACK LINK */
+.back-link { color:var(--text-muted); text-decoration:none; font-size:0.82rem; display:flex; align-items:center; gap:4px; transition:color 0.2s; }
+.back-link:hover { color:var(--primary-light); }
+
+/* RESPONSIVE */
+@media (max-width:768px) {
+  .sidebar { display:none; }
+  .main { margin-left:0; }
+  .charts-row { grid-template-columns:1fr; }
+  .agenda-grid { grid-template-columns:1fr; }
+  .metrics-row { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">⚡ SyncTech</div>
+  <div class="sidebar-biz">
+    <div class="biz-name">Barbearia Exemplo</div>
+    <div class="biz-plan">⭐ Plano Negócio</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">Principal</div>
+    <div class="nav-item active" onclick="showPage('overview')"><span class="nav-icon">📊</span> Visão Geral</div>
+    <div class="nav-item" onclick="showPage('agenda')"><span class="nav-icon">📅</span> Agenda Hoje</div>
+    <div class="nav-item" onclick="showPage('agendamentos')"><span class="nav-icon">📋</span> Agendamentos</div>
+    <div class="nav-item" onclick="showPage('clientes')"><span class="nav-icon">👥</span> Clientes (CRM)</div>
+
+    <div class="nav-section">Automação</div>
+    <div class="nav-item" onclick="showPage('whatsapp')"><span class="nav-icon">🟢</span> WhatsApp Bot</div>
+    <div class="nav-item" onclick="showPage('instagram')"><span class="nav-icon">📸</span> Instagram Auto</div>
+    <div class="nav-item" onclick="showPage('metricas')"><span class="nav-icon">📈</span> Métricas</div>
+
+    <div class="nav-section">Config</div>
+    <div class="nav-item" onclick="showPage('servicos')"><span class="nav-icon">✂️</span> Meus Serviços</div>
+    <div class="nav-item" onclick="showPage('config')"><span class="nav-icon">⚙️</span> Configurações</div>
+    <div class="nav-item" onclick="window.location.href='../index.html'"><span class="nav-icon">🌐</span> Ver Site</div>
+    <div class="nav-item" onclick="window.location.href='../agendamento/index.html'"><span class="nav-icon">📱</span> App Agendamento</div>
+  </nav>
+  <div class="sidebar-bottom">
+    <div><span class="status-dot"></span> Todos os sistemas online</div>
+    <div style="margin-top:4px; font-size:0.7rem">Última sync: agora</div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="page-title">Visão Geral</div>
+    <div class="topbar-right">
+      <div class="topbar-date" id="topbar-date"></div>
+      <a href="../index.html" class="back-link">← Site</a>
+      <div class="topbar-notif">🔔<div class="notif-badge">3</div></div>
+      <div class="topbar-avatar">BR</div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- PAGE: OVERVIEW -->
+    <div class="page active" id="page-overview">
+      <div class="kpi-grid">
+        <div class="kpi purple">
+          <div class="kpi-label">Agendamentos Hoje</div>
+          <div class="kpi-value">12</div>
+          <div class="kpi-change up">↑ +3 vs ontem</div>
+          <div class="kpi-icon">📅</div>
+        </div>
+        <div class="kpi cyan">
+          <div class="kpi-label">Receita do Mês</div>
+          <div class="kpi-value">R$3.840</div>
+          <div class="kpi-change up">↑ +22% vs mês anterior</div>
+          <div class="kpi-icon">💰</div>
+        </div>
+        <div class="kpi green">
+          <div class="kpi-label">Novos Clientes (mês)</div>
+          <div class="kpi-value">47</div>
+          <div class="kpi-change up">↑ +8 vs mês anterior</div>
+          <div class="kpi-icon">👥</div>
+        </div>
+        <div class="kpi yellow">
+          <div class="kpi-label">Taxa de Retorno</div>
+          <div class="kpi-value">68%</div>
+          <div class="kpi-change up">↑ +5% vs mês anterior</div>
+          <div class="kpi-icon">🔄</div>
+        </div>
+        <div class="kpi purple">
+          <div class="kpi-label">Msgs WhatsApp (hoje)</div>
+          <div class="kpi-value">89</div>
+          <div class="kpi-change up">↑ Bot respondeu 94%</div>
+          <div class="kpi-icon">🤖</div>
+        </div>
+        <div class="kpi green">
+          <div class="kpi-label">Avaliação Google</div>
+          <div class="kpi-value">4.9★</div>
+          <div class="kpi-change up">↑ +0.2 este mês</div>
+          <div class="kpi-icon">⭐</div>
+        </div>
+      </div>
+
+      <div class="charts-row">
+        <div class="chart-card">
+          <div class="chart-title">Agendamentos — Últimos 7 dias</div>
+          <div class="chart-sub">Confirmados vs Cancelados</div>
+          <div class="bar-chart" id="bar-chart"></div>
+          <div style="display:flex; gap:16px; margin-top:12px">
+            <span style="font-size:0.75rem; color:var(--text-muted); display:flex; gap:6px; align-items:center">
+              <span style="width:10px;height:10px;background:var(--primary);border-radius:2px;display:inline-block"></span> Confirmados
+            </span>
+            <span style="font-size:0.75rem; color:var(--text-muted); display:flex; gap:6px; align-items:center">
+              <span style="width:10px;height:10px;background:var(--danger);border-radius:2px;display:inline-block;opacity:0.5"></span> Cancelados
+            </span>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Serviços mais agendados</div>
+          <div class="chart-sub">Este mês</div>
+          <div class="donut-wrap">
+            <svg class="donut-svg" viewBox="0 0 120 120">
+              <circle cx="60" cy="60" r="48" fill="none" stroke="var(--dark3)" stroke-width="18"/>
+              <circle cx="60" cy="60" r="48" fill="none" stroke="#7C3AED" stroke-width="18"
+                stroke-dasharray="120 181.6" stroke-dashoffset="0" transform="rotate(-90 60 60)"/>
+              <circle cx="60" cy="60" r="48" fill="none" stroke="#06B6D4" stroke-width="18"
+                stroke-dasharray="73 228.6" stroke-dashoffset="-120" transform="rotate(-90 60 60)"/>
+              <circle cx="60" cy="60" r="48" fill="none" stroke="#10B981" stroke-width="18"
+                stroke-dasharray="42 259.6" stroke-dashoffset="-193" transform="rotate(-90 60 60)"/>
+              <circle cx="60" cy="60" r="48" fill="none" stroke="#F59E0B" stroke-width="18"
+                stroke-dasharray="28 273.6" stroke-dashoffset="-235" transform="rotate(-90 60 60)"/>
+              <text x="60" y="64" text-anchor="middle" fill="var(--text)" font-size="13" font-weight="800" font-family="Inter">148</text>
+              <text x="60" y="76" text-anchor="middle" fill="var(--text-muted)" font-size="7" font-family="Inter">serviços</text>
+            </svg>
+            <div class="donut-legend">
+              <div class="legend-item"><div class="legend-dot" style="background:#7C3AED"></div><span class="legend-label">Corte + Barba</span><span class="legend-val">41%</span></div>
+              <div class="legend-item"><div class="legend-dot" style="background:#06B6D4"></div><span class="legend-label">Corte Masculino</span><span class="legend-val">25%</span></div>
+              <div class="legend-item"><div class="legend-dot" style="background:#10B981"></div><span class="legend-label">Barba</span><span class="legend-val">14%</span></div>
+              <div class="legend-item"><div class="legend-dot" style="background:#F59E0B"></div><span class="legend-label">Hidratação</span><span class="legend-val">10%</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <div class="table-header">
+          <div class="table-title">Próximos Agendamentos de Hoje</div>
+          <button class="table-action" onclick="showPage('agenda')">Ver agenda completa →</button>
+        </div>
+        <table>
+          <thead><tr>
+            <th>Horário</th><th>Cliente</th><th>Serviço</th><th>Valor</th><th>Status</th><th>WhatsApp</th>
+          </tr></thead>
+          <tbody id="next-appointments"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PAGE: AGENDA -->
+    <div class="page" id="page-agenda">
+      <div class="table-header" style="margin-bottom:16px">
+        <div>
+          <div style="font-size:1.1rem; font-weight:700">📅 Agenda de Hoje</div>
+          <div style="font-size:0.8rem; color:var(--text-muted)" id="today-date"></div>
+        </div>
+        <a href="../agendamento/index.html" class="table-action" target="_blank">+ Novo agendamento</a>
+      </div>
+      <div class="agenda-grid">
+        <div class="chart-card">
+          <div class="chart-title">Manhã</div>
+          <div id="agenda-manha"></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Tarde</div>
+          <div id="agenda-tarde"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: AGENDAMENTOS -->
+    <div class="page" id="page-agendamentos">
+      <div class="search-bar">
+        <input class="search-input" placeholder="🔍 Buscar cliente, serviço...">
+        <button class="filter-btn">📅 Esta semana</button>
+        <button class="filter-btn">Status ↓</button>
+      </div>
+      <div class="table-card">
+        <div class="table-header">
+          <div class="table-title">Todos os Agendamentos</div>
+          <button class="table-action">Exportar CSV</button>
+        </div>
+        <table>
+          <thead><tr><th>Data/Hora</th><th>Cliente</th><th>Serviço</th><th>Valor</th><th>Origem</th><th>Status</th></tr></thead>
+          <tbody id="all-appointments"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PAGE: CLIENTES -->
+    <div class="page" id="page-clientes">
+      <div class="search-bar">
+        <input class="search-input" placeholder="🔍 Buscar cliente por nome ou telefone...">
+        <button class="filter-btn">Filtrar ↓</button>
+        <button class="filter-btn" style="background:rgba(124,58,237,0.15);border-color:var(--primary);color:var(--primary-light)">+ Adicionar</button>
+      </div>
+      <div class="client-grid" id="client-grid"></div>
+    </div>
+
+    <!-- PAGE: WHATSAPP -->
+    <div class="page" id="page-whatsapp">
+      <div class="kpi-grid" style="margin-bottom:20px">
+        <div class="kpi green"><div class="kpi-label">Mensagens Hoje</div><div class="kpi-value">89</div><div class="kpi-change up">↑ Bot resolveu 84</div><div class="kpi-icon">💬</div></div>
+        <div class="kpi purple"><div class="kpi-label">Taxa Automação</div><div class="kpi-value">94%</div><div class="kpi-change up">↑ Sem intervenção humana</div><div class="kpi-icon">🤖</div></div>
+        <div class="kpi cyan"><div class="kpi-label">Leads Captados</div><div class="kpi-value">12</div><div class="kpi-change up">↑ Este mês: 47 leads</div><div class="kpi-icon">🎯</div></div>
+      </div>
+      <div class="chart-card" style="margin-bottom:16px">
+        <div class="chart-title">Fluxos do Bot</div>
+        <div class="chart-sub">Ative ou desative cada fluxo automaticamente</div>
+        <div class="bot-flows" id="bot-flows"></div>
+      </div>
+    </div>
+
+    <!-- PAGE: INSTAGRAM -->
+    <div class="page" id="page-instagram">
+      <div class="kpi-grid" style="margin-bottom:20px">
+        <div class="kpi purple"><div class="kpi-label">DMs automáticos</div><div class="kpi-value">34</div><div class="kpi-change up">↑ Hoje</div><div class="kpi-icon">📸</div></div>
+        <div class="kpi cyan"><div class="kpi-label">Comentários respondidos</div><div class="kpi-value">56</div><div class="kpi-change up">↑ Última publicação</div><div class="kpi-icon">💬</div></div>
+        <div class="kpi green"><div class="kpi-label">Leads do Instagram</div><div class="kpi-value">8</div><div class="kpi-change up">↑ Hoje</div><div class="kpi-icon">🎯</div></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Automações do Instagram</div>
+        <div class="chart-sub">Configurar palavras-chave e respostas automáticas</div>
+        <div class="bot-flows" id="ig-flows"></div>
+      </div>
+    </div>
+
+    <!-- PAGE: METRICAS -->
+    <div class="page" id="page-metricas">
+      <div class="metrics-row">
+        <div class="chart-card"><div class="chart-title">Faturamento Mensal</div><div class="chart-sub">Últimos 6 meses</div><div class="bar-chart" id="revenue-chart"></div></div>
+        <div class="chart-card"><div class="chart-title">Novos Clientes</div><div class="chart-sub">Últimos 6 meses</div><div class="bar-chart" id="clients-chart"></div></div>
+        <div class="chart-card"><div class="chart-title">Taxa de Retorno</div><div class="chart-sub">Clientes que voltaram</div><div class="bar-chart" id="return-chart"></div></div>
+      </div>
+      <div class="table-card">
+        <div class="table-header"><div class="table-title">Resumo do Mês</div></div>
+        <table>
+          <thead><tr><th>Métrica</th><th>Este Mês</th><th>Mês Anterior</th><th>Variação</th></tr></thead>
+          <tbody>
+            <tr><td>Total de agendamentos</td><td>148</td><td>121</td><td style="color:var(--accent)">↑ +22%</td></tr>
+            <tr><td>Faturamento total</td><td>R$3.840</td><td>R$3.146</td><td style="color:var(--accent)">↑ +22%</td></tr>
+            <tr><td>Novos clientes</td><td>47</td><td>39</td><td style="color:var(--accent)">↑ +21%</td></tr>
+            <tr><td>Mensagens WhatsApp</td><td>1.847</td><td>1.420</td><td style="color:var(--accent)">↑ +30%</td></tr>
+            <tr><td>Taxa de cancelamento</td><td>8%</td><td>11%</td><td style="color:var(--accent)">↓ -3pp</td></tr>
+            <tr><td>Ticket médio</td><td>R$55</td><td>R$52</td><td style="color:var(--accent)">↑ +6%</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PAGE: SERVICOS -->
+    <div class="page" id="page-servicos">
+      <div class="table-card">
+        <div class="table-header">
+          <div class="table-title">Meus Serviços</div>
+          <button class="table-action">+ Adicionar Serviço</button>
+        </div>
+        <table>
+          <thead><tr><th>Serviço</th><th>Duração</th><th>Preço</th><th>Agendamentos (mês)</th><th>Ativo</th></tr></thead>
+          <tbody>
+            <tr><td>✂️ Corte Masculino</td><td>45 min</td><td>R$45</td><td>37</td><td><div class="toggle on" onclick="this.classList.toggle('on')"></div></td></tr>
+            <tr><td>🪒 Barba</td><td>30 min</td><td>R$35</td><td>21</td><td><div class="toggle on" onclick="this.classList.toggle('on')"></div></td></tr>
+            <tr><td>💈 Corte + Barba</td><td>75 min</td><td>R$70</td><td>61</td><td><div class="toggle on" onclick="this.classList.toggle('on')"></div></td></tr>
+            <tr><td>💧 Hidratação Capilar</td><td>60 min</td><td>R$55</td><td>15</td><td><div class="toggle on" onclick="this.classList.toggle('on')"></div></td></tr>
+            <tr><td>🎨 Pigmentação</td><td>90 min</td><td>R$80</td><td>14</td><td><div class="toggle" onclick="this.classList.toggle('on')"></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PAGE: CONFIG -->
+    <div class="page" id="page-config">
+      <div class="chart-card" style="margin-bottom:16px">
+        <div class="chart-title" style="margin-bottom:16px">⚙️ Configurações do Negócio</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px">
+          <div><label style="font-size:0.78rem;color:var(--text-muted);display:block;margin-bottom:6px">Nome do negócio</label><input class="search-input" style="width:100%" value="Barbearia Exemplo"></div>
+          <div><label style="font-size:0.78rem;color:var(--text-muted);display:block;margin-bottom:6px">WhatsApp</label><input class="search-input" style="width:100%" value="(11) 99999-9999"></div>
+          <div><label style="font-size:0.78rem;color:var(--text-muted);display:block;margin-bottom:6px">Endereço</label><input class="search-input" style="width:100%" value="Rua das Flores, 123 — Centro"></div>
+          <div><label style="font-size:0.78rem;color:var(--text-muted);display:block;margin-bottom:6px">Instagram</label><input class="search-input" style="width:100%" value="@barbearia.exemplo"></div>
+          <div style="grid-column:1/-1"><button style="background:var(--gradient);color:#fff;border:none;padding:12px 24px;border-radius:10px;font-weight:700;cursor:pointer;font-size:0.9rem">Salvar Alterações</button></div>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title" style="margin-bottom:16px">🔗 Integrações</div>
+        <div class="bot-flows" id="integrations"></div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<script>
+// ===== DATA =====
+const appointments = [
+  {time:'09:00',client:'Carlos Silva',service:'Corte + Barba',price:70,status:'confirmed',origin:'WhatsApp',phone:'11999111111'},
+  {time:'09:30',client:'Pedro Alves',service:'Corte Masculino',price:45,status:'confirmed',origin:'Instagram',phone:'11999222222'},
+  {time:'10:30',client:'Lucas Ferreira',service:'Barba',price:35,status:'pending',origin:'App',phone:'11999333333'},
+  {time:'11:00',client:'Rafael Costa',service:'Hidratação',price:55,status:'confirmed',origin:'WhatsApp',phone:'11999444444'},
+  {time:'13:00',client:'Diego Santos',service:'Corte + Barba',price:70,status:'confirmed',origin:'WhatsApp',phone:'11999555555'},
+  {time:'13:30',client:'Mateus Lima',service:'Corte Masculino',price:45,status:'cancelled',origin:'App',phone:'11999666666'},
+  {time:'14:00',client:'Bruno Rocha',service:'Pigmentação',price:80,status:'confirmed',origin:'Google',phone:'11999777777'},
+  {time:'14:30',client:'André Oliveira',service:'Corte + Barba',price:70,status:'confirmed',origin:'WhatsApp',phone:'11999888888'},
+  {time:'15:00',client:'Vitor Mendes',service:'Barba',price:35,status:'pending',origin:'Instagram',phone:'11999999999'},
+  {time:'16:00',client:'Felipe Torres',service:'Corte Masculino',price:45,status:'confirmed',origin:'WhatsApp',phone:'11988111111'},
+  {time:'16:30',client:'Gustavo Pinto',service:'Corte + Barba',price:70,status:'confirmed',origin:'App',phone:'11988222222'},
+  {time:'17:00',client:'Henrique Dias',service:'Hidratação',price:55,status:'done',origin:'WhatsApp',phone:'11988333333'},
+];
+
+const clients = [
+  {name:'Carlos Silva',phone:'11999111111',visits:8,spent:560,last:'10/06/2026'},
+  {name:'Pedro Alves',phone:'11999222222',visits:5,spent:225,last:'08/06/2026'},
+  {name:'Lucas Ferreira',phone:'11999333333',visits:12,spent:840,last:'15/06/2026'},
+  {name:'Diego Santos',phone:'11999555555',visits:3,spent:210,last:'17/06/2026'},
+  {name:'Bruno Rocha',phone:'11999777777',visits:6,spent:480,last:'12/06/2026'},
+  {name:'André Oliveira',phone:'11999888888',visits:15,spent:1050,last:'17/06/2026'},
+  {name:'Felipe Torres',phone:'11988111111',visits:4,spent:180,last:'05/06/2026'},
+  {name:'Gustavo Pinto',phone:'11988222222',visits:9,spent:630,last:'17/06/2026'},
+];
+
+const botFlows = [
+  {icon:'👋', name:'Mensagem de boas-vindas', desc:'Responde automaticamente quando alguém manda o 1º contato', on:true},
+  {icon:'📅', name:'Agendamento pelo WhatsApp', desc:'Cliente pode marcar horário direto pelo bot', on:true},
+  {icon:'⏰', name:'Lembrete 1h antes', desc:'Envia mensagem automática 1h antes do horário marcado', on:true},
+  {icon:'⭐', name:'Pedido de avaliação', desc:'Após o serviço, pede avaliação no Google automaticamente', on:true},
+  {icon:'🎁', name:'Mensagem de aniversário', desc:'Envia cupom especial no aniversário do cliente', on:false},
+  {icon:'💰', name:'Promoções automáticas', desc:'Envia promoção para clientes que não aparecem há 30 dias', on:false},
+];
+
+const igFlows = [
+  {icon:'💬', name:'Resposta automática no DM', desc:'Responde DMs com mensagem personalizada + link de agendamento', on:true},
+  {icon:'💡', name:'Palavra-chave "preço"', desc:'Quando comentar "preço", envia tabela de preços no DM', on:true},
+  {icon:'📅', name:'Palavra-chave "agendar"', desc:'Quando comentar "agendar", envia link de agendamento no DM', on:true},
+  {icon:'❤️', name:'Resposta em comentários', desc:'Responde comentários automaticamente com emoji e CTA', on:false},
+];
+
+const integrations = [
+  {icon:'🟢', name:'WhatsApp Business API', desc:'Conectado — pacoquinhagamer02@gmail.com', on:true},
+  {icon:'📸', name:'Instagram Business', desc:'Conectado — @barbearia.exemplo', on:true},
+  {icon:'📅', name:'Google Calendar', desc:'Sincronização de agenda em tempo real', on:true},
+  {icon:'⭐', name:'Google Meu Negócio', desc:'Desconectado — clique para conectar', on:false},
+  {icon:'💳', name:'Mercado Pago (PIX)', desc:'Desconectado — aceitar pagamentos online', on:false},
+];
+
+// ===== RENDER =====
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+
+  const navMap = {overview:'Visão Geral',agenda:'Agenda Hoje',agendamentos:'Agendamentos',clientes:'Clientes (CRM)',whatsapp:'WhatsApp Bot',instagram:'Instagram Auto',metricas:'Métricas',servicos:'Meus Serviços',config:'Configurações'};
+  document.getElementById('page-title').textContent = navMap[id] || id;
+
+  // Mark active nav
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if (n.getAttribute('onclick') && n.getAttribute('onclick').includes(id)) n.classList.add('active');
+  });
+}
+
+function renderTable(tbodyId, rows) {
+  const tbody = document.getElementById(tbodyId);
+  if (!tbody) return;
+  tbody.innerHTML = rows.map(a => `
+    <tr>
+      <td>${a.time}</td>
+      <td>
+        <div style="font-weight:600">${a.client}</div>
+        <div style="font-size:0.72rem;color:var(--text-muted)">📱 ${a.phone}</div>
+      </td>
+      <td>${a.service}</td>
+      <td style="font-weight:700;color:var(--primary-light)">R$${a.price}</td>
+      <td><span class="badge ${a.status}">${{confirmed:'✅ Confirmado',pending:'⏳ Pendente',cancelled:'❌ Cancelado',done:'✓ Realizado'}[a.status]}</span></td>
+      <td><a href="https://wa.me/55${a.phone}?text=Ol%C3%A1+${encodeURIComponent(a.client)}%2C+lembrete+do+seu+hor%C3%A1rio+%C3%A0s+${a.time}" target="_blank" style="color:var(--accent);font-size:0.78rem;text-decoration:none">💬 Enviar msg</a></td>
+    </tr>
+  `).join('');
+}
+
+function renderAllAppointments() {
+  const tbody = document.getElementById('all-appointments');
+  if (!tbody) return;
+  const today = new Date();
+  const fmt = d => `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}`;
+  tbody.innerHTML = appointments.map((a,i) => {
+    const d = new Date(today); d.setDate(d.getDate() - Math.floor(i/4));
+    return `<tr>
+      <td>${fmt(d)} ${a.time}</td>
+      <td style="font-weight:600">${a.client}</td>
+      <td>${a.service}</td>
+      <td style="font-weight:700;color:var(--primary-light)">R$${a.price}</td>
+      <td><span style="font-size:0.78rem;color:var(--text-muted)">${a.origin}</span></td>
+      <td><span class="badge ${a.status}">${{confirmed:'✅ Confirmado',pending:'⏳ Pendente',cancelled:'❌ Cancelado',done:'✓ Realizado'}[a.status]}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderAgenda() {
+  const manha = appointments.filter(a => parseInt(a.time) < 13);
+  const tarde = appointments.filter(a => parseInt(a.time) >= 13);
+
+  function renderBlock(arr) {
+    return arr.map(a => `
+      <div class="time-block">
+        <div class="tb-time">${a.time}</div>
+        ${a.status === 'cancelled' ?
+          `<div class="tb-empty">Horário disponível</div>` :
+          `<div class="tb-event" style="${a.status==='done'?'opacity:0.5':''}">
+            <div class="tb-status">
+              <span class="tb-name">${a.client}</span>
+              <span class="badge ${a.status}" style="font-size:0.65rem">${{confirmed:'✅',pending:'⏳',done:'✓'}[a.status]}</span>
+            </div>
+            <div class="tb-service">${a.service} • R$${a.price}</div>
+          </div>`}
+      </div>
+    `).join('');
+  }
+
+  document.getElementById('agenda-manha').innerHTML = renderBlock(manha);
+  document.getElementById('agenda-tarde').innerHTML = renderBlock(tarde);
+
+  const today = new Date();
+  document.getElementById('today-date').textContent = today.toLocaleDateString('pt-BR', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
+}
+
+function renderClients() {
+  document.getElementById('client-grid').innerHTML = clients.map(c => `
+    <div class="client-card">
+      <div class="client-head">
+        <div class="client-avatar">${c.name.split(' ').map(n=>n[0]).join('').slice(0,2)}</div>
+        <div>
+          <div class="client-name">${c.name}</div>
+          <div class="client-meta">📱 ${c.phone}</div>
+        </div>
+      </div>
+      <div class="client-stats">
+        <div class="cs-item"><div class="cs-val">${c.visits}x</div><div class="cs-lbl">Visitas</div></div>
+        <div class="cs-item"><div class="cs-val">R$${c.spent}</div><div class="cs-lbl">Gasto total</div></div>
+        <div class="cs-item"><div class="cs-val">${c.last.slice(0,5)}</div><div class="cs-lbl">Última vez</div></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderBotFlows(containerId, flows) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = flows.map((f,i) => `
+    <div class="flow-card">
+      <div class="flow-icon">${f.icon}</div>
+      <div class="flow-info">
+        <div class="flow-name">${f.name}</div>
+        <div class="flow-desc">${f.desc}</div>
+      </div>
+      <div class="toggle ${f.on?'on':''}" onclick="this.classList.toggle('on')"></div>
+    </div>
+  `).join('');
+}
+
+function renderBarChart(id, data, color) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const max = Math.max(...data.map(d=>d.val));
+  el.innerHTML = data.map(d => `
+    <div class="bar-group">
+      <div class="bar" style="height:${(d.val/max)*100}%; background:${color||'rgba(124,58,237,0.4)'}">
+        <div class="bar-tooltip">${d.label}: ${d.display||d.val}</div>
+      </div>
+      <div class="bar-label">${d.label}</div>
+    </div>
+  `).join('');
+}
+
+// ===== INIT =====
+function init() {
+  const now = new Date();
+  document.getElementById('topbar-date').textContent = now.toLocaleDateString('pt-BR', {weekday:'short', day:'2-digit', month:'short'});
+
+  renderTable('next-appointments', appointments.slice(0,6));
+  renderAllAppointments();
+  renderAgenda();
+  renderClients();
+  renderBotFlows('bot-flows', botFlows);
+  renderBotFlows('ig-flows', igFlows);
+  renderBotFlows('integrations', integrations);
+
+  // Weekly chart
+  const days = ['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'];
+  renderBarChart('bar-chart', days.map((l,i) => ({label:l, val:[9,12,8,15,11,14,7][i], display:[9,12,8,15,11,14,7][i]+' agend.'})), 'rgba(124,58,237,0.6)');
+
+  // Revenue chart
+  const months6 = ['Jan','Fev','Mar','Abr','Mai','Jun'];
+  renderBarChart('revenue-chart', months6.map((l,i) => ({label:l, val:[2400,2800,3100,2950,3450,3840][i], display:'R$'+[2400,2800,3100,2950,3450,3840][i]})), 'rgba(6,182,212,0.5)');
+  renderBarChart('clients-chart', months6.map((l,i) => ({label:l, val:[28,35,39,37,43,47][i], display:[28,35,39,37,43,47][i]+' clientes'})), 'rgba(16,185,129,0.5)');
+  renderBarChart('return-chart', months6.map((l,i) => ({label:l, val:[55,59,62,60,65,68][i], display:[55,59,62,60,65,68][i]+'%'})), 'rgba(245,158,11,0.5)');
+}
+
+init();
+</script>
+</body>
+</html>
