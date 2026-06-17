@@ -1278,13 +1278,41 @@ function calcROI() {
 calcROI();
 
 // ── LEAD ──
+var SYNCTECH_WPP = '5511999999999'; // ← SEU WhatsApp aqui (com DDI 55)
+
 function enviarLead() {
   var nome = document.getElementById('lead-nome').value.trim();
-  var tel  = document.getElementById('lead-tel').value.trim();
-  if (!nome || !tel) { alert('Preencha seu nome e WhatsApp para continuar.'); return; }
-  var msg = encodeURIComponent('Olá! Meu nome é ' + nome + ' e quero conhecer a SyncTech Automation. Meu WhatsApp: ' + tel);
-  window.open('https://wa.me/5500000000000?text=' + msg, '_blank');
+  var tel  = document.getElementById('lead-tel').value.replace(/\D/g,'');
+  var nomeEl = document.getElementById('lead-nome');
+  var telEl  = document.getElementById('lead-tel');
+
+  if (!nome) { nomeEl.style.borderColor = '#EF4444'; nomeEl.focus(); return; }
+  if (tel.length < 10) { telEl.style.borderColor = '#EF4444'; telEl.focus(); return; }
+
+  nomeEl.style.borderColor = '';
+  telEl.style.borderColor = '';
+
+  var msg = encodeURIComponent(
+    '👋 Olá! Vim pelo site da SyncTech.\n\n' +
+    '📛 *Nome:* ' + nome + '\n' +
+    '📱 *WhatsApp:* ' + tel + '\n\n' +
+    'Quero um *diagnóstico gratuito* para automatizar meu negócio!'
+  );
+  window.open('https://wa.me/' + SYNCTECH_WPP + '?text=' + msg, '_blank');
 }
+
+// Phone mask no campo de tel do form
+(function(){
+  var t = document.getElementById('lead-tel');
+  if(!t) return;
+  t.addEventListener('input', function(){
+    var v = this.value.replace(/\D/g,'').slice(0,11);
+    if(v.length > 10) v = v.replace(/^(\d{2})(\d{5})(\d{4})$/, '($1) $2-$3');
+    else if(v.length > 6) v = v.replace(/^(\d{2})(\d{4})(\d+)$/, '($1) $2-$3');
+    else if(v.length > 2) v = v.replace(/^(\d{2})(\d+)$/, '($1) $2');
+    this.value = v;
+  });
+})();
 </script>
 </body>
 </html>

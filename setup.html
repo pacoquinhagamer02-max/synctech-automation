@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Setup — SyncTech Automation</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0D1117;--s1:#161B27;--s2:#1C2333;--s3:#222A3A;
+  --border:rgba(255,255,255,0.07);--bord2:rgba(255,255,255,0.12);
+  --primary:#6366F1;--pl:#818CF8;--pd:#4F46E5;
+  --text:#F1F5F9;--muted:#94A3B8;--faint:#4B5563;
+  --green:#22C55E;--yellow:#F59E0B;--red:#EF4444;--r:12px;
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+.header{padding:16px 24px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);background:var(--s1)}
+.logo-mark{width:28px;height:28px;border-radius:7px;background:var(--primary);display:grid;place-items:center}
+.logo-mark svg{width:14px;height:14px;fill:#fff}
+.logo-text{font-size:0.9rem;font-weight:700}
+.header-sub{font-size:0.78rem;color:var(--muted);margin-left:auto}
+
+.setup-wrap{max-width:640px;margin:0 auto;padding:32px 24px}
+
+.step-indicator{display:flex;align-items:center;gap:0;margin-bottom:32px}
+.si-item{display:flex;flex-direction:column;align-items:center;gap:5px;flex:1}
+.si-circle{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);display:grid;place-items:center;font-size:0.7rem;font-weight:700;color:var(--faint);background:var(--s1);transition:all 0.3s;position:relative;z-index:2}
+.si-circle.done{background:var(--primary);border-color:var(--primary);color:#fff}
+.si-circle.active{border-color:var(--primary);color:var(--pl);background:rgba(99,102,241,0.08)}
+.si-label{font-size:0.62rem;color:var(--faint);text-align:center}
+.si-label.active{color:var(--pl)}
+.si-label.done{color:var(--muted)}
+.si-line{flex:1;height:2px;background:var(--border);margin-top:-18px;transition:background 0.3s}
+.si-line.done{background:var(--primary)}
+
+.step{display:none}
+.step.active{display:block}
+.step-title{font-size:1.3rem;font-weight:800;letter-spacing:-0.025em;margin-bottom:6px}
+.step-sub{font-size:0.82rem;color:var(--muted);margin-bottom:24px;line-height:1.6}
+
+.form-group{margin-bottom:14px}
+.form-label{font-size:0.72rem;font-weight:700;color:var(--muted);display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.06em}
+.form-input{width:100%;background:var(--s1);border:1.5px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--text);font-size:0.88rem;outline:none;font-family:'Inter',sans-serif;transition:border-color 0.15s}
+.form-input:focus{border-color:var(--primary)}
+.form-input::placeholder{color:var(--faint)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-hint{font-size:0.7rem;color:var(--faint);margin-top:4px;line-height:1.5}
+
+.svc-builder{display:flex;flex-direction:column;gap:8px}
+.svc-row{display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:8px;align-items:center}
+.svc-row input{width:100%}
+.btn-add-svc{background:none;border:1.5px dashed var(--border);border-radius:8px;color:var(--muted);padding:9px;cursor:pointer;font-size:0.8rem;font-family:'Inter',sans-serif;transition:all 0.15s;width:100%;text-align:center;margin-top:4px}
+.btn-add-svc:hover{border-color:var(--primary);color:var(--pl)}
+.btn-del{background:none;border:none;color:var(--faint);cursor:pointer;font-size:1rem;padding:4px 8px;font-family:'Inter',sans-serif;transition:color 0.15s}
+.btn-del:hover{color:var(--red)}
+
+.webhook-info{background:rgba(99,102,241,0.06);border:1px solid rgba(99,102,241,0.2);border-radius:10px;padding:14px 16px;margin-bottom:16px}
+.webhook-info-title{font-size:0.82rem;font-weight:700;margin-bottom:6px}
+.webhook-info-body{font-size:0.76rem;color:var(--muted);line-height:1.7}
+.webhook-info ol{margin-left:16px;margin-top:6px}
+
+.preview-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:16px}
+.preview-title{font-size:0.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px}
+.preview-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:0.82rem}
+.preview-row:last-child{border-bottom:none}
+.preview-key{color:var(--muted)}
+.preview-val{font-weight:600}
+
+.link-box{background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+.link-url{font-size:0.78rem;color:var(--pl);word-break:break-all;flex:1}
+.btn-copy{background:var(--primary);color:#fff;border:none;padding:7px 14px;border-radius:8px;font-weight:600;cursor:pointer;font-size:0.76rem;font-family:'Inter',sans-serif;white-space:nowrap;transition:all 0.15s}
+.btn-copy:hover{background:var(--pd)}
+
+.success-icon{width:72px;height:72px;border-radius:50%;background:rgba(34,197,94,0.12);border:2px solid rgba(34,197,94,0.3);display:grid;place-items:center;margin:0 auto 20px;font-size:2rem}
+.next-steps{display:flex;flex-direction:column;gap:8px;margin:20px 0}
+.ns-item{display:flex;align-items:center;gap:12px;background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:12px 14px}
+.ns-num{width:26px;height:26px;border-radius:50%;background:var(--primary);display:grid;place-items:center;font-size:0.7rem;font-weight:700;flex-shrink:0}
+.ns-text{font-size:0.82rem}
+.ns-sub{font-size:0.72rem;color:var(--muted);margin-top:2px}
+
+.btn-row{display:flex;gap:10px;margin-top:24px}
+.btn{padding:12px 24px;border-radius:10px;font-size:0.88rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s;border:none}
+.btn-primary{background:var(--primary);color:#fff;flex:1}
+.btn-primary:hover{background:var(--pd)}
+.btn-back{background:none;border:1.5px solid var(--border);color:var(--muted)}
+.btn-back:hover{border-color:var(--bord2);color:var(--text)}
+
+@media(max-width:540px){
+  .svc-row{grid-template-columns:1fr 1fr;grid-template-rows:auto auto}
+  .svc-row input:first-child{grid-column:1/-1}
+  .form-row{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo-mark"><svg viewBox="0 0 14 14"><path d="M7 1L13 4.5V9.5L7 13L1 9.5V4.5L7 1Z"/></svg></div>
+  <span class="logo-text">SyncTech Automation</span>
+  <span class="header-sub">Setup de novo cliente</span>
+</div>
+
+<div class="setup-wrap">
+
+  <div class="step-indicator">
+    <div class="si-item"><div class="si-circle active" id="sc1">1</div><div class="si-label active" id="sl1">Negócio</div></div>
+    <div class="si-line" id="ln1"></div>
+    <div class="si-item"><div class="si-circle" id="sc2">2</div><div class="si-label" id="sl2">Serviços</div></div>
+    <div class="si-line" id="ln2"></div>
+    <div class="si-item"><div class="si-circle" id="sc3">3</div><div class="si-label" id="sl3">Webhook</div></div>
+    <div class="si-line" id="ln3"></div>
+    <div class="si-item"><div class="si-circle" id="sc4">4</div><div class="si-label" id="sl4">Pronto!</div></div>
+  </div>
+
+  <!-- STEP 1 — Dados do negócio -->
+  <div class="step active" id="step1">
+    <div class="step-title">Dados do negócio</div>
+    <div class="step-sub">Informe os dados do cliente que você está configurando. Essas informações aparecem no app de agendamento e no dashboard.</div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Nome do negócio *</label>
+        <input class="form-input" id="s1-name" placeholder="Ex: Barbearia do João">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tipo de negócio</label>
+        <select class="form-input" id="s1-type">
+          <option value="">Selecione...</option>
+          <option>Barbearia</option>
+          <option>Salão de beleza</option>
+          <option>Clínica estética</option>
+          <option>Petshop</option>
+          <option>Consultório</option>
+          <option>Academia</option>
+          <option>Restaurante</option>
+          <option>Outro</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">WhatsApp do dono *</label>
+        <input class="form-input" id="s1-wpp" placeholder="(11) 99999-9999" type="tel">
+        <div class="form-hint">Número que vai receber as notificações de agendamento</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Instagram</label>
+        <input class="form-input" id="s1-ig" placeholder="@seunegocio">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Endereço</label>
+      <input class="form-input" id="s1-addr" placeholder="Rua das Flores, 123 — Centro — SP">
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="goStep(2)">Próximo: Serviços →</button>
+    </div>
+  </div>
+
+  <!-- STEP 2 — Serviços -->
+  <div class="step" id="step2">
+    <div class="step-title">Serviços e preços</div>
+    <div class="step-sub">Adicione os serviços que o cliente oferece. Isso aparece na tela de escolha do app de agendamento.</div>
+
+    <div class="svc-builder" id="svc-builder"></div>
+    <button class="btn-add-svc" onclick="addSvc()">+ Adicionar serviço</button>
+
+    <div class="btn-row">
+      <button class="btn btn-back" onclick="goStep(1)">← Voltar</button>
+      <button class="btn btn-primary" onclick="goStep(3)">Próximo: Webhook →</button>
+    </div>
+  </div>
+
+  <!-- STEP 3 — Webhook -->
+  <div class="step" id="step3">
+    <div class="step-title">Conectar Make / n8n</div>
+    <div class="step-sub">O webhook é o "canal" por onde o agendamento envia os dados para o Make.com ou n8n, que vai notificar o cliente no WhatsApp e salvar na planilha.</div>
+
+    <div class="webhook-info">
+      <div class="webhook-info-title">⚡ Como criar o webhook no Make (gratuito)</div>
+      <div class="webhook-info-body">
+        <ol>
+          <li>Acesse <strong>make.com</strong> e crie uma conta grátis</li>
+          <li>Clique em <strong>Create a new scenario</strong></li>
+          <li>Adicione o módulo <strong>Webhooks → Custom webhook</strong></li>
+          <li>Clique em <strong>Add</strong> → copie a URL gerada</li>
+          <li>Cole abaixo e clique em <strong>Testar</strong></li>
+          <li>Após o teste, adicione o módulo <strong>WhatsApp Business</strong> para enviar a confirmação</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">URL do Webhook *</label>
+      <input class="form-input" id="s3-webhook" placeholder="https://hook.eu1.make.com/abc123xyz">
+      <div class="form-hint">Deixe em branco por enquanto se ainda não tiver — pode configurar depois no Dashboard → Configurações</div>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-bottom:8px">
+      <button onclick="testarWebhook3()" style="background:var(--s3);color:var(--muted);border:1px solid var(--border);padding:9px 16px;border-radius:8px;font-weight:600;cursor:pointer;font-size:0.82rem;font-family:'Inter',sans-serif">⚡ Testar webhook</button>
+    </div>
+    <div id="s3-status" style="font-size:0.76rem;margin-bottom:8px;display:none"></div>
+
+    <div class="btn-row">
+      <button class="btn btn-back" onclick="goStep(2)">← Voltar</button>
+      <button class="btn btn-primary" onclick="salvarTudo()">Finalizar e salvar →</button>
+    </div>
+  </div>
+
+  <!-- STEP 4 — Pronto -->
+  <div class="step" id="step4">
+    <div style="text-align:center;padding:8px 0 24px">
+      <div class="success-icon">🚀</div>
+      <div class="step-title">Cliente configurado!</div>
+      <div class="step-sub">As configurações foram salvas. Compartilhe o link de agendamento com o cliente.</div>
+    </div>
+
+    <div class="preview-card" id="preview-card"></div>
+
+    <div class="preview-title" style="margin-bottom:8px">🔗 Link do agendamento</div>
+    <div class="link-box">
+      <span class="link-url" id="final-link"></span>
+      <button class="btn-copy" id="btn-copy-final" onclick="copiarLinkFinal()">Copiar</button>
+    </div>
+
+    <div class="next-steps">
+      <div class="ns-item">
+        <div class="ns-num">1</div>
+        <div>
+          <div class="ns-text">Envie o link para o cliente</div>
+          <div class="ns-sub">Ele já está funcionando — clientes podem agendar agora</div>
+        </div>
+      </div>
+      <div class="ns-item">
+        <div class="ns-num">2</div>
+        <div>
+          <div class="ns-text">Configure o Make.com</div>
+          <div class="ns-sub">Adicione os módulos de WhatsApp + Google Sheets para automação completa</div>
+        </div>
+      </div>
+      <div class="ns-item">
+        <div class="ns-num">3</div>
+        <div>
+          <div class="ns-text">Abra o Dashboard</div>
+          <div class="ns-sub">Monitore agendamentos, leads e métricas em tempo real</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <a href="dashboard/" style="flex:1;display:block">
+        <button class="btn btn-primary" style="width:100%">Abrir Dashboard →</button>
+      </a>
+      <button class="btn btn-back" onclick="location.reload()">Novo cliente</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+var DATA = { name:'', wpp:'', ig:'', addr:'', type:'', webhookUrl:'', services:[] };
+
+// Phone mask
+document.getElementById('s1-wpp').addEventListener('input', function(){
+  var v = this.value.replace(/\D/g,'').slice(0,11);
+  if(v.length>10) v=v.replace(/^(\d{2})(\d{5})(\d{4})$/,'($1) $2-$3');
+  else if(v.length>6) v=v.replace(/^(\d{2})(\d{4})(\d+)$/,'($1) $2-$3');
+  else if(v.length>2) v=v.replace(/^(\d{2})(\d+)$/,'($1) $2');
+  this.value=v;
+});
+
+// Serviços
+var svcCount = 0;
+var defaultSvcs = [
+  { name:'Serviço Principal', price:50, duration:30 },
+  { name:'Serviço Completo',  price:80, duration:60 },
+];
+
+function renderSvcs() {
+  var b = document.getElementById('svc-builder');
+  if(DATA.services.length===0) defaultSvcs.forEach(function(s){ DATA.services.push(Object.assign({id:++svcCount},s)); });
+  b.innerHTML = DATA.services.map(function(s,i){
+    return '<div class="svc-row" id="sr-'+s.id+'">' +
+      '<input class="form-input" placeholder="Nome do serviço" value="'+s.name+'" oninput="DATA.services['+i+'].name=this.value">' +
+      '<input class="form-input" placeholder="Preço (R$)" value="'+s.price+'" type="number" min="0" oninput="DATA.services['+i+'].price=+this.value">' +
+      '<input class="form-input" placeholder="Duração (min)" value="'+s.duration+'" type="number" min="5" oninput="DATA.services['+i+'].duration=+this.value">' +
+      '<button class="btn-del" onclick="delSvc('+s.id+')">✕</button>' +
+    '</div>';
+  }).join('');
+}
+
+function addSvc() {
+  DATA.services.push({ id:++svcCount, name:'', price:0, duration:30 });
+  renderSvcs();
+}
+
+function delSvc(id) {
+  DATA.services = DATA.services.filter(function(s){ return s.id!==id; });
+  renderSvcs();
+}
+
+renderSvcs();
+
+// Webhook test (step 3)
+function testarWebhook3() {
+  var url = document.getElementById('s3-webhook').value.trim();
+  var st  = document.getElementById('s3-status');
+  if(!url){ st.style.display='block'; st.style.color='var(--red)'; st.textContent='⚠️ Cole a URL do webhook primeiro.'; return; }
+  st.style.display='block'; st.style.color='var(--muted)'; st.textContent='⏳ Enviando teste...';
+  fetch(url,{
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({tipo:'teste',origem:'SyncTech Setup',timestamp:new Date().toISOString()})
+  })
+  .then(function(){ st.style.color='var(--green)'; st.textContent='✓ Webhook funcionando! Verifique no Make/n8n.'; })
+  .catch(function(){ st.style.color='var(--red)'; st.textContent='❌ Falha. Verifique a URL ou tente novamente.'; });
+}
+
+// Save all
+function salvarTudo() {
+  DATA.name       = document.getElementById('s1-name').value.trim();
+  DATA.wpp        = document.getElementById('s1-wpp').value.trim();
+  DATA.ig         = document.getElementById('s1-ig').value.trim();
+  DATA.addr       = document.getElementById('s1-addr').value.trim();
+  DATA.type       = document.getElementById('s1-type').value;
+  DATA.webhookUrl = document.getElementById('s3-webhook').value.trim();
+
+  var cfg = {
+    bizName:    DATA.name,
+    bizWpp:     DATA.wpp,
+    instagram:  DATA.ig,
+    address:    DATA.addr,
+    webhookUrl: DATA.webhookUrl,
+    services:   DATA.services.filter(function(s){ return s.name; }).map(function(s,i){
+      return {
+        id: i+1, icon:'✂️', name:s.name,
+        desc: s.duration+' minutos', price:s.price,
+        duration:s.duration, durationStr:s.duration+' min', popular: i===0
+      };
+    })
+  };
+  localStorage.setItem('synctech_config', JSON.stringify(cfg));
+
+  // Preenche preview
+  var link = window.location.origin + window.location.pathname.replace('setup.html','') + 'agendamento/';
+  document.getElementById('final-link').textContent = link;
+
+  document.getElementById('preview-card').innerHTML =
+    '<div class="preview-title">Resumo da configuração</div>' +
+    [
+      ['Negócio',      DATA.name  || '—'],
+      ['WhatsApp',     DATA.wpp   || '—'],
+      ['Instagram',    DATA.ig    || '—'],
+      ['Webhook',      DATA.webhookUrl ? '✓ Configurado' : '⚠️ Não configurado (manual)'],
+      ['Serviços',     cfg.services.length + ' serviço(s) cadastrado(s)'],
+    ].map(function(r){
+      return '<div class="preview-row"><span class="preview-key">'+r[0]+'</span><span class="preview-val">'+r[1]+'</span></div>';
+    }).join('');
+
+  goStep(4);
+}
+
+function copiarLinkFinal() {
+  var link = document.getElementById('final-link').textContent;
+  navigator.clipboard.writeText(link).then(function(){
+    var btn = document.getElementById('btn-copy-final');
+    btn.textContent = '✓ Copiado!';
+    setTimeout(function(){ btn.textContent = 'Copiar'; }, 2000);
+  });
+}
+
+// Navigation
+function goStep(n) {
+  // Validações
+  if(n===2) {
+    var name = document.getElementById('s1-name').value.trim();
+    var wpp  = document.getElementById('s1-wpp').value.trim();
+    if(!name){ document.getElementById('s1-name').focus(); return; }
+    if(!wpp) { document.getElementById('s1-wpp').focus(); return; }
+  }
+
+  for(var i=1;i<=4;i++){
+    document.getElementById('step'+i).classList.toggle('active',i===n);
+    var sc=document.getElementById('sc'+i);
+    var sl=document.getElementById('sl'+i);
+    sc.className='si-circle'+(i<n?' done':i===n?' active':'');
+    sl.className='si-label'+(i<n?' done':i===n?' active':'');
+    sc.innerHTML=i<n?'✓':String(i);
+    if(i<4) document.getElementById('ln'+i).className='si-line'+(i<n?' done':'');
+  }
+  window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>

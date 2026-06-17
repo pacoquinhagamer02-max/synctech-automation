@@ -680,18 +680,78 @@ tr:hover td { background: rgba(255,255,255,0.015); }
 
     <!-- ── CONFIG ── -->
     <div class="page" id="page-config">
+
+      <!-- Setup checklist -->
+      <div class="card" style="margin-bottom:12px;border-color:rgba(99,102,241,0.25)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <div class="card-title" style="margin-bottom:0">Status da configuração</div>
+          <span id="cfg-pct" style="font-size:0.78rem;font-weight:700;color:var(--primary)">0%</span>
+        </div>
+        <div style="height:4px;background:var(--s3);border-radius:2px;margin-bottom:16px">
+          <div id="cfg-bar" style="height:100%;background:var(--primary);border-radius:2px;transition:width 0.4s;width:0%"></div>
+        </div>
+        <div id="cfg-checklist" style="display:flex;flex-direction:column;gap:8px"></div>
+      </div>
+
+      <!-- Dados do negócio -->
       <div class="card" style="margin-bottom:12px">
-        <div class="card-title" style="margin-bottom:16px">Dados do negócio</div>
+        <div class="card-title" style="margin-bottom:16px">📋 Dados do negócio</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-          <div><label style="font-size:0.72rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px">Nome do negócio</label><input class="search-input" style="width:100%" value="Barbearia Exemplo"></div>
-          <div><label style="font-size:0.72rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px">WhatsApp</label><input class="search-input" style="width:100%" value="(11) 99999-9999"></div>
-          <div><label style="font-size:0.72rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px">Endereço</label><input class="search-input" style="width:100%" value="Rua das Flores, 123 — Centro"></div>
-          <div><label style="font-size:0.72rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px">Instagram</label><input class="search-input" style="width:100%" value="@barbearia.exemplo"></div>
-          <div style="grid-column:1/-1"><button style="background:var(--primary);color:#fff;border:none;padding:9px 20px;border-radius:8px;font-weight:600;cursor:pointer;font-size:0.85rem;font-family:Inter,sans-serif">Salvar alterações</button></div>
+          <div>
+            <label style="font-size:0.72rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px">Nome do negócio *</label>
+            <input class="search-input" id="cfg-bizname" style="width:100%" placeholder="Ex: Barbearia do João">
+          </div>
+          <div>
+            <label style="font-size:0.72rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px">WhatsApp do dono *</label>
+            <input class="search-input" id="cfg-bizwpp" style="width:100%" placeholder="(11) 99999-9999">
+          </div>
+          <div>
+            <label style="font-size:0.72rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px">Endereço</label>
+            <input class="search-input" id="cfg-address" style="width:100%" placeholder="Rua das Flores, 123 — Centro">
+          </div>
+          <div>
+            <label style="font-size:0.72rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px">Instagram</label>
+            <input class="search-input" id="cfg-instagram" style="width:100%" placeholder="@seunegocio">
+          </div>
         </div>
       </div>
-      <div class="card">
-        <div class="card-title" style="margin-bottom:14px">Integrações</div>
+
+      <!-- Webhook -->
+      <div class="card" style="margin-bottom:12px">
+        <div class="card-title" style="margin-bottom:6px">⚡ Webhook de agendamento</div>
+        <div style="font-size:0.75rem;color:var(--muted);margin-bottom:14px;line-height:1.6">
+          Cole aqui a URL do Make.com ou n8n. Cada agendamento confirmado envia os dados para esse endereço automaticamente.
+          <a href="https://make.com" target="_blank" style="color:var(--pl);text-decoration:none"> Criar conta Make grátis →</a>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end">
+          <div>
+            <label style="font-size:0.72rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px">URL do Webhook (Make / n8n)</label>
+            <input class="search-input" id="cfg-webhook" style="width:100%" placeholder="https://hook.make.com/...">
+          </div>
+          <button onclick="testarWebhook()" style="background:var(--s3);color:var(--muted);border:1px solid var(--border-s);padding:8px 14px;border-radius:8px;font-weight:600;cursor:pointer;font-size:0.78rem;font-family:Inter,sans-serif;white-space:nowrap">Testar</button>
+        </div>
+        <div id="webhook-status" style="font-size:0.72rem;margin-top:8px;display:none"></div>
+      </div>
+
+      <!-- Link do agendamento -->
+      <div class="card" style="margin-bottom:12px">
+        <div class="card-title" style="margin-bottom:6px">🔗 Link do agendamento</div>
+        <div style="font-size:0.75rem;color:var(--muted);margin-bottom:12px">Envie esse link para seus clientes agendarem online.</div>
+        <div style="display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center">
+          <input class="search-input" id="cfg-link" style="width:100%;color:var(--muted)" readonly>
+          <button onclick="copiarLink()" id="btn-copy-link" style="background:var(--primary);color:#fff;border:none;padding:8px 14px;border-radius:8px;font-weight:600;cursor:pointer;font-size:0.78rem;font-family:Inter,sans-serif;white-space:nowrap">Copiar</button>
+        </div>
+      </div>
+
+      <!-- Botão salvar -->
+      <button onclick="salvarConfig()" style="width:100%;background:var(--primary);color:#fff;border:none;padding:12px;border-radius:10px;font-weight:700;cursor:pointer;font-size:0.9rem;font-family:Inter,sans-serif;margin-bottom:12px">
+        💾 Salvar configurações
+      </button>
+      <div id="cfg-save-msg" style="text-align:center;font-size:0.78rem;color:var(--green);display:none">✓ Configurações salvas com sucesso!</div>
+
+      <!-- Integrações -->
+      <div class="card" style="margin-top:12px">
+        <div class="card-title" style="margin-bottom:14px">🔌 Integrações</div>
         <div class="flow-list" id="fl-integ"></div>
       </div>
     </div>
@@ -919,6 +979,94 @@ function renderInbox() {
   msgsEl.scrollTop = msgsEl.scrollHeight;
 }
 
+// ── CONFIG PAGE ──
+var CFG_KEY = 'synctech_config';
+
+function carregarConfig() {
+  try {
+    var saved = JSON.parse(localStorage.getItem(CFG_KEY) || '{}');
+    var el = function(id){ return document.getElementById(id); };
+    if(el('cfg-bizname'))   el('cfg-bizname').value   = saved.bizName    || '';
+    if(el('cfg-bizwpp'))    el('cfg-bizwpp').value    = saved.bizWpp     || '';
+    if(el('cfg-address'))   el('cfg-address').value   = saved.address    || '';
+    if(el('cfg-instagram')) el('cfg-instagram').value = saved.instagram  || '';
+    if(el('cfg-webhook'))   el('cfg-webhook').value   = saved.webhookUrl || '';
+    var link = window.location.origin + window.location.pathname.replace('/dashboard/','') + '/agendamento/';
+    if(el('cfg-link')) el('cfg-link').value = link;
+    atualizarChecklist(saved);
+  } catch(e){}
+}
+
+function salvarConfig() {
+  var el = function(id){ return document.getElementById(id); };
+  var data = {
+    bizName:    el('cfg-bizname')   ? el('cfg-bizname').value.trim()   : '',
+    bizWpp:     el('cfg-bizwpp')    ? el('cfg-bizwpp').value.trim()    : '',
+    address:    el('cfg-address')   ? el('cfg-address').value.trim()   : '',
+    instagram:  el('cfg-instagram') ? el('cfg-instagram').value.trim() : '',
+    webhookUrl: el('cfg-webhook')   ? el('cfg-webhook').value.trim()   : '',
+  };
+  localStorage.setItem(CFG_KEY, JSON.stringify(data));
+  // Atualiza nome na topbar se preenchido
+  if(data.bizName) document.getElementById('page-title').textContent = data.bizName + ' — Dashboard';
+  atualizarChecklist(data);
+  var msg = document.getElementById('cfg-save-msg');
+  msg.style.display = 'block';
+  setTimeout(function(){ msg.style.display = 'none'; }, 3000);
+}
+
+function atualizarChecklist(data) {
+  var items = [
+    { label: 'Nome do negócio',   ok: !!(data.bizName)    },
+    { label: 'WhatsApp do dono',  ok: !!(data.bizWpp)     },
+    { label: 'Webhook configurado (Make/n8n)', ok: !!(data.webhookUrl) },
+    { label: 'Endereço preenchido',ok: !!(data.address)   },
+  ];
+  var done = items.filter(function(i){ return i.ok; }).length;
+  var pct  = Math.round(done/items.length*100);
+  var bar  = document.getElementById('cfg-bar');
+  var pctEl= document.getElementById('cfg-pct');
+  var list = document.getElementById('cfg-checklist');
+  if(bar)   bar.style.width = pct + '%';
+  if(pctEl) pctEl.textContent = pct + '%';
+  if(list)  list.innerHTML = items.map(function(i){
+    return '<div style="display:flex;align-items:center;gap:9px;font-size:0.8rem">' +
+      '<span style="width:18px;height:18px;border-radius:50%;display:grid;place-items:center;font-size:0.65rem;flex-shrink:0;background:' +
+      (i.ok ? 'rgba(34,197,94,0.15);color:var(--green)' : 'rgba(255,255,255,0.04);color:var(--faint)') +
+      '">'+(i.ok?'✓':'○')+'</span>'+
+      '<span style="color:'+(i.ok?'var(--text)':'var(--faint)')+'">'+i.label+'</span></div>';
+  }).join('');
+}
+
+function copiarLink() {
+  var link = document.getElementById('cfg-link');
+  if(!link) return;
+  navigator.clipboard.writeText(link.value).then(function(){
+    var btn = document.getElementById('btn-copy-link');
+    btn.textContent = '✓ Copiado!';
+    btn.style.background = 'var(--green)';
+    setTimeout(function(){ btn.textContent = 'Copiar'; btn.style.background = 'var(--primary)'; }, 2000);
+  });
+}
+
+function testarWebhook() {
+  var url = document.getElementById('cfg-webhook') ? document.getElementById('cfg-webhook').value.trim() : '';
+  var status = document.getElementById('webhook-status');
+  if(!url) { status.style.display='block'; status.style.color='var(--red)'; status.textContent='⚠️ Cole a URL do webhook antes de testar.'; return; }
+  status.style.display='block'; status.style.color='var(--muted)'; status.textContent='⏳ Enviando teste...';
+  fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ tipo:'teste', origem:'SyncTech Dashboard', timestamp: new Date().toISOString() })
+  })
+  .then(function(){
+    status.style.color='var(--green)'; status.textContent='✓ Webhook funcionando! Verifique no Make/n8n.';
+  })
+  .catch(function(){
+    status.style.color='var(--red)'; status.textContent='❌ Falha ao conectar. Verifique a URL.';
+  });
+}
+
 // ── INIT ──
 function init() {
   var d = new Date();
@@ -943,6 +1091,8 @@ function init() {
   barChart('bc-rev',    days6, 'rgba(6,182,212,0.5)');
   barChart('bc-cli',    cli6,  'rgba(34,197,94,0.5)');
   barChart('bc-ret',    ret6,  'rgba(245,158,11,0.5)');
+
+  carregarConfig();
 }
 
 init();

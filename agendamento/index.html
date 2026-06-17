@@ -144,6 +144,19 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
   .share-row { flex-direction: column; }
   .prof-card { min-width: 80px; }
 }
+
+/* ── LOADING OVERLAY ── */
+.loading-overlay { position: fixed; inset: 0; background: rgba(13,17,23,0.85); display: none; place-items: center; z-index: 999; flex-direction: column; gap: 14px; }
+.loading-overlay.active { display: flex; }
+.spinner { width: 44px; height: 44px; border: 3px solid rgba(99,102,241,0.2); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text { font-size: 0.85rem; color: var(--muted); }
+
+/* ── ERROR/SUCCESS TOAST ── */
+.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--s2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 20px; font-size: 0.82rem; font-weight: 600; transition: transform 0.3s; z-index: 1000; white-space: nowrap; }
+.toast.show { transform: translateX(-50%) translateY(0); }
+.toast.error { border-color: rgba(239,68,68,0.4); color: var(--red); }
+.toast.success { border-color: rgba(34,197,94,0.4); color: var(--green); }
 </style>
 </head>
 <body>
@@ -256,6 +269,13 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 
 </main>
 
+<!-- Loading overlay -->
+<div class="loading-overlay" id="loading-overlay">
+  <div class="spinner"></div>
+  <div class="loading-text">Confirmando agendamento...</div>
+</div>
+<div class="toast" id="toast"></div>
+
 <footer class="booking-footer">
   <div class="footer-text">Agendamento online por <a href="../" target="_blank">SyncTech Automation</a></div>
 </footer>
@@ -264,6 +284,8 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 var CONFIG = {
   bizName: 'Barbearia Exemplo',
   bizWpp: '5511999990000',
+  webhookUrl: '',  // URL do Make/n8n — preencher no dashboard > Configurações
+
   professionals: [
     { id:0, name:'Qualquer', emoji:'⭐', color:'#6366F1', rating:null, reviews:null },
     { id:1, name:'João M.',  initials:'JM', color:'#06B6D4', rating:4.9, reviews:128 },
@@ -394,28 +416,106 @@ function renderSummaryHeader() {
   document.getElementById('step3-sub').textContent = svc.name+' · '+S.day+'/'+(S.month+1)+'/'+S.year+' às '+S.slot;
 }
 
-// Confirm
+// Toast helper
+function showToast(msg, type) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + (type||'');
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 3500);
+}
+
+// Phone mask: (XX) XXXXX-XXXX
+document.addEventListener('DOMContentLoaded', function(){
+  var wpp = document.getElementById('f-wpp');
+  if(wpp) wpp.addEventListener('input', function(){
+    var v = this.value.replace(/\D/g,'').slice(0,11);
+    if(v.length > 10) v = v.replace(/^(\d{2})(\d{5})(\d{4})$/, '($1) $2-$3');
+    else if(v.length > 6) v = v.replace(/^(\d{2})(\d{4})(\d+)$/, '($1) $2-$3');
+    else if(v.length > 2) v = v.replace(/^(\d{2})(\d+)$/, '($1) $2');
+    this.value = v;
+  });
+});
+
+// Confirm — POST para webhook se configurado
 function confirmBooking() {
   var name  = document.getElementById('f-name').value.trim();
   var phone = document.getElementById('f-wpp').value.trim();
-  if (!name || !phone) { alert('Preencha nome e WhatsApp!'); return; }
+  var email = document.getElementById('f-email').value.trim();
+  var obs   = document.getElementById('f-obs').value.trim();
+
+  if (!name) { showToast('⚠️ Preencha seu nome', 'error'); return; }
+  if (!phone || phone.replace(/\D/g,'').length < 10) { showToast('⚠️ WhatsApp inválido', 'error'); return; }
+
   var svc  = CONFIG.services.filter(function(s){ return s.id===S.svc; })[0];
   var prof = CONFIG.professionals.filter(function(p){ return p.id===S.prof; })[0];
   var dateStr = S.day+'/'+(S.month+1)+'/'+S.year;
 
-  document.getElementById('conf-sub').textContent = 'Olá, '+name.split(' ')[0]+'! Enviaremos confirmação no WhatsApp ('+phone+') e um lembrete 1h antes.';
-  document.getElementById('conf-card').innerHTML = [
-    { icon:'💈', text:svc.name,         sub:svc.icon+' '+svc.durationStr+' · R$'+svc.price },
-    { icon:'📅', text:dateStr+' às '+S.slot, sub:'Confirmado' },
-    { icon:'👤', text:prof.name,        sub:prof.id===0?'Primeiro disponível':(prof.rating?'★ '+prof.rating:'Profissional') },
-    { icon:'📍', text:CONFIG.bizName,   sub:'Local confirmado via WhatsApp' },
-  ].map(function(r){
-    return '<div class="confirm-card-row"><div class="cc-icon">'+r.icon+'</div><div><div class="cc-text">'+r.text+'</div><div class="cc-sub">'+r.sub+'</div></div></div>';
-  }).join('');
+  var payload = {
+    nome:        name,
+    telefone:    phone,
+    email:       email,
+    observacao:  obs,
+    servico:     svc.name,
+    preco:       svc.price,
+    duracao:     svc.durationStr,
+    profissional:prof.name,
+    data:        dateStr,
+    hora:        S.slot,
+    negocio:     CONFIG.bizName,
+    timestamp:   new Date().toISOString()
+  };
 
-  var msg = encodeURIComponent('✅ *Agendamento Confirmado!*\n\n👤 *Nome:* '+name+'\n💈 *Serviço:* '+svc.name+'\n📅 *Data:* '+dateStr+' às '+S.slot+'\n💰 *Valor:* R$'+svc.price+'\n\n_Agendado via SyncTech Automation_');
-  document.getElementById('btn-wa').onclick = function(){ window.open('https://wa.me/'+CONFIG.bizWpp+'?text='+msg,'_blank'); };
-  goTo(4);
+  function finalizarConfirmacao() {
+    document.getElementById('conf-sub').textContent =
+      'Olá, '+name.split(' ')[0]+'! Enviaremos confirmação no WhatsApp ('+phone+') e um lembrete 1h antes.';
+
+    document.getElementById('conf-card').innerHTML = [
+      { icon:'💈', text:svc.name,              sub:svc.icon+' '+svc.durationStr+' · R$'+svc.price },
+      { icon:'📅', text:dateStr+' às '+S.slot, sub:'Confirmado ✓' },
+      { icon:'👤', text:prof.name,             sub:prof.id===0?'Primeiro disponível':(prof.rating?'★ '+prof.rating:'Profissional') },
+      { icon:'📍', text:CONFIG.bizName,        sub:'Endereço confirmado via WhatsApp' },
+    ].map(function(r){
+      return '<div class="confirm-card-row"><div class="cc-icon">'+r.icon+'</div><div><div class="cc-text">'+r.text+'</div><div class="cc-sub">'+r.sub+'</div></div></div>';
+    }).join('');
+
+    var msg = encodeURIComponent(
+      '✅ *Agendamento Confirmado!*\n\n'+
+      '👤 *Nome:* '+name+'\n'+
+      '💈 *Serviço:* '+svc.name+'\n'+
+      '📅 *Data:* '+dateStr+' às '+S.slot+'\n'+
+      '💰 *Valor:* R$'+svc.price+'\n'+
+      (obs ? '📝 *Obs:* '+obs+'\n' : '')+
+      '\n_Agendado via SyncTech Automation_'
+    );
+    document.getElementById('btn-wa').onclick = function(){
+      window.open('https://wa.me/'+CONFIG.bizWpp+'?text='+msg,'_blank');
+    };
+    goTo(4);
+  }
+
+  // Se tem webhook configurado, envia os dados
+  var webhook = CONFIG.webhookUrl || '';
+  if (webhook) {
+    document.getElementById('loading-overlay').classList.add('active');
+    fetch(webhook, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+    .then(function(){
+      document.getElementById('loading-overlay').classList.remove('active');
+      finalizarConfirmacao();
+    })
+    .catch(function(){
+      document.getElementById('loading-overlay').classList.remove('active');
+      // Mesmo com erro no webhook, confirma o agendamento para o cliente
+      showToast('⚠️ Aviso: falha ao notificar sistema', 'error');
+      setTimeout(finalizarConfirmacao, 1200);
+    });
+  } else {
+    finalizarConfirmacao();
+  }
 }
 
 function addToCalendar() {
@@ -442,8 +542,20 @@ function goTo(n) {
   window.scrollTo(0,0);
 }
 
-// Init
+// Init — sobrescreve CONFIG com dados salvos no dashboard
+(function(){
+  try {
+    var saved = JSON.parse(localStorage.getItem('synctech_config') || '{}');
+    if (saved.bizName)    CONFIG.bizName    = saved.bizName;
+    if (saved.bizWpp)     CONFIG.bizWpp     = saved.bizWpp.replace(/\D/g,'');
+    if (saved.webhookUrl) CONFIG.webhookUrl = saved.webhookUrl;
+    if (saved.services && saved.services.length)       CONFIG.services       = saved.services;
+    if (saved.professionals && saved.professionals.length) CONFIG.professionals = saved.professionals;
+  } catch(e){}
+})();
+
 document.getElementById('hdr-bizname').textContent = CONFIG.bizName;
+document.title = 'Agendamento — ' + CONFIG.bizName;
 renderServices();
 renderProfs();
 renderCalendar();
