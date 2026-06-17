@@ -134,8 +134,8 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 .card-title { font-size: 0.85rem; font-weight: 700; margin-bottom: 3px; }
 .card-sub { font-size: 0.72rem; color: var(--muted); margin-bottom: 16px; }
 
-.bar-chart { display: flex; align-items: flex-end; gap: 6px; height: 100px; }
-.bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.bar-chart { display: flex; align-items: flex-end; gap: 6px; height: 100px; padding-bottom: 18px; }
+.bar-col { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 4px; height: 100%; }
 .bar-fill { width: 100%; border-radius: 4px 4px 0 0; min-height: 4px; transition: height 0.3s; position: relative; cursor: pointer; }
 .bar-fill:hover::after { content: attr(data-tip); position: absolute; bottom: calc(100% + 4px); left: 50%; transform: translateX(-50%); background: var(--s3); border: 1px solid var(--border-s); border-radius: 5px; padding: 3px 8px; font-size: 0.68rem; white-space: nowrap; color: var(--text); z-index: 10; }
 .bar-lbl { font-size: 0.62rem; color: var(--faint); }
@@ -834,7 +834,7 @@ function barChart(id, data, color) {
   if (!el) return;
   var max = Math.max.apply(null, data.map(function(d) { return d.v; }));
   el.innerHTML = data.map(function(d) {
-    return '<div class="bar-col"><div class="bar-fill" style="height:' + (d.v/max*96) + '%;background:' + (color||'rgba(99,102,241,0.5)') + '" data-tip="' + d.l + ': ' + (d.d||d.v) + '"></div><div class="bar-lbl">' + d.l + '</div></div>';
+    return '<div class="bar-col"><div class="bar-fill" style="height:' + Math.round(d.v/max*80) + 'px;background:' + (color||'rgba(99,102,241,0.5)') + '" data-tip="' + d.l + ': ' + (d.d||d.v) + '"></div><div class="bar-lbl">' + d.l + '</div></div>';
   }).join('');
 }
 
