@@ -263,6 +263,23 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 <script>
 var DATA = { name:'', wpp:'', ig:'', addr:'', type:'', webhookUrl:'', services:[] };
 
+// Ícones por tipo de negócio
+var TYPE_ICONS = {
+  'Barbearia':       ['✂️','🪒','💈','💧','🎨'],
+  'Salão de beleza': ['💇','💅','💄','🧖','✨'],
+  'Clínica estética':['✨','💉','🌿','💊','🧴'],
+  'Petshop':         ['🐾','🛁','✂️','🐕','🐈'],
+  'Consultório':     ['🩺','💊','📋','🩻','❤️'],
+  'Academia':        ['💪','🏋️','🧘','🏃','⚡'],
+  'Restaurante':     ['🍽️','🍕','🥗','☕','🎂'],
+  'default':         ['✂️','⭐','💼','🎯','🔧'],
+};
+
+function getIcons() {
+  var tipo = document.getElementById('s1-type') ? document.getElementById('s1-type').value : '';
+  return TYPE_ICONS[tipo] || TYPE_ICONS['default'];
+}
+
 // Phone mask
 document.getElementById('s1-wpp').addEventListener('input', function(){
   var v = this.value.replace(/\D/g,'').slice(0,11);
@@ -274,22 +291,40 @@ document.getElementById('s1-wpp').addEventListener('input', function(){
 
 // Serviços
 var svcCount = 0;
-var defaultSvcs = [
-  { name:'Serviço Principal', price:50, duration:30 },
-  { name:'Serviço Completo',  price:80, duration:60 },
-];
+
+function getDefaultSvcs() {
+  var tipo = document.getElementById('s1-type') ? document.getElementById('s1-type').value : '';
+  var defaults = {
+    'Barbearia':       [{name:'Corte Masculino',price:45,duration:45},{name:'Barba',price:35,duration:30},{name:'Corte + Barba',price:70,duration:75}],
+    'Salão de beleza': [{name:'Corte Feminino', price:60,duration:60},{name:'Escova',price:50,duration:45},{name:'Coloração',price:150,duration:120}],
+    'Clínica estética':[{name:'Limpeza de pele',price:120,duration:60},{name:'Hidratação',price:90,duration:45},{name:'Botox',price:350,duration:30}],
+    'Petshop':         [{name:'Banho',price:50,duration:60},{name:'Banho + Tosa',price:80,duration:90},{name:'Tosa',price:60,duration:60}],
+    'Consultório':     [{name:'Consulta',price:200,duration:30},{name:'Retorno',price:100,duration:20},{name:'Avaliação',price:150,duration:45}],
+    'Academia':        [{name:'Avaliação física',price:80,duration:60},{name:'Personal 1h',price:100,duration:60},{name:'Aula em grupo',price:30,duration:60}],
+    'Restaurante':     [{name:'Reserva mesa 2p',price:0,duration:90},{name:'Reserva mesa 4p',price:0,duration:90},{name:'Evento privado',price:500,duration:180}],
+    'default':         [{name:'Serviço Principal',price:80,duration:60},{name:'Serviço Completo',price:120,duration:90}],
+  };
+  return defaults[tipo] || defaults['default'];
+}
 
 function renderSvcs() {
   var b = document.getElementById('svc-builder');
-  if(DATA.services.length===0) defaultSvcs.forEach(function(s){ DATA.services.push(Object.assign({id:++svcCount},s)); });
+  if(DATA.services.length===0) getDefaultSvcs().forEach(function(s){ DATA.services.push(Object.assign({id:++svcCount},s)); });
+  var icons = getIcons();
   b.innerHTML = DATA.services.map(function(s,i){
     return '<div class="svc-row" id="sr-'+s.id+'">' +
-      '<input class="form-input" placeholder="Nome do serviço" value="'+s.name+'" oninput="DATA.services['+i+'].name=this.value">' +
-      '<input class="form-input" placeholder="Preço (R$)" value="'+s.price+'" type="number" min="0" oninput="DATA.services['+i+'].price=+this.value">' +
-      '<input class="form-input" placeholder="Duração (min)" value="'+s.duration+'" type="number" min="5" oninput="DATA.services['+i+'].duration=+this.value">' +
-      '<button class="btn-del" onclick="delSvc('+s.id+')">✕</button>' +
+      '<input class="form-input" placeholder="Nome do serviço" value="'+s.name+'" oninput="DATA.services['+i+'].name=this.value" style="grid-column:span 2">' +
+      '<input class="form-input" placeholder="R$" value="'+s.price+'" type="number" min="0" oninput="DATA.services['+i+'].price=+this.value">' +
+      '<input class="form-input" placeholder="min" value="'+s.duration+'" type="number" min="5" oninput="DATA.services['+i+'].duration=+this.value">' +
+      '<button class="btn-del" onclick="delSvc('+s.id+')" title="Remover">✕</button>' +
     '</div>';
-  }).join('');
+  }).join('') +
+  '<div style="display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:4px;margin-top:4px;padding:0 0 8px">' +
+    '<div style="font-size:0.62rem;color:var(--faint);padding-left:2px">Nome</div>' +
+    '<div style="font-size:0.62rem;color:var(--faint)">Preço R$</div>' +
+    '<div style="font-size:0.62rem;color:var(--faint)">Duração min</div>' +
+    '<div></div>' +
+  '</div>';
 }
 
 function addSvc() {
@@ -298,9 +333,16 @@ function addSvc() {
 }
 
 function delSvc(id) {
+  if(DATA.services.length <= 1) { alert('Mantenha ao menos 1 serviço.'); return; }
   DATA.services = DATA.services.filter(function(s){ return s.id!==id; });
   renderSvcs();
 }
+
+// Atualiza defaults quando tipo muda
+document.getElementById('s1-type').addEventListener('change', function(){
+  DATA.services = [];
+  renderSvcs();
+});
 
 renderSvcs();
 
@@ -327,34 +369,47 @@ function salvarTudo() {
   DATA.type       = document.getElementById('s1-type').value;
   DATA.webhookUrl = document.getElementById('s3-webhook').value.trim();
 
+  var icons = getIcons();
+  var svcsValidos = DATA.services.filter(function(s){ return s.name && s.name.trim(); });
+
   var cfg = {
     bizName:    DATA.name,
     bizWpp:     DATA.wpp,
     instagram:  DATA.ig,
     address:    DATA.addr,
     webhookUrl: DATA.webhookUrl,
-    services:   DATA.services.filter(function(s){ return s.name; }).map(function(s,i){
+    services:   svcsValidos.map(function(s,i){
       return {
-        id: i+1, icon:'✂️', name:s.name,
-        desc: s.duration+' minutos', price:s.price,
-        duration:s.duration, durationStr:s.duration+' min', popular: i===0
+        id: i+1,
+        icon: icons[i % icons.length],
+        name: s.name.trim(),
+        desc: s.duration + ' minutos',
+        price: s.price || 0,
+        duration: s.duration || 30,
+        durationStr: (s.duration || 30) + ' min',
+        popular: i === 0
       };
-    })
+    }),
+    professionals: [
+      { id:0, name:'Qualquer', emoji:'⭐', color:'#6366F1', rating:null, reviews:null }
+    ]
   };
   localStorage.setItem('synctech_config', JSON.stringify(cfg));
 
-  // Preenche preview
-  var link = window.location.origin + window.location.pathname.replace('setup.html','') + 'agendamento/';
+  // Link correto — remove duplas barras
+  var base = (window.location.origin + window.location.pathname).replace(/\/setup\.html.*/, '').replace(/\/+$/, '');
+  var link = base + '/agendamento/';
   document.getElementById('final-link').textContent = link;
 
   document.getElementById('preview-card').innerHTML =
     '<div class="preview-title">Resumo da configuração</div>' +
     [
-      ['Negócio',      DATA.name  || '—'],
-      ['WhatsApp',     DATA.wpp   || '—'],
-      ['Instagram',    DATA.ig    || '—'],
-      ['Webhook',      DATA.webhookUrl ? '✓ Configurado' : '⚠️ Não configurado (manual)'],
-      ['Serviços',     cfg.services.length + ' serviço(s) cadastrado(s)'],
+      ['Negócio',   DATA.name  || '—'],
+      ['Tipo',      DATA.type  || 'Não informado'],
+      ['WhatsApp',  DATA.wpp   || '—'],
+      ['Instagram', DATA.ig    || 'Não informado'],
+      ['Webhook',   DATA.webhookUrl ? '✓ Configurado' : '⚠️ Configurar depois no Dashboard'],
+      ['Serviços',  svcsValidos.length + ' cadastrado(s)'],
     ].map(function(r){
       return '<div class="preview-row"><span class="preview-key">'+r[0]+'</span><span class="preview-val">'+r[1]+'</span></div>';
     }).join('');
@@ -371,26 +426,58 @@ function copiarLinkFinal() {
   });
 }
 
+function mostrarErro(id, msg) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.style.borderColor = 'var(--red)';
+  el.focus();
+  var hint = el.nextElementSibling;
+  if (hint && hint.className === 'form-hint') { hint.style.color='var(--red)'; hint.textContent = msg; }
+  else {
+    var h = document.createElement('div');
+    h.className = 'form-hint'; h.style.color = 'var(--red)'; h.textContent = msg;
+    el.parentNode.insertBefore(h, el.nextSibling);
+  }
+}
+
+function limparErro(id) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.style.borderColor = '';
+  var hint = el.nextElementSibling;
+  if (hint && hint.className === 'form-hint') { hint.style.color = ''; }
+}
+
 // Navigation
 function goStep(n) {
-  // Validações
-  if(n===2) {
+  if (n === 2) {
     var name = document.getElementById('s1-name').value.trim();
-    var wpp  = document.getElementById('s1-wpp').value.trim();
-    if(!name){ document.getElementById('s1-name').focus(); return; }
-    if(!wpp) { document.getElementById('s1-wpp').focus(); return; }
+    var wpp  = document.getElementById('s1-wpp').value.replace(/\D/g,'');
+    var ok = true;
+    if (!name) { mostrarErro('s1-name', 'Informe o nome do negócio'); ok=false; }
+    else limparErro('s1-name');
+    if (wpp.length < 10) { mostrarErro('s1-wpp', 'WhatsApp inválido — informe com DDD'); ok=false; }
+    else limparErro('s1-wpp');
+    if (!ok) return;
+  }
+  if (n === 3) {
+    var svcsOk = DATA.services.filter(function(s){ return s.name && s.name.trim(); });
+    if (svcsOk.length === 0) {
+      alert('Adicione ao menos 1 serviço antes de continuar.');
+      return;
+    }
   }
 
-  for(var i=1;i<=4;i++){
-    document.getElementById('step'+i).classList.toggle('active',i===n);
-    var sc=document.getElementById('sc'+i);
-    var sl=document.getElementById('sl'+i);
-    sc.className='si-circle'+(i<n?' done':i===n?' active':'');
-    sl.className='si-label'+(i<n?' done':i===n?' active':'');
-    sc.innerHTML=i<n?'✓':String(i);
-    if(i<4) document.getElementById('ln'+i).className='si-line'+(i<n?' done':'');
+  for (var i=1; i<=4; i++) {
+    document.getElementById('step'+i).classList.toggle('active', i===n);
+    var sc = document.getElementById('sc'+i);
+    var sl = document.getElementById('sl'+i);
+    sc.className = 'si-circle' + (i<n ? ' done' : i===n ? ' active' : '');
+    sl.className = 'si-label'  + (i<n ? ' done' : i===n ? ' active' : '');
+    sc.innerHTML = i < n ? '✓' : String(i);
+    if (i < 4) document.getElementById('ln'+i).className = 'si-line' + (i<n ? ' done' : '');
   }
-  window.scrollTo(0,0);
+  window.scrollTo(0, 0);
 }
 </script>
 </body>

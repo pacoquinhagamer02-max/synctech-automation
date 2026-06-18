@@ -318,7 +318,7 @@ tr:hover td { background: rgba(255,255,255,0.015); }
     <span class="logo-text">SyncTech</span>
   </div>
   <div class="sidebar-biz">
-    <div class="biz-name">Barbearia Exemplo</div>
+    <div class="biz-name" id="sidebar-bizname">Carregando...</div>
     <div class="biz-plan"><div class="plan-dot"></div> Plano Negócio</div>
   </div>
   <nav class="sidebar-nav">
@@ -899,11 +899,32 @@ function barChart(id, data, color) {
 }
 
 // ── FLOWS ──
+function toggleFlow(listId, idx) {
+  var lists = { 'fl-wa': botFlows, 'fl-ig': igFlows, 'fl-integ': integrations };
+  var list = lists[listId];
+  if (!list || !list[idx]) return;
+  list[idx].on = !list[idx].on;
+  try {
+    var saved = JSON.parse(localStorage.getItem('st_flows_' + listId) || '{}');
+    saved[idx] = list[idx].on;
+    localStorage.setItem('st_flows_' + listId, JSON.stringify(saved));
+  } catch(e){}
+  renderFlows(listId, list);
+}
+
 function renderFlows(id, flows) {
   var el = document.getElementById(id);
   if (!el) return;
-  el.innerHTML = flows.map(function(f) {
-    return '<div class="flow-row"><div class="flow-icon">' + f.icon + '</div><div class="flow-info"><div class="flow-name">' + f.name + '</div><div class="flow-desc">' + f.desc + '</div></div><button class="toggle ' + (f.on?'on':'') + '" onclick="this.classList.toggle(\'on\')"></button></div>';
+  try {
+    var saved = JSON.parse(localStorage.getItem('st_flows_' + id) || '{}');
+    flows.forEach(function(f, i){ if (saved[i] !== undefined) f.on = saved[i]; });
+  } catch(e){}
+  el.innerHTML = flows.map(function(f, i) {
+    return '<div class="flow-row">' +
+      '<div class="flow-icon">' + f.icon + '</div>' +
+      '<div class="flow-info"><div class="flow-name">' + f.name + '</div><div class="flow-desc">' + f.desc + '</div></div>' +
+      '<button class="toggle ' + (f.on ? 'on' : '') + '" onclick="toggleFlow(\'' + id + '\',' + i + ')"></button>' +
+    '</div>';
   }).join('');
 }
 
@@ -958,19 +979,50 @@ function renderPipeline() {
 }
 
 // ── INBOX ──
+var activeConv = 0;
+
 function renderInbox() {
   var el = document.getElementById('inbox-convs');
-  el.innerHTML = inboxConvs.map(function(c) {
-    return '<div class="inbox-conv' + (c.name === 'Carlos Silva' ? ' active' : '') + '"><div class="inbox-av ' + c.cls + '">' + c.av + '</div><div class="inbox-conv-info"><div class="inbox-conv-row"><span class="inbox-conv-name">' + c.name + '</span><span class="inbox-conv-time">' + c.time + '</span></div><div class="inbox-conv-msg">' + c.msg + '</div></div>' + (c.unread ? '<div class="inbox-conv-unread"></div>' : '') + '</div>';
+  el.innerHTML = inboxConvs.map(function(c, i) {
+    return '<div class="inbox-conv' + (i === activeConv ? ' active' : '') + '" onclick="abrirConversa(' + i + ')">' +
+      '<div class="inbox-av ' + c.cls + '">' + c.av + '</div>' +
+      '<div class="inbox-conv-info"><div class="inbox-conv-row"><span class="inbox-conv-name">' + c.name + '</span><span class="inbox-conv-time">' + c.time + '</span></div>' +
+      '<div class="inbox-conv-msg">' + c.msg + '</div></div>' +
+      (c.unread ? '<div class="inbox-conv-unread"></div>' : '') + '</div>';
   }).join('');
+  renderChat(activeConv);
+}
 
+function abrirConversa(idx) {
+  activeConv = idx;
+  inboxConvs[idx].unread = false;
+  var c = inboxConvs[idx];
+  // Atualiza header do chat
+  var hdr = document.querySelector('.inbox-chat-header');
+  if (hdr) {
+    var av = hdr.querySelector('.inbox-chat-av');
+    var nm = hdr.querySelector('.inbox-chat-name');
+    var st = hdr.querySelector('.inbox-chat-status');
+    if (av) { av.textContent = c.av; av.className = 'inbox-chat-av ' + c.cls; }
+    if (nm) nm.textContent = c.name;
+    if (st) st.textContent = 'Online · ' + (c.cls === 'wa' ? 'WhatsApp' : 'Instagram');
+  }
+  // Mostra chat (mobile)
+  var chat = document.querySelector('.inbox-chat');
+  if (chat) chat.style.display = 'flex';
+  renderInbox();
+}
+
+function renderChat(idx) {
   var msgsEl = document.getElementById('inbox-msgs');
+  if (!msgsEl) return;
+  // Mostra mensagens do chatMsgs para o contato ativo (simplificado: sempre o mesmo chat de demo)
   msgsEl.innerHTML = chatMsgs.map(function(m) {
     var isBot = m.dir === 'bot';
     var isOut = m.dir === 'out';
     var cls   = isBot ? 'bot-msg' : isOut ? 'out' : 'in';
     var avCls = isBot ? 'bot' : '';
-    var avTxt = isBot ? 'ST' : (isOut ? 'EU' : m.av);
+    var avTxt = isBot ? 'ST' : (isOut ? 'EU' : (inboxConvs[idx] ? inboxConvs[idx].av : m.av));
     return '<div class="msg-row' + (isOut ? ' out' : '') + '">' +
       '<div class="msg-av2 ' + avCls + '">' + avTxt + '</div>' +
       '<div><div class="msg-label">' + (isBot ? '🤖 Bot · ' : '') + m.time + '</div>' +
@@ -982,6 +1034,12 @@ function renderInbox() {
 // ── CONFIG PAGE ──
 var CFG_KEY = 'synctech_config';
 
+function atualizarSidebar(nome) {
+  var sb = document.getElementById('sidebar-bizname');
+  if (sb) sb.textContent = nome || 'Meu Negócio';
+  document.title = (nome || 'SyncTech') + ' — Dashboard';
+}
+
 function carregarConfig() {
   try {
     var saved = JSON.parse(localStorage.getItem(CFG_KEY) || '{}');
@@ -991,24 +1049,43 @@ function carregarConfig() {
     if(el('cfg-address'))   el('cfg-address').value   = saved.address    || '';
     if(el('cfg-instagram')) el('cfg-instagram').value = saved.instagram  || '';
     if(el('cfg-webhook'))   el('cfg-webhook').value   = saved.webhookUrl || '';
-    var link = window.location.origin + window.location.pathname.replace('/dashboard/','') + '/agendamento/';
-    if(el('cfg-link')) el('cfg-link').value = link;
+    // Link sempre baseado na URL atual
+    var base = window.location.href.replace(/\/dashboard\/?.*/, '');
+    if(el('cfg-link')) el('cfg-link').value = base + '/agendamento/';
+    // Atualiza sidebar com o nome salvo
+    atualizarSidebar(saved.bizName);
+    // Atualiza integrations instagram handle
+    if (saved.instagram) {
+      var igInteg = integrations.find(function(i){ return i.name === 'Instagram Business'; });
+      if (igInteg) igInteg.desc = 'Conectado · ' + saved.instagram;
+    }
     atualizarChecklist(saved);
-  } catch(e){}
+  } catch(e){ atualizarSidebar(''); }
 }
 
 function salvarConfig() {
   var el = function(id){ return document.getElementById(id); };
-  var data = {
-    bizName:    el('cfg-bizname')   ? el('cfg-bizname').value.trim()   : '',
-    bizWpp:     el('cfg-bizwpp')    ? el('cfg-bizwpp').value.trim()    : '',
-    address:    el('cfg-address')   ? el('cfg-address').value.trim()   : '',
-    instagram:  el('cfg-instagram') ? el('cfg-instagram').value.trim() : '',
-    webhookUrl: el('cfg-webhook')   ? el('cfg-webhook').value.trim()   : '',
-  };
+  var nome = el('cfg-bizname') ? el('cfg-bizname').value.trim() : '';
+  var wpp  = el('cfg-bizwpp')  ? el('cfg-bizwpp').value.trim()  : '';
+
+  if (!nome) { el('cfg-bizname').focus(); el('cfg-bizname').style.borderColor='var(--red)'; return; }
+  if (!wpp)  { el('cfg-bizwpp').focus();  el('cfg-bizwpp').style.borderColor='var(--red)'; return; }
+  el('cfg-bizname').style.borderColor = '';
+  el('cfg-bizwpp').style.borderColor  = '';
+
+  // Mescla com dados existentes para não perder services/professionals do setup
+  var existing = {};
+  try { existing = JSON.parse(localStorage.getItem(CFG_KEY) || '{}'); } catch(e){}
+
+  var data = Object.assign(existing, {
+    bizName:    nome,
+    bizWpp:     wpp,
+    address:    el('cfg-address')   ? el('cfg-address').value.trim()   : existing.address   || '',
+    instagram:  el('cfg-instagram') ? el('cfg-instagram').value.trim() : existing.instagram || '',
+    webhookUrl: el('cfg-webhook')   ? el('cfg-webhook').value.trim()   : existing.webhookUrl || '',
+  });
   localStorage.setItem(CFG_KEY, JSON.stringify(data));
-  // Atualiza nome na topbar se preenchido
-  if(data.bizName) document.getElementById('page-title').textContent = data.bizName + ' — Dashboard';
+  atualizarSidebar(data.bizName);
   atualizarChecklist(data);
   var msg = document.getElementById('cfg-save-msg');
   msg.style.display = 'block';
