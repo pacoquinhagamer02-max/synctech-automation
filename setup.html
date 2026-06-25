@@ -156,6 +156,11 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       <label class="form-label">Endereço</label>
       <input class="form-input" id="s1-addr" placeholder="Rua das Flores, 123 — Centro — SP">
     </div>
+    <div class="form-group">
+      <label class="form-label">Link avaliação Google <span style="font-size:0.65rem;color:var(--faint);font-weight:400;text-transform:none">(opcional — aparece na confirmação do agendamento)</span></label>
+      <input class="form-input" id="s1-review" placeholder="https://g.page/r/XXXXX/review">
+      <div class="form-hint">Google Maps → seu negócio → "Peça avaliações" → copie o link curto</div>
+    </div>
 
     <div class="btn-row">
       <button class="btn btn-primary" onclick="goStep(2)">Próximo: Serviços →</button>
@@ -364,22 +369,24 @@ function testarWebhook3() {
 
 // Save all
 function salvarTudo() {
-  DATA.name       = document.getElementById('s1-name').value.trim();
-  DATA.wpp        = document.getElementById('s1-wpp').value.trim();
-  DATA.ig         = document.getElementById('s1-ig').value.trim();
-  DATA.addr       = document.getElementById('s1-addr').value.trim();
-  DATA.type       = document.getElementById('s1-type').value;
-  DATA.webhookUrl = document.getElementById('s3-webhook').value.trim();
+  DATA.name            = document.getElementById('s1-name').value.trim();
+  DATA.wpp             = document.getElementById('s1-wpp').value.trim();
+  DATA.ig              = document.getElementById('s1-ig').value.trim();
+  DATA.addr            = document.getElementById('s1-addr').value.trim();
+  DATA.type            = document.getElementById('s1-type').value;
+  DATA.webhookUrl      = document.getElementById('s3-webhook').value.trim();
+  DATA.googleReviewUrl = document.getElementById('s1-review').value.trim();
 
   var icons = getIcons();
   var svcsValidos = DATA.services.filter(function(s){ return s.name && s.name.trim(); });
 
   var cfg = {
-    bizName:    DATA.name,
-    bizWpp:     DATA.wpp,
-    instagram:  DATA.ig,
-    address:    DATA.addr,
-    webhookUrl: DATA.webhookUrl,
+    bizName:         DATA.name,
+    bizWpp:          DATA.wpp,
+    instagram:       DATA.ig,
+    address:         DATA.addr,
+    webhookUrl:      DATA.webhookUrl,
+    googleReviewUrl: DATA.googleReviewUrl,
     services:   svcsValidos.map(function(s,i){
       return {
         id: i+1,

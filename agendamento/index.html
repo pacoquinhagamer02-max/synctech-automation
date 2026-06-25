@@ -263,6 +263,14 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
         <button class="share-btn wa" id="btn-wa">📱 Chamar no WhatsApp</button>
         <button class="share-btn" onclick="addToCalendar()">📅 Salvar no calendário</button>
       </div>
+      <div id="review-row" style="display:none;margin-top:12px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);border-radius:12px;padding:14px 16px;text-align:center">
+        <div style="font-size:0.78rem;color:#94A3B8;margin-bottom:8px">Adorou o atendimento? Deixe uma avaliação rápida ⭐</div>
+        <button class="share-btn" id="btn-review" style="background:rgba(245,158,11,0.15);border-color:rgba(245,158,11,0.35);color:#F59E0B;width:100%" onclick="openReview()">⭐ Avaliar no Google (1 min)</button>
+      </div>
+      <div style="margin-top:12px;background:rgba(99,102,241,0.07);border:1px solid rgba(99,102,241,0.18);border-radius:12px;padding:14px 16px;text-align:center">
+        <div style="font-size:0.78rem;color:#94A3B8;margin-bottom:8px">Conhece alguém que precisaria? Indique e ajude!</div>
+        <button class="share-btn" style="width:100%" onclick="shareReferral()">📤 Indicar um amigo via WhatsApp</button>
+      </div>
       <div class="btn-row" style="margin-top:16px">
         <button class="btn btn-primary" onclick="location.reload()">Fazer outro agendamento</button>
       </div>
@@ -287,6 +295,7 @@ var CONFIG = {
   bizName: 'Barbearia Exemplo',
   bizWpp: '5511999990000',
   webhookUrl: 'https://hook.eu1.make.com/c3qeo8m738xliljs1vn8th1bea340ggg',
+  googleReviewUrl: '',
 
   professionals: [
     { id:0, name:'Qualquer', emoji:'⭐', color:'#6366F1', rating:null, reviews:null },
@@ -494,6 +503,9 @@ function confirmBooking() {
     document.getElementById('btn-wa').onclick = function(){
       window.open('https://wa.me/'+CONFIG.bizWpp+'?text='+msg,'_blank');
     };
+    if (CONFIG.googleReviewUrl) {
+      document.getElementById('review-row').style.display = 'block';
+    }
     goTo(4);
   }
 
@@ -532,6 +544,16 @@ function addToCalendar() {
   window.open('https://calendar.google.com/calendar/r/eventedit?text='+encodeURIComponent(svc.name+' — '+CONFIG.bizName)+'&dates='+f(start)+'/'+f(end)+'&ctz=America/Sao_Paulo&details='+encodeURIComponent('Agendado via SyncTech Automation\n\nLocal: '+CONFIG.bizName),'_blank');
 }
 
+function openReview() {
+  if (CONFIG.googleReviewUrl) window.open(CONFIG.googleReviewUrl, '_blank');
+}
+
+function shareReferral() {
+  var svc = CONFIG.services.filter(function(s){ return s.id===S.svc; })[0];
+  var msg = 'Acabei de agendar ' + (svc ? svc.name : 'um serviço') + ' em ' + CONFIG.bizName + ' pelo link deles! Super fácil, recomendo: ' + window.location.href.split('#')[0];
+  window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+}
+
 // Navigation
 function goTo(n) {
   if (n===3) renderSummaryHeader();
@@ -555,8 +577,9 @@ function goTo(n) {
       var encoded = hash.slice(8);
       var decoded = JSON.parse(decodeURIComponent(escape(atob(encoded))));
       if (decoded.bizName)    CONFIG.bizName    = decoded.bizName;
-      if (decoded.bizWpp)     CONFIG.bizWpp     = decoded.bizWpp.replace(/\D/g,'');
-      if (decoded.webhookUrl) CONFIG.webhookUrl = decoded.webhookUrl;
+      if (decoded.bizWpp)          CONFIG.bizWpp          = decoded.bizWpp.replace(/\D/g,'');
+      if (decoded.webhookUrl)      CONFIG.webhookUrl      = decoded.webhookUrl;
+      if (decoded.googleReviewUrl) CONFIG.googleReviewUrl = decoded.googleReviewUrl;
       if (decoded.services && decoded.services.length)           CONFIG.services      = decoded.services;
       if (decoded.professionals && decoded.professionals.length) CONFIG.professionals = decoded.professionals;
       return; // usa hash, ignora localStorage
@@ -565,9 +588,10 @@ function goTo(n) {
   // Fallback: sobrescreve CONFIG com dados salvos no dashboard
   try {
     var saved = JSON.parse(localStorage.getItem('synctech_config') || '{}');
-    if (saved.bizName)    CONFIG.bizName    = saved.bizName;
-    if (saved.bizWpp)     CONFIG.bizWpp     = saved.bizWpp.replace(/\D/g,'');
-    if (saved.webhookUrl) CONFIG.webhookUrl = saved.webhookUrl;
+    if (saved.bizName)          CONFIG.bizName          = saved.bizName;
+    if (saved.bizWpp)           CONFIG.bizWpp           = saved.bizWpp.replace(/\D/g,'');
+    if (saved.webhookUrl)       CONFIG.webhookUrl       = saved.webhookUrl;
+    if (saved.googleReviewUrl)  CONFIG.googleReviewUrl  = saved.googleReviewUrl;
     if (saved.services && saved.services.length)       CONFIG.services       = saved.services;
     if (saved.professionals && saved.professionals.length) CONFIG.professionals = saved.professionals;
   } catch(e){}

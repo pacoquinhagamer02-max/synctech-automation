@@ -521,6 +521,20 @@ tr:hover td { background: rgba(255,255,255,0.015); }
         </div>
       </div>
 
+      <!-- Próximo cliente widget -->
+      <div id="next-client-card" style="background:linear-gradient(135deg,rgba(99,102,241,0.12),rgba(6,182,212,0.08));border:1px solid rgba(99,102,241,0.25);border-radius:14px;padding:16px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+        <div style="width:44px;height:44px;border-radius:50%;background:rgba(99,102,241,0.2);display:grid;place-items:center;flex-shrink:0;font-size:1.3rem">⏰</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:0.68rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:3px">Próximo cliente do dia</div>
+          <div id="nc-name" style="font-size:1rem;font-weight:800;letter-spacing:-0.01em">Carregando...</div>
+          <div id="nc-detail" style="font-size:0.78rem;color:var(--muted);margin-top:2px"></div>
+        </div>
+        <div style="display:flex;gap:8px;flex-shrink:0">
+          <button id="nc-wpp-btn" style="background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.3);color:#22C55E;border-radius:8px;padding:8px 14px;font-size:0.78rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif" onclick="nextClientWpp()">📱 Enviar lembrete</button>
+          <button style="background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.2);color:var(--pl);border-radius:8px;padding:8px 14px;font-size:0.78rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif" onclick="showPage('agenda',null,'Agenda Hoje')">Ver agenda →</button>
+        </div>
+      </div>
+
       <div class="table-card">
         <div class="table-head">
           <div class="table-title">Próximos agendamentos</div>
@@ -992,7 +1006,46 @@ var wppNum = function(p) {
   return (p.length >= 10 && p.slice(0,2) !== '55') ? '55'+p : p;
 };
 
+var _nextClient = null;
+
+function renderNextClient() {
+  var td = new Date();
+  var nowMins = td.getHours() * 60 + td.getMinutes();
+  var todayFmts = [
+    String(td.getDate())+'/'+String(td.getMonth()+1)+'/'+td.getFullYear(),
+    String(td.getDate()).padStart(2,'0')+'/'+String(td.getMonth()+1).padStart(2,'0')+'/'+td.getFullYear()
+  ];
+  var todayAppts = appts.filter(function(a){ return !a.date || todayFmts.indexOf(a.date) !== -1; });
+  var upcoming = todayAppts.filter(function(a){
+    var parts = (a.time||'').split(':');
+    var mins = parseInt(parts[0]||0)*60 + parseInt(parts[1]||0);
+    return mins >= nowMins;
+  }).sort(function(a,b){
+    var toMins = function(t){ var p=t.split(':'); return parseInt(p[0]||0)*60+parseInt(p[1]||0); };
+    return toMins(a.time) - toMins(b.time);
+  });
+  var nc = upcoming[0] || todayAppts[0] || appts[0];
+  _nextClient = nc || null;
+  var nameEl   = document.getElementById('nc-name');
+  var detailEl = document.getElementById('nc-detail');
+  if (!nc) {
+    nameEl.textContent   = 'Nenhum agendamento hoje';
+    detailEl.textContent = 'Agenda livre — compartilhe seu link para receber clientes!';
+    return;
+  }
+  nameEl.textContent   = nc.client;
+  detailEl.textContent = '⏰ ' + nc.time + '  ·  ' + nc.svc + '  ·  R$' + nc.price;
+}
+
+function nextClientWpp() {
+  if (!_nextClient) return;
+  var nc = _nextClient;
+  var msg = 'Olá, ' + nc.client.split(' ')[0] + '! 😊 Passando para lembrar do seu agendamento de *' + nc.svc + '* hoje às *' + nc.time + '*. Qualquer dúvida é só falar! Até logo 👋';
+  window.open('https://wa.me/' + wppNum(nc.phone) + '?text=' + encodeURIComponent(msg), '_blank');
+}
+
 function renderUpcoming() {
+  renderNextClient();
   document.getElementById('tb-upcoming').innerHTML = appts.slice(0,6).map(function(a) {
     var dateTime = (a.date && a.date !== '') ? a.date + ' ' + a.time : a.time;
     return '<tr><td style="font-weight:600">' + dateTime + '</td><td><div class="td-name">' + a.client + '</div><div class="td-sub">📱 ' + fmtPhone(a.phone) + '</div></td><td>' + a.svc + '</td><td style="font-weight:600">R$' + a.price + '</td><td>' + badge(a.status) + '</td><td><a href="https://wa.me/' + wppNum(a.phone) + '" target="_blank" style="font-size:0.72rem;color:var(--green);text-decoration:none">Enviar msg</a></td></tr>';
