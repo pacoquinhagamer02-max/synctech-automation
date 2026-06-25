@@ -979,24 +979,45 @@ function renderFlows(id, flows) {
 }
 
 // ── TABLES ──
+var fmtPhone = function(p) {
+  p = String(p||'').replace(/\D/g,'');
+  if (p.length === 11) return '('+p.slice(0,2)+') '+p.slice(2,7)+'-'+p.slice(7);
+  if (p.length === 10) return '('+p.slice(0,2)+') '+p.slice(2,6)+'-'+p.slice(6);
+  return p || '—';
+};
+var wppNum = function(p) {
+  p = String(p||'').replace(/\D/g,'');
+  return (p.length >= 10 && p.slice(0,2) !== '55') ? '55'+p : p;
+};
+
 function renderUpcoming() {
   document.getElementById('tb-upcoming').innerHTML = appts.slice(0,6).map(function(a) {
-    return '<tr><td style="font-weight:600">' + a.time + '</td><td><div class="td-name">' + a.client + '</div><div class="td-sub">📱 ' + a.phone + '</div></td><td>' + a.svc + '</td><td style="font-weight:600">R$' + a.price + '</td><td>' + badge(a.status) + '</td><td><a href="https://wa.me/55' + a.phone + '" target="_blank" style="font-size:0.72rem;color:var(--green);text-decoration:none">Enviar msg</a></td></tr>';
+    var dateTime = (a.date && a.date !== '') ? a.date + ' ' + a.time : a.time;
+    return '<tr><td style="font-weight:600">' + dateTime + '</td><td><div class="td-name">' + a.client + '</div><div class="td-sub">📱 ' + fmtPhone(a.phone) + '</div></td><td>' + a.svc + '</td><td style="font-weight:600">R$' + a.price + '</td><td>' + badge(a.status) + '</td><td><a href="https://wa.me/' + wppNum(a.phone) + '" target="_blank" style="font-size:0.72rem;color:var(--green);text-decoration:none">Enviar msg</a></td></tr>';
   }).join('');
 }
 
 function renderAll() {
   var today = new Date();
-  var f = function(d) { return String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth()+1).padStart(2,'0'); };
-  document.getElementById('tb-all').innerHTML = appts.map(function(a, i) {
+  var fakeDateFn = function(i) {
     var d = new Date(today); d.setDate(d.getDate() - Math.floor(i/3));
-    return '<tr><td>' + f(d) + ' ' + a.time + '</td><td style="font-weight:600">' + a.client + '</td><td>' + a.svc + '</td><td style="font-weight:600">R$' + a.price + '</td><td style="color:var(--muted);font-size:0.75rem">' + a.origin + '</td><td>' + badge(a.status) + '</td></tr>';
+    return String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth()+1).padStart(2,'0');
+  };
+  document.getElementById('tb-all').innerHTML = appts.map(function(a, i) {
+    var dateLabel = (a.date && a.date !== '') ? a.date : fakeDateFn(i);
+    return '<tr><td>' + dateLabel + ' ' + a.time + '</td><td style="font-weight:600">' + a.client + '</td><td>' + a.svc + '</td><td style="font-weight:600">R$' + a.price + '</td><td style="color:var(--muted);font-size:0.75rem">' + a.origin + '</td><td>' + badge(a.status) + '</td></tr>';
   }).join('');
 }
 
 function renderAgenda() {
-  var m = appts.filter(function(a) { return parseInt(a.time) < 13; });
-  var t = appts.filter(function(a) { return parseInt(a.time) >= 13; });
+  var td = new Date();
+  var todayFmts = [
+    String(td.getDate())+'/'+String(td.getMonth()+1)+'/'+td.getFullYear(),
+    String(td.getDate()).padStart(2,'0')+'/'+String(td.getMonth()+1).padStart(2,'0')+'/'+td.getFullYear()
+  ];
+  var todayAppts = appts.filter(function(a){ return !a.date || todayFmts.indexOf(a.date) !== -1; });
+  var m = todayAppts.filter(function(a) { return parseInt(a.time) < 13; });
+  var t = todayAppts.filter(function(a) { return parseInt(a.time) >= 13; });
   function block(arr) {
     return arr.map(function(a) {
       return '<div class="agenda-block"><div class="ab-time">' + a.time + '</div>' + (a.status === 'cancelled' ? '<div class="ab-empty">Disponível</div>' : '<div class="ab-event ' + (a.status==='done'?'done':'') + '"><div class="ab-row"><div class="ab-name">' + a.client + '</div>' + badge(a.status) + '</div><div class="ab-svc">' + a.svc + ' · R$' + a.price + '</div></div>') + '</div>';
@@ -1237,8 +1258,10 @@ function loadSheetsData() {
       var loaded = rows.map(function(r) {
         return {
           time:   (r[9]||'').trim() || '--:--',
+          date:   (r[8]||'').trim(),
           client: (r[1]||'').trim(),
           phone:  (r[2]||'').replace(/\D/g,''),
+          email:  (r[3]||'').trim(),
           svc:    (r[4]||'').trim(),
           price:  parseFloat((r[5]||'0').replace(',','.')) || 0,
           status: 'pending',

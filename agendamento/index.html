@@ -449,7 +449,8 @@ function confirmBooking() {
 
   var svc  = CONFIG.services.filter(function(s){ return s.id===S.svc; })[0];
   var prof = CONFIG.professionals.filter(function(p){ return p.id===S.prof; })[0];
-  var dateStr = S.day+'/'+(S.month+1)+'/'+S.year;
+  var pad2 = function(n){ return String(n).padStart(2,'0'); };
+  var dateStr = pad2(S.day)+'/'+pad2(S.month+1)+'/'+S.year;
 
   var payload = {
     nome:        name,
@@ -523,8 +524,10 @@ function addToCalendar() {
   var parts = S.slot.split(':');
   var start = new Date(S.year, S.month, S.day, parseInt(parts[0]), parseInt(parts[1]));
   var end   = new Date(start.getTime() + svc.duration*60000);
-  var f = function(d){ return d.toISOString().replace(/-|:|\.\d{3}/g,''); };
-  window.open('https://calendar.google.com/calendar/r/eventedit?text='+encodeURIComponent(svc.name+' — '+CONFIG.bizName)+'&dates='+f(start)+'/'+f(end)+'&details='+encodeURIComponent('Agendado via SyncTech Automation'),'_blank');
+  // Usa horário local (sem Z) + timezone Brasília para evitar 3h de diferença
+  var pad = function(n){ return String(n).padStart(2,'0'); };
+  var f = function(d){ return d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'T'+pad(d.getHours())+pad(d.getMinutes())+'00'; };
+  window.open('https://calendar.google.com/calendar/r/eventedit?text='+encodeURIComponent(svc.name+' — '+CONFIG.bizName)+'&dates='+f(start)+'/'+f(end)+'&ctz=America/Sao_Paulo&details='+encodeURIComponent('Agendado via SyncTech Automation\n\nLocal: '+CONFIG.bizName),'_blank');
 }
 
 // Navigation
