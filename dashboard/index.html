@@ -487,6 +487,12 @@ tr:hover td { background: rgba(255,255,255,0.015); }
         </div>
       </div>
 
+      <!-- Forecast widget (Databox pattern) -->
+      <div id="forecast-widget" style="background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin-bottom:16px">
+        <div style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:6px">Previsão de receita — conecte a planilha para ativar</div>
+        <div style="font-size:1.8rem;font-weight:900;letter-spacing:-0.04em;color:var(--faint)">— —</div>
+      </div>
+
       <!-- Banner: planilha não pública ainda -->
       <div id="sheets-banner" style="display:none;align-items:center;gap:12px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:0.8rem;color:#F59E0B">
         <span style="font-size:1.1rem">⚠️</span>
@@ -854,19 +860,22 @@ const clients = [
 ];
 
 const botFlows = [
-  {icon:'👋',name:'Boas-vindas automáticas',   desc:'Responde o primeiro contato de novos clientes automaticamente',on:true},
-  {icon:'📅',name:'Agendamento pelo WhatsApp', desc:'Cliente pode marcar horário direto pelo bot',                   on:true},
-  {icon:'⏰',name:'Lembrete 1h antes',         desc:'Envia mensagem automática 1 hora antes do horário marcado',    on:true},
-  {icon:'⭐',name:'Pedido de avaliação',       desc:'Após o serviço, pede avaliação no Google automaticamente',     on:true},
-  {icon:'🎁',name:'Mensagem de aniversário',   desc:'Envia cupom especial no aniversário do cliente',               on:false},
-  {icon:'💰',name:'Reativação de clientes',    desc:'Envia promoção para quem não aparece há 30 dias',              on:false},
+  {icon:'👋',name:'Boas-vindas automáticas',    desc:'Responde o primeiro contato de novos clientes automaticamente',         on:true},
+  {icon:'📅',name:'Agendamento pelo WhatsApp',  desc:'Cliente pode marcar horário direto pelo bot 24/7',                      on:true},
+  {icon:'⏰',name:'Lembrete 1h antes',          desc:'Envia mensagem automática 1 hora antes do horário marcado',             on:true},
+  {icon:'⭐',name:'Pedido de avaliação Google', desc:'Após o serviço, pede avaliação — roteamento inteligente (GatherUp)',    on:true},
+  {icon:'💰',name:'Reativação 30 dias',         desc:'Envia promoção automaticamente para quem não aparece há 30 dias',       on:true},
+  {icon:'🎁',name:'Mensagem de aniversário',    desc:'Envia cupom especial no dia do aniversário do cliente',                 on:false},
+  {icon:'🔔',name:'Confirmação de presença',    desc:'Pergunta "Vai comparecer?" 24h antes — cancela se não responder',       on:false},
+  {icon:'🔁',name:'Sequência pós-atendimento', desc:'D+1: avaliação · D+7: dica · D+30: reativação (ManyChat sequence)',     on:false},
 ];
 
 const igFlows = [
-  {icon:'💬',name:'Resposta automática no DM', desc:'Responde DMs com mensagem personalizada + link de agendamento',on:true},
-  {icon:'💡',name:'Palavra-chave "preço"',     desc:'Envia tabela de preços no DM quando comentar "preço"',        on:true},
-  {icon:'📅',name:'Palavra-chave "agendar"',  desc:'Envia link de agendamento no DM quando comentar "agendar"',   on:true},
-  {icon:'❤️',name:'Resposta em comentários',  desc:'Responde comentários com CTA automático',                      on:false},
+  {icon:'💬',name:'Resposta automática no DM',  desc:'Responde DMs com mensagem personalizada + link de agendamento',        on:true},
+  {icon:'💡',name:'Palavra-chave → DM',         desc:'Comentou "preço" ou "agendar" no post → recebe DM automático',        on:true},
+  {icon:'❤️',name:'Comentário → DM (ManyChat)', desc:'Comentou em qualquer post → DM com oferta + link de agendamento',    on:true},
+  {icon:'👤',name:'Seguiu → Boas-vindas DM',    desc:'Novo seguidor recebe DM de boas-vindas com link de agendamento',      on:false},
+  {icon:'📤',name:'Story menção → resposta',     desc:'Cliente mencionou sua conta nos Stories → resposta automática no DM', on:false},
 ];
 
 const integrations = [
@@ -1086,22 +1095,84 @@ function renderAgenda() {
 
 function renderCRM() {
   document.getElementById('crm-grid').innerHTML = clients.map(function(c) {
-    var initials = c.name.split(' ').slice(0,2).map(function(n) { return n[0]; }).join('');
-    return '<div class="client-card"><div class="cc-head"><div class="cc-av">' + initials + '</div><div><div class="cc-name">' + c.name + '</div><div class="cc-meta">📱 ' + c.phone + '</div></div></div><div class="cc-stats"><div class="cc-stat"><div class="cc-val">' + c.visits + 'x</div><div class="cc-lbl">Visitas</div></div><div class="cc-stat"><div class="cc-val">R$' + c.spent + '</div><div class="cc-lbl">Total</div></div><div class="cc-stat"><div class="cc-val">' + c.last + '</div><div class="cc-lbl">Última</div></div></div></div>';
+    var initials = c.name.split(' ').slice(0,2).map(function(n){ return n[0]; }).join('');
+    var phone = String(c.phone||'').replace(/\D/g,'');
+    var wppLink = phone ? 'https://wa.me/' + (phone.length>=10 && phone.slice(0,2)!=='55' ? '55'+phone : phone) : null;
+    var topSvc = '';
+    if (c.svcs) {
+      var best = Object.entries(c.svcs).sort(function(a,b){ return b[1]-a[1]; })[0];
+      if (best) topSvc = best[0];
+    }
+    var score = c.visits >= 10 ? '🔥 VIP' : c.visits >= 5 ? '⭐ Fiel' : '🆕 Novo';
+    return '<div class="client-card">' +
+      '<div class="cc-head">' +
+        '<div class="cc-av">' + initials + '</div>' +
+        '<div style="flex:1;min-width:0">' +
+          '<div class="cc-name">' + c.name + '</div>' +
+          '<div class="cc-meta">' + score + (topSvc ? ' · '+topSvc : '') + '</div>' +
+        '</div>' +
+        (wppLink ? '<a href="'+wppLink+'" target="_blank" style="color:#25D366;font-size:1.1rem;text-decoration:none;flex-shrink:0">💬</a>' : '') +
+      '</div>' +
+      '<div class="cc-stats">' +
+        '<div class="cc-stat"><div class="cc-val">' + c.visits + 'x</div><div class="cc-lbl">Visitas</div></div>' +
+        '<div class="cc-stat"><div class="cc-val">R$' + (c.spent||0) + '</div><div class="cc-lbl">Total gasto</div></div>' +
+        '<div class="cc-stat"><div class="cc-val">' + (c.last||'—') + '</div><div class="cc-lbl">Última vez</div></div>' +
+      '</div>' +
+    '</div>';
   }).join('');
 }
 
-// ── PIPELINE ──
+// ── PIPELINE (Kommo pattern: conversational CRM com WA buttons) ──
 function renderPipeline() {
   var el = document.getElementById('pipeline-board');
-  el.innerHTML = pipelineData.map(function(col) {
-    var cards = col.leads.map(function(l) {
-      var srcCls = l.src === 'wa' ? 'lc-wa' : l.src === 'ig' ? 'lc-ig' : 'lc-google';
-      var srcLabel = l.src === 'wa' ? 'WhatsApp' : l.src === 'ig' ? 'Instagram' : 'Google';
-      return '<div class="lead-card"><div class="lc-name">' + l.name + '</div><div class="lc-biz">' + l.biz + '</div><div class="lc-row"><span class="lc-val">R$' + l.val + '/mês</span><span class="lc-source ' + srcCls + '">' + srcLabel + '</span></div><div class="lc-time">' + l.time + '</div></div>';
+  el.innerHTML = pipelineData.map(function(col, colIdx) {
+    var cards = col.leads.map(function(l, li) {
+      var srcCls = l.src==='wa' ? 'lc-wa' : l.src==='ig' ? 'lc-ig' : 'lc-google';
+      var srcLabel = l.src==='wa' ? 'WhatsApp' : l.src==='ig' ? 'Instagram' : 'Google';
+      var nextStage = pipelineData[colIdx+1] ? pipelineData[colIdx+1].stage : null;
+      var wppMsg = encodeURIComponent('Olá, '+l.name+'! Aqui é da SyncTech Automation. Quero apresentar como a automação pode ajudar '+l.biz+'. Tem 5 minutos?');
+      return '<div class="lead-card">' +
+        '<div class="lc-name">' + l.name + '</div>' +
+        '<div class="lc-biz">' + l.biz + '</div>' +
+        '<div class="lc-row"><span class="lc-val">R$' + l.val + '/mês</span><span class="lc-source '+srcCls+'">'+srcLabel+'</span></div>' +
+        '<div class="lc-time">' + l.time + '</div>' +
+        '<div style="display:flex;gap:6px;margin-top:10px">' +
+          '<a href="https://wa.me/55?text='+wppMsg+'" target="_blank" style="flex:1;background:rgba(37,211,102,0.12);border:1px solid rgba(37,211,102,0.25);color:#25D366;border-radius:7px;padding:6px;font-size:0.68rem;font-weight:700;text-align:center;text-decoration:none">💬 WhatsApp</a>' +
+          (nextStage ? '<button onclick="moveLead('+colIdx+','+li+')" style="flex:1;background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.2);color:var(--pl);border-radius:7px;padding:6px;font-size:0.68rem;font-weight:700;cursor:pointer;font-family:inherit">→ '+nextStage+'</button>' : '<span style="flex:1;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.2);color:var(--green);border-radius:7px;padding:6px;font-size:0.68rem;font-weight:700;text-align:center">✓ Fechado</span>') +
+        '</div>' +
+      '</div>';
     }).join('');
-    return '<div class="pipeline-col"><div class="pipeline-col-header"><span class="pipeline-col-title">' + col.stage + '</span><span class="pipeline-count">' + col.leads.length + '</span></div><div class="pipeline-cards">' + cards + '</div></div>';
+    var total = col.leads.reduce(function(s,l){ return s+l.val; }, 0);
+    return '<div class="pipeline-col">' +
+      '<div class="pipeline-col-header"><span class="pipeline-col-title">'+col.stage+'</span><span class="pipeline-count">'+col.leads.length+'</span></div>' +
+      (total ? '<div style="font-size:0.65rem;color:var(--muted);margin-bottom:8px">R$'+total+'/mês em aberto</div>' : '') +
+      '<div class="pipeline-cards">'+cards+'</div>' +
+    '</div>';
   }).join('');
+}
+
+function moveLead(colIdx, leadIdx) {
+  if (colIdx >= pipelineData.length - 1) return;
+  var lead = pipelineData[colIdx].leads.splice(leadIdx, 1)[0];
+  pipelineData[colIdx+1].leads.unshift(lead);
+  renderPipeline();
+}
+
+// ── FORECAST (Databox pattern: projeção baseada no ritmo atual) ──
+function renderForecast(aptArr) {
+  var el = document.getElementById('forecast-widget');
+  if (!el || !aptArr || !aptArr.length) return;
+  var now = new Date();
+  var dayOfMonth = now.getDate();
+  var daysInMonth = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
+  var monthRev = aptArr.reduce(function(s,a){ return s + (a.price||0); }, 0);
+  var forecast = Math.round(monthRev / dayOfMonth * daysInMonth);
+  var pct = Math.min(Math.round(dayOfMonth / daysInMonth * 100), 100);
+  el.innerHTML =
+    '<div style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:6px">Previsão de receita — ' + now.toLocaleDateString('pt-BR',{month:'long'}) + '</div>' +
+    '<div style="font-size:1.8rem;font-weight:900;letter-spacing:-0.04em;color:var(--green)">R$' + forecast.toLocaleString('pt-BR') + '</div>' +
+    '<div style="font-size:0.72rem;color:var(--muted);margin:4px 0 10px">Realizado: R$'+monthRev.toLocaleString('pt-BR')+' · '+pct+'% do mês</div>' +
+    '<div style="height:6px;background:var(--s3);border-radius:4px;overflow:hidden"><div style="width:'+pct+'%;height:100%;background:linear-gradient(90deg,var(--primary),var(--green));border-radius:4px"></div></div>';
 }
 
 // ── INBOX ──
@@ -1347,6 +1418,29 @@ function loadSheetsData() {
       renderUpcoming();
       renderAll();
       renderAgenda();
+
+      // Reconstrói CRM com dados reais da planilha (Kommo pattern: histórico por cliente)
+      var clientMap = {};
+      appts.forEach(function(a) {
+        var key = a.phone || a.client.toLowerCase();
+        if (!clientMap[key]) {
+          clientMap[key] = { name: a.client, phone: a.phone, visits: 0, spent: 0, last: '', svcs: {} };
+        }
+        clientMap[key].visits++;
+        clientMap[key].spent += a.price;
+        if (!clientMap[key].last || a.date > clientMap[key].last) clientMap[key].last = a.date || '—';
+        if (a.svc) clientMap[key].svcs[a.svc] = (clientMap[key].svcs[a.svc]||0)+1;
+      });
+      var realClients = Object.values(clientMap).sort(function(a,b){ return b.visits - a.visits; });
+      if (realClients.length) {
+        // Substitui array global e re-renderiza
+        clients.length = 0;
+        realClients.forEach(function(c){ clients.push(c); });
+        renderCRM();
+      }
+
+      // Previsão de receita (Databox pattern)
+      renderForecast(appts);
 
       // Indica que dados são reais
       var banner = document.getElementById('sheets-banner');

@@ -97,7 +97,25 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 .slot-btn:hover:not(:disabled) { border-color: rgba(99,102,241,0.4); color: var(--pl); }
 .slot-btn.selected { border-color: var(--primary); background: rgba(99,102,241,0.1); color: var(--pl); font-weight: 700; }
 .slot-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.slot-btn.booked { opacity: 0.55; border-color: rgba(239,68,68,0.25); color: var(--faint); cursor: pointer; }
+.slot-btn.booked:hover { border-color: rgba(239,68,68,0.5); color: var(--red); opacity: 0.8; }
 .slot-btn.popular::after { content:'↑'; position:absolute; top:-8px; right:3px; font-size:0.58rem; color:var(--yellow); }
+/* Modais */
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:200; align-items:flex-end; justify-content:center; }
+.modal-overlay.open { display:flex; }
+.modal-sheet { background:var(--s1); border-radius:20px 20px 0 0; padding:28px 24px 36px; width:100%; max-width:540px; }
+.modal-sheet-title { font-size:1rem; font-weight:800; letter-spacing:-0.02em; margin-bottom:6px; }
+.modal-sheet-sub { font-size:0.8rem; color:var(--muted); margin-bottom:18px; line-height:1.6; }
+.stars-row { display:flex; justify-content:center; gap:12px; margin-bottom:20px; }
+.star-btn { font-size:2rem; cursor:pointer; opacity:0.25; transition:opacity 0.15s, transform 0.1s; background:none; border:none; padding:0; }
+.star-btn.lit { opacity:1; }
+.star-btn:hover { transform:scale(1.2); }
+.modal-textarea { width:100%; background:var(--s2); border:1.5px solid var(--border); border-radius:10px; padding:12px; color:var(--text); font-size:0.84rem; font-family:'Inter',sans-serif; min-height:80px; resize:none; outline:none; margin-bottom:10px; }
+.modal-textarea:focus { border-color:var(--primary); }
+.modal-btn { width:100%; padding:14px; border-radius:10px; border:none; font-size:0.9rem; font-weight:700; cursor:pointer; font-family:inherit; }
+.modal-btn-green { background:var(--green); color:#fff; }
+.modal-btn-yellow { background:rgba(245,158,11,0.9); color:#fff; }
+.modal-btn-ghost { background:none; border:none; color:var(--faint); font-size:0.78rem; cursor:pointer; font-family:inherit; margin-top:10px; width:100%; }
 
 .form-group { margin-bottom: 14px; }
 .form-label { font-size: 0.72rem; font-weight: 600; color: var(--muted); display: block; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.06em; }
@@ -241,6 +259,9 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
       <label class="form-label">Observações (opcional)</label>
       <input class="form-input" id="f-obs" placeholder="Ex: primeira vez, alergias, preferências...">
     </div>
+    <!-- Intake questions (Acuity pattern) — preenchido dinamicamente -->
+    <div id="intake-questions"></div>
+
     <div class="payment-section">
       <div class="payment-title">💳 Pagamento</div>
       <div class="payment-body">O pagamento é feito presencialmente no atendimento. Aceitamos Pix, dinheiro, cartão de débito e crédito.</div>
@@ -279,6 +300,44 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 
 </main>
 
+<!-- Modal: Lista de espera (SimplyBook pattern) -->
+<div class="modal-overlay" id="waitlist-overlay" onclick="closeModal('waitlist-overlay',event)">
+  <div class="modal-sheet">
+    <div class="modal-sheet-title">⏳ Entrar na lista de espera</div>
+    <div class="modal-sheet-sub" id="waitlist-slot-info">Este horário está ocupado. Se alguém cancelar, avisamos você primeiro.</div>
+    <div class="form-group">
+      <label class="form-label">Seu nome *</label>
+      <input class="form-input" id="wl-name" placeholder="Nome completo">
+    </div>
+    <div class="form-group">
+      <label class="form-label">WhatsApp *</label>
+      <input class="form-input" id="wl-wpp" placeholder="(11) 99999-9999" type="tel">
+    </div>
+    <button class="modal-btn modal-btn-green" onclick="submitWaitlist()" style="margin-top:4px">✓ Entrar na lista de espera</button>
+    <button class="modal-btn-ghost" onclick="closeModal('waitlist-overlay')">Cancelar</button>
+  </div>
+</div>
+
+<!-- Modal: Avaliação inteligente (GatherUp pattern) -->
+<div class="modal-overlay" id="review-overlay" onclick="closeModal('review-overlay',event)">
+  <div class="modal-sheet">
+    <div class="modal-sheet-title" id="review-modal-title">Como foi a sua experiência?</div>
+    <div class="modal-sheet-sub" id="review-modal-sub">Sua avaliação ajuda outros clientes a nos conhecer.</div>
+    <div class="stars-row" id="review-stars">
+      <button class="star-btn" data-v="1" onclick="rateStar(1)">★</button>
+      <button class="star-btn" data-v="2" onclick="rateStar(2)">★</button>
+      <button class="star-btn" data-v="3" onclick="rateStar(3)">★</button>
+      <button class="star-btn" data-v="4" onclick="rateStar(4)">★</button>
+      <button class="star-btn" data-v="5" onclick="rateStar(5)">★</button>
+    </div>
+    <div id="review-feedback-area" style="display:none">
+      <textarea class="modal-textarea" id="review-feedback-text" placeholder="Nos conte o que aconteceu para podermos melhorar..."></textarea>
+      <button class="modal-btn modal-btn-yellow" onclick="sendPrivateFeedback()">Enviar feedback privado</button>
+    </div>
+    <button class="modal-btn-ghost" onclick="closeModal('review-overlay')">Fechar</button>
+  </div>
+</div>
+
 <!-- Loading overlay -->
 <div class="loading-overlay" id="loading-overlay">
   <div class="spinner"></div>
@@ -296,6 +355,7 @@ var CONFIG = {
   bizWpp: '5511999990000',
   webhookUrl: 'https://hook.eu1.make.com/c3qeo8m738xliljs1vn8th1bea340ggg',
   googleReviewUrl: '',
+  intakeQuestions: [],
 
   professionals: [
     { id:0, name:'Qualquer', emoji:'⭐', color:'#6366F1', rating:null, reviews:null },
@@ -412,13 +472,36 @@ function renderSlots() {
   document.getElementById('slots-grid').innerHTML = all.map(function(t) {
     var booked  = CONFIG.bookedSlots.indexOf(t) !== -1;
     var popular = CONFIG.popularSlots.indexOf(t) !== -1;
-    return '<button class="slot-btn'+(S.slot===t?' selected':'')+(popular?' popular':'')+'"'+(booked?' disabled':' onclick="pickSlot(\''+t+'\')"')+'>'+t+'</button>';
+    return '<button class="slot-btn'+(S.slot===t?' selected':'')+(popular?' popular':'')+(booked?' booked':'')+'"'+(booked?' onclick="openWaitlist(\''+t+'\')" title="Ocupado — entrar na lista de espera"':' onclick="pickSlot(\''+t+'\')"')+'>'+t+(booked?'<span style="display:block;font-size:0.55rem;margin-top:1px;opacity:0.8">lista</span>':'')+'</button>';
   }).join('');
 }
 
 function pickSlot(t) {
   S.slot=t; renderSlots();
   document.getElementById('btn2').disabled = false;
+}
+
+// Intake form (Acuity pattern: perguntas configuráveis antes de confirmar)
+function renderIntakeQuestions() {
+  var el = document.getElementById('intake-questions');
+  if (!CONFIG.intakeQuestions || !CONFIG.intakeQuestions.length) { el.innerHTML = ''; return; }
+  el.innerHTML = CONFIG.intakeQuestions.map(function(q, i) {
+    var inp = q.type === 'textarea'
+      ? '<textarea class="form-input" id="iq-'+i+'" placeholder="'+(q.placeholder||'')+'" style="min-height:70px;resize:none"></textarea>'
+      : q.type === 'select' && q.options
+      ? '<select class="form-input" id="iq-'+i+'"><option value="">Selecione...</option>'+q.options.map(function(o){ return '<option>'+o+'</option>'; }).join('')+'</select>'
+      : '<input class="form-input" id="iq-'+i+'" placeholder="'+(q.placeholder||'')+'" type="text">';
+    return '<div class="form-group"><label class="form-label">'+q.label+(q.required?' *':'')+'</label>'+inp+'</div>';
+  }).join('');
+}
+function collectIntakeAnswers() {
+  if (!CONFIG.intakeQuestions || !CONFIG.intakeQuestions.length) return {};
+  var ans = {};
+  CONFIG.intakeQuestions.forEach(function(q, i) {
+    var el = document.getElementById('iq-'+i);
+    if (el) ans[q.label] = el.value.trim();
+  });
+  return ans;
 }
 
 // Step 3 summary header
@@ -475,7 +558,8 @@ function confirmBooking() {
     data:        dateStr,
     hora:        S.slot,
     negocio:     CONFIG.bizName,
-    timestamp:   new Date().toISOString()
+    timestamp:   new Date().toISOString(),
+    intakeRespostas: collectIntakeAnswers()
   };
 
   function finalizarConfirmacao() {
@@ -544,8 +628,71 @@ function addToCalendar() {
   window.open('https://calendar.google.com/calendar/r/eventedit?text='+encodeURIComponent(svc.name+' — '+CONFIG.bizName)+'&dates='+f(start)+'/'+f(end)+'&ctz=America/Sao_Paulo&details='+encodeURIComponent('Agendado via SyncTech Automation\n\nLocal: '+CONFIG.bizName),'_blank');
 }
 
+// ── Modais ──
+function closeModal(id, e) {
+  if (!e || e.target === document.getElementById(id)) {
+    document.getElementById(id).classList.remove('open');
+  }
+}
+
+// Review modal (GatherUp pattern: pesquisa privada primeiro, depois roteamento)
+var _reviewStars = 0;
 function openReview() {
-  if (CONFIG.googleReviewUrl) window.open(CONFIG.googleReviewUrl, '_blank');
+  _reviewStars = 0;
+  document.querySelectorAll('.star-btn').forEach(function(s){ s.classList.remove('lit'); });
+  document.getElementById('review-modal-title').textContent = 'Como foi a sua experiência?';
+  document.getElementById('review-modal-sub').textContent = 'Sua avaliação ajuda outros clientes a nos conhecer.';
+  document.getElementById('review-feedback-area').style.display = 'none';
+  document.getElementById('review-feedback-text').value = '';
+  document.getElementById('review-overlay').classList.add('open');
+}
+function rateStar(n) {
+  _reviewStars = n;
+  document.querySelectorAll('.star-btn').forEach(function(s){
+    s.classList.toggle('lit', parseInt(s.dataset.v) <= n);
+  });
+  setTimeout(function(){
+    if (n >= 4) {
+      // Caminho positivo → abre Google direto
+      closeModal('review-overlay');
+      if (CONFIG.googleReviewUrl) window.open(CONFIG.googleReviewUrl, '_blank');
+    } else {
+      // Caminho negativo → feedback privado (protege reputação)
+      document.getElementById('review-modal-title').textContent = 'Sentimos muito 😞';
+      document.getElementById('review-modal-sub').textContent = 'Nos conte o que aconteceu. Queremos resolver antes de qualquer coisa.';
+      document.getElementById('review-feedback-area').style.display = 'block';
+    }
+  }, 350);
+}
+function sendPrivateFeedback() {
+  var txt = document.getElementById('review-feedback-text').value.trim();
+  if (!txt) { showToast('Escreva seu feedback primeiro', 'error'); return; }
+  var stars = '★'.repeat(_reviewStars) + '☆'.repeat(5 - _reviewStars);
+  var msg = '⚠️ *Feedback Privado Recebido*\n\nNota: '+stars+' ('+_reviewStars+'/5)\n\nServiço: '+(S.svc ? (CONFIG.services.filter(function(s){return s.id===S.svc;})[0]||{name:'—'}).name : '—')+'\n\nComentário: '+txt+'\n\n_Via SyncTech Agendamento_';
+  window.open('https://wa.me/'+CONFIG.bizWpp+'?text='+encodeURIComponent(msg), '_blank');
+  closeModal('review-overlay');
+  showToast('Feedback enviado! Obrigado.', 'success');
+}
+
+// Waitlist (SimplyBook pattern: lista de espera para slots cheios)
+var _waitlistSlot = '';
+function openWaitlist(slot) {
+  _waitlistSlot = slot;
+  document.getElementById('waitlist-slot-info').textContent = 'Horário das '+slot+' está ocupado. Se alguém cancelar, avisamos você primeiro via WhatsApp!';
+  document.getElementById('wl-name').value = '';
+  document.getElementById('wl-wpp').value = '';
+  document.getElementById('waitlist-overlay').classList.add('open');
+}
+function submitWaitlist() {
+  var name = document.getElementById('wl-name').value.trim();
+  var wpp  = document.getElementById('wl-wpp').value.replace(/\D/g,'');
+  if (!name || wpp.length < 10) { showToast('Preencha nome e WhatsApp', 'error'); return; }
+  var payload = { tipo:'waitlist', nome:name, telefone:wpp, horario:_waitlistSlot, negocio:CONFIG.bizName, timestamp:new Date().toISOString() };
+  if (CONFIG.webhookUrl) {
+    fetch(CONFIG.webhookUrl, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) }).catch(function(){});
+  }
+  closeModal('waitlist-overlay');
+  showToast('✓ Você entrou na lista! Te avisamos se abrir vaga.', 'success');
 }
 
 function shareReferral() {
@@ -556,7 +703,7 @@ function shareReferral() {
 
 // Navigation
 function goTo(n) {
-  if (n===3) renderSummaryHeader();
+  if (n===3) { renderSummaryHeader(); renderIntakeQuestions(); }
   for (var i=1; i<=4; i++) {
     document.getElementById('step'+i).classList.toggle('active', i===n);
     var sc = document.getElementById('sc'+i);
@@ -579,7 +726,8 @@ function goTo(n) {
       if (decoded.bizName)    CONFIG.bizName    = decoded.bizName;
       if (decoded.bizWpp)          CONFIG.bizWpp          = decoded.bizWpp.replace(/\D/g,'');
       if (decoded.webhookUrl)      CONFIG.webhookUrl      = decoded.webhookUrl;
-      if (decoded.googleReviewUrl) CONFIG.googleReviewUrl = decoded.googleReviewUrl;
+      if (decoded.googleReviewUrl)  CONFIG.googleReviewUrl  = decoded.googleReviewUrl;
+      if (decoded.intakeQuestions && decoded.intakeQuestions.length) CONFIG.intakeQuestions = decoded.intakeQuestions;
       if (decoded.services && decoded.services.length)           CONFIG.services      = decoded.services;
       if (decoded.professionals && decoded.professionals.length) CONFIG.professionals = decoded.professionals;
       return; // usa hash, ignora localStorage

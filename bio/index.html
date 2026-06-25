@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#6366F1">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%236366F1'/><text y='72' font-size='58' text-anchor='middle' x='50' fill='white' font-family='Arial' font-weight='bold'>S</text></svg>">
+<title>Link na Bio — SyncTech</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0D1117; --s1: #161B27; --s2: #1C2333;
+  --border: rgba(255,255,255,0.07); --bord2: rgba(255,255,255,0.12);
+  --primary: #6366F1; --pl: #818CF8; --pd: #4F46E5;
+  --text: #F1F5F9; --muted: #94A3B8; --faint: #4B5563;
+  --green: #22C55E; --yellow: #F59E0B; --red: #EF4444;
+  --cover: #6366F1;
+}
+body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; max-width: 480px; margin: 0 auto; }
+
+/* COVER */
+.cover { height: 110px; background: linear-gradient(135deg, var(--cover) 0%, #0D1117 100%); position: relative; }
+.cover::after { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.25); }
+
+/* AVATAR */
+.avatar-wrap { position: relative; padding: 0 24px; margin-top: -40px; z-index: 2; display: flex; align-items: flex-end; justify-content: space-between; }
+.avatar { width: 80px; height: 80px; border-radius: 20px; background: var(--s1); border: 3px solid var(--bg); display: grid; place-items: center; font-size: 2.2rem; box-shadow: 0 4px 20px rgba(0,0,0,0.4); }
+.share-btn-small { background: var(--s1); border: 1px solid var(--border); color: var(--muted); border-radius: 8px; padding: 8px 12px; font-size: 0.72rem; font-weight: 600; cursor: pointer; font-family: inherit; }
+
+/* BIZ INFO */
+.biz-info { padding: 12px 24px 0; }
+.biz-name { font-size: 1.35rem; font-weight: 800; letter-spacing: -0.025em; color: #fff; margin-bottom: 5px; }
+.biz-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.badge { display: inline-flex; align-items: center; gap: 4px; font-size: 0.7rem; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+.badge-type { background: rgba(99,102,241,0.12); border: 1px solid rgba(99,102,241,0.2); color: var(--pl); }
+.badge-rating { background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.2); color: var(--yellow); }
+.badge-city { background: rgba(255,255,255,0.04); border: 1px solid var(--border); color: var(--muted); }
+.biz-about { font-size: 0.82rem; color: var(--muted); line-height: 1.65; margin-bottom: 0; }
+
+/* CTA BUTTONS */
+.cta-section { padding: 18px 24px; display: flex; flex-direction: column; gap: 10px; }
+.btn-book { background: var(--primary); color: #fff; border: none; border-radius: 12px; padding: 15px; font-size: 0.92rem; font-weight: 700; cursor: pointer; font-family: inherit; text-align: center; text-decoration: none; display: block; letter-spacing: -0.01em; transition: opacity 0.15s; }
+.btn-book:hover { opacity: 0.9; }
+.btn-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.btn-sec { background: var(--s1); border: 1px solid var(--border); color: var(--text); border-radius: 12px; padding: 12px; font-size: 0.82rem; font-weight: 600; cursor: pointer; font-family: inherit; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 6px; transition: border-color 0.15s; }
+.btn-sec:hover { border-color: var(--bord2); }
+.btn-sec.wpp { color: #25D366; border-color: rgba(37,211,102,0.2); }
+.btn-sec.wpp:hover { border-color: rgba(37,211,102,0.4); }
+
+/* SECTIONS */
+.section { padding: 0 24px 20px; }
+.section-title { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--faint); margin-bottom: 10px; }
+.divider { height: 1px; background: var(--border); margin: 4px 0 20px; }
+
+/* SERVICES */
+.svc-list { display: flex; flex-direction: column; gap: 8px; }
+.svc-item { background: var(--s1); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: border-color 0.15s; text-decoration: none; color: inherit; }
+.svc-item:hover { border-color: rgba(99,102,241,0.3); }
+.svc-icon { font-size: 1.3rem; width: 36px; text-align: center; flex-shrink: 0; }
+.svc-name { font-size: 0.85rem; font-weight: 700; margin-bottom: 1px; }
+.svc-meta { font-size: 0.72rem; color: var(--muted); }
+.svc-right { margin-left: auto; text-align: right; flex-shrink: 0; }
+.svc-price { font-size: 0.95rem; font-weight: 800; }
+.svc-dur { font-size: 0.65rem; color: var(--faint); }
+.svc-popular { background: rgba(245,158,11,0.12); color: var(--yellow); border: 1px solid rgba(245,158,11,0.25); font-size: 0.58rem; font-weight: 700; padding: 1px 6px; border-radius: 8px; display: inline-block; margin-top: 3px; }
+
+/* INFO */
+.info-list { display: flex; flex-direction: column; gap: 8px; }
+.info-row { display: flex; align-items: center; gap: 10px; font-size: 0.82rem; color: var(--muted); }
+.info-icon { font-size: 1rem; width: 20px; text-align: center; flex-shrink: 0; }
+
+/* SOCIAL */
+.social-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; }
+.social-btn { background: var(--s1); border: 1px solid var(--border); border-radius: 10px; padding: 10px; text-align: center; cursor: pointer; font-size: 0.72rem; font-weight: 600; color: var(--muted); text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 5px; transition: border-color 0.15s; }
+.social-btn:hover { border-color: var(--bord2); color: var(--text); }
+.social-icon { font-size: 1.2rem; }
+
+/* REVIEW MODAL */
+.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; align-items: flex-end; }
+.overlay.open { display: flex; }
+.modal { background: var(--s1); border-radius: 20px 20px 0 0; padding: 28px 24px 36px; width: 100%; max-width: 480px; margin: 0 auto; }
+.modal-title { font-size: 1.05rem; font-weight: 800; letter-spacing: -0.02em; text-align: center; margin-bottom: 6px; }
+.modal-sub { font-size: 0.8rem; color: var(--muted); text-align: center; margin-bottom: 20px; }
+.stars-row { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+.star { font-size: 2.2rem; cursor: pointer; opacity: 0.3; transition: opacity 0.15s, transform 0.1s; }
+.star.lit { opacity: 1; }
+.star:hover { transform: scale(1.15); }
+.modal-feedback { display: none; flex-direction: column; gap: 10px; }
+.modal-feedback.show { display: flex; }
+.modal-feedback textarea { width: 100%; background: var(--s2); border: 1.5px solid var(--border); border-radius: 10px; padding: 12px; color: var(--text); font-size: 0.84rem; font-family: inherit; min-height: 80px; resize: none; outline: none; }
+.modal-feedback textarea:focus { border-color: var(--primary); }
+.btn-modal { width: 100%; padding: 14px; border-radius: 10px; border: none; font-size: 0.9rem; font-weight: 700; cursor: pointer; font-family: inherit; transition: opacity 0.15s; }
+.btn-modal:hover { opacity: 0.9; }
+.btn-positive { background: var(--green); color: #fff; }
+.btn-negative { background: rgba(245,158,11,0.9); color: #fff; }
+.btn-close { background: none; border: none; color: var(--faint); font-size: 0.78rem; cursor: pointer; font-family: inherit; margin-top: 10px; width: 100%; }
+
+/* FOOTER */
+.bio-footer { padding: 16px 24px 32px; text-align: center; }
+.footer-link { font-size: 0.7rem; color: var(--faint); text-decoration: none; display: inline-flex; align-items: center; gap: 5px; }
+.footer-link:hover { color: var(--muted); }
+.footer-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--primary); }
+</style>
+</head>
+<body>
+
+<!-- Cover -->
+<div class="cover" id="cover"></div>
+
+<!-- Avatar + share -->
+<div class="avatar-wrap">
+  <div class="avatar" id="biz-avatar">✂️</div>
+  <button class="share-btn-small" onclick="sharePage()">📤 Compartilhar</button>
+</div>
+
+<!-- Business info -->
+<div class="biz-info">
+  <div class="biz-name" id="biz-name">Carregando...</div>
+  <div class="biz-badges">
+    <span class="badge badge-type" id="badge-type">✂️ Barbearia</span>
+    <span class="badge badge-rating" id="badge-rating" style="display:none">⭐ 4.9</span>
+    <span class="badge badge-city" id="badge-city" style="display:none">📍 São Paulo</span>
+  </div>
+  <p class="biz-about" id="biz-about"></p>
+</div>
+
+<!-- CTA buttons -->
+<div class="cta-section">
+  <a id="btn-book" href="#" class="btn-book" style="display:none">📅 Agendar agora — é rápido!</a>
+  <div class="btn-row-2">
+    <a id="btn-wpp" href="#" class="btn-sec wpp" target="_blank">💬 WhatsApp</a>
+    <a id="btn-insta" href="#" class="btn-sec" target="_blank" style="display:none">📸 Instagram</a>
+    <a id="btn-site" href="#" class="btn-sec" target="_blank" style="display:none">🌐 Site</a>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- Services -->
+<div class="section" id="svc-section">
+  <div class="section-title">Serviços e preços</div>
+  <div class="svc-list" id="svc-list"></div>
+</div>
+
+<!-- Info -->
+<div class="section" id="info-section" style="display:none">
+  <div class="divider" style="margin:0 0 14px"></div>
+  <div class="section-title">Localização & horários</div>
+  <div class="info-list" id="info-list"></div>
+</div>
+
+<!-- Google review + social -->
+<div class="section" id="social-section">
+  <div class="divider" style="margin:0 0 14px"></div>
+  <div class="section-title">Avalie e siga</div>
+  <div class="social-grid" id="social-grid"></div>
+</div>
+
+<!-- Footer -->
+<div class="bio-footer">
+  <a href="../" class="footer-link" target="_blank">
+    <span class="footer-dot"></span>
+    Criado com SyncTech Automation
+    <span class="footer-dot"></span>
+  </a>
+</div>
+
+<!-- Review modal -->
+<div class="overlay" id="review-overlay" onclick="closeReviewModal(event)">
+  <div class="modal" id="review-modal">
+    <div class="modal-title">Como foi a sua experiência?</div>
+    <div class="modal-sub" id="modal-sub">Sua avaliação ajuda outros clientes a conhecer o negócio.</div>
+    <div class="stars-row" id="stars-row">
+      <span class="star" data-v="1" onclick="rateStar(1)">★</span>
+      <span class="star" data-v="2" onclick="rateStar(2)">★</span>
+      <span class="star" data-v="3" onclick="rateStar(3)">★</span>
+      <span class="star" data-v="4" onclick="rateStar(4)">★</span>
+      <span class="star" data-v="5" onclick="rateStar(5)">★</span>
+    </div>
+    <div class="modal-feedback" id="modal-feedback">
+      <textarea id="feedback-text" placeholder="Nos conte o que aconteceu para podermos melhorar..."></textarea>
+      <button class="btn-modal btn-negative" onclick="sendFeedback()">Enviar feedback privado</button>
+    </div>
+    <button class="btn-close" onclick="closeReviewModal()">Fechar</button>
+  </div>
+</div>
+
+<script>
+var CONFIG = {
+  bizName: 'Negócio Exemplo',
+  bizType: 'Barbearia',
+  bizEmoji: '✂️',
+  bizWpp: '5511999990000',
+  coverColor: '#6366F1',
+  rating: null,
+  reviewCount: null,
+  city: '',
+  address: '',
+  schedule: '',
+  about: '',
+  instagram: '',
+  website: '',
+  googleReviewUrl: '',
+  agendamentoUrl: '',
+  services: [
+    { id:1, icon:'✂️', name:'Corte Masculino', price:45, durationStr:'45 min', popular:false },
+    { id:2, icon:'🪒', name:'Barba',           price:35, durationStr:'30 min', popular:false },
+    { id:3, icon:'💈', name:'Corte + Barba',   price:70, durationStr:'75 min', popular:true  },
+  ]
+};
+
+// ── Load config from URL hash ──
+(function(){
+  try {
+    var hash = window.location.hash;
+    if (hash && hash.indexOf('#config=') === 0) {
+      var dec = JSON.parse(decodeURIComponent(escape(atob(hash.slice(8)))));
+      ['bizName','bizType','bizEmoji','bizWpp','coverColor','rating','reviewCount',
+       'city','address','schedule','about','instagram','website','googleReviewUrl','agendamentoUrl'].forEach(function(k){
+        if (dec[k] !== undefined && dec[k] !== null && dec[k] !== '') CONFIG[k] = dec[k];
+      });
+      if (dec.services && dec.services.length) CONFIG.services = dec.services;
+    }
+  } catch(e){}
+})();
+
+// ── Render ──
+function render() {
+  document.title = CONFIG.bizName + ' — SyncTech Bio';
+
+  // Cover color
+  document.documentElement.style.setProperty('--cover', CONFIG.coverColor || '#6366F1');
+  document.getElementById('cover').style.background =
+    'linear-gradient(135deg, ' + (CONFIG.coverColor||'#6366F1') + ' 0%, #0D1117 100%)';
+  document.getElementById('biz-avatar').textContent = CONFIG.bizEmoji || '🏪';
+
+  // Theme color
+  document.querySelector('meta[name="theme-color"]').content = CONFIG.coverColor || '#6366F1';
+
+  // Name
+  document.getElementById('biz-name').textContent = CONFIG.bizName;
+
+  // Badges
+  var badgeType = document.getElementById('badge-type');
+  badgeType.textContent = (CONFIG.bizEmoji || '') + ' ' + (CONFIG.bizType || '');
+
+  if (CONFIG.rating) {
+    var br = document.getElementById('badge-rating');
+    br.style.display = '';
+    br.textContent = '⭐ ' + CONFIG.rating + (CONFIG.reviewCount ? ' (' + CONFIG.reviewCount + ')' : '');
+  }
+  if (CONFIG.city) {
+    var bc = document.getElementById('badge-city');
+    bc.style.display = '';
+    bc.textContent = '📍 ' + CONFIG.city;
+  }
+
+  // About
+  if (CONFIG.about) {
+    document.getElementById('biz-about').textContent = CONFIG.about;
+  } else {
+    document.getElementById('biz-about').style.display = 'none';
+  }
+
+  // CTA — agendar
+  var btnBook = document.getElementById('btn-book');
+  if (CONFIG.agendamentoUrl) {
+    btnBook.href = CONFIG.agendamentoUrl;
+    btnBook.style.display = 'block';
+    btnBook.style.background = CONFIG.coverColor || '#6366F1';
+  }
+
+  // WhatsApp
+  var btnWpp = document.getElementById('btn-wpp');
+  if (CONFIG.bizWpp) {
+    btnWpp.href = 'https://wa.me/' + CONFIG.bizWpp.replace(/\D/g,'');
+  }
+
+  // Instagram
+  var btnInsta = document.getElementById('btn-insta');
+  if (CONFIG.instagram) {
+    var igHandle = CONFIG.instagram.replace('@','');
+    btnInsta.href = 'https://instagram.com/' + igHandle;
+    btnInsta.style.display = 'flex';
+  }
+
+  // Site
+  var btnSite = document.getElementById('btn-site');
+  if (CONFIG.website) {
+    btnSite.href = CONFIG.website;
+    btnSite.style.display = 'flex';
+  }
+
+  // Adjust 2-col grid
+  var show2 = CONFIG.instagram || CONFIG.website;
+  if (!show2) {
+    document.querySelector('.btn-row-2').style.gridTemplateColumns = '1fr';
+    btnWpp.style.padding = '14px';
+  }
+
+  // Services
+  var svcList = document.getElementById('svc-list');
+  svcList.innerHTML = CONFIG.services.map(function(s) {
+    var agUrl = CONFIG.agendamentoUrl ?
+      CONFIG.agendamentoUrl + (CONFIG.agendamentoUrl.indexOf('#') > -1 ? '' : '') : '#';
+    return '<a href="' + agUrl + '" class="svc-item">' +
+      '<span class="svc-icon">' + (s.icon||'🔧') + '</span>' +
+      '<div style="flex:1;min-width:0">' +
+        '<div class="svc-name">' + s.name + '</div>' +
+        (s.desc ? '<div class="svc-meta">' + s.desc + '</div>' : '') +
+        (s.popular ? '<span class="svc-popular">Mais popular</span>' : '') +
+      '</div>' +
+      '<div class="svc-right">' +
+        '<div class="svc-price">R$' + (s.price||0) + '</div>' +
+        '<div class="svc-dur">⏱ ' + (s.durationStr||s.duration+' min') + '</div>' +
+      '</div>' +
+    '</a>';
+  }).join('');
+  if (!CONFIG.services.length) document.getElementById('svc-section').style.display = 'none';
+
+  // Info
+  var infoItems = [];
+  if (CONFIG.address) infoItems.push({ icon:'📍', text: CONFIG.address });
+  if (CONFIG.schedule) infoItems.push({ icon:'🕐', text: CONFIG.schedule });
+  if (infoItems.length) {
+    document.getElementById('info-section').style.display = 'block';
+    document.getElementById('info-list').innerHTML = infoItems.map(function(r){
+      return '<div class="info-row"><span class="info-icon">'+r.icon+'</span><span>'+r.text+'</span></div>';
+    }).join('');
+  }
+
+  // Social grid
+  var socialBtns = [];
+  if (CONFIG.googleReviewUrl) {
+    socialBtns.push('<button class="social-btn" onclick="openReviewModal()"><span class="social-icon">⭐</span>Avaliar no Google</button>');
+  }
+  if (CONFIG.instagram) {
+    socialBtns.push('<a class="social-btn" href="https://instagram.com/'+CONFIG.instagram.replace('@','')+'" target="_blank"><span class="social-icon">📸</span>@'+CONFIG.instagram.replace('@','')+'</a>');
+  }
+  if (!socialBtns.length) {
+    document.getElementById('social-section').style.display = 'none';
+  } else {
+    document.getElementById('social-grid').innerHTML = socialBtns.join('');
+  }
+}
+
+// ── Review modal ──
+var _selectedStars = 0;
+function openReviewModal() {
+  _selectedStars = 0;
+  document.querySelectorAll('.star').forEach(function(s){ s.classList.remove('lit'); });
+  document.getElementById('modal-sub').textContent = 'Sua avaliação ajuda outros clientes a conhecer o negócio.';
+  document.getElementById('modal-feedback').classList.remove('show');
+  document.getElementById('feedback-text').value = '';
+  document.getElementById('review-overlay').classList.add('open');
+}
+function closeReviewModal(e) {
+  if (!e || e.target === document.getElementById('review-overlay')) {
+    document.getElementById('review-overlay').classList.remove('open');
+  }
+}
+function rateStar(n) {
+  _selectedStars = n;
+  document.querySelectorAll('.star').forEach(function(s){
+    s.classList.toggle('lit', parseInt(s.dataset.v) <= n);
+  });
+  setTimeout(function(){
+    if (n >= 4) {
+      // Happy path → Google review
+      document.getElementById('review-overlay').classList.remove('open');
+      if (CONFIG.googleReviewUrl) window.open(CONFIG.googleReviewUrl, '_blank');
+    } else {
+      // Sad path → private feedback
+      document.getElementById('modal-sub').textContent = 'Sentimos muito. Pode nos contar o que aconteceu? Iremos resolver.';
+      document.getElementById('modal-feedback').classList.add('show');
+    }
+  }, 300);
+}
+function sendFeedback() {
+  var txt = document.getElementById('feedback-text').value.trim();
+  if (!txt) return;
+  var stars = '★'.repeat(_selectedStars) + '☆'.repeat(5 - _selectedStars);
+  var msg = '⚠️ *Feedback Privado Recebido*\n\n' +
+    'Nota: ' + stars + ' (' + _selectedStars + '/5)\n\n' +
+    'Comentário: ' + txt + '\n\n_Via SyncTech Bio_';
+  window.open('https://wa.me/' + CONFIG.bizWpp.replace(/\D/g,'') + '?text=' + encodeURIComponent(msg), '_blank');
+  document.getElementById('review-overlay').classList.remove('open');
+}
+
+// ── Share page ──
+function sharePage() {
+  var url = window.location.href;
+  if (navigator.share) {
+    navigator.share({ title: CONFIG.bizName, url: url });
+  } else {
+    navigator.clipboard.writeText(url).then(function(){
+      var btn = document.querySelector('.share-btn-small');
+      btn.textContent = '✓ Link copiado!';
+      setTimeout(function(){ btn.textContent = '📤 Compartilhar'; }, 2000);
+    });
+  }
+}
+
+render();
+</script>
+</body>
+</html>

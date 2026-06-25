@@ -162,6 +162,13 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       <div class="form-hint">Google Maps → seu negócio → "Peça avaliações" → copie o link curto</div>
     </div>
 
+    <!-- Intake questions (Acuity pattern) -->
+    <div style="margin-top:8px;padding:14px;background:rgba(99,102,241,0.05);border:1px solid rgba(99,102,241,0.15);border-radius:10px">
+      <div style="font-size:0.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px">Perguntas de triagem <span style="font-size:0.62rem;font-weight:400;text-transform:none;color:var(--faint)">(opcional — aparecem no agendamento antes de confirmar)</span></div>
+      <div id="iq-builder" style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px"></div>
+      <button type="button" class="btn-add-svc" onclick="addIntakeQuestion()" style="margin-top:0">+ Adicionar pergunta</button>
+    </div>
+
     <div class="btn-row">
       <button class="btn btn-primary" onclick="goStep(2)">Próximo: Serviços →</button>
     </div>
@@ -227,11 +234,18 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 
     <div class="preview-card" id="preview-card"></div>
 
-    <div class="preview-title" style="margin-bottom:8px">🔗 Link do agendamento</div>
+    <div class="preview-title" style="margin-bottom:8px">📅 Link de agendamento</div>
     <div class="link-box">
       <span class="link-url" id="final-link"></span>
       <button class="btn-copy" id="btn-copy-final" onclick="copiarLinkFinal()">Copiar</button>
     </div>
+
+    <div class="preview-title" style="margin:14px 0 8px">🔗 Link na Bio (Linktree do cliente)</div>
+    <div class="link-box">
+      <span class="link-url" id="final-link-bio"></span>
+      <button class="btn-copy" id="btn-copy-bio" onclick="copiarLinkBio()">Copiar</button>
+    </div>
+    <div class="form-hint" style="margin-bottom:0">Este link vai na bio do Instagram do cliente — mostra serviços, preços, WhatsApp e agendamento em uma página só.</div>
 
     <div class="next-steps">
       <div class="ns-item">
@@ -405,11 +419,26 @@ function salvarTudo() {
   };
   localStorage.setItem('synctech_config', JSON.stringify(cfg));
 
-  // Link com config codificada — funciona em qualquer device sem localStorage
+  // Intake questions
+  var iqs = [];
+  document.querySelectorAll('.iq-row').forEach(function(row) {
+    var label = row.querySelector('.iq-label').value.trim();
+    var type  = row.querySelector('.iq-type').value;
+    if (label) iqs.push({ label: label, type: type, required: false, placeholder: '' });
+  });
+  if (iqs.length) cfg.intakeQuestions = iqs;
+
+  localStorage.setItem('synctech_config', JSON.stringify(cfg));
+
+  // Links com config codificada — funcionam em qualquer device sem localStorage
   var base = (window.location.origin + window.location.pathname).replace(/\/setup\.html.*/, '').replace(/\/+$/, '');
   var configEncoded = btoa(unescape(encodeURIComponent(JSON.stringify(cfg))));
-  var link = base + '/agendamento/#config=' + configEncoded;
-  document.getElementById('final-link').textContent = link;
+
+  var linkAgend = base + '/agendamento/#config=' + configEncoded;
+  var linkBio   = base + '/bio/#config=' + configEncoded;
+
+  document.getElementById('final-link').textContent = linkAgend;
+  document.getElementById('final-link-bio').textContent = linkBio;
 
   document.getElementById('preview-card').innerHTML =
     '<div class="preview-title">Resumo da configuração</div>' +
@@ -434,6 +463,33 @@ function copiarLinkFinal() {
     btn.textContent = '✓ Copiado!';
     setTimeout(function(){ btn.textContent = 'Copiar'; }, 2000);
   });
+}
+
+function copiarLinkBio() {
+  var link = document.getElementById('final-link-bio').textContent;
+  navigator.clipboard.writeText(link).then(function(){
+    var btn = document.getElementById('btn-copy-bio');
+    btn.textContent = '✓ Copiado!';
+    setTimeout(function(){ btn.textContent = 'Copiar'; }, 2000);
+  });
+}
+
+var _iqCount = 0;
+function addIntakeQuestion() {
+  var builder = document.getElementById('iq-builder');
+  if (builder.children.length >= 4) return; // máximo 4 perguntas
+  var id = _iqCount++;
+  var row = document.createElement('div');
+  row.className = 'iq-row';
+  row.style.cssText = 'display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center';
+  row.innerHTML =
+    '<input class="form-input iq-label" placeholder="Ex: Tem alguma alergia?" style="font-size:0.82rem">' +
+    '<select class="form-input iq-type" style="width:110px;font-size:0.78rem">' +
+      '<option value="text">Texto</option>' +
+      '<option value="textarea">Texto longo</option>' +
+    '</select>' +
+    '<button type="button" class="btn-del" onclick="this.closest(\'.iq-row\').remove()">✕</button>';
+  builder.appendChild(row);
 }
 
 function mostrarErro(id, msg) {
