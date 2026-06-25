@@ -468,7 +468,7 @@ function confirmBooking() {
 
   function finalizarConfirmacao() {
     document.getElementById('conf-sub').textContent =
-      'Olá, '+name.split(' ')[0]+'! Enviaremos confirmação no WhatsApp ('+phone+') e um lembrete 1h antes.';
+      'Olá, '+name.split(' ')[0]+'! Salve no calendário abaixo para receber um lembrete automático antes do seu horário.';
 
     document.getElementById('conf-card').innerHTML = [
       { icon:'💈', text:svc.name,              sub:svc.icon+' '+svc.durationStr+' · R$'+svc.price },
