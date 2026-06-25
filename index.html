@@ -1290,17 +1290,39 @@ var SYNCTECH_WPP = '5531986551626';
   if (footer) { footer.href = base + '?text=' + msgSup; footer.target = '_blank'; }
 })();
 
+var LEADS_WEBHOOK = 'https://hook.eu1.make.com/c3qeo8m738xliljs1vn8th1bea340ggg';
+
 function enviarLead() {
   var nome = document.getElementById('lead-nome').value.trim();
   var tel  = document.getElementById('lead-tel').value.replace(/\D/g,'');
   var nomeEl = document.getElementById('lead-nome');
   var telEl  = document.getElementById('lead-tel');
+  var btn    = document.querySelector('.cta-form .btn-primary');
 
   if (!nome) { nomeEl.style.borderColor = '#EF4444'; nomeEl.focus(); return; }
   if (tel.length < 10) { telEl.style.borderColor = '#EF4444'; telEl.focus(); return; }
 
   nomeEl.style.borderColor = '';
   telEl.style.borderColor = '';
+
+  // Salva lead no Make.com → Gmail notifica Rafael + linha no Google Sheets
+  fetch(LEADS_WEBHOOK, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      tipo: 'lead',
+      nome: nome,
+      telefone: tel,
+      timestamp: new Date().toISOString(),
+      origem: 'Site SyncTech'
+    })
+  }).catch(function(){});
+
+  // Feedback visual antes de abrir WhatsApp
+  if (btn) { btn.textContent = '✓ Enviando para o WhatsApp...'; btn.disabled = true; }
+  setTimeout(function(){
+    if (btn) { btn.textContent = 'Quero diagnóstico gratuito →'; btn.disabled = false; }
+  }, 3000);
 
   var msg = encodeURIComponent(
     '👋 Olá! Vim pelo site da SyncTech.\n\n' +

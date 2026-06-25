@@ -396,9 +396,10 @@ function salvarTudo() {
   };
   localStorage.setItem('synctech_config', JSON.stringify(cfg));
 
-  // Link correto — remove duplas barras
+  // Link com config codificada — funciona em qualquer device sem localStorage
   var base = (window.location.origin + window.location.pathname).replace(/\/setup\.html.*/, '').replace(/\/+$/, '');
-  var link = base + '/agendamento/';
+  var configEncoded = btoa(unescape(encodeURIComponent(JSON.stringify(cfg))));
+  var link = base + '/agendamento/#config=' + configEncoded;
   document.getElementById('final-link').textContent = link;
 
   document.getElementById('preview-card').innerHTML =

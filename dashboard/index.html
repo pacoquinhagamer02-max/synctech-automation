@@ -436,16 +436,16 @@ tr:hover td { background: rgba(255,255,255,0.015); }
             <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="var(--muted)" stroke-width="1.5"><rect x="1" y="2" width="11" height="10" rx="1.5"/><path d="M1 5.5H12M4.5 1.5V3M8.5 1.5V3"/></svg>
             Agendamentos hoje
           </div>
-          <div class="kpi-val">12</div>
-          <div class="kpi-delta up">↑ +3 vs ontem</div>
+          <div class="kpi-val" id="kv-agend">12</div>
+          <div class="kpi-delta up" id="kd-agend">↑ +3 vs ontem</div>
         </div>
         <div class="kpi-card">
           <div class="kpi-label">
             <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="var(--muted)" stroke-width="1.5"><path d="M6.5 1.5v11M3 4.5h5.5a2 2 0 010 4H3.5a2 2 0 000 4H10"/></svg>
             Receita do mês
           </div>
-          <div class="kpi-val">R$3.840</div>
-          <div class="kpi-delta up">↑ +22% vs mês anterior</div>
+          <div class="kpi-val" id="kv-rev">R$3.840</div>
+          <div class="kpi-delta up" id="kd-rev">↑ +22% vs mês anterior</div>
           <div class="goal-bar-wrap">
             <div class="goal-bar-row"><span>Meta: R$5.000</span><span>76%</span></div>
             <div class="goal-bar-track"><div class="goal-bar-fill" style="width:76%"></div></div>
@@ -456,15 +456,15 @@ tr:hover td { background: rgba(255,255,255,0.015); }
             <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="var(--muted)" stroke-width="1.5"><circle cx="5" cy="4.5" r="2.5"/><path d="M1 12c0-2.5 1.8-3.5 4-3.5s4 1 4 3.5"/><circle cx="10" cy="5" r="1.5"/><path d="M13 12c0-1.5-.8-2.5-2-3"/></svg>
             Novos clientes
           </div>
-          <div class="kpi-val">47</div>
-          <div class="kpi-delta up">↑ +8 vs mês anterior</div>
+          <div class="kpi-val" id="kv-clients">47</div>
+          <div class="kpi-delta up" id="kd-clients">↑ +8 vs mês anterior</div>
         </div>
         <div class="kpi-card">
           <div class="kpi-label">
             <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="var(--muted)" stroke-width="1.5"><path d="M1 9.5L4 6l3 2 4-5.5 2 2.5"/></svg>
             Taxa de retorno
           </div>
-          <div class="kpi-val">68%</div>
+          <div class="kpi-val" id="kv-ret">68%</div>
           <div class="kpi-delta up">↑ +5% vs mês anterior</div>
         </div>
         <div class="kpi-card">
@@ -483,6 +483,12 @@ tr:hover td { background: rgba(255,255,255,0.015); }
           <div class="kpi-val">4.9★</div>
           <div class="kpi-delta up">↑ +0.2 este mês</div>
         </div>
+      </div>
+
+      <!-- Banner: planilha não pública ainda -->
+      <div id="sheets-banner" style="display:none;align-items:center;gap:12px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:0.8rem;color:#F59E0B">
+        <span style="font-size:1.1rem">⚠️</span>
+        <span>Exibindo dados de demonstração. Para ver dados reais: abra a <a href="https://docs.google.com/spreadsheets/d/1HDn6wkD0UbMdMhgMkdH5vL4RvVRtgmFSb08wHmritKs" target="_blank" style="color:#F59E0B;font-weight:600">planilha SyncTech Agendamentos</a> → <strong>Compartilhar → Qualquer pessoa com o link pode ver</strong></span>
       </div>
 
       <div class="charts-row">
@@ -1049,9 +1055,14 @@ function carregarConfig() {
     if(el('cfg-address'))   el('cfg-address').value   = saved.address    || '';
     if(el('cfg-instagram')) el('cfg-instagram').value = saved.instagram  || '';
     if(el('cfg-webhook'))   el('cfg-webhook').value   = saved.webhookUrl || '';
-    // Link sempre baseado na URL atual
-    var base = window.location.href.replace(/\/dashboard\/?.*/, '');
-    if(el('cfg-link')) el('cfg-link').value = base + '/agendamento/';
+    // Link com config codificada — funciona em qualquer device
+    var base = window.location.href.replace(/\/dashboard\/?.*/, '').replace(/\/+$/, '');
+    if(el('cfg-link')) {
+      try {
+        var enc = btoa(unescape(encodeURIComponent(JSON.stringify(saved))));
+        el('cfg-link').value = base + '/agendamento/#config=' + enc;
+      } catch(e) { el('cfg-link').value = base + '/agendamento/'; }
+    }
     // Atualiza sidebar com o nome salvo
     atualizarSidebar(saved.bizName);
     // Atualiza integrations instagram handle
@@ -1144,6 +1155,88 @@ function testarWebhook() {
   });
 }
 
+// ── GOOGLE SHEETS REAL DATA ──
+var SHEETS_ID = '1HDn6wkD0UbMdMhgMkdH5vL4RvVRtgmFSb08wHmritKs';
+var SHEETS_CSV = 'https://docs.google.com/spreadsheets/d/' + SHEETS_ID + '/export?format=csv&gid=0';
+
+function parseCSV(text) {
+  var rows = [];
+  var lines = text.split('\n');
+  for (var i = 1; i < lines.length; i++) { // pula header
+    var line = lines[i].trim();
+    if (!line) continue;
+    var cols = [];
+    var cur = ''; var inQ = false;
+    for (var c = 0; c < line.length; c++) {
+      var ch = line[c];
+      if (ch === '"') { inQ = !inQ; }
+      else if (ch === ',' && !inQ) { cols.push(cur); cur = ''; }
+      else cur += ch;
+    }
+    cols.push(cur);
+    rows.push(cols);
+  }
+  return rows;
+}
+
+function loadSheetsData() {
+  fetch(SHEETS_CSV)
+    .then(function(r) {
+      if (!r.ok) throw new Error('status ' + r.status);
+      return r.text();
+    })
+    .then(function(csv) {
+      var rows = parseCSV(csv);
+      if (!rows.length) return;
+      // Monta appts a partir das linhas da planilha
+      // Colunas: 0=Timestamp,1=Nome,2=Telefone,3=Email,4=Serviço,5=Preço,6=Duração,7=Profissional,8=Data,9=Hora,10=Negócio,11=Observação
+      var loaded = rows.map(function(r) {
+        return {
+          time:   (r[9]||'').trim() || '--:--',
+          client: (r[1]||'').trim(),
+          phone:  (r[2]||'').replace(/\D/g,''),
+          svc:    (r[4]||'').trim(),
+          price:  parseFloat((r[5]||'0').replace(',','.')) || 0,
+          status: 'pending',
+          origin: 'App'
+        };
+      }).filter(function(a){ return a.client; });
+      if (!loaded.length) return;
+      appts = loaded;
+
+      // KPIs
+      var total = appts.length;
+      var rev   = appts.reduce(function(s,a){ return s + a.price; }, 0);
+      var uniqueClients = {};
+      appts.forEach(function(a){ if(a.client) uniqueClients[a.client.toLowerCase()] = 1; });
+      var numClients = Object.keys(uniqueClients).length;
+
+      var kvA = document.getElementById('kv-agend');
+      var kvR = document.getElementById('kv-rev');
+      var kvC = document.getElementById('kv-clients');
+      var kdA = document.getElementById('kd-agend');
+      var kdR = document.getElementById('kd-rev');
+      if (kvA) kvA.textContent = total;
+      if (kvR) kvR.textContent = 'R$' + rev.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+      if (kvC) kvC.textContent = numClients;
+      if (kdA) kdA.textContent = '↑ ' + total + ' agendamento(s) reais';
+      if (kdR) kdR.textContent = '↑ Receita real da planilha';
+
+      renderUpcoming();
+      renderAll();
+      renderAgenda();
+
+      // Indica que dados são reais
+      var banner = document.getElementById('sheets-banner');
+      if (banner) { banner.style.display = 'none'; }
+    })
+    .catch(function() {
+      // Planilha não pública ainda — mostra banner de instrução
+      var banner = document.getElementById('sheets-banner');
+      if (banner) banner.style.display = 'flex';
+    });
+}
+
 // ── INIT ──
 function init() {
   var d = new Date();
@@ -1170,6 +1263,7 @@ function init() {
   barChart('bc-ret',    ret6,  'rgba(245,158,11,0.5)');
 
   carregarConfig();
+  loadSheetsData();
 }
 
 init();

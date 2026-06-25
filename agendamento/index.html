@@ -542,8 +542,22 @@ function goTo(n) {
   window.scrollTo(0,0);
 }
 
-// Init — sobrescreve CONFIG com dados salvos no dashboard
+// Init — lê config do hash da URL (#config=BASE64) — gerado pelo setup.html
 (function(){
+  try {
+    var hash = window.location.hash;
+    if (hash && hash.indexOf('#config=') === 0) {
+      var encoded = hash.slice(8);
+      var decoded = JSON.parse(decodeURIComponent(escape(atob(encoded))));
+      if (decoded.bizName)    CONFIG.bizName    = decoded.bizName;
+      if (decoded.bizWpp)     CONFIG.bizWpp     = decoded.bizWpp.replace(/\D/g,'');
+      if (decoded.webhookUrl) CONFIG.webhookUrl = decoded.webhookUrl;
+      if (decoded.services && decoded.services.length)           CONFIG.services      = decoded.services;
+      if (decoded.professionals && decoded.professionals.length) CONFIG.professionals = decoded.professionals;
+      return; // usa hash, ignora localStorage
+    }
+  } catch(e){}
+  // Fallback: sobrescreve CONFIG com dados salvos no dashboard
   try {
     var saved = JSON.parse(localStorage.getItem('synctech_config') || '{}');
     if (saved.bizName)    CONFIG.bizName    = saved.bizName;
