@@ -23,7 +23,7 @@ html { font-size: 16px; }
   --pd:       #9333EA;
   --text:     #F1EAFB;
   --muted:    #B0A0CC;
-  --faint:    #6B5A8B;
+  --faint:    #8B7CAE;
   --green:    #22C55E;
   --yellow:   #F59E0B;
   --red:      #EF4444;
@@ -129,8 +129,8 @@ h1, h2, h3, .logo { font-family: var(--font-head, 'Inter'), sans-serif; }
   font-family: 'Inter', sans-serif; transition: all 0.15s;
 }
 .qa-btn:hover { border-color: var(--primary); color: var(--pl); background: rgba(168,85,247,0.07); }
-.qa-btn.primary { background: var(--primary); color: #fff; border-color: var(--primary); }
-.qa-btn.primary:hover { background: var(--pd); }
+.qa-btn.primary { background: var(--pd); color: #fff; border-color: var(--pd); }
+.qa-btn.primary:hover { background: var(--primary); }
 .qa-btn svg { width: 14px; height: 14px; }
 
 /* ── CHARTS ── */
@@ -249,7 +249,7 @@ tr:hover td { background: rgba(255,255,255,0.015); }
 .inbox-input { padding: 12px 16px; border-top: 1px solid var(--border); display: flex; gap: 8px; background: var(--s1); flex-shrink: 0; }
 .inbox-input input { flex: 1; background: var(--s2); border: 1px solid var(--border-s); border-radius: 8px; padding: 9px 13px; color: var(--text); font-size: 0.82rem; outline: none; font-family: 'Inter', sans-serif; }
 .inbox-input input::placeholder { color: var(--faint); }
-.inbox-send { padding: 9px 16px; border-radius: 8px; background: var(--primary); color: #fff; border: none; font-size: 0.78rem; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; }
+.inbox-send { padding: 9px 16px; border-radius: 8px; background: var(--pd); color: #fff; border: none; font-size: 0.78rem; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; }
 
 /* ── CRM ── */
 .crm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
@@ -814,12 +814,12 @@ tr:hover td { background: rgba(255,255,255,0.015); }
         <div style="font-size:0.75rem;color:var(--muted);margin-bottom:12px">Envie esse link para seus clientes agendarem online.</div>
         <div style="display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center">
           <input class="search-input" id="cfg-link" style="width:100%;color:var(--muted)" readonly>
-          <button onclick="copiarLink()" id="btn-copy-link" style="background:var(--primary);color:#fff;border:none;padding:8px 14px;border-radius:8px;font-weight:600;cursor:pointer;font-size:0.78rem;font-family:Inter,sans-serif;white-space:nowrap">Copiar</button>
+          <button onclick="copiarLink()" id="btn-copy-link" style="background:var(--pd);color:#fff;border:none;padding:8px 14px;border-radius:8px;font-weight:600;cursor:pointer;font-size:0.78rem;font-family:Inter,sans-serif;white-space:nowrap">Copiar</button>
         </div>
       </div>
 
       <!-- Botão salvar -->
-      <button onclick="salvarConfig()" style="width:100%;background:var(--primary);color:#fff;border:none;padding:12px;border-radius:10px;font-weight:700;cursor:pointer;font-size:0.9rem;font-family:Inter,sans-serif;margin-bottom:12px">
+      <button onclick="salvarConfig()" style="width:100%;background:var(--pd);color:#fff;border:none;padding:12px;border-radius:10px;font-weight:700;cursor:pointer;font-size:0.9rem;font-family:Inter,sans-serif;margin-bottom:12px">
         Salvar configurações
       </button>
       <div id="cfg-save-msg" style="text-align:center;font-size:0.78rem;color:var(--green);display:none">✓ Configurações salvas com sucesso!</div>
