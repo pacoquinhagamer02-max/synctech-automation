@@ -3,24 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<meta name="theme-color" content="#6366F1">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%236366F1'/><text y='72' font-size='58' text-anchor='middle' x='50' fill='white' font-family='Arial' font-weight='bold'>S</text></svg>">
+<meta name="theme-color" content="#A855F7">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23A855F7'/><text y='72' font-size='58' text-anchor='middle' x='50' fill='white' font-family='Arial' font-weight='bold'>S</text></svg>">
 <title>Link na Bio — SyncTech</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Syne:wght@700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  --bg: #0D1117; --s1: #161B27; --s2: #1C2333;
-  --border: rgba(255,255,255,0.07); --bord2: rgba(255,255,255,0.12);
-  --primary: #6366F1; --pl: #818CF8; --pd: #4F46E5;
-  --text: #F1F5F9; --muted: #94A3B8; --faint: #4B5563;
+  --bg: #0A0714; --s1: #150F24; --s2: #1D1530;
+  --border: rgba(168,85,247,0.14); --bord2: rgba(168,85,247,0.28);
+  --primary: #A855F7; --pl: #C084FC; --pd: #9333EA;
+  --text: #F1EAFB; --muted: #B0A0CC; --faint: #6B5A8B;
   --green: #22C55E; --yellow: #F59E0B; --red: #EF4444;
-  --cover: #6366F1;
+  --cover: #A855F7;
+  --font-display: 'Syne', sans-serif;
+  --font-head: 'Space Grotesk', sans-serif;
 }
 body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; max-width: 480px; margin: 0 auto; }
+h1, h2, h3 { font-family: var(--font-head, 'Inter'), sans-serif; }
+.biz-name { font-family: var(--font-display); letter-spacing: -0.01em; }
 
 /* COVER */
-.cover { height: 110px; background: linear-gradient(135deg, var(--cover) 0%, #0D1117 100%); position: relative; }
+.cover { height: 110px; background: linear-gradient(135deg, var(--cover) 0%, #0A0714 100%); position: relative; }
 .cover::after { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.25); }
 
 /* AVATAR */
@@ -33,7 +37,7 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 .biz-name { font-size: 1.35rem; font-weight: 800; letter-spacing: -0.025em; color: #fff; margin-bottom: 5px; }
 .biz-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
 .badge { display: inline-flex; align-items: center; gap: 4px; font-size: 0.7rem; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
-.badge-type { background: rgba(99,102,241,0.12); border: 1px solid rgba(99,102,241,0.2); color: var(--pl); }
+.badge-type { background: rgba(168,85,247,0.12); border: 1px solid rgba(168,85,247,0.2); color: var(--pl); }
 .badge-rating { background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.2); color: var(--yellow); }
 .badge-city { background: rgba(255,255,255,0.04); border: 1px solid var(--border); color: var(--muted); }
 .biz-about { font-size: 0.82rem; color: var(--muted); line-height: 1.65; margin-bottom: 0; }
@@ -56,7 +60,7 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 /* SERVICES */
 .svc-list { display: flex; flex-direction: column; gap: 8px; }
 .svc-item { background: var(--s1); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: border-color 0.15s; text-decoration: none; color: inherit; }
-.svc-item:hover { border-color: rgba(99,102,241,0.3); }
+.svc-item:hover { border-color: rgba(168,85,247,0.3); }
 .svc-icon { font-size: 1.3rem; width: 36px; text-align: center; flex-shrink: 0; }
 .svc-name { font-size: 0.85rem; font-weight: 700; margin-bottom: 1px; }
 .svc-meta { font-size: 0.72rem; color: var(--muted); }
@@ -192,7 +196,7 @@ var CONFIG = {
   bizType: 'Barbearia',
   bizEmoji: '✂️',
   bizWpp: '5511999990000',
-  coverColor: '#6366F1',
+  coverColor: '#A855F7',
   rating: null,
   reviewCount: null,
   city: '',
@@ -230,13 +234,13 @@ function render() {
   document.title = CONFIG.bizName + ' — SyncTech Bio';
 
   // Cover color
-  document.documentElement.style.setProperty('--cover', CONFIG.coverColor || '#6366F1');
+  document.documentElement.style.setProperty('--cover', CONFIG.coverColor || '#A855F7');
   document.getElementById('cover').style.background =
-    'linear-gradient(135deg, ' + (CONFIG.coverColor||'#6366F1') + ' 0%, #0D1117 100%)';
+    'linear-gradient(135deg, ' + (CONFIG.coverColor||'#A855F7') + ' 0%, #0A0714 100%)';
   document.getElementById('biz-avatar').textContent = CONFIG.bizEmoji || '🏪';
 
   // Theme color
-  document.querySelector('meta[name="theme-color"]').content = CONFIG.coverColor || '#6366F1';
+  document.querySelector('meta[name="theme-color"]').content = CONFIG.coverColor || '#A855F7';
 
   // Name
   document.getElementById('biz-name').textContent = CONFIG.bizName;
@@ -268,7 +272,7 @@ function render() {
   if (CONFIG.agendamentoUrl) {
     btnBook.href = CONFIG.agendamentoUrl;
     btnBook.style.display = 'block';
-    btnBook.style.background = CONFIG.coverColor || '#6366F1';
+    btnBook.style.background = CONFIG.coverColor || '#A855F7';
   }
 
   // WhatsApp
