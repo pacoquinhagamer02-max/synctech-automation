@@ -115,7 +115,7 @@ h1, h2, h3 { font-family: var(--font-head, 'Inter'), sans-serif; }
 <!-- Avatar + share -->
 <div class="avatar-wrap">
   <div class="avatar" id="biz-avatar">✂️</div>
-  <button class="share-btn-small" onclick="sharePage()">📤 Compartilhar</button>
+  <button class="share-btn-small" onclick="sharePage()"><svg width="13" height="13" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:3px"><path d="M9 2v9M9 2L6.2 4.8M9 2l2.8 2.8"/><path d="M3.5 9.5v5a1 1 0 001 1h9a1 1 0 001-1v-5"/></svg>Compartilhar</button>
 </div>
 
 <!-- Business info -->
@@ -131,11 +131,11 @@ h1, h2, h3 { font-family: var(--font-head, 'Inter'), sans-serif; }
 
 <!-- CTA buttons -->
 <div class="cta-section">
-  <a id="btn-book" href="#" class="btn-book" style="display:none">📅 Agendar agora — é rápido!</a>
+  <a id="btn-book" href="#" class="btn-book" style="display:none">Agendar agora — é rápido!</a>
   <div class="btn-row-2">
-    <a id="btn-wpp" href="#" class="btn-sec wpp" target="_blank">💬 WhatsApp</a>
-    <a id="btn-insta" href="#" class="btn-sec" target="_blank" style="display:none">📸 Instagram</a>
-    <a id="btn-site" href="#" class="btn-sec" target="_blank" style="display:none">🌐 Site</a>
+    <a id="btn-wpp" href="#" class="btn-sec wpp" target="_blank"><svg width="15" height="15" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3.5A.5.5 0 013.5 3h11a.5.5 0 01.5.5v8a.5.5 0 01-.5.5H9l-3 3v-3H3.5a.5.5 0 01-.5-.5v-8z"/></svg>WhatsApp</a>
+    <a id="btn-insta" href="#" class="btn-sec" target="_blank" style="display:none"><svg width="15" height="15" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="14" height="14" rx="3"/><circle cx="9" cy="9" r="2.5"/><circle cx="13" cy="5" r="0.8" fill="currentColor" stroke="none"/></svg>Instagram</a>
+    <a id="btn-site" href="#" class="btn-sec" target="_blank" style="display:none"><svg width="15" height="15" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="6.5"/><path d="M2.5 9h13M9 2.5c2 2 3 4.5 3 6.5s-1 4.5-3 6.5c-2-2-3-4.5-3-6.5s1-4.5 3-6.5z"/></svg>Site</a>
   </div>
 </div>
 
@@ -400,8 +400,9 @@ function sharePage() {
   } else {
     navigator.clipboard.writeText(url).then(function(){
       var btn = document.querySelector('.share-btn-small');
+      var original = btn.innerHTML;
       btn.textContent = '✓ Link copiado!';
-      setTimeout(function(){ btn.textContent = '📤 Compartilhar'; }, 2000);
+      setTimeout(function(){ btn.innerHTML = original; }, 2000);
     });
   }
 }

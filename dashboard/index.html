@@ -539,7 +539,7 @@ tr:hover td { background: rgba(255,255,255,0.015); }
           <div id="nc-detail" style="font-size:0.78rem;color:var(--muted);margin-top:2px"></div>
         </div>
         <div style="display:flex;gap:8px;flex-shrink:0">
-          <button id="nc-wpp-btn" style="background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.3);color:#22C55E;border-radius:8px;padding:8px 14px;font-size:0.78rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif" onclick="nextClientWpp()">📱 Enviar lembrete</button>
+          <button id="nc-wpp-btn" style="background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.3);color:#22C55E;border-radius:8px;padding:8px 14px;font-size:0.78rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif" onclick="nextClientWpp()">Enviar lembrete</button>
           <button style="background:rgba(168,85,247,0.1);border:1px solid rgba(168,85,247,0.2);color:var(--pl);border-radius:8px;padding:8px 14px;font-size:0.78rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif" onclick="showPage('agenda',null,'Agenda Hoje')">Ver agenda →</button>
         </div>
       </div>
@@ -647,7 +647,7 @@ tr:hover td { background: rgba(255,255,255,0.015); }
       <!-- Status de conexão -->
       <div class="card" style="margin-bottom:14px;border-color:rgba(245,158,11,0.3)">
         <div style="display:flex;align-items:center;gap:14px">
-          <div style="width:44px;height:44px;border-radius:12px;background:rgba(245,158,11,0.1);display:grid;place-items:center;flex-shrink:0;font-size:1.3rem">📡</div>
+          <div style="width:44px;height:44px;border-radius:12px;background:rgba(245,158,11,0.1);display:grid;place-items:center;flex-shrink:0;color:#FBBF24"><svg width="20" height="20" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="14" r="1" fill="currentColor" stroke="none"/><path d="M6.2 11.2a4 4 0 015.6 0M3.8 8.8a7.5 7.5 0 0110.4 0"/></svg></div>
           <div style="flex:1">
             <div style="font-weight:700;font-size:0.95rem;margin-bottom:3px">WhatsApp Bot — Pendente de Conexão</div>
             <div style="font-size:0.78rem;color:var(--muted)">Configure o número abaixo para ativar resposta automática 24/7</div>
@@ -770,7 +770,7 @@ tr:hover td { background: rgba(255,255,255,0.015); }
 
       <!-- Dados do negócio -->
       <div class="card" style="margin-bottom:12px">
-        <div class="card-title" style="margin-bottom:16px">📋 Dados do negócio</div>
+        <div class="card-title" style="margin-bottom:16px">Dados do negócio</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
           <div>
             <label style="font-size:0.72rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px">Nome do negócio *</label>
@@ -793,7 +793,7 @@ tr:hover td { background: rgba(255,255,255,0.015); }
 
       <!-- Webhook -->
       <div class="card" style="margin-bottom:12px">
-        <div class="card-title" style="margin-bottom:6px">⚡ Webhook de agendamento</div>
+        <div class="card-title" style="margin-bottom:6px">Webhook de agendamento</div>
         <div style="font-size:0.75rem;color:var(--muted);margin-bottom:14px;line-height:1.6">
           Cole aqui a URL do Make.com ou n8n. Cada agendamento confirmado envia os dados para esse endereço automaticamente.
           <a href="https://make.com" target="_blank" style="color:var(--pl);text-decoration:none"> Criar conta Make grátis →</a>
@@ -810,7 +810,7 @@ tr:hover td { background: rgba(255,255,255,0.015); }
 
       <!-- Link do agendamento -->
       <div class="card" style="margin-bottom:12px">
-        <div class="card-title" style="margin-bottom:6px">🔗 Link do agendamento</div>
+        <div class="card-title" style="margin-bottom:6px">Link do agendamento</div>
         <div style="font-size:0.75rem;color:var(--muted);margin-bottom:12px">Envie esse link para seus clientes agendarem online.</div>
         <div style="display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center">
           <input class="search-input" id="cfg-link" style="width:100%;color:var(--muted)" readonly>
@@ -820,13 +820,13 @@ tr:hover td { background: rgba(255,255,255,0.015); }
 
       <!-- Botão salvar -->
       <button onclick="salvarConfig()" style="width:100%;background:var(--primary);color:#fff;border:none;padding:12px;border-radius:10px;font-weight:700;cursor:pointer;font-size:0.9rem;font-family:Inter,sans-serif;margin-bottom:12px">
-        💾 Salvar configurações
+        Salvar configurações
       </button>
       <div id="cfg-save-msg" style="text-align:center;font-size:0.78rem;color:var(--green);display:none">✓ Configurações salvas com sucesso!</div>
 
       <!-- Integrações -->
       <div class="card" style="margin-top:12px">
-        <div class="card-title" style="margin-bottom:14px">🔌 Integrações</div>
+        <div class="card-title" style="margin-bottom:14px">Integrações</div>
         <div class="flow-list" id="fl-integ"></div>
       </div>
     </div>
@@ -1106,7 +1106,7 @@ function renderCRM() {
       var best = Object.entries(c.svcs).sort(function(a,b){ return b[1]-a[1]; })[0];
       if (best) topSvc = best[0];
     }
-    var score = c.visits >= 10 ? '🔥 VIP' : c.visits >= 5 ? '⭐ Fiel' : '🆕 Novo';
+    var score = c.visits >= 10 ? 'VIP' : c.visits >= 5 ? 'Fiel' : 'Novo';
     return '<div class="client-card">' +
       '<div class="cc-head">' +
         '<div class="cc-av">' + initials + '</div>' +

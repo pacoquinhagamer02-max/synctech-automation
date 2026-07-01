@@ -197,7 +197,7 @@ h1,h2,h3,.logo{font-family:var(--font-head)}
     <div class="step-sub">O webhook é o "canal" por onde o agendamento envia os dados para o Make.com ou n8n, que vai notificar o cliente no WhatsApp e salvar na planilha.</div>
 
     <div class="webhook-info">
-      <div class="webhook-info-title">⚡ Como criar o webhook no Make (gratuito)</div>
+      <div class="webhook-info-title">Como criar o webhook no Make (gratuito)</div>
       <div class="webhook-info-body">
         <ol>
           <li>Acesse <strong>make.com</strong> e crie uma conta grátis</li>
@@ -217,7 +217,7 @@ h1,h2,h3,.logo{font-family:var(--font-head)}
     </div>
 
     <div style="display:flex;gap:8px;margin-bottom:8px">
-      <button onclick="testarWebhook3()" style="background:var(--s3);color:var(--muted);border:1px solid var(--border);padding:9px 16px;border-radius:8px;font-weight:600;cursor:pointer;font-size:0.82rem;font-family:'Inter',sans-serif">⚡ Testar webhook</button>
+      <button onclick="testarWebhook3()" style="background:var(--s3);color:var(--muted);border:1px solid var(--border);padding:9px 16px;border-radius:8px;font-weight:600;cursor:pointer;font-size:0.82rem;font-family:'Inter',sans-serif">Testar webhook</button>
     </div>
     <div id="s3-status" style="font-size:0.76rem;margin-bottom:8px;display:none"></div>
 
@@ -230,20 +230,20 @@ h1,h2,h3,.logo{font-family:var(--font-head)}
   <!-- STEP 4 — Pronto -->
   <div class="step" id="step4">
     <div style="text-align:center;padding:8px 0 24px">
-      <div class="success-icon">🚀</div>
+      <div class="success-icon"><svg width="30" height="30" viewBox="0 0 18 18" fill="none" stroke="#4ADE80" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L7 13.5L15 4.5"/></svg></div>
       <div class="step-title">Cliente configurado!</div>
       <div class="step-sub">As configurações foram salvas. Compartilhe o link de agendamento com o cliente.</div>
     </div>
 
     <div class="preview-card" id="preview-card"></div>
 
-    <div class="preview-title" style="margin-bottom:8px">📅 Link de agendamento</div>
+    <div class="preview-title" style="margin-bottom:8px">Link de agendamento</div>
     <div class="link-box">
       <span class="link-url" id="final-link"></span>
       <button class="btn-copy" id="btn-copy-final" onclick="copiarLinkFinal()">Copiar</button>
     </div>
 
-    <div class="preview-title" style="margin:14px 0 8px">🔗 Link na Bio (Linktree do cliente)</div>
+    <div class="preview-title" style="margin:14px 0 8px">Link na Bio (Linktree do cliente)</div>
     <div class="link-box">
       <span class="link-url" id="final-link-bio"></span>
       <button class="btn-copy" id="btn-copy-bio" onclick="copiarLinkBio()">Copiar</button>
