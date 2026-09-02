@@ -1,4 +1,4 @@
-const CACHE = 'synctech-app-v2';
+const CACHE = 'synctech-app-v3';
 const SHELL = [
   './',
   './index.html',
