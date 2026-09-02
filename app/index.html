@@ -242,6 +242,11 @@ h1, h2, h3, .logo { font-family: var(--font-head), sans-serif; }
 .client-goal-sub { font-size: 0.7rem; color: var(--muted); }
 .client-link { padding: 7px 12px; border-radius: 8px; border: 1px solid var(--border-s); background: var(--s2); color: var(--muted); font-size: 0.72rem; font-weight: 600; text-decoration: none; transition: all 0.15s; }
 .client-link:hover { border-color: var(--primary); color: var(--pl); }
+.client-svc-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.client-svc-pill { display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 100px; font-size: 0.68rem; font-weight: 600; border: 1px solid; }
+.client-svc-pill.active { background: rgba(34,197,94,0.08); border-color: rgba(34,197,94,0.25); color: var(--green); }
+.client-svc-pill.pending { background: rgba(245,158,11,0.08); border-color: rgba(245,158,11,0.25); color: var(--yellow); }
+.client-svc-notuse { font-size: 0.68rem; color: var(--faint); line-height: 1.5; margin-bottom: 10px; }
 
 /* ── FORM (config wizard) ── */
 .form-group { margin-bottom: 14px; }
@@ -607,6 +612,20 @@ function renderClients() {
       ],
       cadence: { before: 0.6, after: 3.0, beforeLabel:'19 meses anteriores (11 posts)', afterLabel:'Últimos 2 meses (6 posts)' },
       goal: { label:'Meta: próteses fechadas via WhatsApp/Instagram', target:10, closed:1, commissionPerUnit:160 },
+      // Mapeamento real dos 11 módulos do hub — quais fazem sentido pro porte/perfil da Martins (não é genérico).
+      servicesUsed: {
+        active: [
+          'Pacote de conteúdo (4 reels/mês + atendimento pessoal)',
+          'CRM com Pipeline',
+          'Gestão de Reputação',
+          'Dashboard de Métricas',
+        ],
+        pending: [
+          'Instagram Automático (token gerado, cenário Make.com falta montar)',
+          'Tráfego Pago (Meta Ads) — ainda não iniciado',
+        ],
+        notUsed: 'Agendamento Online e Link na Bio (usa CashBarber + site próprio) · WhatsApp Bot 24/7 (Rafael atende pessoalmente, por opção) · Catálogo Digital, Chat ao Vivo e Email Marketing (baixa relevância pro porte do negócio)',
+      },
       actionPlan: [
         { done:true,  text:'Manter ritmo de ~3 posts/mês — já provou funcionar: +18% de seguidores em 23 dias desde que o plano de conteúdo começou.' },
         { done:true,  text:'Roteiro de 27 mensagens de WhatsApp pronto pra objeções e fechamento de prótese.' },
@@ -640,6 +659,15 @@ function renderClients() {
           '<div class="client-stat"><div class="client-stat-val">'+likesAvg+'</div><div class="client-stat-lbl">curtidas em média/post</div></div>' +
         '</div>' +
         '<div class="client-best-post">🏆 Melhor post: <strong>'+s.bestPost.likes+' curtidas · '+s.bestPost.comments+' comentários</strong> ('+s.bestPost.date+') — '+s.bestPost.desc+'</div>';
+
+      if (s.servicesUsed) {
+        var sv = s.servicesUsed;
+        statsHtml += '<div class="client-chart-title">Serviços SyncTech em uso</div><div class="client-svc-pills">' +
+          sv.active.map(function(name){ return '<span class="client-svc-pill active">✓ '+name+'</span>'; }).join('') +
+          sv.pending.map(function(name){ return '<span class="client-svc-pill pending">⏳ '+name+'</span>'; }).join('') +
+        '</div>' +
+        (sv.notUsed ? '<div class="client-svc-notuse">Não usa: '+sv.notUsed+'</div>' : '');
+      }
 
       if (s.posts && s.posts.length) {
         var maxLikes = Math.max.apply(null, s.posts.map(function(p){ return p.likes; }));
