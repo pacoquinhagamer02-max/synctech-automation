@@ -233,6 +233,13 @@ h1, h2, h3, .logo { font-family: var(--font-head), sans-serif; }
 .client-action-item .ai-icon { flex-shrink: 0; margin-top: 1px; }
 .client-action-item.done .ai-icon { color: var(--green); }
 .client-action-item:not(.done) .ai-icon { color: var(--yellow); }
+.client-goal-box { background: var(--s2); border: 1px solid var(--border); border-radius: 9px; padding: 12px 14px; margin-bottom: 10px; }
+.client-goal-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; gap: 8px; }
+.client-goal-lbl { font-size: 0.76rem; font-weight: 600; }
+.client-goal-count { font-family: var(--font-mono); font-size: 0.82rem; color: var(--pl); font-weight: 700; flex-shrink: 0; }
+.client-goal-track { height: 8px; background: var(--s3); border-radius: 5px; overflow: hidden; margin-bottom: 8px; }
+.client-goal-fill { height: 100%; border-radius: 5px; background: linear-gradient(90deg, var(--pd), var(--primary), var(--pl)); transition: width .4s ease; }
+.client-goal-sub { font-size: 0.7rem; color: var(--muted); }
 .client-link { padding: 7px 12px; border-radius: 8px; border: 1px solid var(--border-s); background: var(--s2); color: var(--muted); font-size: 0.72rem; font-weight: 600; text-decoration: none; transition: all 0.15s; }
 .client-link:hover { border-color: var(--primary); color: var(--pl); }
 
@@ -474,7 +481,7 @@ var pipelineData = [
   { stage: 'Demo enviado', leads: [] },
   { stage: 'Proposta', leads: [] },
   { stage: 'Fechado', leads: [
-    { name:'Moisés Martins',  biz:'Barbearia Martins — Pacote Conteúdo/Prótese (R$800+10% ou R$1.000 fixo)', val:1000, time:'Cliente ativo', src:'wa', phone:'31982800596' },
+    { name:'Moisés Martins',  biz:'Barbearia Martins — R$1.200 fixo + 10% (R$160) por prótese fechada via WhatsApp/Instagram', val:1200, time:'Cliente ativo', src:'wa', phone:'31982800596' },
   ]},
 ];
 
@@ -574,7 +581,7 @@ function renderServicesGrid() {
 function renderClients() {
   var stored = JSON.parse(localStorage.getItem('synctech_new_clients') || '[]');
   var fixed = [
-    { name:'Barbearia Martins', plan:'Pacote Conteúdo/Prótese', links:[
+    { name:'Barbearia Martins', plan:'R$1.200/mês fixo + R$160 por prótese (10% de R$1.600) fechada via WA/Instagram', links:[
       { label:'Site', url:'https://synctech-automation.github.io/barbearia-martins-site/' },
       { label:'WhatsApp', url:'https://wa.me/5531982800596' },
       { label:'Instagram', url:'https://instagram.com/barbeariamartins.0' },
@@ -599,6 +606,7 @@ function renderClients() {
         { date:'02/09', likes:12,  comments:null },
       ],
       cadence: { before: 0.6, after: 3.0, beforeLabel:'19 meses anteriores (11 posts)', afterLabel:'Últimos 2 meses (6 posts)' },
+      goal: { label:'Meta: próteses fechadas via WhatsApp/Instagram', target:10, closed:1, commissionPerUnit:160 },
       actionPlan: [
         { done:true,  text:'Manter ritmo de ~3 posts/mês — já provou funcionar: +18% de seguidores em 23 dias desde que o plano de conteúdo começou.' },
         { done:true,  text:'Roteiro de 27 mensagens de WhatsApp pronto pra objeções e fechamento de prótese.' },
@@ -659,6 +667,19 @@ function renderClients() {
             '<div class="client-compare-track"><div class="client-compare-fill after" style="height:'+Math.round(cd.after/maxCad*100)+'%"></div></div>' +
             '<div class="client-compare-val">'+cd.after.toFixed(1).replace('.',',')+'/mês</div></div>' +
         '</div>';
+      }
+
+      if (s.goal) {
+        var g = s.goal;
+        var pct = Math.min(100, Math.round(g.closed / g.target * 100));
+        var ganhoAtual = g.closed * g.commissionPerUnit;
+        var ganhoTotal = g.target * g.commissionPerUnit;
+        statsHtml += '<div class="client-chart-title">Meta de comissão</div>' +
+          '<div class="client-goal-box">' +
+            '<div class="client-goal-top"><span class="client-goal-lbl">'+g.label+'</span><span class="client-goal-count">'+g.closed+'/'+g.target+'</span></div>' +
+            '<div class="client-goal-track"><div class="client-goal-fill" style="width:'+pct+'%"></div></div>' +
+            '<div class="client-goal-sub">R$'+g.commissionPerUnit+' por prótese · R$'+ganhoAtual.toLocaleString('pt-BR')+' ganho até agora · R$'+ganhoTotal.toLocaleString('pt-BR')+' se bater a meta</div>' +
+          '</div>';
       }
 
       if (s.actionPlan && s.actionPlan.length) {
