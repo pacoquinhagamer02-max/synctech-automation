@@ -404,6 +404,57 @@ h1, h2, h3, .logo { font-family: var(--font-head), sans-serif; }
         <div class="client-chart-title">Funil por estágio</div>
         <div id="pipeline-funnel" class="client-bars"></div>
       </div>
+
+      <div class="card">
+        <div class="card-title">+ Adicionar lead ao funil</div>
+        <div class="card-sub">Cadastre aqui todo prospect que encontrar em Mariana/Ouro Preto — entra direto em "Novo Lead"</div>
+        <div class="form-row2">
+          <div class="form-group">
+            <label class="form-label">Nome do contato *</label>
+            <input class="form-input" id="pl-name" placeholder="Ex: João Silva">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Negócio *</label>
+            <input class="form-input" id="pl-biz" placeholder="Ex: Salão Beleza Pura">
+          </div>
+        </div>
+        <div class="form-row2">
+          <div class="form-group">
+            <label class="form-label">WhatsApp *</label>
+            <input class="form-input" id="pl-wpp" placeholder="(31) 99999-9999">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Cidade</label>
+            <select class="form-input" id="pl-city">
+              <option value="Mariana/MG">Mariana/MG</option>
+              <option value="Ouro Preto/MG">Ouro Preto/MG</option>
+              <option value="Itabirito/MG">Itabirito/MG</option>
+              <option value="Congonhas/MG">Congonhas/MG</option>
+              <option value="Outra">Outra</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row2">
+          <div class="form-group">
+            <label class="form-label">Origem</label>
+            <select class="form-input" id="pl-src">
+              <option value="wa">WhatsApp</option>
+              <option value="ig">Instagram</option>
+              <option value="google">Google/Indicação</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Plano estimado</label>
+            <select class="form-input" id="pl-val">
+              <option value="197">Starter — R$197/mês</option>
+              <option value="397" selected>Negócio — R$397/mês</option>
+              <option value="797">Pro — R$797/mês</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="adicionarLead()">Adicionar ao funil →</button>
+      </div>
+
       <div class="pipeline-board" id="pipeline-board"></div>
     </div>
 
@@ -667,51 +718,104 @@ function renderHome() {
   }).join('');
 }
 
+// ═══════════════ PIPELINE: leads cadastrados manualmente (localStorage) ═══════════════
+var STAGE_ORDER = ['Novo Lead', 'Contato feito', 'Demo enviado', 'Proposta', 'Fechado'];
+
+function getStoredLeads() {
+  return JSON.parse(localStorage.getItem('synctech_pipeline_leads') || '[]');
+}
+function saveStoredLeads(leads) {
+  localStorage.setItem('synctech_pipeline_leads', JSON.stringify(leads));
+}
+
+function adicionarLead() {
+  var name = document.getElementById('pl-name').value.trim();
+  var biz  = document.getElementById('pl-biz').value.trim();
+  var wpp  = document.getElementById('pl-wpp').value.trim();
+  var city = document.getElementById('pl-city').value;
+  var src  = document.getElementById('pl-src').value;
+  var val  = parseInt(document.getElementById('pl-val').value, 10);
+  if (!name || !biz || !wpp) { showToast('Preencha nome, negócio e WhatsApp', 'error'); return; }
+
+  var leads = getStoredLeads();
+  leads.push({ id: 'ld'+leads.length+'_'+wpp.replace(/\D/g,''), name:name, biz:biz+' — '+city, val:val, time:'Cadastrado agora', src:src, phone:wpp.replace(/\D/g,''), stage:'Novo Lead', city:city });
+  saveStoredLeads(leads);
+
+  document.getElementById('pl-name').value = '';
+  document.getElementById('pl-biz').value = '';
+  document.getElementById('pl-wpp').value = '';
+  showToast('Lead adicionado ao funil!', 'success');
+  renderPipeline();
+}
+
+function avancarLead(id) {
+  var leads = getStoredLeads();
+  var lead = leads.filter(function(l){ return l.id===id; })[0];
+  if (!lead) return;
+  var idx = STAGE_ORDER.indexOf(lead.stage);
+  if (idx >= 0 && idx < STAGE_ORDER.length-1) {
+    lead.stage = STAGE_ORDER[idx+1];
+    lead.time = 'Movido p/ '+lead.stage+' agora';
+    saveStoredLeads(leads);
+    showToast(lead.name+' avançou para "'+lead.stage+'"', 'success');
+    renderPipeline();
+  }
+}
+
 // ═══════════════ RENDER: PIPELINE ═══════════════
 function renderPipeline() {
+  var storedLeads = getStoredLeads();
   var el = document.getElementById('pipeline-board');
   el.innerHTML = pipelineData.map(function(col, colIdx) {
-    var cards = col.leads.map(function(l, li) {
+    var colLeads = col.leads.concat(storedLeads.filter(function(l){ return l.stage===col.stage; }));
+    var cards = colLeads.map(function(l, li) {
       var srcCls = l.src==='wa' ? 'lc-wa' : l.src==='ig' ? 'lc-ig' : 'lc-google';
       var srcLabel = l.src==='wa' ? 'WhatsApp' : l.src==='ig' ? 'Instagram' : 'Google';
       var wppMsg = encodeURIComponent('Olá, '+l.name+'! Aqui é da SyncTech Automation. Quero apresentar como a automação pode ajudar '+l.biz+'. Tem 5 minutos?');
       var wppNum = l.phone ? '55'+l.phone.replace(/\D/g,'') : '55';
+      var isStored = !!l.id;
+      var nextStage = isStored ? STAGE_ORDER[STAGE_ORDER.indexOf(l.stage)+1] : null;
       return '<div class="lead-card">' +
         '<div class="lc-name">'+l.name+'</div>' +
         '<div class="lc-biz">'+l.biz+'</div>' +
         '<div class="lc-row"><span class="lc-val">R$'+l.val+'/mês</span><span class="lc-source '+srcCls+'">'+srcLabel+'</span></div>' +
         '<div class="lc-time">'+l.time+'</div>' +
         '<a href="https://wa.me/'+wppNum+'?text='+wppMsg+'" target="_blank" style="display:block;text-align:center;margin-top:10px;background:rgba(37,211,102,0.12);border:1px solid rgba(37,211,102,0.25);color:#25D366;border-radius:7px;padding:7px;font-size:0.7rem;font-weight:700;text-decoration:none">💬 WhatsApp</a>' +
+        (nextStage ? '<button onclick="avancarLead(\''+l.id+'\')" style="width:100%;margin-top:7px;background:var(--s3);border:1px solid var(--border-s);color:var(--pl);border-radius:7px;padding:7px;font-size:0.68rem;font-weight:700;cursor:pointer;font-family:var(--font-head),sans-serif;text-transform:uppercase;letter-spacing:0.03em">→ '+nextStage+'</button>' : '') +
       '</div>';
     }).join('');
-    var total = col.leads.reduce(function(s,l){ return s+l.val; }, 0);
+    var total = colLeads.reduce(function(s,l){ return s+l.val; }, 0);
     return '<div class="pipeline-col">' +
-      '<div class="pipeline-col-header"><span class="pipeline-col-title">'+col.stage+'</span><span class="pipeline-count">'+col.leads.length+'</span></div>' +
+      '<div class="pipeline-col-header"><span class="pipeline-col-title">'+col.stage+'</span><span class="pipeline-count">'+colLeads.length+'</span></div>' +
       (total ? '<div style="font-size:0.65rem;color:var(--muted);margin-bottom:8px">R$'+total.toLocaleString('pt-BR')+'/mês</div>' : '') +
       '<div class="pipeline-cards">'+cards+'</div>' +
     '</div>';
   }).join('');
 
-  var allLeads = pipelineData.reduce(function(s,c){ return s+c.leads.length; }, 0);
-  var openVal = pipelineData.filter(function(c){ return c.stage!=='Fechado'; }).reduce(function(s,c){ return s+c.leads.reduce(function(s2,l){ return s2+l.val; },0); }, 0);
+  var allLeads = pipelineData.reduce(function(s,c){ return s+c.leads.length; }, 0) + storedLeads.length;
+  var openVal = pipelineData.filter(function(c){ return c.stage!=='Fechado'; }).reduce(function(s,c){ return s+c.leads.reduce(function(s2,l){ return s2+l.val; },0); }, 0)
+    + storedLeads.filter(function(l){ return l.stage!=='Fechado'; }).reduce(function(s,l){ return s+l.val; }, 0);
   document.getElementById('pipeline-summary').textContent = allLeads+' leads no funil · R$'+openVal.toLocaleString('pt-BR')+'/mês em aberto';
 
-  var fechadosCount = pipelineData.filter(function(c){ return c.stage==='Fechado'; })[0].leads.length;
+  var fechadosCount = pipelineData.filter(function(c){ return c.stage==='Fechado'; })[0].leads.length + storedLeads.filter(function(l){ return l.stage==='Fechado'; }).length;
   var taxaConv = allLeads ? Math.round(fechadosCount/allLeads*100) : 0;
-  var mrrFechado = pipelineData.filter(function(c){ return c.stage==='Fechado'; })[0].leads.reduce(function(s,l){ return s+l.val; }, 0);
+  var mrrFechado = pipelineData.filter(function(c){ return c.stage==='Fechado'; })[0].leads.reduce(function(s,l){ return s+l.val; }, 0)
+    + storedLeads.filter(function(l){ return l.stage==='Fechado'; }).reduce(function(s,l){ return s+l.val; }, 0);
   document.getElementById('pipeline-kpis').innerHTML = [
     { val: allLeads, lbl: 'leads no funil (todos os estágios)' },
     { val: taxaConv+'%', lbl: 'taxa de conversão (fechados / total)' },
     { val: 'R$'+mrrFechado.toLocaleString('pt-BR'), lbl: 'MRR fechado via pipeline' },
   ].map(function(k){ return '<div class="client-stat"><div class="client-stat-val">'+k.val+'</div><div class="client-stat-lbl">'+k.lbl+'</div></div>'; }).join('');
 
-  var maxCount = Math.max(1, Math.max.apply(null, pipelineData.map(function(c){ return c.leads.length; })));
-  document.getElementById('pipeline-funnel').innerHTML = pipelineData.map(function(c) {
-    var h = Math.max(6, Math.round(c.leads.length/maxCount*100));
-    var val = c.leads.reduce(function(s,l){ return s+l.val; }, 0);
-    return '<div class="client-bar-col" title="'+c.stage+' — '+c.leads.length+' lead(s)'+(val?' · R$'+val.toLocaleString('pt-BR')+'/mês':'')+'">' +
-      '<div class="client-bar-val">'+c.leads.length+'</div>' +
-      '<div class="client-bar'+(c.stage==='Fechado'&&c.leads.length?' peak':'')+'" style="height:'+h+'%"></div>' +
+  var stageCounts = pipelineData.map(function(c){ return c.leads.length + storedLeads.filter(function(l){ return l.stage===c.stage; }).length; });
+  var maxCount = Math.max(1, Math.max.apply(null, stageCounts));
+  document.getElementById('pipeline-funnel').innerHTML = pipelineData.map(function(c, i) {
+    var count = stageCounts[i];
+    var h = Math.max(6, Math.round(count/maxCount*100));
+    var val = c.leads.concat(storedLeads.filter(function(l){ return l.stage===c.stage; })).reduce(function(s,l){ return s+l.val; }, 0);
+    return '<div class="client-bar-col" title="'+c.stage+' — '+count+' lead(s)'+(val?' · R$'+val.toLocaleString('pt-BR')+'/mês':'')+'">' +
+      '<div class="client-bar-val">'+count+'</div>' +
+      '<div class="client-bar'+(c.stage==='Fechado'&&count?' peak':'')+'" style="height:'+h+'%"></div>' +
       '<div class="client-bar-lbl">'+c.stage+'</div>' +
     '</div>';
   }).join('');
