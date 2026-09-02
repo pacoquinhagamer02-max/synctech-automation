@@ -638,13 +638,19 @@ function renderHome() {
   var abertos = pipelineData.filter(function(c){ return c.stage!=='Fechado'; }).reduce(function(s,c){ return s+c.leads.length; }, 0);
   var mrr = fechados.reduce(function(s,l){ return s+l.val; }, 0);
   var ativos = SERVICES.filter(function(s){ return s.status==='ok'; }).length;
+  var martinsGoal = CLIENTS_FIXED[0] && CLIENTS_FIXED[0].stats ? CLIENTS_FIXED[0].stats.goal : null;
 
-  document.getElementById('home-kpis').innerHTML = [
+  var kpis = [
     { label:'Clientes fechados', val: fechados.length, delta: 'MRR ~R$'+mrr.toLocaleString('pt-BR'), cls:'up' },
     { label:'Leads em aberto',   val: abertos, delta: 'no funil agora', cls:'up' },
     { label:'Serviços ativos',   val: ativos+'/11', delta: (11-ativos)+' pendentes de config', cls: (11-ativos)>0 ? 'warn':'up' },
     { label:'Instagram Martins', val: '499', delta: '+18% desde 10/08/2026', cls:'up' },
-  ].map(function(k){
+  ];
+  if (martinsGoal) {
+    var ganho = martinsGoal.closed * martinsGoal.commissionPerUnit;
+    kpis.push({ label:'Meta de próteses (Martins)', val: martinsGoal.closed+'/'+martinsGoal.target, delta: 'R$'+ganho.toLocaleString('pt-BR')+' já ganhos', cls:'up' });
+  }
+  document.getElementById('home-kpis').innerHTML = kpis.map(function(k){
     return '<div class="kpi-card"><div class="kpi-label">'+k.label+'</div><div class="kpi-val">'+k.val+'</div><div class="kpi-delta '+k.cls+'">'+k.delta+'</div></div>';
   }).join('');
 
