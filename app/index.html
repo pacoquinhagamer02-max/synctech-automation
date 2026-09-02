@@ -269,7 +269,7 @@ h1, h2, h3, .logo { font-family: var(--font-head), sans-serif; }
   <nav class="sidebar-nav" id="sidebar-nav"></nav>
   <div class="sidebar-footer">
     <button class="install-btn hidden" id="install-btn" onclick="installApp()">📲 Instalar App</button>
-    <div class="online-badge"><span class="online-dot"></span>Todos os módulos operacionais</div>
+    <div class="online-badge"><span class="online-dot" id="status-dot"></span><span id="status-text">Carregando status...</span></div>
   </div>
 </aside>
 
@@ -482,6 +482,15 @@ var SERVICES = [
 
 function statusLabel(s) { return s==='ok' ? 'Ativo' : s==='warn' ? 'Requer config.' : 'Não implementado'; }
 
+function renderFooterStatus() {
+  var ativos = SERVICES.filter(function(s){ return s.status==='ok'; }).length;
+  var dot = document.getElementById('status-dot');
+  var txt = document.getElementById('status-text');
+  txt.textContent = ativos + ' de ' + SERVICES.length + ' módulos ativos';
+  dot.style.background = ativos === SERVICES.length ? 'var(--green)' : 'var(--yellow)';
+  dot.style.boxShadow = '0 0 6px ' + (ativos === SERVICES.length ? 'var(--green)' : 'var(--yellow)');
+}
+
 // ═══════════════ RENDER: INÍCIO ═══════════════
 function renderHome() {
   var fechados = pipelineData.filter(function(c){ return c.stage==='Fechado'; })[0].leads;
@@ -637,6 +646,7 @@ renderHome();
 renderPipeline();
 renderServicesGrid();
 renderClients();
+renderFooterStatus();
 document.getElementById('topbar-date').textContent = new Date().toLocaleDateString('pt-BR', { weekday:'short', day:'2-digit', month:'short' });
 </script>
 </body>
