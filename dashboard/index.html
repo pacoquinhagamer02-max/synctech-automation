@@ -340,7 +340,7 @@ tr:hover td { background: rgba(255,255,255,0.015); }
     <div class="nav-item" onclick="showPage('pipeline',this,'Pipeline de Leads')">
       <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="3" height="10" rx="1"/><rect x="6" y="5" width="3" height="8" rx="1"/><rect x="11" y="7" width="3" height="6" rx="1"/></svg>
       Pipeline de Leads
-      <span class="nav-badge">12</span>
+      <span class="nav-badge" id="pipeline-count-badge">12</span>
     </div>
     <div class="nav-item" onclick="showPage('agenda',this,'Agenda Hoje')">
       <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1.5" y="2.5" width="13" height="12" rx="1.5"/><path d="M1.5 6.5H14.5M5 1.5V3.5M11 1.5V3.5"/></svg>
@@ -423,7 +423,7 @@ tr:hover td { background: rgba(255,255,255,0.015); }
         </button>
         <button class="qa-btn" onclick="showPage('pipeline',null,'Pipeline de Leads')">
           <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="2" width="3" height="10" rx="1"/><rect x="5.5" y="4" width="3" height="8" rx="1"/><rect x="10" y="6" width="3" height="6" rx="1"/></svg>
-          Pipeline (12 leads)
+          Pipeline (<span id="pipeline-count-qa">12</span> leads)
         </button>
         <button class="qa-btn" onclick="window.open('../agendamento/','_blank')">
           <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 1V7M1 7H7M7 7L11 3"/></svg>
@@ -592,7 +592,7 @@ tr:hover td { background: rgba(255,255,255,0.015); }
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
         <div>
           <div style="font-size:1rem;font-weight:700">Pipeline de Leads</div>
-          <div style="font-size:0.78rem;color:var(--muted)">12 leads ativos · R$4.320 em aberto</div>
+          <div style="font-size:0.78rem;color:var(--muted)" id="pipeline-summary">12 leads ativos · R$4.320 em aberto</div>
         </div>
         <button class="filter-btn primary" style="font-size:0.75rem">+ Novo lead</button>
       </div>
@@ -1199,6 +1199,15 @@ function renderPipeline() {
       '<div class="pipeline-cards">'+cards+'</div>' +
     '</div>';
   }).join('');
+
+  var allLeads = pipelineData.reduce(function(s,col){ return s+col.leads.length; }, 0);
+  var openVal = pipelineData.filter(function(col){ return col.stage !== 'Fechado'; })
+    .reduce(function(s,col){ return s + col.leads.reduce(function(s2,l){ return s2+l.val; },0); }, 0);
+  ['pipeline-count-badge','pipeline-count-qa'].forEach(function(id){
+    var e = document.getElementById(id); if (e) e.textContent = allLeads;
+  });
+  var summary = document.getElementById('pipeline-summary');
+  if (summary) summary.textContent = allLeads + ' leads ativos · R$' + openVal.toLocaleString('pt-BR') + ' em aberto';
 }
 
 function moveLead(colIdx, leadIdx) {
