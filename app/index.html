@@ -455,6 +455,54 @@ h1, h2, h3, .logo { font-family: var(--font-head), sans-serif; }
         <button class="btn btn-primary" onclick="adicionarLead()">Adicionar ao funil →</button>
       </div>
 
+      <div class="card" id="guide-sync">
+        <div class="card-title">🔄 Sincronizar entre celular e PC</div>
+        <div class="card-sub">Sem isso, os leads que você cadastra ficam só no aparelho usado. Com 5 min de setup (planilha Google), tudo aparece em qualquer aparelho.</div>
+        <div class="guide-steps">
+          <div class="guide-step"><div class="guide-num">1</div><div><div class="guide-step-title">Crie uma planilha Google nova</div><div class="guide-step-desc">sheets.google.com → planilha em branco. Pode deixar sem nenhuma aba especial, o script cria sozinho.</div></div></div>
+          <div class="guide-step"><div class="guide-num">2</div><div><div class="guide-step-title">Cole o script em Extensões → Apps Script</div><div class="guide-step-desc">Apague o conteúdo padrão e cole o código abaixo. Depois clique em <strong>Implantar → Nova implantação → tipo "App da Web"</strong>, com acesso "Qualquer pessoa" — copie a URL gerada.</div></div></div>
+          <div class="guide-step"><div class="guide-num">3</div><div><div class="guide-step-title">Cole a URL aqui embaixo em todo aparelho</div><div class="guide-step-desc">Repita esse último passo (só colar a URL, o script é o mesmo) em cada celular/PC onde for usar o Pipeline.</div></div></div>
+        </div>
+        <div class="result-link" style="white-space:pre-wrap;word-break:break-word;font-size:0.62rem;line-height:1.6;max-height:220px;overflow-y:auto" id="sync-script-code">function doPost(e) {
+  var sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Pipeline') || SpreadsheetApp.getActiveSpreadsheet().insertSheet('Pipeline');
+  if (sh.getLastRow() === 0) sh.appendRow(['id','name','biz','phone','city','src','val','stage','time']);
+  var data = JSON.parse(e.postData.contents);
+  if (data.action === 'add') {
+    var l = data.lead;
+    sh.appendRow([l.id, l.name, l.biz, l.phone, l.city, l.src, l.val, l.stage, l.time]);
+  } else if (data.action === 'update') {
+    var rows = sh.getDataRange().getValues();
+    for (var i = 1; i < rows.length; i++) {
+      if (rows[i][0] === data.id) {
+        sh.getRange(i+1, 8).setValue(data.stage);
+        sh.getRange(i+1, 9).setValue(data.time || '');
+        break;
+      }
+    }
+  }
+  return ContentService.createTextOutput(JSON.stringify({ok:true})).setMimeType(ContentService.MimeType.JSON);
+}
+
+function doGet(e) {
+  var sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Pipeline');
+  if (!sh || sh.getLastRow() < 2) return ContentService.createTextOutput('[]').setMimeType(ContentService.MimeType.JSON);
+  var rows = sh.getDataRange().getValues();
+  var headers = rows[0];
+  var leads = rows.slice(1).map(function(row) {
+    var obj = {};
+    headers.forEach(function(h, i) { obj[h] = row[i]; });
+    return obj;
+  });
+  return ContentService.createTextOutput(JSON.stringify(leads)).setMimeType(ContentService.MimeType.JSON);
+}</div>
+        <button class="copy-btn" style="margin:8px 0 14px" onclick="copiarScriptSync()">Copiar código do script</button>
+        <div class="form-group">
+          <label class="form-label">URL do App da Web (deixe vazio pra ficar só local)</label>
+          <input class="form-input" id="pl-sync-url" placeholder="https://script.google.com/macros/s/..." value="">
+        </div>
+        <button class="btn btn-primary" onclick="salvarSyncUrl()">Salvar e sincronizar →</button>
+      </div>
+
       <div class="pipeline-board" id="pipeline-board"></div>
     </div>
 
@@ -599,6 +647,7 @@ function goPage(id) {
   var p = PAGES.filter(function(x){ return x.id===id; })[0];
   document.getElementById('topbar-title').textContent = p ? p.label : '';
   window.scrollTo(0,0);
+  if (id === 'pipeline' && typeof syncPipelineFromCloud === 'function') { syncPipelineFromCloud(renderPipeline); }
 }
 
 // ═══════════════ DADOS ═══════════════
@@ -718,14 +767,48 @@ function renderHome() {
   }).join('');
 }
 
-// ═══════════════ PIPELINE: leads cadastrados manualmente (localStorage) ═══════════════
+// ═══════════════ PIPELINE: leads cadastrados manualmente (localStorage + sincronização em nuvem) ═══════════════
 var STAGE_ORDER = ['Novo Lead', 'Contato feito', 'Demo enviado', 'Proposta', 'Fechado'];
+var PIPELINE_SYNC_URL = localStorage.getItem('synctech_pipeline_sync_url') || '';
 
 function getStoredLeads() {
   return JSON.parse(localStorage.getItem('synctech_pipeline_leads') || '[]');
 }
 function saveStoredLeads(leads) {
   localStorage.setItem('synctech_pipeline_leads', JSON.stringify(leads));
+}
+
+// Enquanto PIPELINE_SYNC_URL estiver vazia, tudo continua 100% local, sem quebrar nada.
+function salvarSyncUrl() {
+  var url = document.getElementById('pl-sync-url').value.trim();
+  localStorage.setItem('synctech_pipeline_sync_url', url);
+  PIPELINE_SYNC_URL = url;
+  showToast(url ? 'Sincronização ativada!' : 'Sincronização desativada — voltou a ser só local', 'success');
+  if (url) syncPipelineFromCloud(renderPipeline);
+}
+
+function pushLeadToCloud(action, payload) {
+  if (!PIPELINE_SYNC_URL) return;
+  fetch(PIPELINE_SYNC_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain' }, // evita preflight CORS no Apps Script
+    body: JSON.stringify(Object.assign({ action: action }, payload)),
+  }).catch(function(){});
+}
+
+function syncPipelineFromCloud(callback) {
+  if (!PIPELINE_SYNC_URL) { if (callback) callback(); return; }
+  fetch(PIPELINE_SYNC_URL)
+    .then(function(r){ return r.json(); })
+    .then(function(cloudLeads){
+      var normalized = (cloudLeads||[]).map(function(l){ return {
+        id: l.id, name: l.name, biz: l.biz, phone: l.phone, city: l.city,
+        src: l.src, val: parseInt(l.val,10)||0, stage: l.stage, time: l.time,
+      }; });
+      saveStoredLeads(normalized);
+      if (callback) callback();
+    })
+    .catch(function(){ if (callback) callback(); });
 }
 
 function adicionarLead() {
@@ -738,13 +821,15 @@ function adicionarLead() {
   if (!name || !biz || !wpp) { showToast('Preencha nome, negócio e WhatsApp', 'error'); return; }
 
   var leads = getStoredLeads();
-  leads.push({ id: 'ld'+leads.length+'_'+wpp.replace(/\D/g,''), name:name, biz:biz+' — '+city, val:val, time:'Cadastrado agora', src:src, phone:wpp.replace(/\D/g,''), stage:'Novo Lead', city:city });
+  var novo = { id: 'ld'+Date.now()+'_'+wpp.replace(/\D/g,''), name:name, biz:biz+' — '+city, val:val, time:'Cadastrado agora', src:src, phone:wpp.replace(/\D/g,''), stage:'Novo Lead', city:city };
+  leads.push(novo);
   saveStoredLeads(leads);
+  pushLeadToCloud('add', { lead: novo });
 
   document.getElementById('pl-name').value = '';
   document.getElementById('pl-biz').value = '';
   document.getElementById('pl-wpp').value = '';
-  showToast('Lead adicionado ao funil!', 'success');
+  showToast('Lead adicionado ao funil!' + (PIPELINE_SYNC_URL ? ' Sincronizando...' : ''), 'success');
   renderPipeline();
 }
 
@@ -757,6 +842,7 @@ function avancarLead(id) {
     lead.stage = STAGE_ORDER[idx+1];
     lead.time = 'Movido p/ '+lead.stage+' agora';
     saveStoredLeads(leads);
+    pushLeadToCloud('update', { id: lead.id, stage: lead.stage, time: lead.time });
     showToast(lead.name+' avançou para "'+lead.stage+'"', 'success');
     renderPipeline();
   }
@@ -1047,6 +1133,11 @@ function copiarLinksCliente() {
   navigator.clipboard.writeText(txt).then(function(){ showToast('Links copiados!', 'success'); });
 }
 
+function copiarScriptSync() {
+  var txt = document.getElementById('sync-script-code').textContent;
+  navigator.clipboard.writeText(txt).then(function(){ showToast('Código copiado! Cole no Apps Script.', 'success'); });
+}
+
 function showToast(msg, type) {
   var t = document.getElementById('toast');
   t.textContent = msg;
@@ -1073,7 +1164,9 @@ if ('serviceWorker' in navigator) {
 // ═══════════════ INIT ═══════════════
 renderNav();
 renderHome();
+document.getElementById('pl-sync-url').value = PIPELINE_SYNC_URL;
 renderPipeline();
+if (PIPELINE_SYNC_URL) { syncPipelineFromCloud(renderPipeline); }
 renderServicesGrid();
 renderClients();
 renderReport();
