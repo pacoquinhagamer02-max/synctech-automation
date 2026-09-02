@@ -248,6 +248,15 @@ h1, h2, h3, .logo { font-family: var(--font-head), sans-serif; }
 .client-svc-pill.pending { background: rgba(245,158,11,0.08); border-color: rgba(245,158,11,0.25); color: var(--yellow); }
 .client-svc-notuse { font-size: 0.68rem; color: var(--faint); line-height: 1.5; margin-bottom: 10px; }
 
+/* ── RELATÓRIO ── */
+.report-card { margin-bottom: 14px; }
+.report-card-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+.report-card-title { font-family: var(--font-head), sans-serif; font-size: 1.05rem; font-weight: 700; }
+.report-badge { font-family: var(--font-mono); font-size: 0.66rem; color: var(--pl); background: rgba(168,85,247,0.1); border: 1px solid rgba(168,85,247,0.25); border-radius: 100px; padding: 4px 10px; white-space: nowrap; }
+.report-summary { font-size: 0.85rem; line-height: 1.65; color: var(--text); background: var(--s2); border: 1px solid var(--border); border-radius: 9px; padding: 12px 14px; margin-bottom: 4px; }
+.report-summary strong { color: var(--pl); }
+.report-next { font-size: 0.7rem; color: var(--faint); margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); }
+
 /* ── FORM (config wizard) ── */
 .form-group { margin-bottom: 14px; }
 .form-label { font-size: 0.72rem; font-weight: 600; color: var(--muted); display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.06em; }
@@ -398,6 +407,15 @@ h1, h2, h3, .logo { font-family: var(--font-head), sans-serif; }
       <div id="clients-list"></div>
     </div>
 
+    <!-- ── RELATÓRIO ── -->
+    <div class="page" id="page-relatorio">
+      <div class="hero">
+        <div class="hero-greet" style="font-size:1.25rem">Relatório mensal</div>
+        <div class="hero-sub" id="report-sub"></div>
+      </div>
+      <div id="report-body"></div>
+    </div>
+
     <!-- ── CONFIG (novo cliente) ── -->
     <div class="page" id="page-config">
       <div class="hero">
@@ -455,6 +473,7 @@ var PAGES = [
   { id:'pipeline', label:'Pipeline',  icon:'<rect x="1" y="4" width="4" height="12"/><rect x="7" y="7" width="4" height="9"/><rect x="13" y="10" width="4" height="6"/>' },
   { id:'servicos', label:'Serviços',  icon:'<rect x="2" y="2" width="6" height="6" rx="1"/><rect x="10" y="2" width="6" height="6" rx="1"/><rect x="2" y="10" width="6" height="6" rx="1"/><rect x="10" y="10" width="6" height="6" rx="1"/>' },
   { id:'clientes', label:'Clientes',  icon:'<circle cx="9" cy="6" r="3"/><path d="M3 16c0-3.3 2.7-6 6-6s6 2.7 6 6"/>' },
+  { id:'relatorio', label:'Relatório', icon:'<path d="M4 2h7l3 3v11H4V2Z"/><path d="M11 2v3h3"/><path d="M6.5 10.5v3M9 8.5v5M11.5 11.5v2"/>' },
   { id:'config',   label:'Config',    icon:'<circle cx="9" cy="9" r="2.5"/><path d="M9 1v2.4M9 14.6V17M17 9h-2.4M3.4 9H1M14.7 3.3l-1.7 1.7M4.9 12.9L3.3 14.7M14.7 14.7l-1.7-1.7M4.9 5.1L3.3 3.3"/>' },
 ];
 
@@ -582,10 +601,8 @@ function renderServicesGrid() {
   }).join('');
 }
 
-// ═══════════════ RENDER: CLIENTES ═══════════════
-function renderClients() {
-  var stored = JSON.parse(localStorage.getItem('synctech_new_clients') || '[]');
-  var fixed = [
+// ═══════════════ DADOS: CLIENTES ═══════════════
+var CLIENTS_FIXED = [
     { name:'Barbearia Martins', plan:'R$1.200/mês fixo + R$160 por prótese (10% de R$1.600) fechada via WA/Instagram', links:[
       { label:'Site', url:'https://synctech-automation.github.io/barbearia-martins-site/' },
       { label:'WhatsApp', url:'https://wa.me/5531982800596' },
@@ -637,17 +654,13 @@ function renderClients() {
       ],
     }},
   ];
-  // Nota: CRM/Avaliação/Dashboard financeiro dela ainda são arquivos locais (barbearia-martins-ferramentas/),
-  // sem site publicado — não linkar aqui até estarem hospedados, senão quebra no celular.
-  var all = fixed.concat(stored.map(function(c){
-    return { name:c.bizName, plan:c.plan, links:[
-      { label:'Agendamento', url:c.agendLink },
-      { label:'Bio', url:c.bioLink },
-    ]};
-  }));
-  document.getElementById('clients-list').innerHTML = all.map(function(c) {
-    var statsHtml = '';
-    if (c.stats) {
+// Nota: CRM/Avaliação/Dashboard financeiro dela ainda são arquivos locais (barbearia-martins-ferramentas/),
+// sem site publicado — não linkar aqui até estarem hospedados, senão quebra no celular.
+
+// ═══════════════ HELPER: gráficos/stats reais de um cliente (usado em Clientes e Relatório) ═══════════════
+function buildStatsHtml(c) {
+  var statsHtml = '';
+  if (c.stats) {
       var s = c.stats;
       var growthPct = Math.round((s.followers - s.followersPrev) / s.followersPrev * 100);
       var likesAvg = Math.round(s.likesTotal / s.posts60d);
@@ -716,11 +729,52 @@ function renderClients() {
             return '<div class="client-action-item'+(a.done?' done':'')+'"><span class="ai-icon">'+(a.done?'✓':'○')+'</span><span>'+a.text+'</span></div>';
           }).join('');
       }
-    }
+  }
+  return statsHtml;
+}
+
+// ═══════════════ RENDER: CLIENTES ═══════════════
+function renderClients() {
+  var stored = JSON.parse(localStorage.getItem('synctech_new_clients') || '[]');
+  var fixed = CLIENTS_FIXED;
+  var all = fixed.concat(stored.map(function(c){
+    return { name:c.bizName, plan:c.plan, links:[
+      { label:'Agendamento', url:c.agendLink },
+      { label:'Bio', url:c.bioLink },
+    ]};
+  }));
+  document.getElementById('clients-list').innerHTML = all.map(function(c) {
     return '<div class="client-card">' +
       '<div class="client-head"><div class="client-av">'+c.name.charAt(0)+'</div><div><div class="client-name">'+c.name+'</div><div class="client-meta">'+c.plan+'</div></div></div>' +
-      statsHtml +
+      buildStatsHtml(c) +
       '<div class="client-links">'+c.links.map(function(l){ return '<a class="client-link" href="'+l.url+'" target="_blank">'+l.label+' →</a>'; }).join('')+'</div>' +
+    '</div>';
+  }).join('');
+}
+
+// ═══════════════ RENDER: RELATÓRIO MENSAL ═══════════════
+function renderReport() {
+  var withData = CLIENTS_FIXED.filter(function(c){ return c.stats; });
+  document.getElementById('report-sub').textContent = withData.length
+    ? 'Atualizado todo dia 30 — dados reais coletados manualmente até a data indicada em cada relatório'
+    : 'Ainda sem clientes com dados coletados';
+
+  document.getElementById('report-body').innerHTML = withData.map(function(c) {
+    var s = c.stats;
+    var growthPct = Math.round((s.followers - s.followersPrev) / s.followersPrev * 100);
+    var g = s.goal;
+    var resumo = c.name+' fechou '+s.collectedAt+' com <strong>'+s.followers+' seguidores</strong> no Instagram, um crescimento de <strong>+'+growthPct+'%</strong> desde '+s.followersPrevDate+'. '+
+      'Nos últimos '+ (s.posts && s.posts.length ? s.posts.length : s.posts60d) +' posts, o destaque foi o de '+s.bestPost.date+' ('+s.bestPost.likes+' curtidas — o reel sobre prótese) — sinal de que esse formato converte mais que foto/carrossel. ' +
+      (g ? 'Na meta de comissão, já são <strong>'+g.closed+' de '+g.target+' próteses</strong> fechadas via WhatsApp/Instagram, R$'+(g.closed*g.commissionPerUnit).toLocaleString('pt-BR')+' em comissão garantida até agora.' : '');
+
+    return '<div class="card report-card">' +
+      '<div class="report-card-head">' +
+        '<div class="report-card-title">'+c.name+'</div>' +
+        '<div class="report-badge">Coletado em '+s.collectedAt+'</div>' +
+      '</div>' +
+      '<div class="report-summary">'+resumo+'</div>' +
+      buildStatsHtml(c) +
+      '<div class="report-next">📅 Próximo relatório: dia 30 do mês que vem — atualizado com dados novos do Instagram.</div>' +
     '</div>';
   }).join('');
 }
@@ -787,6 +841,7 @@ renderHome();
 renderPipeline();
 renderServicesGrid();
 renderClients();
+renderReport();
 renderFooterStatus();
 document.getElementById('topbar-date').textContent = new Date().toLocaleDateString('pt-BR', { weekday:'short', day:'2-digit', month:'short' });
 </script>
