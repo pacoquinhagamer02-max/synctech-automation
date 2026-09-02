@@ -251,6 +251,7 @@ h1, h2, h3, .logo { font-family: var(--font-head), sans-serif; }
 .client-goal-earned { background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.25); border-radius: 9px; padding: 12px 14px; margin-bottom: 12px; text-align: center; }
 .client-goal-earned-lbl { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--green); margin-bottom: 4px; }
 .client-goal-earned-val { font-family: var(--font-head), sans-serif; font-size: 2.2rem; font-weight: 700; color: var(--green); text-shadow: 0 0 18px rgba(34,197,94,0.55), 0 0 36px rgba(34,197,94,0.25); }
+.client-goal-breakdown { font-size: 0.7rem; color: var(--muted); margin-top: 4px; font-family: var(--font-mono); }
 .client-goal-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; gap: 8px; }
 .client-goal-lbl { font-size: 0.76rem; font-weight: 600; }
 .client-goal-count { font-family: var(--font-head), sans-serif; font-size: 1rem; color: var(--pl); font-weight: 700; flex-shrink: 0; text-shadow: 0 0 10px rgba(192,132,252,0.5); }
@@ -648,7 +649,9 @@ function renderHome() {
   ];
   if (martinsGoal) {
     var ganho = martinsGoal.closed * martinsGoal.commissionPerUnit;
-    kpis.push({ label:'Meta de próteses (Martins)', val: martinsGoal.closed+'/'+martinsGoal.target, delta: 'R$'+ganho.toLocaleString('pt-BR')+' já ganhos', cls:'up' });
+    var faturadoMartins = (martinsGoal.fixedMonthly||0) + ganho;
+    kpis.push({ label:'Meta de próteses (Martins)', val: martinsGoal.closed+'/'+martinsGoal.target, delta: 'R$'+ganho.toLocaleString('pt-BR')+' em comissão', cls:'up' });
+    kpis.push({ label:'Faturamento Martins (mês)', val: 'R$'+faturadoMartins.toLocaleString('pt-BR'), delta: 'R$'+martinsGoal.fixedMonthly.toLocaleString('pt-BR')+' fixo + R$'+ganho.toLocaleString('pt-BR')+' comissão', cls:'up' });
   }
   document.getElementById('home-kpis').innerHTML = kpis.map(function(k){
     return '<div class="kpi-card"><div class="kpi-label">'+k.label+'</div><div class="kpi-val">'+k.val+'</div><div class="kpi-delta '+k.cls+'">'+k.delta+'</div></div>';
@@ -752,7 +755,7 @@ var CLIENTS_FIXED = [
         { date:'02/09', likes:12,  comments:null },
       ],
       cadence: { before: 0.6, after: 3.0, beforeLabel:'19 meses anteriores (11 posts)', afterLabel:'Últimos 2 meses (6 posts)' },
-      goal: { label:'Meta: próteses fechadas via WhatsApp/Instagram', target:10, closed:3, commissionPerUnit:160 },
+      goal: { label:'Meta: próteses fechadas via WhatsApp/Instagram', target:10, closed:3, commissionPerUnit:160, fixedMonthly:1200 },
       // Mapeamento real dos 11 módulos do hub — quais fazem sentido pro porte/perfil da Martins (não é genérico).
       servicesUsed: {
         active: [
@@ -839,9 +842,12 @@ function buildStatsHtml(c) {
         var pct = Math.min(100, Math.round(g.closed / g.target * 100));
         var ganhoAtual = g.closed * g.commissionPerUnit;
         var ganhoTotal = g.target * g.commissionPerUnit;
-        statsHtml += '<div class="client-chart-title">Meta de comissão</div>' +
+        var faturadoMes = (g.fixedMonthly||0) + ganhoAtual;
+        statsHtml += '<div class="client-chart-title">Faturamento e meta de comissão</div>' +
           '<div class="client-goal-box">' +
-            '<div class="client-goal-earned"><div class="client-goal-earned-lbl">Você já ganhou</div><div class="client-goal-earned-val">R$'+ganhoAtual.toLocaleString('pt-BR')+'</div></div>' +
+            '<div class="client-goal-earned"><div class="client-goal-earned-lbl">Faturamento total este mês</div><div class="client-goal-earned-val">R$'+faturadoMes.toLocaleString('pt-BR')+'</div>' +
+              (g.fixedMonthly ? '<div class="client-goal-breakdown">R$'+g.fixedMonthly.toLocaleString('pt-BR')+' fixo + R$'+ganhoAtual.toLocaleString('pt-BR')+' em comissões</div>' : '') +
+            '</div>' +
             '<div class="client-goal-top"><span class="client-goal-lbl">'+g.label+'</span><span class="client-goal-count">'+g.closed+'/'+g.target+'</span></div>' +
             '<div class="client-goal-track"><div class="client-goal-fill" style="width:'+pct+'%"></div></div>' +
             '<div class="client-goal-sub">R$'+g.commissionPerUnit+' por prótese · R$'+ganhoTotal.toLocaleString('pt-BR')+' se bater a meta inteira</div>' +
