@@ -205,6 +205,13 @@ h1, h2, h3, .logo { font-family: var(--font-head), sans-serif; }
 .client-name { font-size: 0.9rem; font-weight: 700; }
 .client-meta { font-size: 0.73rem; color: var(--muted); margin-top: 1px; }
 .client-links { display: flex; gap: 8px; flex-wrap: wrap; }
+.client-stats-title { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--faint); margin: 14px 0 8px; }
+.client-stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 8px; margin-bottom: 12px; }
+.client-stat { background: var(--s2); border: 1px solid var(--border); border-radius: 9px; padding: 10px 12px; }
+.client-stat-val { font-size: 1.05rem; font-weight: 800; }
+.client-stat-lbl { font-size: 0.66rem; color: var(--muted); margin-top: 2px; }
+.client-best-post { background: rgba(168,85,247,0.06); border: 1px solid rgba(168,85,247,0.18); border-radius: 9px; padding: 10px 12px; font-size: 0.75rem; color: var(--muted); margin-bottom: 10px; }
+.client-data-note { font-size: 0.66rem; color: var(--faint); }
 .client-link { padding: 7px 12px; border-radius: 8px; border: 1px solid var(--border-s); background: var(--s2); color: var(--muted); font-size: 0.72rem; font-weight: 600; text-decoration: none; transition: all 0.15s; }
 .client-link:hover { border-color: var(--primary); color: var(--pl); }
 
@@ -566,7 +573,19 @@ function renderClients() {
       { label:'Site', url:'https://synctech-automation.github.io/barbearia-martins-site/' },
       { label:'WhatsApp', url:'https://wa.me/5531982800596' },
       { label:'Instagram', url:'https://instagram.com/barbeariamartins.0' },
-    ]},
+    ],
+    // Dados reais coletados manualmente no Instagram em 02/09/2026 — não é live, é uma foto do momento.
+    // Posts contam só o feed principal (@barbeariamartins.0), incluindo os 2 reels em colaboração com @moisesbarber_.
+    stats: {
+      collectedAt: '02/09/2026',
+      followers: 499,
+      followersPrev: 424,
+      followersPrevDate: '10/08/2026',
+      posts60d: 6,
+      likesTotal: 243,
+      commentsTotal: 45,
+      bestPost: { date:'26/08', likes:113, comments:13, desc:'Reel sobre prótese capilar — melhor post do período' },
+    }},
   ];
   // Nota: CRM/Avaliação/Dashboard financeiro dela ainda são arquivos locais (barbearia-martins-ferramentas/),
   // sem site publicado — não linkar aqui até estarem hospedados, senão quebra no celular.
@@ -577,8 +596,23 @@ function renderClients() {
     ]};
   }));
   document.getElementById('clients-list').innerHTML = all.map(function(c) {
+    var statsHtml = '';
+    if (c.stats) {
+      var s = c.stats;
+      var growthPct = Math.round((s.followers - s.followersPrev) / s.followersPrev * 100);
+      var likesAvg = Math.round(s.likesTotal / s.posts60d);
+      statsHtml =
+        '<div class="client-stats-title">Instagram — dados reais (coletado em '+s.collectedAt+')</div>' +
+        '<div class="client-stats-grid">' +
+          '<div class="client-stat"><div class="client-stat-val">'+s.followers+'</div><div class="client-stat-lbl">seguidores (+'+growthPct+'% desde '+s.followersPrevDate+')</div></div>' +
+          '<div class="client-stat"><div class="client-stat-val">'+s.posts60d+'</div><div class="client-stat-lbl">posts nos últimos 2 meses</div></div>' +
+          '<div class="client-stat"><div class="client-stat-val">'+likesAvg+'</div><div class="client-stat-lbl">curtidas em média/post</div></div>' +
+        '</div>' +
+        '<div class="client-best-post">🏆 Melhor post: <strong>'+s.bestPost.likes+' curtidas · '+s.bestPost.comments+' comentários</strong> ('+s.bestPost.date+') — '+s.bestPost.desc+'</div>';
+    }
     return '<div class="client-card">' +
       '<div class="client-head"><div class="client-av">'+c.name.charAt(0)+'</div><div><div class="client-name">'+c.name+'</div><div class="client-meta">'+c.plan+'</div></div></div>' +
+      statsHtml +
       '<div class="client-links">'+c.links.map(function(l){ return '<a class="client-link" href="'+l.url+'" target="_blank">'+l.label+' →</a>'; }).join('')+'</div>' +
     '</div>';
   }).join('');
