@@ -1,0 +1,17 @@
+{
+  "name": "SyncTech Automation",
+  "short_name": "SyncTech",
+  "description": "Hub de automação para empresas locais — agendamento, CRM, WhatsApp e Instagram automáticos.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0A0714",
+  "theme_color": "#0A0714",
+  "lang": "pt-BR",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0A0714">
+<meta name="description" content="SyncTech Automation — hub completo de automação: Pipeline, CRM, WhatsApp e Instagram automáticos, agendamento e onboarding de clientes.">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/favicon-64.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SyncTech">
+<title>SyncTech Automation — App</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html { font-size: 16px; }
+
+:root {
+  --bg:       #08050F;
+  --bg2:      #0C0818;
+  --s1:       #150F24;
+  --s2:       #1D1530;
+  --s3:       #251C3D;
+  --border:   rgba(168,85,247,0.14);
+  --border-s: rgba(168,85,247,0.30);
+  --primary:  #A855F7;
+  --pl:       #C084FC;
+  --pd:       #9333EA;
+  --cyan:     #22D3EE;
+  --text:     #F5F0FC;
+  --muted:    #B0A0CC;
+  --faint:    #8B7CAE;
+  --green:    #22C55E;
+  --yellow:   #F59E0B;
+  --red:      #EF4444;
+  --sidebar:  248px;
+  --topbar:   58px;
+  --bottomnav:64px;
+  --r:        12px;
+  --font-head: 'Space Grotesk', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --glow: 0 0 0 1px rgba(168,85,247,0.15), 0 8px 30px rgba(124,58,237,0.18);
+}
+
+body {
+  font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text);
+  min-height: 100vh; overflow-x: hidden; position: relative;
+}
+h1, h2, h3, .logo { font-family: var(--font-head), sans-serif; }
+
+/* ── FUTURISTIC BACKGROUND ── */
+.aurora { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.aurora::before, .aurora::after {
+  content: ''; position: absolute; width: 60vmax; height: 60vmax; border-radius: 50%;
+  filter: blur(90px); opacity: 0.16; will-change: transform;
+}
+.aurora::before { background: radial-gradient(circle, #A855F7, transparent 70%); top: -20vmax; left: -15vmax; animation: float1 26s ease-in-out infinite; }
+.aurora::after  { background: radial-gradient(circle, #22D3EE, transparent 70%); bottom: -25vmax; right: -15vmax; animation: float2 32s ease-in-out infinite; }
+@keyframes float1 { 0%,100%{ transform: translate(0,0); } 50%{ transform: translate(6vmax,8vmax); } }
+@keyframes float2 { 0%,100%{ transform: translate(0,0); } 50%{ transform: translate(-6vmax,-6vmax); } }
+.grid-overlay {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image: linear-gradient(rgba(168,85,247,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(168,85,247,0.05) 1px, transparent 1px);
+  background-size: 42px 42px; mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 30%, transparent 90%);
+}
+
+/* ── SIDEBAR (desktop) ── */
+.sidebar {
+  width: var(--sidebar); background: rgba(21,15,36,0.72); backdrop-filter: blur(20px);
+  border-right: 1px solid var(--border); position: fixed; top: 0; left: 0; bottom: 0; z-index: 40;
+  display: flex; flex-direction: column;
+}
+.sidebar-logo { height: var(--topbar); display: flex; align-items: center; gap: 10px; padding: 0 18px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.logo-mark {
+  width: 30px; height: 30px; border-radius: 9px; flex-shrink: 0;
+  background: linear-gradient(135deg, var(--primary), var(--cyan));
+  display: grid; place-items: center; box-shadow: 0 0 18px rgba(168,85,247,0.55);
+}
+.logo-mark svg { width: 15px; height: 15px; fill: #fff; }
+.logo-text { font-size: 0.94rem; font-weight: 700; letter-spacing: -0.01em; }
+.logo-text .accent { background: linear-gradient(90deg, var(--pl), var(--cyan)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+.sidebar-biz { padding: 14px 18px; border-bottom: 1px solid var(--border); }
+.biz-name { font-size: 0.84rem; font-weight: 700; }
+.biz-plan { font-size: 0.7rem; color: var(--pl); margin-top: 3px; display: flex; align-items: center; gap: 5px; }
+.plan-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--pl); box-shadow: 0 0 6px var(--pl); }
+
+.sidebar-nav { flex: 1; padding: 10px 10px; overflow-y: auto; }
+.nav-item {
+  display: flex; align-items: center; gap: 10px; padding: 10px 12px; margin-bottom: 3px;
+  cursor: pointer; font-size: 0.84rem; color: var(--muted); border-radius: 10px;
+  transition: all 0.15s; user-select: none; position: relative;
+}
+.nav-item:hover { color: var(--text); background: rgba(255,255,255,0.03); }
+.nav-item.active { color: #fff; background: linear-gradient(90deg, rgba(168,85,247,0.22), rgba(34,211,238,0.06)); box-shadow: inset 0 0 0 1px rgba(168,85,247,0.3); }
+.nav-icon { width: 17px; height: 17px; flex-shrink: 0; opacity: 0.75; }
+.nav-item.active .nav-icon { opacity: 1; }
+.nav-badge { margin-left: auto; background: var(--primary); color: #fff; font-size: 0.6rem; font-weight: 700; padding: 1px 7px; border-radius: 10px; }
+
+.sidebar-footer { padding: 14px 18px; border-top: 1px solid var(--border); flex-shrink: 0; }
+.install-btn {
+  width: 100%; padding: 10px; border-radius: 10px; border: 1px solid rgba(168,85,247,0.35);
+  background: linear-gradient(135deg, rgba(168,85,247,0.18), rgba(34,211,238,0.08));
+  color: var(--pl); font-size: 0.78rem; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif;
+  display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 10px; transition: all 0.15s;
+}
+.install-btn:hover { border-color: var(--primary); box-shadow: 0 0 16px rgba(168,85,247,0.35); }
+.install-btn.hidden { display: none; }
+.online-badge { display: flex; align-items: center; gap: 7px; font-size: 0.72rem; color: var(--muted); }
+.online-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 6px var(--green); flex-shrink: 0; }
+
+/* ── MAIN ── */
+.main { margin-left: var(--sidebar); position: relative; z-index: 1; min-height: 100vh; display: flex; flex-direction: column; }
+.topbar {
+  height: var(--topbar); background: rgba(8,5,15,0.75); backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 30;
+  display: flex; align-items: center; padding: 0 22px; gap: 12px;
+}
+.topbar-title { font-size: 0.94rem; font-weight: 700; }
+.topbar-right { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+.topbar-date { font-size: 0.74rem; color: var(--muted); }
+.content { padding: 22px; flex: 1; max-width: 1180px; width: 100%; margin: 0 auto; padding-bottom: calc(22px + var(--bottomnav)); }
+.page { display: none; animation: fadeIn 0.25s ease; }
+.page.active { display: block; }
+@keyframes fadeIn { from { opacity:0; transform: translateY(6px);} to { opacity:1; transform:none; } }
+
+.hero { margin-bottom: 22px; }
+.hero-greet { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; }
+.hero-greet .accent { background: linear-gradient(90deg, var(--pl), var(--cyan)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.hero-sub { font-size: 0.82rem; color: var(--muted); margin-top: 4px; }
+
+/* ── KPI ── */
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin-bottom: 22px; }
+.kpi-card { background: var(--s1); border: 1px solid var(--border); border-radius: var(--r); padding: 18px; position: relative; overflow: hidden; }
+.kpi-card::before { content:''; position:absolute; top:-30%; right:-30%; width:70%; height:70%; background: radial-gradient(circle, rgba(168,85,247,0.14), transparent 70%); pointer-events:none; }
+.kpi-label { font-size: 0.68rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 10px; }
+.kpi-val { font-size: 1.8rem; font-weight: 800; letter-spacing: -0.025em; margin-bottom: 5px; font-variant-numeric: tabular-nums; }
+.kpi-delta { font-size: 0.72rem; font-weight: 500; }
+.kpi-delta.up { color: var(--green); }
+.kpi-delta.warn { color: var(--yellow); }
+
+.card { background: var(--s1); border: 1px solid var(--border); border-radius: var(--r); padding: 18px; margin-bottom: 14px; }
+.card-title { font-size: 0.88rem; font-weight: 700; margin-bottom: 3px; }
+.card-sub { font-size: 0.74rem; color: var(--muted); margin-bottom: 14px; }
+
+.quick-actions { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+.qa-btn {
+  display: flex; align-items: center; gap: 7px; padding: 9px 15px; border-radius: 10px;
+  border: 1px solid var(--border-s); background: var(--s1); color: var(--muted);
+  font-size: 0.78rem; font-weight: 500; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.15s;
+}
+.qa-btn:hover { border-color: var(--primary); color: var(--pl); background: rgba(168,85,247,0.08); }
+.qa-btn.primary { background: linear-gradient(135deg, var(--pd), var(--primary)); color: #fff; border-color: transparent; box-shadow: 0 4px 18px rgba(147,51,234,0.35); }
+.qa-btn.primary:hover { filter: brightness(1.1); }
+
+/* ── PIPELINE ── */
+.pipeline-board { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px; }
+.pipeline-col { min-width: 230px; max-width: 260px; flex-shrink: 0; }
+.pipeline-col-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.pipeline-col-title { font-size: 0.78rem; font-weight: 700; }
+.pipeline-count { background: var(--s3); color: var(--muted); font-size: 0.68rem; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
+.pipeline-cards { display: flex; flex-direction: column; gap: 8px; }
+.lead-card { background: var(--s2); border: 1px solid var(--border); border-radius: var(--r); padding: 13px; transition: border-color 0.15s; }
+.lead-card:hover { border-color: var(--border-s); }
+.lc-name { font-size: 0.82rem; font-weight: 700; margin-bottom: 4px; }
+.lc-biz { font-size: 0.71rem; color: var(--muted); margin-bottom: 9px; line-height: 1.4; }
+.lc-row { display: flex; justify-content: space-between; align-items: center; }
+.lc-val { font-size: 0.78rem; font-weight: 700; }
+.lc-time { font-size: 0.68rem; color: var(--faint); margin-top: 6px; }
+.lc-source { font-size: 0.64rem; padding: 2px 7px; border-radius: 5px; font-weight: 600; }
+.lc-wa { background: rgba(37,211,102,0.12); color: #25D366; }
+.lc-ig { background: rgba(225,48,108,0.12); color: #E1306C; }
+.lc-google { background: rgba(66,133,244,0.12); color: #4285F4; }
+
+/* ── SERVIÇOS GRID ── */
+.svc-grid2 { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.svc-tile { background: var(--s1); border: 1px solid var(--border); border-radius: var(--r); padding: 16px; transition: border-color 0.15s; }
+.svc-tile:hover { border-color: var(--border-s); }
+.svc-tile-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.svc-tile-icon { width: 36px; height: 36px; border-radius: 9px; background: rgba(168,85,247,0.1); display: grid; place-items: center; font-size: 1.05rem; flex-shrink: 0; }
+.svc-tile-name { font-size: 0.86rem; font-weight: 700; flex: 1; }
+.svc-tile-desc { font-size: 0.74rem; color: var(--muted); line-height: 1.5; margin-bottom: 12px; }
+.status-pill { display: inline-flex; align-items: center; gap: 5px; font-size: 0.66rem; font-weight: 700; padding: 3px 9px; border-radius: 20px; }
+.status-pill.ok { background: rgba(34,197,94,0.12); color: var(--green); border: 1px solid rgba(34,197,94,0.25); }
+.status-pill.warn { background: rgba(245,158,11,0.12); color: var(--yellow); border: 1px solid rgba(245,158,11,0.25); }
+.status-pill.off { background: rgba(148,163,184,0.08); color: var(--faint); border: 1px solid var(--border); }
+.status-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+
+.guide-steps { display: flex; flex-direction: column; gap: 12px; margin-top: 14px; }
+.guide-step { display: flex; gap: 12px; align-items: flex-start; }
+.guide-num { width: 24px; height: 24px; border-radius: 50%; background: var(--primary); display: grid; place-items: center; font-size: 0.66rem; font-weight: 800; flex-shrink: 0; }
+.guide-step-title { font-weight: 600; font-size: 0.8rem; margin-bottom: 2px; }
+.guide-step-desc { font-size: 0.73rem; color: var(--muted); line-height: 1.55; }
+.guide-links { display: flex; gap: 10px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); }
+.guide-link { flex: 1; text-align: center; padding: 9px; border-radius: 9px; font-size: 0.76rem; font-weight: 600; text-decoration: none; transition: all 0.15s; }
+.guide-link.green { background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2); color: var(--green); }
+.guide-link.purple { background: rgba(168,85,247,0.08); border: 1px solid rgba(168,85,247,0.2); color: var(--pl); }
+
+/* ── CLIENTES ── */
+.client-card { background: var(--s1); border: 1px solid var(--border); border-radius: var(--r); padding: 16px; margin-bottom: 10px; }
+.client-head { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.client-av { width: 42px; height: 42px; border-radius: 11px; background: linear-gradient(135deg, var(--primary), var(--cyan)); display: grid; place-items: center; font-size: 1.1rem; flex-shrink: 0; }
+.client-name { font-size: 0.9rem; font-weight: 700; }
+.client-meta { font-size: 0.73rem; color: var(--muted); margin-top: 1px; }
+.client-links { display: flex; gap: 8px; flex-wrap: wrap; }
+.client-link { padding: 7px 12px; border-radius: 8px; border: 1px solid var(--border-s); background: var(--s2); color: var(--muted); font-size: 0.72rem; font-weight: 600; text-decoration: none; transition: all 0.15s; }
+.client-link:hover { border-color: var(--primary); color: var(--pl); }
+
+/* ── FORM (config wizard) ── */
+.form-group { margin-bottom: 14px; }
+.form-label { font-size: 0.72rem; font-weight: 600; color: var(--muted); display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.06em; }
+.form-input, select.form-input { width: 100%; background: var(--s2); border: 1.5px solid var(--border-s); border-radius: 10px; padding: 10px 13px; color: var(--text); font-size: 0.86rem; outline: none; font-family: 'Inter', sans-serif; transition: border-color 0.15s; }
+.form-input:focus { border-color: var(--primary); }
+.form-input::placeholder { color: var(--faint); }
+.form-row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.btn { padding: 12px 22px; border-radius: 10px; font-size: 0.86rem; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; border: none; transition: all 0.2s; }
+.btn-primary { background: linear-gradient(135deg, var(--pd), var(--primary)); color: #fff; box-shadow: 0 4px 18px rgba(147,51,234,0.3); }
+.btn-primary:hover { filter: brightness(1.08); transform: translateY(-1px); }
+
+.result-link { background: var(--s2); border: 1px solid var(--border-s); border-radius: 10px; padding: 10px 13px; font-size: 0.72rem; font-family: var(--font-mono); color: var(--pl); word-break: break-all; margin-bottom: 8px; }
+.copy-btn { padding: 6px 12px; border-radius: 7px; border: 1px solid var(--border-s); background: var(--s3); color: var(--muted); font-size: 0.7rem; cursor: pointer; font-family: 'Inter',sans-serif; }
+.copy-btn:hover { color: var(--text); border-color: var(--primary); }
+
+.toast { position: fixed; bottom: calc(var(--bottomnav) + 16px); left: 50%; transform: translateX(-50%) translateY(80px); background: var(--s2); border: 1px solid var(--border-s); border-radius: 10px; padding: 12px 20px; font-size: 0.82rem; font-weight: 600; transition: transform 0.3s; z-index: 1000; white-space: nowrap; box-shadow: var(--glow); }
+.toast.show { transform: translateX(-50%) translateY(0); }
+.toast.success { border-color: rgba(34,197,94,0.4); color: var(--green); }
+
+/* ── BOTTOM NAV (mobile) ── */
+.bottom-nav { display: none; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 860px) {
+  .sidebar { display: none; }
+  .main { margin-left: 0; }
+  .content { padding: 16px; padding-bottom: calc(16px + var(--bottomnav) + 10px); }
+  .bottom-nav {
+    display: flex; position: fixed; bottom: 0; left: 0; right: 0; height: var(--bottomnav); z-index: 40;
+    background: rgba(13,9,23,0.88); backdrop-filter: blur(20px); border-top: 1px solid var(--border);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .bn-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: var(--faint); cursor: pointer; transition: color 0.15s; }
+  .bn-item.active { color: var(--pl); }
+  .bn-item svg { width: 20px; height: 20px; }
+  .bn-item span { font-size: 0.62rem; font-weight: 600; }
+  .kpi-grid { grid-template-columns: 1fr 1fr; }
+  .svc-grid2 { grid-template-columns: 1fr; }
+  .form-row2 { grid-template-columns: 1fr; }
+  .topbar { padding: 0 16px; }
+}
+</style>
+</head>
+<body>
+
+<div class="aurora"></div>
+<div class="grid-overlay"></div>
+
+<!-- SIDEBAR (desktop) -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark"><svg viewBox="0 0 14 14"><path d="M7 1L13 4.5V9.5L7 13L1 9.5V4.5L7 1Z"/></svg></div>
+    <span class="logo-text">Sync<span class="accent">Tech</span></span>
+  </div>
+  <div class="sidebar-biz">
+    <div class="biz-name">Rafael · SyncTech Automation</div>
+    <div class="biz-plan"><span class="plan-dot"></span>Painel do operador</div>
+  </div>
+  <nav class="sidebar-nav" id="sidebar-nav"></nav>
+  <div class="sidebar-footer">
+    <button class="install-btn hidden" id="install-btn" onclick="installApp()">📲 Instalar App</button>
+    <div class="online-badge"><span class="online-dot"></span>Todos os módulos operacionais</div>
+  </div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="topbar-title">Início</div>
+    <div class="topbar-right">
+      <span class="topbar-date" id="topbar-date"></span>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ── INÍCIO ── -->
+    <div class="page active" id="page-inicio">
+      <div class="hero">
+        <div class="hero-greet">Olá, <span class="accent">Rafael</span> 👋</div>
+        <div class="hero-sub">Aqui está o resumo do seu hub de automação hoje.</div>
+      </div>
+      <div class="kpi-grid" id="home-kpis"></div>
+      <div class="quick-actions">
+        <button class="qa-btn primary" onclick="goPage('pipeline')">📋 Ver Pipeline</button>
+        <button class="qa-btn" onclick="goPage('servicos')">🧩 Ver Serviços</button>
+        <button class="qa-btn" onclick="goPage('clientes')">👥 Clientes ativos</button>
+        <button class="qa-btn" onclick="goPage('config')">➕ Novo cliente</button>
+      </div>
+      <div class="card">
+        <div class="card-title">Próximos passos</div>
+        <div class="card-sub">O que ainda precisa da sua atenção</div>
+        <div id="home-todos"></div>
+      </div>
+    </div>
+
+    <!-- ── PIPELINE ── -->
+    <div class="page" id="page-pipeline">
+      <div class="hero">
+        <div class="hero-greet" style="font-size:1.25rem">Pipeline de Leads</div>
+        <div class="hero-sub" id="pipeline-summary"></div>
+      </div>
+      <div class="pipeline-board" id="pipeline-board"></div>
+    </div>
+
+    <!-- ── SERVIÇOS ── -->
+    <div class="page" id="page-servicos">
+      <div class="hero">
+        <div class="hero-greet" style="font-size:1.25rem">Os 11 serviços do hub</div>
+        <div class="hero-sub">Status real de cada módulo — o que já funciona e o que precisa de configuração</div>
+      </div>
+      <div class="svc-grid2" id="services-grid"></div>
+
+      <div id="guide-whatsapp" class="card" style="margin-top:18px">
+        <div class="card-title">📱 Ativar WhatsApp Bot 24/7 (Z-API)</div>
+        <div class="card-sub">3 passos — sem custo de plataforma extra além da Z-API</div>
+        <div class="guide-steps">
+          <div class="guide-step"><div class="guide-num">1</div><div><div class="guide-step-title">Crie conta gratuita na Z-API</div><div class="guide-step-desc">Acesse z-api.io → Cadastre-se → Crie uma instância → Escaneie o QR Code com o WhatsApp do negócio.</div></div></div>
+          <div class="guide-step"><div class="guide-num">2</div><div><div class="guide-step-title">Copie Instance ID e Token</div><div class="guide-step-desc">No painel Z-API: Instâncias → clique na instância → API → copie o Instance ID e o Client Token.</div></div></div>
+          <div class="guide-step"><div class="guide-num">3</div><div><div class="guide-step-title">Configure no Make.com</div><div class="guide-step-desc">Cenário: Webhooks (recebe msg) → Filtro de palavra-chave → Z-API (envia resposta). Cole Instance ID e Token na conexão.</div></div></div>
+        </div>
+        <div class="guide-links">
+          <a href="https://www.z-api.io" target="_blank" class="guide-link green">Abrir Z-API →</a>
+          <a href="https://make.com" target="_blank" class="guide-link purple">Abrir Make.com →</a>
+        </div>
+      </div>
+
+      <div id="guide-instagram" class="card">
+        <div class="card-title">📸 Ativar Instagram Automático (Make.com nativo)</div>
+        <div class="card-sub">Usa o Make.com que você já tem — sem pagar ManyChat</div>
+        <div class="guide-steps">
+          <div class="guide-step"><div class="guide-num">1</div><div><div class="guide-step-title">Conta Business vinculada a uma Página do Facebook</div><div class="guide-step-desc">O Instagram do cliente precisa ser Profissional/Business e vinculado a uma Página no business.facebook.com.</div></div></div>
+          <div class="guide-step"><div class="guide-num">2</div><div><div class="guide-step-title">Conecte o Instagram dentro do Make.com</div><div class="guide-step-desc">Adicione o app "Instagram for Business" → Criar conexão → login com a conta do Facebook que administra a página.</div></div></div>
+          <div class="guide-step"><div class="guide-num">3</div><div><div class="guide-step-title">Monte o fluxo</div><div class="guide-step-desc">Watch Comments/Messages (dispara no comentário/DM) → Filtro de palavra-chave → Create a Message (responde no DM).</div></div></div>
+        </div>
+        <div class="guide-links">
+          <a href="https://business.facebook.com" target="_blank" class="guide-link green">Meta Business Suite →</a>
+          <a href="https://make.com" target="_blank" class="guide-link purple">Abrir Make.com →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── CLIENTES ── -->
+    <div class="page" id="page-clientes">
+      <div class="hero">
+        <div class="hero-greet" style="font-size:1.25rem">Clientes ativos</div>
+        <div class="hero-sub">Contratos fechados — acesso rápido às ferramentas de cada um</div>
+      </div>
+      <div id="clients-list"></div>
+    </div>
+
+    <!-- ── CONFIG (novo cliente) ── -->
+    <div class="page" id="page-config">
+      <div class="hero">
+        <div class="hero-greet" style="font-size:1.25rem">Onboarding de novo cliente</div>
+        <div class="hero-sub">Gera os links de agendamento + bio prontos para enviar</div>
+      </div>
+      <div class="card">
+        <div class="form-group">
+          <label class="form-label">Nome do negócio *</label>
+          <input class="form-input" id="nc-name" placeholder="Ex: Barbearia do João">
+        </div>
+        <div class="form-row2">
+          <div class="form-group">
+            <label class="form-label">WhatsApp do dono *</label>
+            <input class="form-input" id="nc-wpp" placeholder="(11) 99999-9999">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Instagram</label>
+            <input class="form-input" id="nc-ig" placeholder="@seunegocio">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Plano</label>
+          <select class="form-input" id="nc-plan">
+            <option value="Starter">Starter — R$197/mês</option>
+            <option value="Negócio" selected>Negócio — R$397/mês</option>
+            <option value="Pro">Pro — R$797/mês</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" onclick="gerarCliente()">Gerar links do cliente →</button>
+      </div>
+      <div class="card" id="nc-result" style="display:none">
+        <div class="card-title">✓ Cliente pronto</div>
+        <div class="card-sub">Envie os dois links abaixo — o cliente já pode receber agendamentos</div>
+        <label class="form-label">Link de agendamento</label>
+        <div class="result-link" id="nc-link-agend"></div>
+        <label class="form-label">Link na bio (Linktree do cliente)</label>
+        <div class="result-link" id="nc-link-bio"></div>
+        <button class="copy-btn" onclick="copiarLinksCliente()">Copiar os dois links</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- BOTTOM NAV (mobile) -->
+<nav class="bottom-nav" id="bottom-nav"></nav>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════ NAV ═══════════════
+var PAGES = [
+  { id:'inicio',   label:'Início',    icon:'<path d="M2 8L9 2L16 8M4 7V15H14V7"/>' },
+  { id:'pipeline', label:'Pipeline',  icon:'<rect x="1" y="4" width="4" height="12"/><rect x="7" y="7" width="4" height="9"/><rect x="13" y="10" width="4" height="6"/>' },
+  { id:'servicos', label:'Serviços',  icon:'<rect x="2" y="2" width="6" height="6" rx="1"/><rect x="10" y="2" width="6" height="6" rx="1"/><rect x="2" y="10" width="6" height="6" rx="1"/><rect x="10" y="10" width="6" height="6" rx="1"/>' },
+  { id:'clientes', label:'Clientes',  icon:'<circle cx="9" cy="6" r="3"/><path d="M3 16c0-3.3 2.7-6 6-6s6 2.7 6 6"/>' },
+  { id:'config',   label:'Config',    icon:'<circle cx="9" cy="9" r="2.5"/><path d="M9 1v2.4M9 14.6V17M17 9h-2.4M3.4 9H1M14.7 3.3l-1.7 1.7M4.9 12.9L3.3 14.7M14.7 14.7l-1.7-1.7M4.9 5.1L3.3 3.3"/>' },
+];
+
+function renderNav() {
+  document.getElementById('sidebar-nav').innerHTML = PAGES.map(function(p, i) {
+    return '<div class="nav-item'+(i===0?' active':'')+'" data-page="'+p.id+'" onclick="goPage(\''+p.id+'\')">' +
+      '<svg class="nav-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">'+p.icon+'</svg>' +
+      '<span>'+p.label+'</span></div>';
+  }).join('');
+  document.getElementById('bottom-nav').innerHTML = PAGES.map(function(p, i) {
+    return '<div class="bn-item'+(i===0?' active':'')+'" data-page="'+p.id+'" onclick="goPage(\''+p.id+'\')">' +
+      '<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">'+p.icon+'</svg>' +
+      '<span>'+p.label+'</span></div>';
+  }).join('');
+}
+
+function goPage(id) {
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.toggle('active', p.id==='page-'+id); });
+  document.querySelectorAll('.nav-item, .bn-item').forEach(function(n){ n.classList.toggle('active', n.dataset.page===id); });
+  var p = PAGES.filter(function(x){ return x.id===id; })[0];
+  document.getElementById('topbar-title').textContent = p ? p.label : '';
+  window.scrollTo(0,0);
+}
+
+// ═══════════════ DADOS ═══════════════
+var pipelineData = [
+  { stage: 'Novo Lead', leads: [
+    { name:'José Pereira',    biz:'Pizzaria Central',    val:397, time:'Há 2h',   src:'wa' },
+    { name:'Maria Alves',     biz:'Salão da Maria',      val:197, time:'Há 4h',   src:'ig' },
+    { name:'Roberto Silva',   biz:'Academia Power',      val:797, time:'Há 6h',   src:'google' },
+  ]},
+  { stage: 'Contato feito', leads: [
+    { name:'Fernanda Lima',   biz:'Clínica Estética',    val:397, time:'Ontem',   src:'ig' },
+    { name:'Carlos Mendes',   biz:'Barbearia Top',       val:397, time:'Há 2d',   src:'wa' },
+    { name:'Ana Rodrigues',   biz:'Pet Shop Amigo',      val:197, time:'Há 3d',   src:'wa' },
+  ]},
+  { stage: 'Demo enviado', leads: [
+    { name:'Paulo Costa',     biz:'Restaurante Belo',    val:397, time:'Há 3d',   src:'google' },
+    { name:'Sandra Oliveira', biz:'Studio de Pilates',   val:197, time:'Há 4d',   src:'ig' },
+  ]},
+  { stage: 'Proposta', leads: [
+    { name:'Marcos Souza',    biz:'Imobiliária MS',      val:797, time:'Há 5d',   src:'wa' },
+    { name:'Juliana Nunes',   biz:'Ótica Nunes',         val:397, time:'Há 6d',   src:'google' },
+  ]},
+  { stage: 'Fechado', leads: [
+    { name:'Moisés Martins',  biz:'Barbearia Martins — Pacote Conteúdo/Prótese (R$800+10% ou R$1.000 fixo)', val:1000, time:'Cliente ativo', src:'wa', phone:'31982800596' },
+    { name:'Felipe Araújo',   biz:'Barbearia Araújo',    val:397, time:'Hoje',    src:'wa' },
+    { name:'Renata Borges',   biz:'Clínica Sorriso',     val:797, time:'Ontem',   src:'ig' },
+  ]},
+];
+
+var SERVICES = [
+  { icon:'💬', name:'WhatsApp Bot 24/7',       status:'warn', desc:'Atende, agenda e responde clientes automaticamente. Requer Z-API conectado por cliente.' },
+  { icon:'📸', name:'Instagram Automático',     status:'warn', desc:'Comentário→DM, seguiu→boas-vindas. Requer conta Business + Make.com conectados.' },
+  { icon:'📅', name:'Agendamento Online',       status:'ok',   desc:'App completo: serviços, calendário, lista de espera e confirmação. Funcionando 100%.' },
+  { icon:'📋', name:'CRM com Pipeline',         status:'ok',   desc:'Kanban de leads com WhatsApp direto e histórico por cliente. Funcionando 100%.' },
+  { icon:'🔗', name:'Link na Bio',              status:'ok',   desc:'Página mobile com serviços, preços e agendamento — pronta para o Instagram do cliente.' },
+  { icon:'⭐', name:'Gestão de Reputação',       status:'ok',   desc:'Roteamento inteligente: 1-3★ vira feedback privado, 4-5★ vai direto pro Google.' },
+  { icon:'📊', name:'Dashboard de Métricas',    status:'warn', desc:'Mostra dados de demonstração até a planilha Google ser compartilhada publicamente.' },
+  { icon:'🛍️', name:'Catálogo Digital',         status:'ok',   desc:'Reaproveita a mesma tela de serviços do agendamento/bio.' },
+  { icon:'💭', name:'Chat ao Vivo no Site',     status:'off',  desc:'Ainda não implementado. Recomendado: Tawk.to (grátis, sem limite).' },
+  { icon:'✉️', name:'Email Marketing',          status:'off',  desc:'Ainda não implementado. Recomendado: Brevo (grátis até 9 mil emails/mês).' },
+  { icon:'📈', name:'Tráfego Pago (Meta Ads)',  status:'ok',   desc:'Add-on prestado manualmente por você — setup R$297 + gestão R$397/mês.' },
+];
+
+function statusLabel(s) { return s==='ok' ? 'Ativo' : s==='warn' ? 'Requer config.' : 'Não implementado'; }
+
+// ═══════════════ RENDER: INÍCIO ═══════════════
+function renderHome() {
+  var fechados = pipelineData.filter(function(c){ return c.stage==='Fechado'; })[0].leads;
+  var abertos = pipelineData.filter(function(c){ return c.stage!=='Fechado'; }).reduce(function(s,c){ return s+c.leads.length; }, 0);
+  var mrr = fechados.reduce(function(s,l){ return s+l.val; }, 0);
+  var ativos = SERVICES.filter(function(s){ return s.status==='ok'; }).length;
+
+  document.getElementById('home-kpis').innerHTML = [
+    { label:'Clientes fechados', val: fechados.length, delta: 'MRR ~R$'+mrr.toLocaleString('pt-BR'), cls:'up' },
+    { label:'Leads em aberto',   val: abertos, delta: 'no funil agora', cls:'up' },
+    { label:'Serviços ativos',   val: ativos+'/11', delta: (11-ativos)+' pendentes de config', cls: (11-ativos)>0 ? 'warn':'up' },
+    { label:'Plano mais vendido', val: 'Negócio', delta: 'R$397/mês', cls:'up' },
+  ].map(function(k){
+    return '<div class="kpi-card"><div class="kpi-label">'+k.label+'</div><div class="kpi-val">'+k.val+'</div><div class="kpi-delta '+k.cls+'">'+k.delta+'</div></div>';
+  }).join('');
+
+  var todos = [
+    { done:false, text:'Compartilhar a planilha Google publicamente (Dashboard mostra dados reais)' },
+    { done:false, text:'Criar og.png da landing page' },
+    { done:false, text:'Decidir Z-API x Evolution API antes de ativar WhatsApp Bot em massa' },
+  ];
+  document.getElementById('home-todos').innerHTML = todos.map(function(t){
+    return '<div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--border)"><span style="color:var(--yellow)">⚠️</span><span style="font-size:0.8rem;color:var(--muted)">'+t.text+'</span></div>';
+  }).join('');
+}
+
+// ═══════════════ RENDER: PIPELINE ═══════════════
+function renderPipeline() {
+  var el = document.getElementById('pipeline-board');
+  el.innerHTML = pipelineData.map(function(col, colIdx) {
+    var cards = col.leads.map(function(l, li) {
+      var srcCls = l.src==='wa' ? 'lc-wa' : l.src==='ig' ? 'lc-ig' : 'lc-google';
+      var srcLabel = l.src==='wa' ? 'WhatsApp' : l.src==='ig' ? 'Instagram' : 'Google';
+      var wppMsg = encodeURIComponent('Olá, '+l.name+'! Aqui é da SyncTech Automation. Quero apresentar como a automação pode ajudar '+l.biz+'. Tem 5 minutos?');
+      var wppNum = l.phone ? '55'+l.phone.replace(/\D/g,'') : '55';
+      return '<div class="lead-card">' +
+        '<div class="lc-name">'+l.name+'</div>' +
+        '<div class="lc-biz">'+l.biz+'</div>' +
+        '<div class="lc-row"><span class="lc-val">R$'+l.val+'/mês</span><span class="lc-source '+srcCls+'">'+srcLabel+'</span></div>' +
+        '<div class="lc-time">'+l.time+'</div>' +
+        '<a href="https://wa.me/'+wppNum+'?text='+wppMsg+'" target="_blank" style="display:block;text-align:center;margin-top:10px;background:rgba(37,211,102,0.12);border:1px solid rgba(37,211,102,0.25);color:#25D366;border-radius:7px;padding:7px;font-size:0.7rem;font-weight:700;text-decoration:none">💬 WhatsApp</a>' +
+      '</div>';
+    }).join('');
+    var total = col.leads.reduce(function(s,l){ return s+l.val; }, 0);
+    return '<div class="pipeline-col">' +
+      '<div class="pipeline-col-header"><span class="pipeline-col-title">'+col.stage+'</span><span class="pipeline-count">'+col.leads.length+'</span></div>' +
+      (total ? '<div style="font-size:0.65rem;color:var(--muted);margin-bottom:8px">R$'+total.toLocaleString('pt-BR')+'/mês</div>' : '') +
+      '<div class="pipeline-cards">'+cards+'</div>' +
+    '</div>';
+  }).join('');
+
+  var allLeads = pipelineData.reduce(function(s,c){ return s+c.leads.length; }, 0);
+  var openVal = pipelineData.filter(function(c){ return c.stage!=='Fechado'; }).reduce(function(s,c){ return s+c.leads.reduce(function(s2,l){ return s2+l.val; },0); }, 0);
+  document.getElementById('pipeline-summary').textContent = allLeads+' leads no funil · R$'+openVal.toLocaleString('pt-BR')+'/mês em aberto';
+}
+
+// ═══════════════ RENDER: SERVIÇOS ═══════════════
+function renderServicesGrid() {
+  document.getElementById('services-grid').innerHTML = SERVICES.map(function(s) {
+    return '<div class="svc-tile">' +
+      '<div class="svc-tile-head"><div class="svc-tile-icon">'+s.icon+'</div><div class="svc-tile-name">'+s.name+'</div></div>' +
+      '<div class="svc-tile-desc">'+s.desc+'</div>' +
+      '<span class="status-pill '+s.status+'"><span class="status-dot"></span>'+statusLabel(s.status)+'</span>' +
+    '</div>';
+  }).join('');
+}
+
+// ═══════════════ RENDER: CLIENTES ═══════════════
+function renderClients() {
+  var stored = JSON.parse(localStorage.getItem('synctech_new_clients') || '[]');
+  var fixed = [
+    { name:'Barbearia Martins', plan:'Pacote Conteúdo/Prótese', links:[
+      { label:'Site', url:'https://synctech-automation.github.io/barbearia-martins-site/' },
+      { label:'CRM',  url:'../../barbearia-martins-ferramentas/crm.html' },
+      { label:'Avaliações', url:'../../barbearia-martins-ferramentas/avaliacao.html' },
+      { label:'Dashboard financeiro', url:'../../barbearia-martins-ferramentas/dashboard.html' },
+    ]},
+  ];
+  var all = fixed.concat(stored.map(function(c){
+    return { name:c.bizName, plan:c.plan, links:[
+      { label:'Agendamento', url:c.agendLink },
+      { label:'Bio', url:c.bioLink },
+    ]};
+  }));
+  document.getElementById('clients-list').innerHTML = all.map(function(c) {
+    return '<div class="client-card">' +
+      '<div class="client-head"><div class="client-av">'+c.name.charAt(0)+'</div><div><div class="client-name">'+c.name+'</div><div class="client-meta">'+c.plan+'</div></div></div>' +
+      '<div class="client-links">'+c.links.map(function(l){ return '<a class="client-link" href="'+l.url+'" target="_blank">'+l.label+' →</a>'; }).join('')+'</div>' +
+    '</div>';
+  }).join('');
+}
+
+// ═══════════════ CONFIG: NOVO CLIENTE ═══════════════
+function gerarCliente() {
+  var name = document.getElementById('nc-name').value.trim();
+  var wpp  = document.getElementById('nc-wpp').value.trim();
+  var ig   = document.getElementById('nc-ig').value.trim();
+  var plan = document.getElementById('nc-plan').value;
+  if (!name || !wpp) { showToast('Preencha nome e WhatsApp', 'error'); return; }
+
+  var cfg = { bizName:name, bizWpp:wpp, instagram:ig, services:[], professionals:[{id:0,name:'Qualquer',emoji:'⭐',color:'#A855F7',rating:null,reviews:null}] };
+  var base = 'https://pacoquinhagamer02-max.github.io/synctech-automation';
+  var encoded = btoa(unescape(encodeURIComponent(JSON.stringify(cfg))));
+  var cfgBio = Object.assign({}, cfg, { agendamentoUrl: base+'/agendamento/#config='+encoded });
+  var encodedBio = btoa(unescape(encodeURIComponent(JSON.stringify(cfgBio))));
+
+  var agendLink = base+'/agendamento/#config='+encoded;
+  var bioLink   = base+'/bio/#config='+encodedBio;
+
+  document.getElementById('nc-link-agend').textContent = agendLink;
+  document.getElementById('nc-link-bio').textContent = bioLink;
+  document.getElementById('nc-result').style.display = 'block';
+
+  var stored = JSON.parse(localStorage.getItem('synctech_new_clients') || '[]');
+  stored.push({ bizName:name, plan:plan, agendLink:agendLink, bioLink:bioLink, createdAt:new Date().toISOString() });
+  localStorage.setItem('synctech_new_clients', JSON.stringify(stored));
+  renderClients();
+  showToast('Cliente criado! Links prontos para enviar.', 'success');
+}
+
+function copiarLinksCliente() {
+  var txt = document.getElementById('nc-link-agend').textContent + '\n' + document.getElementById('nc-link-bio').textContent;
+  navigator.clipboard.writeText(txt).then(function(){ showToast('Links copiados!', 'success'); });
+}
+
+function showToast(msg, type) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + (type||'') + ' show';
+  setTimeout(function(){ t.classList.remove('show'); }, 3200);
+}
+
+// ═══════════════ PWA INSTALL ═══════════════
+var deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', function(e) {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('install-btn').classList.remove('hidden');
+});
+function installApp() {
+  if (!deferredPrompt) { showToast('Use o menu do navegador → "Instalar app"', 'success'); return; }
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(function(){ deferredPrompt = null; document.getElementById('install-btn').classList.add('hidden'); });
+}
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); });
+}
+
+// ═══════════════ INIT ═══════════════
+renderNav();
+renderHome();
+renderPipeline();
+renderServicesGrid();
+renderClients();
+document.getElementById('topbar-date').textContent = new Date().toLocaleDateString('pt-BR', { weekday:'short', day:'2-digit', month:'short' });
+</script>
+</body>
+</html>
