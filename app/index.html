@@ -448,28 +448,12 @@ function goPage(id) {
 
 // ═══════════════ DADOS ═══════════════
 var pipelineData = [
-  { stage: 'Novo Lead', leads: [
-    { name:'José Pereira',    biz:'Pizzaria Central',    val:397, time:'Há 2h',   src:'wa' },
-    { name:'Maria Alves',     biz:'Salão da Maria',      val:197, time:'Há 4h',   src:'ig' },
-    { name:'Roberto Silva',   biz:'Academia Power',      val:797, time:'Há 6h',   src:'google' },
-  ]},
-  { stage: 'Contato feito', leads: [
-    { name:'Fernanda Lima',   biz:'Clínica Estética',    val:397, time:'Ontem',   src:'ig' },
-    { name:'Carlos Mendes',   biz:'Barbearia Top',       val:397, time:'Há 2d',   src:'wa' },
-    { name:'Ana Rodrigues',   biz:'Pet Shop Amigo',      val:197, time:'Há 3d',   src:'wa' },
-  ]},
-  { stage: 'Demo enviado', leads: [
-    { name:'Paulo Costa',     biz:'Restaurante Belo',    val:397, time:'Há 3d',   src:'google' },
-    { name:'Sandra Oliveira', biz:'Studio de Pilates',   val:197, time:'Há 4d',   src:'ig' },
-  ]},
-  { stage: 'Proposta', leads: [
-    { name:'Marcos Souza',    biz:'Imobiliária MS',      val:797, time:'Há 5d',   src:'wa' },
-    { name:'Juliana Nunes',   biz:'Ótica Nunes',         val:397, time:'Há 6d',   src:'google' },
-  ]},
+  { stage: 'Novo Lead', leads: [] },
+  { stage: 'Contato feito', leads: [] },
+  { stage: 'Demo enviado', leads: [] },
+  { stage: 'Proposta', leads: [] },
   { stage: 'Fechado', leads: [
     { name:'Moisés Martins',  biz:'Barbearia Martins — Pacote Conteúdo/Prótese (R$800+10% ou R$1.000 fixo)', val:1000, time:'Cliente ativo', src:'wa', phone:'31982800596' },
-    { name:'Felipe Araújo',   biz:'Barbearia Araújo',    val:397, time:'Hoje',    src:'wa' },
-    { name:'Renata Borges',   biz:'Clínica Sorriso',     val:797, time:'Ontem',   src:'ig' },
   ]},
 ];
 
@@ -509,7 +493,7 @@ function renderHome() {
     { label:'Clientes fechados', val: fechados.length, delta: 'MRR ~R$'+mrr.toLocaleString('pt-BR'), cls:'up' },
     { label:'Leads em aberto',   val: abertos, delta: 'no funil agora', cls:'up' },
     { label:'Serviços ativos',   val: ativos+'/11', delta: (11-ativos)+' pendentes de config', cls: (11-ativos)>0 ? 'warn':'up' },
-    { label:'Plano mais vendido', val: 'Negócio', delta: 'R$397/mês', cls:'up' },
+    { label:'Instagram Martins', val: '499', delta: '+18% desde 10/08/2026', cls:'up' },
   ].map(function(k){
     return '<div class="kpi-card"><div class="kpi-label">'+k.label+'</div><div class="kpi-val">'+k.val+'</div><div class="kpi-delta '+k.cls+'">'+k.delta+'</div></div>';
   }).join('');
@@ -517,7 +501,7 @@ function renderHome() {
   var todos = [
     { done:false, text:'Compartilhar a planilha Google publicamente (Dashboard mostra dados reais)' },
     { done:false, text:'Criar og.png da landing page' },
-    { done:false, text:'Decidir Z-API x Evolution API antes de ativar WhatsApp Bot em massa' },
+    { done:false, text:'Montar o cenário de resposta automática no Make.com (token do Instagram já gerado)' },
   ];
   document.getElementById('home-todos').innerHTML = todos.map(function(t){
     return '<div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--border)"><span style="color:var(--yellow)">⚠️</span><span style="font-size:0.8rem;color:var(--muted)">'+t.text+'</span></div>';
