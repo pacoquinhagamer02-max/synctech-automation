@@ -438,7 +438,11 @@ function salvarTudo() {
   var configEncoded = btoa(unescape(encodeURIComponent(JSON.stringify(cfg))));
 
   var linkAgend = base + '/agendamento/#config=' + configEncoded;
-  var linkBio   = base + '/bio/#config=' + configEncoded;
+
+  // Config da Bio precisa do link de agendamento pro botão "Agendar agora" funcionar
+  var cfgBio = Object.assign({}, cfg, { agendamentoUrl: linkAgend });
+  var configEncodedBio = btoa(unescape(encodeURIComponent(JSON.stringify(cfgBio))));
+  var linkBio   = base + '/bio/#config=' + configEncodedBio;
 
   document.getElementById('final-link').textContent = linkAgend;
   document.getElementById('final-link-bio').textContent = linkBio;
