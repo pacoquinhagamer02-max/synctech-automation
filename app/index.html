@@ -229,6 +229,10 @@ h1, h2, h3, .logo { font-family: var(--font-head), sans-serif; }
 .client-compare-fill { width: 100%; border-radius: 4px 4px 0 0; background: linear-gradient(180deg, var(--primary), var(--pd)); }
 .client-compare-fill.after { background: linear-gradient(180deg, var(--pl), var(--primary)); }
 .client-compare-val { font-family: var(--font-mono); font-weight: 700; font-size: 0.85rem; }
+.client-action-item { display: flex; gap: 9px; align-items: flex-start; padding: 8px 0; border-top: 1px solid var(--border); font-size: 0.78rem; color: var(--muted); }
+.client-action-item .ai-icon { flex-shrink: 0; margin-top: 1px; }
+.client-action-item.done .ai-icon { color: var(--green); }
+.client-action-item:not(.done) .ai-icon { color: var(--yellow); }
 .client-link { padding: 7px 12px; border-radius: 8px; border: 1px solid var(--border-s); background: var(--s2); color: var(--muted); font-size: 0.72rem; font-weight: 600; text-decoration: none; transition: all 0.15s; }
 .client-link:hover { border-color: var(--primary); color: var(--pl); }
 
@@ -595,6 +599,15 @@ function renderClients() {
         { date:'02/09', likes:12,  comments:null },
       ],
       cadence: { before: 0.6, after: 3.0, beforeLabel:'19 meses anteriores (11 posts)', afterLabel:'Últimos 2 meses (6 posts)' },
+      actionPlan: [
+        { done:true,  text:'Manter ritmo de ~3 posts/mês — já provou funcionar: +18% de seguidores em 23 dias desde que o plano de conteúdo começou.' },
+        { done:true,  text:'Roteiro de 27 mensagens de WhatsApp pronto pra objeções e fechamento de prótese.' },
+        { done:false, text:'Priorizar Reels sobre prótese: o post de 26/08 (reel) teve 113 curtidas — 5x a média — contra 12–22 dos posts em foto/carrossel.' },
+        { done:false, text:'Reduzir posts em foto/carrossel estático: são o formato com pior retorno no período (12, 22 curtidas).' },
+        { done:false, text:'Ativar Google Meu Negócio — gratuito, o site já tem o schema pronto, só falta cadastrar.' },
+        { done:false, text:'Configurar o link real de "Peça avaliações" do Google (hoje é placeholder na ferramenta de avaliação).' },
+        { done:false, text:'Ligar tráfego pago R$15–20/dia, raio 60km (Mariana + Ouro Preto/Itabirito/Congonhas), homens 30–55 — ainda não iniciado.' },
+      ],
     }},
   ];
   // Nota: CRM/Avaliação/Dashboard financeiro dela ainda são arquivos locais (barbearia-martins-ferramentas/),
@@ -646,6 +659,13 @@ function renderClients() {
             '<div class="client-compare-track"><div class="client-compare-fill after" style="height:'+Math.round(cd.after/maxCad*100)+'%"></div></div>' +
             '<div class="client-compare-val">'+cd.after.toFixed(1).replace('.',',')+'/mês</div></div>' +
         '</div>';
+      }
+
+      if (s.actionPlan && s.actionPlan.length) {
+        statsHtml += '<div class="client-chart-title">Plano de ação (baseado nos dados acima)</div>' +
+          s.actionPlan.map(function(a) {
+            return '<div class="client-action-item'+(a.done?' done':'')+'"><span class="ai-icon">'+(a.done?'✓':'○')+'</span><span>'+a.text+'</span></div>';
+          }).join('');
       }
     }
     return '<div class="client-card">' +
