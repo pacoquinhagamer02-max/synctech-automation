@@ -702,13 +702,58 @@ tr:hover td { background: rgba(255,255,255,0.015); }
 
     <!-- ── INSTAGRAM ── -->
     <div class="page" id="page-instagram">
+      <!-- Status de conexão -->
+      <div class="card" style="margin-bottom:14px;border-color:rgba(245,158,11,0.3)">
+        <div style="display:flex;align-items:center;gap:14px">
+          <div style="width:44px;height:44px;border-radius:12px;background:rgba(245,158,11,0.1);display:grid;place-items:center;flex-shrink:0;color:#FBBF24">📸</div>
+          <div style="flex:1">
+            <div style="font-weight:700;font-size:0.95rem;margin-bottom:3px">Instagram Automático — Pendente de Conexão</div>
+            <div style="font-size:0.78rem;color:var(--muted)">Conecte a conta abaixo para ativar DM e comentário automáticos</div>
+          </div>
+          <span style="font-size:0.7rem;font-weight:600;background:rgba(245,158,11,0.15);color:#F59E0B;padding:4px 10px;border-radius:20px;white-space:nowrap">Configurar</span>
+        </div>
+      </div>
+
+      <!-- Guia de setup — módulo nativo do Make.com, sem ManyChat -->
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-title">Como ativar o Instagram Automático</div>
+        <div class="card-sub" style="margin-bottom:16px">Usa o Make.com que você já tem — sem pagar ferramenta extra</div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;gap:14px;align-items:flex-start">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--primary);display:grid;place-items:center;font-size:0.72rem;font-weight:800;flex-shrink:0">1</div>
+            <div>
+              <div style="font-weight:600;font-size:0.85rem;margin-bottom:3px">Conta Business vinculada a uma Página do Facebook</div>
+              <div style="font-size:0.76rem;color:var(--muted);line-height:1.6">O Instagram do cliente precisa ser conta Profissional/Business e estar vinculado a uma Página do Facebook — a Meta exige isso pra qualquer automação. Configura em <span style="color:var(--pl);font-weight:500">business.facebook.com</span> → Configurações → Contas do Instagram.</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:14px;align-items:flex-start">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--primary);display:grid;place-items:center;font-size:0.72rem;font-weight:800;flex-shrink:0">2</div>
+            <div>
+              <div style="font-weight:600;font-size:0.85rem;margin-bottom:3px">Conecte o Instagram dentro do Make.com</div>
+              <div style="font-size:0.76rem;color:var(--muted);line-height:1.6">No mesmo cenário do agendamento (ou um novo), adicione o app <strong style="color:var(--text)">Instagram for Business</strong> → Criar conexão → faça login com a conta do Facebook que administra a página vinculada.</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:14px;align-items:flex-start">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--primary);display:grid;place-items:center;font-size:0.72rem;font-weight:800;flex-shrink:0">3</div>
+            <div>
+              <div style="font-weight:600;font-size:0.85rem;margin-bottom:3px">Monte o fluxo no cenário</div>
+              <div style="font-size:0.76rem;color:var(--muted);line-height:1.6"><strong style="color:var(--text)">Watch Comments</strong> ou <strong style="color:var(--text)">Watch Instagram Messages</strong> (dispara no comentário/DM) → Filtro de palavra-chave → <strong style="color:var(--text)">Create a Message</strong> (responde automaticamente no DM). Mesma lógica do bot de WhatsApp, dentro do mesmo Make.com.</div>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);display:flex;gap:10px">
+          <a href="https://business.facebook.com" target="_blank" style="flex:1;text-align:center;padding:9px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:9px;color:var(--green);font-size:0.78rem;font-weight:600;text-decoration:none">Meta Business Suite →</a>
+          <a href="https://make.com" target="_blank" style="flex:1;text-align:center;padding:9px;background:rgba(168,85,247,0.08);border:1px solid rgba(168,85,247,0.2);border-radius:9px;color:var(--pl);font-size:0.78rem;font-weight:600;text-decoration:none">Abrir Make.com →</a>
+        </div>
+      </div>
+
       <div class="kpi-grid" style="margin-bottom:16px">
         <div class="kpi-card"><div class="kpi-label">DMs automáticos hoje</div><div class="kpi-val">34</div><div class="kpi-delta up">↑ Respondidos em &lt;1s</div></div>
         <div class="kpi-card"><div class="kpi-label">Comentários respondidos</div><div class="kpi-val">56</div><div class="kpi-delta up">↑ Última publicação</div></div>
         <div class="kpi-card"><div class="kpi-label">Leads do Instagram</div><div class="kpi-val">8</div><div class="kpi-delta up">↑ Hoje</div></div>
       </div>
       <div class="card">
-        <div class="card-title">Automações do Instagram</div>
+        <div class="card-title">Automações do Instagram <span style="font-size:0.72rem;color:var(--muted);font-weight:400">(ativadas após conexão)</span></div>
         <div class="card-sub">Configure palavras-chave e respostas automáticas</div>
         <div class="flow-list" id="fl-ig"></div>
       </div>
@@ -876,14 +921,14 @@ const botFlows = [
 const igFlows = [
   {icon:'💬',name:'Resposta automática no DM',  desc:'Responde DMs com mensagem personalizada + link de agendamento',        on:true},
   {icon:'💡',name:'Palavra-chave → DM',         desc:'Comentou "preço" ou "agendar" no post → recebe DM automático',        on:true},
-  {icon:'❤️',name:'Comentário → DM (ManyChat)', desc:'Comentou em qualquer post → DM com oferta + link de agendamento',    on:true},
+  {icon:'❤️',name:'Comentário → DM',            desc:'Comentou em qualquer post → DM com oferta + link de agendamento',    on:true},
   {icon:'👤',name:'Seguiu → Boas-vindas DM',    desc:'Novo seguidor recebe DM de boas-vindas com link de agendamento',      on:false},
   {icon:'📤',name:'Story menção → resposta',     desc:'Cliente mencionou sua conta nos Stories → resposta automática no DM', on:false},
 ];
 
 const integrations = [
-  {icon:'🟢',name:'WhatsApp Business API',  desc:'Conectado · Número ativo',              on:true},
-  {icon:'📸',name:'Instagram Business',     desc:'Conectado · @barbearia.exemplo',        on:true},
+  {icon:'🟢',name:'WhatsApp Business API',  desc:'Desconectado · configure na aba WhatsApp Bot', on:false},
+  {icon:'📸',name:'Instagram Business',     desc:'Desconectado · configure na aba Instagram Auto',on:false},
   {icon:'📅',name:'Google Calendar',        desc:'Sincronização de agenda em tempo real', on:true},
   {icon:'⭐',name:'Google Meu Negócio',     desc:'Desconectado · clique para conectar',   on:false},
   {icon:'💳',name:'Mercado Pago (PIX)',     desc:'Desconectado · aceitar pagamentos online',on:false},
@@ -1259,10 +1304,10 @@ function carregarConfig() {
     }
     // Atualiza sidebar com o nome salvo
     atualizarSidebar(saved.bizName);
-    // Atualiza integrations instagram handle
+    // Mostra o handle salvo, mas não assume que a integração real está conectada
     if (saved.instagram) {
       var igInteg = integrations.find(function(i){ return i.name === 'Instagram Business'; });
-      if (igInteg) igInteg.desc = 'Conectado · ' + saved.instagram;
+      if (igInteg && !igInteg.on) igInteg.desc = 'Desconectado · ' + saved.instagram + ' — configure na aba Instagram Auto';
     }
     atualizarChecklist(saved);
   } catch(e){ atualizarSidebar(''); }
