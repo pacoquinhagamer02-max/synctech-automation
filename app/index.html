@@ -555,11 +555,12 @@ function renderClients() {
   var fixed = [
     { name:'Barbearia Martins', plan:'Pacote Conteúdo/Prótese', links:[
       { label:'Site', url:'https://synctech-automation.github.io/barbearia-martins-site/' },
-      { label:'CRM',  url:'../../barbearia-martins-ferramentas/crm.html' },
-      { label:'Avaliações', url:'../../barbearia-martins-ferramentas/avaliacao.html' },
-      { label:'Dashboard financeiro', url:'../../barbearia-martins-ferramentas/dashboard.html' },
+      { label:'WhatsApp', url:'https://wa.me/5531982800596' },
+      { label:'Instagram', url:'https://instagram.com/barbeariamartins.0' },
     ]},
   ];
+  // Nota: CRM/Avaliação/Dashboard financeiro dela ainda são arquivos locais (barbearia-martins-ferramentas/),
+  // sem site publicado — não linkar aqui até estarem hospedados, senão quebra no celular.
   var all = fixed.concat(stored.map(function(c){
     return { name:c.bizName, plan:c.plan, links:[
       { label:'Agendamento', url:c.agendLink },
