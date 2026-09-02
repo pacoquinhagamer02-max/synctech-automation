@@ -954,6 +954,7 @@ const pipelineData = [
     { name:'Juliana Nunes',   biz:'Ótica Nunes',         val:397, time:'Há 6d',   src:'google' },
   ]},
   { stage: 'Fechado', color: 'var(--green)', leads: [
+    { name:'Moisés Martins',  biz:'Barbearia Martins — Pacote Conteúdo/Prótese (R$800+10% ou R$1.000 fixo)', val:1000, time:'Cliente ativo', src:'wa', phone:'31982800596' },
     { name:'Felipe Araújo',   biz:'Barbearia Araújo',    val:397, time:'Hoje',    src:'wa' },
     { name:'Renata Borges',   biz:'Clínica Sorriso',     val:797, time:'Ontem',   src:'ig' },
   ]},
@@ -1179,13 +1180,14 @@ function renderPipeline() {
       var srcLabel = l.src==='wa' ? 'WhatsApp' : l.src==='ig' ? 'Instagram' : 'Google';
       var nextStage = pipelineData[colIdx+1] ? pipelineData[colIdx+1].stage : null;
       var wppMsg = encodeURIComponent('Olá, '+l.name+'! Aqui é da SyncTech Automation. Quero apresentar como a automação pode ajudar '+l.biz+'. Tem 5 minutos?');
+      var wppNum = l.phone ? '55'+l.phone.replace(/\D/g,'') : '55';
       return '<div class="lead-card">' +
         '<div class="lc-name">' + l.name + '</div>' +
         '<div class="lc-biz">' + l.biz + '</div>' +
         '<div class="lc-row"><span class="lc-val">R$' + l.val + '/mês</span><span class="lc-source '+srcCls+'">'+srcLabel+'</span></div>' +
         '<div class="lc-time">' + l.time + '</div>' +
         '<div style="display:flex;gap:6px;margin-top:10px">' +
-          '<a href="https://wa.me/55?text='+wppMsg+'" target="_blank" style="flex:1;background:rgba(37,211,102,0.12);border:1px solid rgba(37,211,102,0.25);color:#25D366;border-radius:7px;padding:6px;font-size:0.68rem;font-weight:700;text-align:center;text-decoration:none">💬 WhatsApp</a>' +
+          '<a href="https://wa.me/'+wppNum+'?text='+wppMsg+'" target="_blank" style="flex:1;background:rgba(37,211,102,0.12);border:1px solid rgba(37,211,102,0.25);color:#25D366;border-radius:7px;padding:6px;font-size:0.68rem;font-weight:700;text-align:center;text-decoration:none">💬 WhatsApp</a>' +
           (nextStage ? '<button onclick="moveLead('+colIdx+','+li+')" style="flex:1;background:rgba(168,85,247,0.1);border:1px solid rgba(168,85,247,0.2);color:var(--pl);border-radius:7px;padding:6px;font-size:0.68rem;font-weight:700;cursor:pointer;font-family:inherit">→ '+nextStage+'</button>' : '<span style="flex:1;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.2);color:var(--green);border-radius:7px;padding:6px;font-size:0.68rem;font-weight:700;text-align:center">✓ Fechado</span>') +
         '</div>' +
       '</div>';
