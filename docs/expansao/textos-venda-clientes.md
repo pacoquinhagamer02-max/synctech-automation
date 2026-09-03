@@ -15,7 +15,39 @@ WhatsApp e Instagram. Posso te mostrar como funcionaria pro seu negócio? Leva
 5 minutos.
 ```
 
-## 2. Texto completo — planos, avulsos e apps sob medida
+## 2. Texto curto — planos + avulso, direto ao ponto
+
+Versão enxuta (pedida pelo Rafael 03/09/2026: "mais curto e objetivo", foco em
+"vamos automatizar o negócio da pessoa"). Pra mandar quando o prospect já
+demonstrou interesse mas você quer ir direto ao preço, sem o passo a passo
+de cada ferramenta.
+
+```
+*SyncTech Automation* 🤖
+
+Vamos automatizar o atendimento do seu negócio — WhatsApp, agendamento e
+Instagram funcionando sozinhos, 24h.
+
+📊 Uma barbearia aqui em Mariana cresceu *18% em agendamentos em 30 dias*
+com isso, sem gastar mais com anúncio.
+
+*🔹 Starter — R$197/mês*
+WhatsApp Bot + Agendamento Online + Link na Bio
+
+*🔸 Negócio — R$397/mês* ⭐ mais popular
+Tudo do Starter + IA no WhatsApp + Instagram Automático + CRM
+
+*🔺 Pro — R$797/mês*
+Tudo do Negócio + Reputação Google + Email Marketing + suporte todo dia
+
+Não precisa de plano fechado — dá pra contratar *só o que falta* no seu
+negócio hoje, avulso.
+
+*Bora começar?* Me chama e em 5 minutos eu já te digo o que encaixa melhor
+no seu negócio. Sem compromisso.
+```
+
+## 3. Texto completo — planos, avulsos e apps sob medida
 
 Pra mandar quando o prospect já demonstrou interesse e quer entender preço/opções.
 
