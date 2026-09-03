@@ -47,7 +47,83 @@ negócio hoje, avulso.
 no seu negócio. Sem compromisso.
 ```
 
-## 3. Texto completo — planos, avulsos e apps sob medida
+## 3. Texto médio — planos e ferramentas explicados, só os avulsos de mais procura
+
+Pedido do Rafael 03/09/2026: mais detalhado que a versão curta, mas sem listar
+os 11 serviços avulsos — só os 4 que resolvem a dor mais comum de quem procura
+(atendimento lento, sem agenda online, sem presença no Instagram, sem cuidar
+da avaliação no Google). Cada plano e cada avulso vem com o que ele *resolve*,
+não só o nome da funcionalidade.
+
+```
+*SyncTech Automation* 🤖
+_Automação completa pro seu negócio local_
+
+Você já perdeu cliente por demorar a responder o WhatsApp? Ou por só
+conseguir marcar horário por ligação, em vez de deixar a pessoa agendar
+sozinha? Isso é dinheiro escapando todo mês, mesmo sem perceber.
+
+📊 *Case real:* uma barbearia aqui em Mariana cresceu *18% em seguidores e
+agendamentos em 30 dias*, sem gastar mais com anúncio — só automação bem
+feita.
+
+━━━━━━━━━━━━━━━
+*OS 3 PLANOS — O QUE CADA UM MUDA NO SEU NEGÓCIO*
+━━━━━━━━━━━━━━━
+
+*🔹 STARTER — R$197/mês + R$299 setup*
+_O primeiro passo pra parar de perder cliente por demora_
+WhatsApp responde o básico sozinho, cliente marca horário online sem
+precisar ligar, e você ganha uma página profissional pra colocar na bio do
+Instagram. Resolve o atendimento mais urgente sem virar uma reforma grande
+no seu dia a dia.
+
+*🔸 NEGÓCIO — R$397/mês + R$499 setup* ⭐ mais popular
+_Atendimento e venda automáticos, não só organização_
+Além de tudo do Starter: IA de verdade no WhatsApp (não são só respostas
+prontas), Instagram vira canal de venda (comentário e DM respondem
+sozinhos), e um painel mostra cada cliente em potencial até fechar negócio.
+É pra quem quer crescer o número de clientes, não só organizar os que já
+tem.
+
+*🔺 PRO — R$797/mês + R$799 setup*
+_Automação ponta a ponta, sem nada passando batido_
+Tudo do Negócio, mais: sua reputação no Google protegida (só entra
+avaliação boa, insatisfeito fala com você antes), email pra ex-cliente
+voltar a comprar, chat ao vivo no site, e reunião comigo todo mês revisando
+o resultado. Pra quem já cresceu e quer parar de deixar coisa na mão.
+
+━━━━━━━━━━━━━━━
+*NÃO PRECISA DE PLANO FECHADO — OS 4 SERVIÇOS AVULSOS MAIS PROCURADOS*
+━━━━━━━━━━━━━━━
+
+💬 *WhatsApp Bot 24/7 — R$147/mês*
+Responde, agenda e tira dúvida sozinho, até de madrugada. Resolve quem some
+do WhatsApp só porque demorou a te responder.
+
+📅 *Agendamento Online — R$97/mês*
+Cliente escolhe dia e horário sozinho, 24h, sem trocar 10 mensagens
+perguntando "qual horário você tem". Funciona até de madrugada.
+
+📸 *Instagram Automático — R$127/mês*
+Comentário ou DM no Instagram já vira resposta automática direcionando pro
+WhatsApp. Curtida virando conversa de venda sozinha.
+
+⭐ *Gestão de Reputação (Google) — R$97/mês*
+Cliente satisfeito é direcionado pra avaliar no Google; insatisfeito manda
+feedback só pra você, antes de virar reclamação pública. Protege sua nota.
+
+_(+ configuração inicial de cada serviço, valor conforme a complexidade —
+tem mais serviços avulsos além desses 4, é só perguntar)_
+
+━━━━━━━━━━━━━━━
+
+*Bora automatizar seu atendimento?* Me conta como funciona seu dia a dia
+hoje (WhatsApp, agenda, Instagram) que eu já te digo na hora qual opção —
+plano ou avulso — encaixa melhor no seu negócio. 5 minutos, sem compromisso.
+```
+
+## 4. Texto completo — planos, avulsos e apps sob medida
 
 Pra mandar quando o prospect já demonstrou interesse e quer entender preço/opções.
 
