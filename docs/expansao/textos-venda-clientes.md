@@ -50,10 +50,10 @@ no seu negócio. Sem compromisso.
 ## 3. Texto médio — planos e ferramentas explicados, só os avulsos de mais procura
 
 Pedido do Rafael 03/09/2026: mais detalhado que a versão curta, mas sem listar
-os 11 serviços avulsos — só os 4 que resolvem a dor mais comum de quem procura
+os 11 serviços avulsos — só os 5 que resolvem a dor mais comum de quem procura
 (atendimento lento, sem agenda online, sem presença no Instagram, sem cuidar
-da avaliação no Google). Cada plano e cada avulso vem com o que ele *resolve*,
-não só o nome da funcionalidade.
+da avaliação no Google, sem aparecer pra gente nova na região). Cada plano e
+cada avulso vem com o que ele *resolve*, não só o nome da funcionalidade.
 
 ```
 *SyncTech Automation* 🤖
@@ -94,7 +94,7 @@ voltar a comprar, chat ao vivo no site, e reunião comigo todo mês revisando
 o resultado. Pra quem já cresceu e quer parar de deixar coisa na mão.
 
 ━━━━━━━━━━━━━━━
-*NÃO PRECISA DE PLANO FECHADO — OS 4 SERVIÇOS AVULSOS MAIS PROCURADOS*
+*NÃO PRECISA DE PLANO FECHADO — OS 5 SERVIÇOS AVULSOS MAIS PROCURADOS*
 ━━━━━━━━━━━━━━━
 
 💬 *WhatsApp Bot 24/7 — R$147/mês*
@@ -113,8 +113,13 @@ WhatsApp. Curtida virando conversa de venda sozinha.
 Cliente satisfeito é direcionado pra avaliar no Google; insatisfeito manda
 feedback só pra você, antes de virar reclamação pública. Protege sua nota.
 
+📈 *Tráfego Pago (Meta Ads) — R$297 setup + R$397/mês*
+Coloca seu negócio na frente de gente na sua região que ainda não te
+conhece — campanha criada e otimizada por profissional, você só paga a
+verba direto pra Meta, separada da gestão.
+
 _(+ configuração inicial de cada serviço, valor conforme a complexidade —
-tem mais serviços avulsos além desses 4, é só perguntar)_
+tem mais serviços avulsos além desses 5, é só perguntar)_
 
 ━━━━━━━━━━━━━━━
 
