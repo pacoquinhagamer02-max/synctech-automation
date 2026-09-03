@@ -657,7 +657,7 @@ var pipelineData = [
   { stage: 'Demo enviado', leads: [] },
   { stage: 'Proposta', leads: [] },
   { stage: 'Fechado', leads: [
-    { name:'Moisés Martins',  biz:'Barbearia Martins — R$1.200 fixo + R$397 tráfego pago + 10% (R$160) por prótese fechada via WhatsApp/Instagram', val:1597, time:'Cliente ativo', src:'wa', phone:'31982800596' },
+    { name:'Moisés Martins',  biz:'Barbearia Martins — R$1.200 fixo + 10% (R$160) por prótese fechada via WhatsApp/Instagram', val:1200, time:'Cliente ativo', src:'wa', phone:'31982800596' },
   ]},
 ];
 
@@ -925,7 +925,7 @@ function renderServicesGrid() {
 
 // ═══════════════ DADOS: CLIENTES ═══════════════
 var CLIENTS_FIXED = [
-    { name:'Barbearia Martins', plan:'R$1.200/mês fixo + R$397/mês tráfego pago + R$160 por prótese (10% de R$1.600) fechada via WA/Instagram', links:[
+    { name:'Barbearia Martins', plan:'R$1.200/mês fixo + R$160 por prótese (10% de R$1.600) fechada via WA/Instagram', links:[
       { label:'Site', url:'https://synctech-automation.github.io/barbearia-martins-site/' },
       { label:'WhatsApp', url:'https://wa.me/5531982800596' },
       { label:'Instagram', url:'https://instagram.com/barbeariamartins.0' },
@@ -950,7 +950,7 @@ var CLIENTS_FIXED = [
         { date:'02/09', likes:12,  comments:null },
       ],
       cadence: { before: 0.6, after: 3.0, beforeLabel:'19 meses anteriores (11 posts)', afterLabel:'Últimos 2 meses (6 posts)' },
-      goal: { label:'Meta: próteses fechadas via WhatsApp/Instagram', target:10, closed:3, commissionPerUnit:160, fixedMonthly:1597 },
+      goal: { label:'Meta: próteses fechadas via WhatsApp/Instagram', target:10, closed:3, commissionPerUnit:160, fixedMonthly:1200 },
       // Mapeamento real dos 11 módulos do hub — quais fazem sentido pro porte/perfil da Martins (não é genérico).
       servicesUsed: {
         active: [
