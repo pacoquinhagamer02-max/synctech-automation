@@ -1,6 +1,8 @@
 # Vendas & Prospecção — SyncTech Automation
 
 > Ferramenta de prospecção automatizada (Apollo) requer autorização sua em Configurações de Conectores — não consigo ativar sozinho. Enquanto isso, aqui está um kit pra prospectar manualmente.
+>
+> Textos prontos pra copiar e enviar (CTA, planos+preços, explicação das ferramentas) ficam em [textos-venda-clientes.md](textos-venda-clientes.md) — este arquivo aqui é o processo/script, aquele é o conteúdo final.
 
 ## Perfil de Cliente Ideal (ICP)
 
