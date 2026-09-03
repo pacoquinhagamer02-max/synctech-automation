@@ -739,14 +739,18 @@ function renderHome() {
   var abertos = pipelineData.filter(function(c){ return c.stage!=='Fechado'; }).reduce(function(s,c){ return s+c.leads.length; }, 0);
   var mrr = fechados.reduce(function(s,l){ return s+l.val; }, 0);
   var ativos = SERVICES.filter(function(s){ return s.status==='ok'; }).length;
-  var martinsGoal = CLIENTS_FIXED[0] && CLIENTS_FIXED[0].stats ? CLIENTS_FIXED[0].stats.goal : null;
+  var martinsStats = CLIENTS_FIXED[0] && CLIENTS_FIXED[0].stats ? CLIENTS_FIXED[0].stats : null;
+  var martinsGoal = martinsStats ? martinsStats.goal : null;
 
   var kpis = [
     { label:'Clientes fechados', val: fechados.length, delta: 'MRR ~R$'+mrr.toLocaleString('pt-BR'), cls:'up' },
     { label:'Leads em aberto',   val: abertos, delta: 'no funil agora', cls:'up' },
     { label:'Serviços ativos',   val: ativos+'/11', delta: (11-ativos)+' pendentes de config', cls: (11-ativos)>0 ? 'warn':'up' },
-    { label:'Instagram Martins', val: '499', delta: '+18% desde 10/08/2026', cls:'up' },
   ];
+  if (martinsStats) {
+    var igGrowthPct = Math.round((martinsStats.followers - martinsStats.followersPrev) / martinsStats.followersPrev * 100);
+    kpis.push({ label:'Instagram Martins', val: String(martinsStats.followers), delta: '+'+igGrowthPct+'% desde '+martinsStats.followersPrevDate, cls:'up' });
+  }
   if (martinsGoal) {
     var ganho = martinsGoal.closed * martinsGoal.commissionPerUnit;
     var faturadoMartins = (martinsGoal.fixedMonthly||0) + ganho;
@@ -926,11 +930,11 @@ var CLIENTS_FIXED = [
       { label:'WhatsApp', url:'https://wa.me/5531982800596' },
       { label:'Instagram', url:'https://instagram.com/barbeariamartins.0' },
     ],
-    // Dados reais coletados manualmente no Instagram em 02/09/2026 — não é live, é uma foto do momento.
+    // Dados reais coletados manualmente no Instagram em 03/09/2026 — não é live, é uma foto do momento.
     // Posts contam só o feed principal (@barbeariamartins.0), incluindo os 2 reels em colaboração com @moisesbarber_.
     stats: {
-      collectedAt: '02/09/2026',
-      followers: 499,
+      collectedAt: '03/09/2026',
+      followers: 502,
       followersPrev: 424,
       followersPrevDate: '10/08/2026',
       posts60d: 6,
@@ -962,6 +966,7 @@ var CLIENTS_FIXED = [
         notUsed: 'Agendamento Online e Link na Bio (usa CashBarber + site próprio) · WhatsApp Bot 24/7 (Rafael atende pessoalmente, por opção) · Catálogo Digital, Chat ao Vivo e Email Marketing (baixa relevância pro porte do negócio)',
       },
       actionPlan: [
+        { done:true,  text:'Site com Reels do Instagram embutidos ("Vídeos recentes") e as 3 fotos de prótese agora linkam pro vídeo de origem no Instagram — publicado em 03/09/2026.' },
         { done:true,  text:'Manter ritmo de ~3 posts/mês — já provou funcionar: +18% de seguidores em 23 dias desde que o plano de conteúdo começou.' },
         { done:true,  text:'Roteiro de 27 mensagens de WhatsApp pronto pra objeções e fechamento de prótese.' },
         { done:false, text:'Priorizar Reels sobre prótese: o post de 26/08 (reel) teve 113 curtidas — 5x a média — contra 12–22 dos posts em foto/carrossel.' },
