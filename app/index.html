@@ -802,7 +802,7 @@ function syncPipelineFromCloud(callback) {
     .then(function(r){ return r.json(); })
     .then(function(cloudLeads){
       var normalized = (cloudLeads||[]).map(function(l){ return {
-        id: l.id, name: l.name, biz: l.biz, phone: l.phone, city: l.city,
+        id: String(l.id), name: l.name, biz: l.biz, phone: String(l.phone||''), city: l.city,
         src: l.src, val: parseInt(l.val,10)||0, stage: l.stage, time: l.time,
       }; });
       saveStoredLeads(normalized);
