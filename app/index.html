@@ -857,7 +857,8 @@ function renderPipeline() {
     var cards = colLeads.map(function(l, li) {
       var srcCls = l.src==='wa' ? 'lc-wa' : l.src==='ig' ? 'lc-ig' : 'lc-google';
       var srcLabel = l.src==='wa' ? 'WhatsApp' : l.src==='ig' ? 'Instagram' : 'Google';
-      var wppMsg = encodeURIComponent('Olá, '+l.name+'! Aqui é da SyncTech Automation. Quero apresentar como a automação pode ajudar '+l.biz+'. Tem 5 minutos?');
+      var cidadeTxt = l.city ? ' aqui em '+l.city : '';
+      var wppMsg = encodeURIComponent('Oi! Vi o '+l.name+cidadeTxt+'. Ajudei uma barbearia em Mariana a crescer 18% em agendamentos sem gastar mais com anúncio — usando automação de WhatsApp e Instagram. Posso te mostrar como funcionaria pro seu negócio? Leva 5 minutos.');
       var wppNum = l.phone ? '55'+l.phone.replace(/\D/g,'') : '55';
       var isStored = !!l.id;
       var nextStage = isStored ? STAGE_ORDER[STAGE_ORDER.indexOf(l.stage)+1] : null;
