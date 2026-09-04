@@ -6,82 +6,147 @@
 <meta name="robots" content="noindex, nofollow">
 <title>Cardápio — Padaria Cantinho do Pão</title>
 <meta name="theme-color" content="#1C1712">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Cardápio — Padaria Cantinho do Pão">
+<meta property="og:description" content="Monte seu pedido e finalize direto no WhatsApp. Salgados, pães, bolos e bebidas fresquinhos.">
+<meta property="og:image" content="https://pacoquinhagamer02-max.github.io/synctech-automation/padaria-cantinho-do-pao/assets/hero.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --bg:#FAF3E3; --surface:#FFFFFF; --surface2:#F1E3C4;
   --line:rgba(28,23,18,0.12); --line-strong:rgba(28,23,18,0.22);
-  --accent:#A97D1C; --accent-d:#7D5C12; --ink:#1C1712; --gold-l:#E3C168;
+  --accent:#A97D1C; --accent-d:#7D5C12; --accent-l:#D4AF4E;
+  --ink:#1C1712; --ink2:#2B2115;
   --text:#2A2117; --muted:#7A6B54; --faint:#A79879;
+  --green:#3F7D4A;
   --disp:'Fraunces',serif;
+  --r-sm:8px; --r:14px; --r-lg:20px;
 }
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.5;padding-bottom:90px}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.5;padding-bottom:94px;-webkit-font-smoothing:antialiased}
 h1,h2,h3{font-family:var(--disp)}
 a{color:inherit;text-decoration:none}
-.wrap{max-width:520px;margin:0 auto;padding:0 18px}
+.wrap{max-width:540px;margin:0 auto;padding:0 18px}
 img{max-width:100%;display:block}
+::selection{background:var(--accent);color:#fff}
 
-header.top{background:linear-gradient(165deg,#100D0A,var(--ink) 60%,#2B2115);color:#fff;padding:26px 0 34px;border-radius:0 0 22px 22px;border-bottom:2px solid var(--accent)}
-.logo-img{width:34px;height:34px;border-radius:50%;display:block}
-.brand-row{display:flex;align-items:center;gap:8px}
-.top-row{display:flex;align-items:center;justify-content:space-between}
-.badge{font-family:'Inter',sans-serif;font-size:0.7rem;letter-spacing:0.06em;text-transform:uppercase;background:rgba(255,255,255,0.18);padding:5px 12px;border-radius:100px}
-.top h1{font-size:1.5rem;margin-top:14px;font-weight:700}
-.top p{font-size:0.86rem;opacity:0.9;margin-top:6px}
-.top-info{display:flex;gap:16px;margin-top:16px;font-size:0.74rem;opacity:0.92;flex-wrap:wrap}
+/* ── HERO ── */
+.hero{position:relative;min-height:280px;display:flex;align-items:flex-end;overflow:hidden}
+.hero-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 35%}
+.hero::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(16,13,10,0.35) 0%,rgba(16,13,10,0.55) 45%,var(--ink) 96%)}
+.hero-content{position:relative;z-index:2;padding:20px 18px 22px;width:100%;max-width:540px;margin:0 auto;color:#fff}
+.hero-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:auto}
+.brand-pill{display:flex;align-items:center;gap:8px;background:rgba(16,13,10,0.55);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,0.16);padding:5px 14px 5px 5px;border-radius:100px}
+.brand-pill img{width:30px;height:30px;border-radius:50%}
+.brand-pill span{font-size:0.76rem;font-weight:700;letter-spacing:0.02em}
+.status-pill{font-size:0.68rem;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;background:rgba(63,125,74,0.9);padding:5px 12px;border-radius:100px;display:flex;align-items:center;gap:5px}
+.status-pill.closed{background:rgba(120,60,50,0.85)}
+.status-pill .dot{width:6px;height:6px;border-radius:50%;background:#fff}
+.hero h1{font-size:clamp(1.6rem,7vw,2.1rem);font-weight:700;line-height:1.08;margin-top:36px;text-wrap:balance}
+.hero p{font-size:0.86rem;opacity:0.86;margin-top:8px;max-width:380px}
+.hero-facts{display:flex;gap:14px;margin-top:16px;flex-wrap:wrap;font-size:0.74rem;opacity:0.92}
+.hero-facts span{display:flex;align-items:center;gap:5px}
 
-.cat-nav{display:flex;gap:8px;overflow-x:auto;padding:16px 18px;position:sticky;top:0;background:var(--bg);z-index:20;border-bottom:1px solid var(--line)}
-.cat-btn{flex-shrink:0;font-size:0.8rem;font-weight:600;padding:8px 16px;border-radius:100px;background:var(--surface);border:1px solid var(--line-strong);color:var(--muted);white-space:nowrap}
-.cat-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+/* ── PROVA SOCIAL ── */
+.proof{background:var(--ink);padding:16px 0 20px}
+.proof-scroll{display:flex;gap:10px;overflow-x:auto;padding:0 18px;scrollbar-width:none}
+.proof-scroll::-webkit-scrollbar{display:none}
+.proof-card{flex-shrink:0;width:230px;background:var(--ink2);border:1px solid rgba(212,175,78,0.18);border-radius:var(--r-sm);padding:14px}
+.proof-card p{color:#F0E6CC;font-size:0.8rem;font-style:italic;line-height:1.4}
+.proof-card span{display:block;margin-top:8px;color:var(--accent-l);font-size:0.7rem;font-weight:600}
+
+/* ── NAV ── */
+.cat-nav{display:flex;gap:8px;overflow-x:auto;padding:14px 18px;position:sticky;top:0;background:var(--bg);z-index:20;border-bottom:1px solid var(--line);scrollbar-width:none}
+.cat-nav::-webkit-scrollbar{display:none}
+.cat-btn{flex-shrink:0;font-size:0.8rem;font-weight:600;padding:9px 16px;border-radius:100px;background:var(--surface);border:1px solid var(--line-strong);color:var(--muted);white-space:nowrap;transition:transform .12s ease,background .15s ease,color .15s ease}
+.cat-btn.active{background:var(--ink);color:var(--accent-l);border-color:var(--ink)}
+.cat-btn:active{transform:scale(.95)}
 
 main{padding-top:6px}
-.cat-section{padding:22px 0 6px}
+.cat-section{padding:24px 0 6px}
 .cat-title{display:flex;align-items:baseline;gap:8px;margin-bottom:4px}
-.cat-title h2{font-size:1.2rem}
-.cat-highlight{font-size:0.68rem;font-family:'Inter',sans-serif;font-weight:700;color:var(--accent-d);background:rgba(169,125,28,0.12);padding:3px 9px;border-radius:100px;letter-spacing:0.03em;text-transform:uppercase}
-.cat-note{font-size:0.8rem;color:var(--muted);margin-bottom:14px}
+.cat-title h2{font-size:1.3rem}
+.cat-highlight{font-size:0.66rem;font-family:'Inter',sans-serif;font-weight:700;color:var(--accent-d);background:rgba(169,125,28,0.12);padding:3px 9px;border-radius:100px;letter-spacing:0.03em;text-transform:uppercase}
+.cat-note{font-size:0.82rem;color:var(--muted);margin-bottom:16px}
 
-.item{display:flex;gap:14px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px}
-.item-ph{flex-shrink:0;width:58px;height:58px;border-radius:9px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:1.5rem}
+/* ── ITENS ── */
+.item{display:flex;gap:14px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px;margin-bottom:10px;opacity:0;transform:translateY(16px);transition:opacity .5s cubic-bezier(.16,.8,.3,1),transform .5s cubic-bezier(.16,.8,.3,1),border-color .15s ease,box-shadow .15s ease}
+.item.in{opacity:1;transform:translateY(0)}
+.item.just-added{border-color:var(--accent);box-shadow:0 0 0 3px rgba(169,125,28,0.15)}
+.item-ph{flex-shrink:0;width:60px;height:60px;border-radius:12px;background:linear-gradient(150deg,var(--surface2),#E8D6A8);display:flex;align-items:center;justify-content:center;font-size:1.6rem;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(28,23,18,0.06)}
+.item-ph img{width:100%;height:100%;object-fit:cover}
 .item-info{flex:1;min-width:0}
-.item-info h3{font-size:0.94rem;font-weight:600;font-family:'Inter',sans-serif}
+.item-info h3{font-size:0.95rem;font-weight:600;font-family:'Inter',sans-serif}
 .item-info p{font-size:0.76rem;color:var(--muted);margin-top:2px}
-.item-price{font-family:var(--disp);font-weight:700;font-size:0.95rem;margin-top:5px;color:var(--accent-d)}
-.item-add{flex-shrink:0;display:flex;align-items:center;gap:10px}
-.qty-btn{width:30px;height:30px;border-radius:8px;border:1px solid var(--line-strong);background:var(--surface);font-size:1.1rem;font-weight:700;color:var(--accent);display:flex;align-items:center;justify-content:center}
-.qty-btn:active{background:var(--surface2)}
-.qty-val{min-width:16px;text-align:center;font-weight:700;font-size:0.9rem}
+.item-price{font-family:var(--disp);font-weight:700;font-size:0.96rem;margin-top:5px;color:var(--accent-d)}
+.item-add{flex-shrink:0;display:flex;align-items:center;gap:9px}
+.qty-btn{width:31px;height:31px;border-radius:9px;border:1px solid var(--line-strong);background:var(--surface);font-size:1.15rem;font-weight:700;color:var(--accent-d);display:flex;align-items:center;justify-content:center;transition:transform .1s ease,background .1s ease}
+.qty-btn:active{transform:scale(.88);background:var(--surface2)}
+.qty-val{min-width:16px;text-align:center;font-weight:700;font-size:0.92rem;font-variant-numeric:tabular-nums}
 
-.cart-bar{position:fixed;left:0;right:0;bottom:0;background:var(--ink);color:#fff;padding:14px 18px;display:none;align-items:center;justify-content:space-between;z-index:30;box-shadow:0 -8px 24px rgba(0,0,0,0.25);border-top:2px solid var(--accent)}
-.cart-bar.show{display:flex}
-.cart-bar .info{font-size:0.82rem}
-.cart-bar .info b{display:block;font-family:var(--disp);font-size:1.05rem}
-.cart-bar .btn{background:var(--accent);color:#fff;font-weight:700;font-size:0.86rem;padding:11px 20px;border-radius:100px;border:none;display:flex;align-items:center;gap:6px}
+/* ── CARRINHO ── */
+.cart-bar{position:fixed;left:0;right:0;bottom:0;background:var(--ink);color:#fff;padding:14px 18px;z-index:30;box-shadow:0 -8px 28px rgba(0,0,0,0.28);border-top:2px solid var(--accent);transform:translateY(110%);transition:transform .3s cubic-bezier(.16,.8,.3,1)}
+.cart-bar.show{transform:translateY(0)}
+.cart-bar-row{max-width:540px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:14px}
+.cart-bar .info{font-size:0.8rem;opacity:0.85}
+.cart-bar .info b{display:block;font-family:var(--disp);font-size:1.1rem;color:var(--accent-l);opacity:1}
+.cart-bar .btn{background:var(--accent);color:#1C1712;font-weight:700;font-size:0.86rem;padding:12px 20px;border-radius:100px;border:none;display:flex;align-items:center;gap:6px;flex-shrink:0;transition:transform .1s ease}
+.cart-bar .btn:active{transform:scale(.95)}
 
-footer{text-align:center;padding:34px 18px 10px;font-size:0.72rem;color:var(--faint)}
+/* ── CHECKOUT MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(16,13,10,0.62);z-index:40;display:none;align-items:flex-end;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal{background:var(--bg);width:100%;max-width:540px;border-radius:20px 20px 0 0;padding:22px 20px 26px;max-height:88vh;overflow-y:auto}
+.modal-handle{width:40px;height:4px;background:var(--line-strong);border-radius:4px;margin:0 auto 16px}
+.modal h2{font-size:1.2rem;margin-bottom:14px}
+.modal-summary{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);padding:12px 14px;margin-bottom:16px;max-height:140px;overflow-y:auto}
+.modal-summary .row{display:flex;justify-content:space-between;font-size:0.83rem;padding:4px 0;color:var(--muted)}
+.modal-summary .row b{color:var(--text);font-weight:600}
+.modal-total{display:flex;justify-content:space-between;border-top:1px solid var(--line);margin-top:8px;padding-top:8px;font-weight:700;font-family:var(--disp);font-size:1.05rem;color:var(--accent-d)}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:0.8rem;font-weight:600;margin-bottom:6px}
+.field input{width:100%;padding:12px 14px;border-radius:var(--r-sm);border:1px solid var(--line-strong);background:var(--surface);font-family:'Inter',sans-serif;font-size:0.92rem;color:var(--text)}
+.field input:focus{outline:2px solid var(--accent);outline-offset:1px}
+.opt-group{display:flex;gap:10px}
+.opt{flex:1;border:1px solid var(--line-strong);border-radius:var(--r-sm);padding:12px;text-align:center;font-size:0.84rem;font-weight:600;color:var(--muted);cursor:pointer;transition:.12s}
+.opt.sel{border-color:var(--accent);background:rgba(169,125,28,0.1);color:var(--accent-d)}
+.modal-send{width:100%;background:var(--ink);color:var(--accent-l);font-weight:700;font-size:0.94rem;padding:15px;border-radius:100px;border:none;margin-top:6px;display:flex;align-items:center;justify-content:center;gap:8px}
+.modal-send:active{transform:scale(.98)}
+.modal-close{position:absolute;top:18px;right:18px;width:30px;height:30px;border-radius:50%;background:var(--surface2);border:none;font-size:1rem;color:var(--text)}
+
+footer{text-align:center;padding:30px 18px 10px;font-size:0.72rem;color:var(--faint)}
+
+@media(prefers-reduced-motion:reduce){.item{opacity:1;transform:none;transition:none}.cart-bar{transition:none}}
 </style>
 </head>
 <body>
 
-<header class="top">
-  <div class="wrap">
-    <div class="top-row">
-      <div class="badge brand-row"><img class="logo-img" src="assets/logo.jpg" alt="Cantinho do Pão"> Cantinho do Pão</div>
-      <div class="badge" id="status-badge">Aberto agora</div>
+<header class="hero">
+  <img class="hero-img" src="assets/hero.jpg" alt="Pão fresquinho da Padaria Cantinho do Pão">
+  <div class="hero-content">
+    <div class="hero-top">
+      <div class="brand-pill"><img src="assets/logo.jpg" alt="Cantinho do Pão"><span>Cantinho do Pão</span></div>
+      <div class="status-pill" id="status-badge"><span class="dot"></span>Aberto agora</div>
     </div>
     <h1>Monte seu pedido</h1>
-    <p>Escolha os itens, finalize e o pedido cai certinho no nosso WhatsApp.</p>
-    <div class="top-info">
-      <span>📍 R. do Catete, 500 — Mariana/MG</span>
+    <p>Escolha os itens e finalize direto no nosso WhatsApp — sem enrolação.</p>
+    <div class="hero-facts">
+      <span>📍 R. do Catete, 500</span>
       <span>⭐ 4,5 · 74 avaliações</span>
-    </div>
-    <div class="top-info" style="margin-top:6px">
-      <span>🛵 Delivery às quintas, 8h-16h · consulte a taxa do seu bairro</span>
+      <span>🛵 Delivery às quintas, 8h-16h</span>
     </div>
   </div>
 </header>
+
+<div class="proof">
+  <div class="proof-scroll">
+    <div class="proof-card"><p>"Salgados de extrema qualidade e variedade e atendentes maravilhosos."</p><span>— Felippe S., Google</span></div>
+    <div class="proof-card"><p>"Produtos novinhos, frescos e de qualidade."</p><span>— Gabriella L., Google</span></div>
+    <div class="proof-card"><p>"Uma boa variedade de produtos e muito gostosos."</p><span>— avaliação real, Google</span></div>
+  </div>
+</div>
 
 <nav class="cat-nav" id="cat-nav">
   <button class="cat-btn active" data-cat="salgados">🥟 Salgados</button>
@@ -140,14 +205,14 @@ footer{text-align:center;padding:34px 18px 10px;font-size:0.72rem;color:var(--fa
   <section class="cat-section" data-cat="doces" style="display:none">
     <div class="cat-title"><h2>Bolos & Doces</h2></div>
     <p class="cat-note">Fatia pra hoje ou bolo inteiro por encomenda.</p>
+    <div class="item" data-name="Fatia de bolo de chocolate" data-price="9">
+      <div class="item-ph"><img src="assets/bolo-chocolate.jpg" alt="Bolo de chocolate"></div>
+      <div class="item-info"><h3>Fatia de bolo de chocolate</h3><p>Cobertura cremosa — foto real da nossa vitrine</p><div class="item-price">R$9,00</div></div>
+      <div class="item-add"><button class="qty-btn minus">−</button><span class="qty-val">0</span><button class="qty-btn plus">+</button></div>
+    </div>
     <div class="item" data-name="Fatia de bolo de fubá" data-price="9">
       <div class="item-ph">🍰</div>
       <div class="item-info"><h3>Fatia de bolo de fubá</h3><p>Com queijo, receita da casa</p><div class="item-price">R$9,00</div></div>
-      <div class="item-add"><button class="qty-btn minus">−</button><span class="qty-val">0</span><button class="qty-btn plus">+</button></div>
-    </div>
-    <div class="item" data-name="Fatia de bolo de chocolate" data-price="9">
-      <div class="item-ph">🍫</div>
-      <div class="item-info"><h3>Fatia de bolo de chocolate</h3><p>Cobertura cremosa</p><div class="item-price">R$9,00</div></div>
       <div class="item-add"><button class="qty-btn minus">−</button><span class="qty-val">0</span><button class="qty-btn plus">+</button></div>
     </div>
     <div class="item" data-name="Sonho recheado" data-price="8">
@@ -175,8 +240,31 @@ footer{text-align:center;padding:34px 18px 10px;font-size:0.72rem;color:var(--fa
 </main>
 
 <div class="cart-bar" id="cart-bar">
-  <div class="info"><span id="cart-count">0 itens</span><b id="cart-total">R$0,00</b></div>
-  <button class="btn" id="cart-checkout">Finalizar no WhatsApp →</button>
+  <div class="cart-bar-row">
+    <div class="info"><span id="cart-count">0 itens</span><b id="cart-total">R$0,00</b></div>
+    <button class="btn" id="cart-open">Ver pedido →</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <button class="modal-close" id="modal-close">✕</button>
+    <div class="modal-handle"></div>
+    <h2>Confirmar pedido</h2>
+    <div class="modal-summary" id="modal-summary"></div>
+    <div class="field">
+      <label for="f-name">Seu nome</label>
+      <input type="text" id="f-name" placeholder="Como podemos te chamar?">
+    </div>
+    <div class="field">
+      <label>Retirada ou entrega</label>
+      <div class="opt-group">
+        <div class="opt sel" data-mode="Retirada na loja">Retirada na loja</div>
+        <div class="opt" data-mode="Entrega (quinta-feira)">Entrega (quinta)</div>
+      </div>
+    </div>
+    <button class="modal-send" id="modal-send">Enviar pedido no WhatsApp →</button>
+  </div>
 </div>
 
 <footer>
@@ -188,7 +276,9 @@ footer{text-align:center;padding:34px 18px 10px;font-size:0.72rem;color:var(--fa
 (function(){
   var WHATSAPP = '553137913010';
   var cart = {};
+  var deliveryMode = 'Retirada na loja';
 
+  // ── Navegação por categoria ──
   document.querySelectorAll('.cat-btn').forEach(function(btn){
     btn.addEventListener('click', function(){
       document.querySelectorAll('.cat-btn').forEach(function(b){ b.classList.remove('active'); });
@@ -197,9 +287,11 @@ footer{text-align:center;padding:34px 18px 10px;font-size:0.72rem;color:var(--fa
       document.querySelectorAll('.cat-section').forEach(function(s){
         s.style.display = (s.dataset.cat === cat) ? '' : 'none';
       });
+      revealVisible();
     });
   });
 
+  // ── Quantidade por item ──
   document.querySelectorAll('.item').forEach(function(item){
     var name = item.dataset.name;
     var price = parseFloat(item.dataset.price);
@@ -217,6 +309,8 @@ footer{text-align:center;padding:34px 18px 10px;font-size:0.72rem;color:var(--fa
     plus.addEventListener('click', function(){
       var q = (cart[name] ? cart[name].qty : 0) + 1;
       update(q);
+      item.classList.add('just-added');
+      setTimeout(function(){ item.classList.remove('just-added'); }, 500);
     });
     minus.addEventListener('click', function(){
       var q = Math.max(0, (cart[name] ? cart[name].qty : 0) - 1);
@@ -224,50 +318,108 @@ footer{text-align:center;padding:34px 18px 10px;font-size:0.72rem;color:var(--fa
     });
   });
 
-  function renderCart(){
-    var bar = document.getElementById('cart-bar');
+  function cartTotals(){
     var count = 0, total = 0;
-    Object.keys(cart).forEach(function(k){
-      count += cart[k].qty;
-      total += cart[k].qty * cart[k].price;
-    });
-    if (count > 0) {
+    Object.keys(cart).forEach(function(k){ count += cart[k].qty; total += cart[k].qty * cart[k].price; });
+    return { count: count, total: total };
+  }
+
+  function renderCart(){
+    var t = cartTotals();
+    var bar = document.getElementById('cart-bar');
+    if (t.count > 0) {
       bar.classList.add('show');
-      document.getElementById('cart-count').textContent = count + (count === 1 ? ' item' : ' itens');
-      document.getElementById('cart-total').textContent = 'R$' + total.toFixed(2).replace('.', ',');
+      document.getElementById('cart-count').textContent = t.count + (t.count === 1 ? ' item' : ' itens');
+      document.getElementById('cart-total').textContent = 'R$' + t.total.toFixed(2).replace('.', ',');
     } else {
       bar.classList.remove('show');
     }
   }
 
-  document.getElementById('cart-checkout').addEventListener('click', function(){
+  // ── Modal de checkout ──
+  var overlay = document.getElementById('modal-overlay');
+  document.getElementById('cart-open').addEventListener('click', function(){
+    renderModalSummary();
+    overlay.classList.add('show');
+  });
+  document.getElementById('modal-close').addEventListener('click', function(){ overlay.classList.remove('show'); });
+  overlay.addEventListener('click', function(e){ if (e.target === overlay) overlay.classList.remove('show'); });
+
+  document.querySelectorAll('.opt').forEach(function(opt){
+    opt.addEventListener('click', function(){
+      document.querySelectorAll('.opt').forEach(function(o){ o.classList.remove('sel'); });
+      opt.classList.add('sel');
+      deliveryMode = opt.dataset.mode;
+    });
+  });
+
+  function renderModalSummary(){
+    var el = document.getElementById('modal-summary');
+    var html = '';
+    var t = cartTotals();
+    Object.keys(cart).forEach(function(k){
+      var c = cart[k];
+      html += '<div class="row"><span>' + c.qty + 'x ' + k + '</span><b>R$' + (c.qty * c.price).toFixed(2).replace('.', ',') + '</b></div>';
+    });
+    html += '<div class="modal-total"><span>Total</span><span>R$' + t.total.toFixed(2).replace('.', ',') + '</span></div>';
+    el.innerHTML = html;
+  }
+
+  document.getElementById('modal-send').addEventListener('click', function(){
+    var t = cartTotals();
+    if (t.count === 0) return;
+    var name = document.getElementById('f-name').value.trim();
     var lines = ['Olá! Quero fazer um pedido:', ''];
-    var total = 0;
     Object.keys(cart).forEach(function(k){
       var c = cart[k];
       lines.push('• ' + c.qty + 'x ' + k + ' — R$' + (c.qty * c.price).toFixed(2).replace('.', ','));
-      total += c.qty * c.price;
     });
     lines.push('');
-    lines.push('Total: R$' + total.toFixed(2).replace('.', ','));
+    lines.push('Total: R$' + t.total.toFixed(2).replace('.', ','));
     lines.push('');
-    lines.push('Nome: ');
-    lines.push('Retirada ou entrega: ');
+    lines.push('Nome: ' + (name || '(não informado)'));
+    lines.push(deliveryMode === 'Retirada na loja' ? 'Retirada na loja' : 'Entrega — ' + deliveryMode);
     var msg = encodeURIComponent(lines.join('\n'));
     window.open('https://wa.me/' + WHATSAPP + '?text=' + msg, '_blank');
   });
 
-  // Status aberto/fechado real, baseado no horario informado no Instagram
+  // ── Status aberto/fechado real ──
   (function(){
     var badge = document.getElementById('status-badge');
     var now = new Date();
-    var day = now.getDay(); // 0=dom
+    var day = now.getDay();
     var mins = now.getHours() * 60 + now.getMinutes();
     var open = false;
-    if (day >= 1 && day <= 5) open = mins >= 330 && mins < 1200; // 05:30-20:00
-    else if (day === 6) open = mins >= 330 && mins < 1140; // 05:30-19:00
-    badge.textContent = open ? 'Aberto agora' : 'Fechado agora';
+    if (day >= 1 && day <= 5) open = mins >= 330 && mins < 1200;
+    else if (day === 6) open = mins >= 330 && mins < 1140;
+    if (!open) {
+      badge.classList.add('closed');
+      badge.innerHTML = '<span class="dot"></span>Fechado agora';
+    }
   })();
+
+  // ── Reveal com IntersectionObserver + rede de seguranca ──
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var io = null;
+  if (!reduce && 'IntersectionObserver' in window) {
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if (entry.isIntersecting) { entry.target.classList.add('in'); io.unobserve(entry.target); }
+      });
+    }, { threshold: 0.1 });
+  }
+  function revealVisible(){
+    var items = document.querySelectorAll('.cat-section:not([style*="display: none"]) .item');
+    items.forEach(function(el, i){
+      if (el.classList.contains('in') || el.dataset.observed) return;
+      el.dataset.observed = '1';
+      el.style.transitionDelay = Math.min(i * 60, 300) + 'ms';
+      if (io) io.observe(el); else el.classList.add('in');
+    });
+    setTimeout(function(){ items.forEach(function(el){ el.classList.add('in'); }); }, 1000);
+  }
+  if (reduce) { document.querySelectorAll('.item').forEach(function(el){ el.classList.add('in'); }); }
+  else revealVisible();
 })();
 </script>
 
