@@ -23,6 +23,12 @@
       });
     }, {threshold: 0.12});
     revealEls.forEach(function(el){ io.observe(el); });
+    // Rede de seguranca: se o navegador nao disparar o observer (webview restrito,
+    // aba em segundo plano, etc.), o conteudo aparece de qualquer forma.
+    setTimeout(function(){
+      revealEls.forEach(function(el){ el.classList.add('sy-in'); });
+      io.disconnect();
+    }, 1200);
   }
 
   var heroImg = document.querySelector('.hero img');
