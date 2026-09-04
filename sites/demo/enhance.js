@@ -3,7 +3,7 @@
 
   var style = document.createElement('style');
   style.textContent =
-    '.sy-reveal{opacity:0;transform:translateY(22px);transition:opacity .7s cubic-bezier(.16,.8,.3,1),transform .7s cubic-bezier(.16,.8,.3,1)}' +
+    '.sy-reveal{opacity:0;transform:translateY(22px);transition:opacity .5s cubic-bezier(.16,.8,.3,1),transform .5s cubic-bezier(.16,.8,.3,1)}' +
     '.sy-in{opacity:1;transform:translateY(0)}' +
     '.sy-tilt{will-change:transform}';
   document.head.appendChild(style);
@@ -62,7 +62,9 @@
     var tiltEls = document.querySelectorAll('.cat, .cat-card, .serv, .oc');
     tiltEls.forEach(function(el){
       el.classList.add('sy-tilt');
-      el.style.transition = 'transform .15s ease';
+      // Duracao curta so pro transform (resposta do mouse), sem mexer no
+      // transition-delay do stagger nem na duracao do opacity da entrada.
+      el.style.transitionDuration = '.5s, .15s';
       el.addEventListener('mousemove', function(e){
         var r = el.getBoundingClientRect();
         var px = (e.clientX - r.left) / r.width - 0.5;
