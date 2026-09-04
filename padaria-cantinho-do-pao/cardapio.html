@@ -59,6 +59,18 @@ button{font-family:inherit}
 .facts{display:flex;flex-direction:column;gap:6px;margin-top:20px;font-family:var(--mono);font-size:0.74rem;color:var(--chalk-dim)}
 .facts span b{color:var(--gold);font-weight:700}
 
+.trust-strip{display:flex;gap:22px;margin-top:22px;padding-top:18px;border-top:1px dashed rgba(241,236,220,0.16)}
+.trust-item b{display:block;font-family:var(--mono);font-size:1.1rem;color:var(--gold);font-weight:700}
+.trust-item span{display:block;font-size:0.68rem;color:var(--chalk-faint);margin-top:2px}
+
+/* ── COMO FUNCIONA ── */
+.how{background:var(--paper);color:var(--ink);padding:18px 0}
+.how .wrap{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center}
+.how-step{display:flex;align-items:center;gap:8px;font-size:0.78rem;text-align:left}
+.how-step b{font-family:var(--mono);color:var(--gold-d);font-weight:700;font-size:0.9rem}
+.how-arrow{color:var(--ink-faint);font-size:0.9rem}
+@media(max-width:420px){.how-arrow{display:none}.how .wrap{flex-direction:column;align-items:flex-start;gap:10px}}
+
 /* ── HUMANO (foto real da entrega no balcao) ── */
 .humano{position:relative;height:120px;overflow:hidden;background:var(--board)}
 .humano img{width:100%;height:100%;object-fit:cover;object-position:50% 0%;filter:saturate(1.05)}
@@ -178,8 +190,23 @@ footer{text-align:center;padding:28px 18px 10px;font-size:0.7rem;color:var(--ink
       <span>⭐ <b>4,5</b> — 74 avaliações reais no Google</span>
       <span>🛵 Delivery <b>às quintas, 8h–16h</b></span>
     </div>
+    <div class="trust-strip">
+      <div class="trust-item"><b>4,5★</b><span>74 avaliações Google</span></div>
+      <div class="trust-item"><b>2.488</b><span>seguidores reais</span></div>
+      <div class="trust-item"><b>05h30</b><span>abrimos todo dia</span></div>
+    </div>
   </div>
 </header>
+
+<section class="how">
+  <div class="wrap">
+    <div class="how-step"><b>01</b><span>Escolha os itens no cardápio</span></div>
+    <div class="how-arrow">→</div>
+    <div class="how-step"><b>02</b><span>Diga seu nome e retirada ou entrega</span></div>
+    <div class="how-arrow">→</div>
+    <div class="how-step"><b>03</b><span>Confirme no WhatsApp — pronto</span></div>
+  </div>
+</section>
 
 <div class="humano">
   <img src="assets/equipe.jpg" alt="Nossa equipe entregando um pedido no balcão">
