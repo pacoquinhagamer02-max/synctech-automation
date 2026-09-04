@@ -10,8 +10,25 @@
 
   if (reduce) return;
 
+  var heroStyle = document.createElement('style');
+  heroStyle.textContent =
+    '.hero-content{opacity:0;transform:translateY(16px);animation:sy-hero-in .8s cubic-bezier(.16,.8,.3,1) .1s forwards}' +
+    '@keyframes sy-hero-in{to{opacity:1;transform:translateY(0)}}';
+  document.head.appendChild(heroStyle);
+
   var revealSel = 'section, .cat, .cat-card, .serv, .oc, .info-band, .trust, .trust-item, .diff-item, .heritage, .ig-band, .delivery, .quote';
   var revealEls = document.querySelectorAll(revealSel);
+
+  // Entrada escalonada: cards do mesmo grid aparecem em sequencia, nao todos de uma vez.
+  var cardEls = document.querySelectorAll('.cat, .cat-card, .serv, .oc, .trust-item, .diff-item');
+  var staggerCount = new Map();
+  cardEls.forEach(function(el){
+    var p = el.parentElement;
+    var idx = staggerCount.get(p) || 0;
+    el.style.transitionDelay = Math.min(idx * 70, 350) + 'ms';
+    staggerCount.set(p, idx + 1);
+  });
+
   if ('IntersectionObserver' in window) {
     revealEls.forEach(function(el){ el.classList.add('sy-reveal'); });
     var io = new IntersectionObserver(function(entries){
