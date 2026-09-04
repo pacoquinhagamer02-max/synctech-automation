@@ -44,7 +44,7 @@ section{padding:60px 0}
 .tag{font-size:0.78rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
 h2.title{font-size:clamp(1.7rem,3.8vw,2.4rem)}
 
-.cats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:32px}
+.cats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:32px}
 .cat{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:26px 20px;text-align:center}
 .cat h3{font-size:1.1rem}
 .cat p{font-size:0.8rem;color:var(--faint);margin-top:6px}
@@ -66,7 +66,7 @@ h2.title{font-size:clamp(1.7rem,3.8vw,2.4rem)}
 footer{border-top:1px solid var(--line);padding:24px 0;text-align:center;color:var(--faint);font-size:0.78rem}
 footer a{color:var(--accent-l)}
 
-@media(max-width:760px){.cats,.heritage,.info-grid{grid-template-columns:1fr}}
+@media(max-width:760px){.heritage,.info-grid{grid-template-columns:1fr}.cats{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
@@ -97,6 +97,7 @@ footer a{color:var(--accent-l)}
     <h2 class="title">Um pouco de tudo, num só lugar</h2>
     <div class="cats">
       <div class="cat"><h3>Papelaria & Escritório</h3><p>Material escolar e suprimentos</p></div>
+      <div class="cat"><h3>Brinquedos</h3><p>Setor próprio, bem avaliado pelos clientes</p></div>
       <div class="cat"><h3>Presentes & Utilidades</h3><p>Lembrança pra levar de Ouro Preto</p></div>
       <div class="cat"><h3>Informática & Documentos</h3><p>Suprimentos e serviços fiscais</p></div>
     </div>
