@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Oficina Centro Automotivo — Mariana</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#121316; --surface:#1B1D22; --surface2:#24262C;
+  --line:rgba(77,163,255,0.2); --accent:#4DA3FF; --accent-l:#7EC0FF; --steel:#8B93A0;
+  --text:#F2F3F5; --muted:#B3B8C2; --faint:#72767F;
+  --disp:'Oswald',sans-serif;
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+h1,h2,h3{font-family:var(--disp);text-transform:uppercase;letter-spacing:0.02em;font-weight:600}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1040px;margin:0 auto;padding:0 24px}
+
+nav{padding:18px 0;border-bottom:1px solid var(--line)}
+.nav-inner{display:flex;align-items:center;justify-content:space-between}
+.logo{font-family:var(--disp);font-size:1.25rem}
+.logo span{color:var(--accent)}
+.nav-cta{background:var(--accent);color:#0A1420;padding:10px 20px;border-radius:3px;font-weight:600;font-size:0.85rem}
+
+.hero{position:relative;padding:80px 0 60px;overflow:hidden;background:
+  repeating-linear-gradient(-45deg, var(--surface) 0 44px, var(--surface2) 44px 88px);
+}
+.hero::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(18,19,22,0.6),var(--bg) 92%)}
+.hero-content{position:relative;z-index:2;max-width:640px}
+.eyebrow{display:inline-block;font-family:var(--disp);font-size:0.8rem;letter-spacing:0.08em;color:var(--accent-l);background:rgba(77,163,255,0.12);border:1px solid var(--accent);padding:6px 14px;border-radius:3px;margin-bottom:16px}
+.hero h1{font-size:clamp(2.1rem,5.6vw,3.2rem);line-height:1.08}
+.hero p{margin-top:16px;color:var(--muted);font-size:1.02rem;max-width:460px}
+.hero-ctas{margin-top:28px;display:flex;gap:12px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:14px 26px;border-radius:3px;font-family:var(--disp);font-weight:600;text-transform:uppercase;letter-spacing:0.03em;font-size:0.92rem}
+.btn-p{background:var(--accent);color:#0A1420}
+.btn-p:hover{background:var(--accent-l)}
+.btn-g{border:1px solid var(--faint);color:var(--text)}
+
+section{padding:58px 0}
+.tag{font-family:var(--disp);font-size:0.8rem;letter-spacing:0.08em;color:var(--accent);text-transform:uppercase;margin-bottom:8px}
+h2.title{font-size:clamp(1.6rem,3.6vw,2.2rem)}
+
+.serv-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:30px}
+.serv{background:var(--surface);border:1px solid var(--line);border-radius:5px;padding:24px 16px;text-align:center;transition:.2s}
+.serv:hover{border-color:var(--accent)}
+.serv h3{font-size:0.95rem}
+.serv p{font-size:0.76rem;color:var(--faint);margin-top:6px}
+
+.trust{margin-top:40px;background:var(--surface);border-left:3px solid var(--accent);padding:22px 26px;max-width:520px}
+.trust b{display:block;font-family:var(--disp);font-size:1.8rem;color:var(--accent-l)}
+.trust span{font-size:0.85rem;color:var(--muted)}
+
+.info-band{background:var(--surface);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.info-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;padding:34px 0}
+.info-item b{display:block;font-size:0.93rem;margin-bottom:3px}
+.info-item span{font-size:0.84rem;color:var(--muted)}
+
+.cta-final{text-align:center;padding:72px 0}
+.cta-final h2{font-size:clamp(1.6rem,4vw,2.2rem);max-width:560px;margin:0 auto 14px}
+.cta-final p{color:var(--muted);margin-bottom:26px}
+
+footer{border-top:1px solid var(--line);padding:22px 0;text-align:center;color:var(--faint);font-size:0.76rem}
+footer a{color:var(--accent-l)}
+
+@media(max-width:760px){.serv-grid{grid-template-columns:repeat(2,1fr)}.info-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap nav-inner">
+    <div class="logo">CENTRO<span>AUTOMOTIVO</span></div>
+    <a class="nav-cta" href="https://wa.me/553135585955?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20quero%20um%20or%C3%A7amento." target="_blank">Pedir orçamento</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap hero-content">
+    <div class="eyebrow">5,0★ — 29 avaliações reais no Google</div>
+    <h1>Sua oficina de confiança em Mariana.</h1>
+    <p>Revisão, freios, suspensão e elétrica — atendimento que os clientes avaliam com nota máxima.</p>
+    <div class="hero-ctas">
+      <a class="btn btn-p" href="https://wa.me/553135585955?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20quero%20um%20or%C3%A7amento." target="_blank">Pedir orçamento →</a>
+      <a class="btn btn-g" href="#servicos">Ver serviços</a>
+    </div>
+  </div>
+</header>
+
+<section id="servicos">
+  <div class="wrap">
+    <div class="tag">Serviços</div>
+    <h2 class="title">O que fazemos</h2>
+    <div class="serv-grid">
+      <div class="serv"><h3>Revisão Geral</h3><p>Checagem completa do veículo</p></div>
+      <div class="serv"><h3>Freios</h3><p>Pastilhas, discos e manutenção</p></div>
+      <div class="serv"><h3>Suspensão</h3><p>Amortecedores e alinhamento</p></div>
+      <div class="serv"><h3>Elétrica</h3><p>Diagnóstico e reparo</p></div>
+    </div>
+
+    <div class="trust">
+      <b>5,0★</b>
+      <span>Nota máxima em 29 avaliações reais de clientes no Google</span>
+    </div>
+  </div>
+</section>
+
+<div class="info-band">
+  <div class="wrap info-grid">
+    <div class="info-item"><b>Endereço</b><span>R. Taxista Joãozinho Vieira, 559 — Mariana/MG</span></div>
+    <div class="info-item"><b>Horário</b><span>Aberto até 18h</span></div>
+    <div class="info-item"><b>WhatsApp</b><span>(31) 3558-5955</span></div>
+  </div>
+</div>
+
+<section class="cta-final">
+  <div class="wrap">
+    <h2>Carro precisando de revisão?</h2>
+    <p>Manda mensagem e agenda um horário sem sair de casa.</p>
+    <a class="btn btn-p" href="https://wa.me/553135585955?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20quero%20um%20or%C3%A7amento." target="_blank">Chamar no WhatsApp →</a>
+  </div>
+</section>
+
+<footer>
+  Demonstração criada pela <a href="https://pacoquinhagamer02-max.github.io/synctech-automation/sites/">SyncTech Automation</a> — este é um exemplo de como o site do Centro Automotivo poderia ficar no ar.
+</footer>
+
+</body>
+</html>
