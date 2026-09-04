@@ -65,6 +65,21 @@ button{font-family:inherit}
 .humano-tag{position:absolute;left:18px;bottom:8px;font-family:var(--disp);font-size:1.15rem;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,0.7)}
 .humano::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 45%,rgba(16,13,10,0.62) 100%)}
 
+/* ── MURAL (fotos reais da vitrine) ── */
+.mural{background:var(--board2);padding:20px 0 22px;border-bottom:1px dashed rgba(241,236,220,0.16)}
+.mural-head{padding:0 18px;margin-bottom:14px}
+.mural-tag{font-family:var(--mono);font-size:0.68rem;letter-spacing:0.04em;text-transform:uppercase;color:var(--chalk-dim)}
+.mural-scroll{display:flex;gap:22px;overflow-x:auto;padding:6px 24px 10px;scrollbar-width:none}
+.mural-scroll::-webkit-scrollbar{display:none}
+.pin{flex-shrink:0;width:104px;background:#fff;padding:6px 6px 22px;box-shadow:0 8px 18px rgba(0,0,0,0.35);position:relative}
+.pin.r1{transform:rotate(-5deg)}
+.pin.r2{transform:rotate(4deg)}
+.pin.r3{transform:rotate(-2deg)}
+.pin img{width:100%;height:96px;object-fit:cover;object-position:50% 50%}
+.pin.wide{width:160px}
+.pin.wide img{height:72px;object-position:50% 0%}
+.pin span{position:absolute;left:6px;right:6px;bottom:5px;font-family:var(--disp);font-size:0.85rem;color:var(--ink);text-align:center;line-height:1.1}
+
 /* ── PROVA (recibos) ── */
 .proof{padding:18px 0 4px}
 .proof-scroll{display:flex;gap:10px;overflow-x:auto;padding:0 18px 4px;scrollbar-width:none}
@@ -171,6 +186,19 @@ footer{text-align:center;padding:28px 18px 10px;font-size:0.7rem;color:var(--ink
 <div class="humano">
   <img src="assets/equipe.jpg" alt="Nossa equipe entregando um pedido no balcão">
   <div class="humano-tag">feito à mão, entregue à mão — todo dia</div>
+</div>
+
+<div class="mural chalk-tex">
+  <div class="mural-head">
+    <span class="mural-tag">direto da nossa vitrine</span>
+  </div>
+  <div class="mural-scroll">
+    <div class="pin r1"><img src="assets/hero.jpg" alt="Pão francês fresquinho"><span>pão de todo dia</span></div>
+    <div class="pin wide r2"><img src="assets/cafe-manha.jpg" alt="Café da manhã com pão francês e manteiga"><span>café da manhã</span></div>
+    <div class="pin r3"><img src="assets/bolo-chocolate.jpg" alt="Bolo de chocolate da vitrine"><span>bolo de chocolate</span></div>
+    <div class="pin r1"><img src="assets/sonho.jpg" alt="Sonho recheado da vitrine"><span>sonho recheado</span></div>
+    <div class="pin r2"><img src="assets/cupcake.jpg" alt="Cupcake gourmet da vitrine"><span>cupcake gourmet</span></div>
+  </div>
 </div>
 
 <div class="proof">
