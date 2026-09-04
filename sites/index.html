@@ -149,17 +149,17 @@ footer { border-top: 1px solid var(--border); padding: 28px 0; text-align: cente
 <nav>
   <div class="nav-inner">
     <div class="logo">Sync<span>Tech</span> · Sites</div>
-    <a class="nav-cta" href="https://wa.me/5531986551626?text=Ol%C3%A1!%20Vi%20a%20p%C3%A1gina%20de%20sites%20da%20SyncTech%20e%20quero%20saber%20mais." target="_blank">Falar agora →</a>
+    <a class="nav-cta wa-link" href="https://wa.me/5531986551626?text=Ol%C3%A1!%20Vi%20a%20p%C3%A1gina%20de%20sites%20da%20SyncTech%20e%20quero%20saber%20mais." target="_blank">Falar agora →</a>
   </div>
 </nav>
 
 <header class="hero">
   <div class="container">
-    <div class="eyebrow"><span class="dot"></span> Vagas limitadas este mês</div>
-    <h1>Sua empresa não aparece no Google. <em>Isso custa cliente todo dia.</em></h1>
-    <p class="hero-sub">Site profissional, no ar em até 7 dias, feito por quem já entregou site real pra negócio real da região — não é template genérico.</p>
+    <div class="eyebrow" id="eyebrow"><span class="dot"></span> Vagas limitadas este mês</div>
+    <h1 id="hero-h1">Sua empresa não aparece no Google. <em>Isso custa cliente todo dia.</em></h1>
+    <p class="hero-sub" id="hero-sub">Site profissional, no ar em até 7 dias, feito por quem já entregou site real pra negócio real da região — não é template genérico.</p>
     <div class="hero-ctas">
-      <a class="btn btn-primary" href="https://wa.me/5531986551626?text=Ol%C3%A1!%20Vi%20a%20p%C3%A1gina%20de%20sites%20da%20SyncTech%20e%20quero%20fazer%20o%20site%20do%20meu%20neg%C3%B3cio." target="_blank">Quero meu site →</a>
+      <a class="btn btn-primary wa-link" id="cta-hero" href="https://wa.me/5531986551626?text=Ol%C3%A1!%20Vi%20a%20p%C3%A1gina%20de%20sites%20da%20SyncTech%20e%20quero%20fazer%20o%20site%20do%20meu%20neg%C3%B3cio." target="_blank">Quero meu site →</a>
       <a class="btn btn-ghost" href="#case">Ver exemplo real</a>
     </div>
     <div class="hero-proof">
@@ -294,7 +294,7 @@ footer { border-top: 1px solid var(--border); padding: 28px 0; text-align: cente
         <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> Ajustes inclusos até você aprovar</li>
         <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> No ar em até 7 dias</li>
       </ul>
-      <a class="btn btn-primary" href="https://wa.me/5531986551626?text=Ol%C3%A1!%20Quero%20fazer%20o%20site%20profissional%20do%20meu%20neg%C3%B3cio." target="_blank">Quero esse site →</a>
+      <a class="btn btn-primary wa-link" href="https://wa.me/5531986551626?text=Ol%C3%A1!%20Quero%20fazer%20o%20site%20profissional%20do%20meu%20neg%C3%B3cio." target="_blank">Quero esse site →</a>
     </div>
   </div>
 </section>
@@ -328,13 +328,43 @@ footer { border-top: 1px solid var(--border); padding: 28px 0; text-align: cente
   <div class="container">
     <h2>Seu concorrente já pode ter site. Sua vez de aparecer também.</h2>
     <p>15 minutos de conversa e eu já te digo exatamente como ficaria o site do seu negócio.</p>
-    <a class="btn btn-primary" href="https://wa.me/5531986551626?text=Ol%C3%A1!%20Vi%20a%20p%C3%A1gina%20de%20sites%20da%20SyncTech%20e%20quero%20fazer%20o%20site%20do%20meu%20neg%C3%B3cio." target="_blank">Quero meu site agora →</a>
+    <a class="btn btn-primary wa-link" href="https://wa.me/5531986551626?text=Ol%C3%A1!%20Vi%20a%20p%C3%A1gina%20de%20sites%20da%20SyncTech%20e%20quero%20fazer%20o%20site%20do%20meu%20neg%C3%B3cio." target="_blank">Quero meu site agora →</a>
   </div>
 </section>
 
 <footer>
   SyncTech Automation · Mariana/MG · <a href="https://pacoquinhagamer02-max.github.io/synctech-automation/">Conheça o hub completo de automação →</a>
 </footer>
+
+<script>
+// Personalização por link — mesmo padrão de setup.html/agendamento/bio: config vem no #hash, sem servidor.
+// Gerar link: base + '#config=' + btoa(unescape(encodeURIComponent(JSON.stringify({biz, city, ig}))))
+(function(){
+  var hash = location.hash.replace('#config=', '');
+  if (!hash) return;
+  var cfg;
+  try { cfg = JSON.parse(decodeURIComponent(escape(atob(hash)))); } catch(e) { return; }
+  if (!cfg.biz) return;
+
+  var biz = cfg.biz, city = cfg.city || '', ig = cfg.ig || '';
+
+  var eyebrow = document.getElementById('eyebrow');
+  if (eyebrow) eyebrow.innerHTML = '<span class="dot"></span> Feito especialmente pra ' + biz;
+
+  var h1 = document.getElementById('hero-h1');
+  if (h1) h1.innerHTML = biz + ' ainda não aparece no Google. <em>Isso custa cliente todo dia.</em>';
+
+  var sub = document.getElementById('hero-sub');
+  if (sub) sub.textContent = 'Vi o perfil de vocês' + (ig ? ' (' + ig + ')' : '') + (city ? ' em ' + city : '') + ' e reparei que ainda não têm site. Dá pra resolver isso em até 7 dias — sem complicação.';
+
+  var msg = encodeURIComponent('Olá! Vi o perfil da ' + biz + (ig ? ' (' + ig + ')' : '') + ' e quero fazer o site profissional do negócio.');
+  document.querySelectorAll('.wa-link').forEach(function(a){
+    a.href = 'https://wa.me/5531986551626?text=' + msg;
+  });
+
+  document.title = 'Site Profissional pra ' + biz + ' — SyncTech Automation';
+})();
+</script>
 
 </body>
 </html>
