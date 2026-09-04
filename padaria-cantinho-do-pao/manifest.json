@@ -1,0 +1,14 @@
+{
+  "name": "Cardápio — Padaria Cantinho do Pão",
+  "short_name": "Cantinho do Pão",
+  "description": "Monte seu pedido e finalize direto no WhatsApp",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#1E2621",
+  "theme_color": "#1E2621",
+  "lang": "pt-BR",
+  "icons": [
+    { "src": "assets/logo.jpg", "sizes": "150x150", "type": "image/jpeg", "purpose": "any" }
+  ]
+}
