@@ -58,6 +58,12 @@ button{font-family:inherit}
 .facts{display:flex;flex-direction:column;gap:6px;margin-top:20px;font-family:var(--mono);font-size:0.74rem;color:var(--chalk-dim)}
 .facts span b{color:var(--gold);font-weight:700}
 
+/* ── HUMANO (foto real da entrega no balcao) ── */
+.humano{position:relative;height:120px;overflow:hidden;background:var(--board)}
+.humano img{width:100%;height:100%;object-fit:cover;object-position:50% 0%;filter:saturate(1.05)}
+.humano-tag{position:absolute;left:18px;bottom:8px;font-family:var(--disp);font-size:1.15rem;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,0.7)}
+.humano::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 45%,rgba(16,13,10,0.62) 100%)}
+
 /* ── PROVA (recibos) ── */
 .proof{padding:18px 0 4px}
 .proof-scroll{display:flex;gap:10px;overflow-x:auto;padding:0 18px 4px;scrollbar-width:none}
@@ -160,6 +166,11 @@ footer{text-align:center;padding:28px 18px 10px;font-size:0.7rem;color:var(--ink
   </div>
 </header>
 
+<div class="humano">
+  <img src="assets/equipe.jpg" alt="Nossa equipe entregando um pedido no balcão">
+  <div class="humano-tag">feito à mão, entregue à mão — todo dia</div>
+</div>
+
 <div class="proof">
   <div class="proof-scroll">
     <div class="receipt"><p>"Salgados de extrema qualidade e variedade e atendentes maravilhosos."</p><span>Felippe S. — Google</span></div>
@@ -229,7 +240,13 @@ footer{text-align:center;padding:28px 18px 10px;font-size:0.7rem;color:var(--ink
       <div class="item-add"><button class="qty-btn minus">−</button><span class="qty-val">0</span><button class="qty-btn plus">+</button></div>
     </div>
     <div class="item" data-name="Sonho recheado" data-price="8">
-      <div class="item-info"><h3>Sonho recheado</h3><p>Creme ou doce de leite</p><div class="item-price">R$8,00</div></div>
+      <div class="item-ph"><img src="assets/sonho.jpg" alt="Sonho recheado da vitrine"></div>
+      <div class="item-info"><h3>Sonho recheado</h3><p>Creme e cereja — foto real da vitrine</p><div class="item-price">R$8,00</div></div>
+      <div class="item-add"><button class="qty-btn minus">−</button><span class="qty-val">0</span><button class="qty-btn plus">+</button></div>
+    </div>
+    <div class="item" data-name="Cupcake gourmet" data-price="9">
+      <div class="item-ph"><img src="assets/cupcake.jpg" alt="Cupcake gourmet da vitrine"></div>
+      <div class="item-info"><h3>Cupcake gourmet</h3><p>Cobertura e cereja — foto real da vitrine</p><div class="item-price">R$9,00</div></div>
       <div class="item-add"><button class="qty-btn minus">−</button><span class="qty-val">0</span><button class="qty-btn plus">+</button></div>
     </div>
   </section>
