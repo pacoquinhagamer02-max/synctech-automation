@@ -349,6 +349,10 @@ footer{text-align:center;padding:28px 18px 10px;font-size:0.7rem;color:var(--ink
         <div class="opt" data-mode="Entrega (quinta-feira)">Entrega (quinta)</div>
       </div>
     </div>
+    <div class="field" id="f-address-field" style="display:none">
+      <label for="f-address">Endereço de entrega</label>
+      <input type="text" id="f-address" placeholder="Rua, número, bairro">
+    </div>
     <button class="modal-send" id="modal-send">ENVIAR PEDIDO NO WHATSAPP →</button>
   </div>
 </div>
@@ -427,11 +431,14 @@ footer{text-align:center;padding:28px 18px 10px;font-size:0.7rem;color:var(--ink
   document.getElementById('modal-close').addEventListener('click', function(){ overlay.classList.remove('show'); });
   overlay.addEventListener('click', function(e){ if (e.target === overlay) overlay.classList.remove('show'); });
 
+  var addressField = document.getElementById('f-address-field');
+  var addressInput = document.getElementById('f-address');
   document.querySelectorAll('.opt').forEach(function(opt){
     opt.addEventListener('click', function(){
       document.querySelectorAll('.opt').forEach(function(o){ o.classList.remove('sel'); });
       opt.classList.add('sel');
       deliveryMode = opt.dataset.mode;
+      addressField.style.display = (deliveryMode === 'Retirada na loja') ? 'none' : '';
     });
   });
 
@@ -451,6 +458,12 @@ footer{text-align:center;padding:28px 18px 10px;font-size:0.7rem;color:var(--ink
     var t = cartTotals();
     if (t.count === 0) return;
     var name = document.getElementById('f-name').value.trim();
+    var address = addressInput.value.trim();
+    var isDelivery = deliveryMode !== 'Retirada na loja';
+
+    if (!name) { document.getElementById('f-name').focus(); return; }
+    if (isDelivery && !address) { addressInput.focus(); return; }
+
     var lines = ['Olá! Quero fazer um pedido:', ''];
     Object.keys(cart).forEach(function(k){
       var c = cart[k];
@@ -459,8 +472,13 @@ footer{text-align:center;padding:28px 18px 10px;font-size:0.7rem;color:var(--ink
     lines.push('');
     lines.push('Total: R$' + t.total.toFixed(2).replace('.', ','));
     lines.push('');
-    lines.push('Nome: ' + (name || '(não informado)'));
-    lines.push(deliveryMode === 'Retirada na loja' ? 'Retirada na loja' : 'Entrega — ' + deliveryMode);
+    lines.push('Nome: ' + name);
+    if (isDelivery) {
+      lines.push('Entrega — ' + deliveryMode);
+      lines.push('Endereço: ' + address);
+    } else {
+      lines.push('Retirada na loja');
+    }
     var msg = encodeURIComponent(lines.join('\n'));
     window.open('https://wa.me/' + WHATSAPP + '?text=' + msg, '_blank');
   });
