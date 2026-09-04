@@ -5,7 +5,10 @@
   style.textContent =
     '.sy-reveal{opacity:0;transform:translateY(22px);transition:opacity .4s cubic-bezier(.16,.8,.3,1),transform .4s cubic-bezier(.16,.8,.3,1)}' +
     '.sy-in{opacity:1;transform:translateY(0)}' +
-    '.sy-tilt{will-change:transform}';
+    '.sy-tilt{will-change:transform}' +
+    '.btn,.nav-cta{transition:transform .12s ease,filter .12s ease}' +
+    '.btn:active,.nav-cta:active{transform:scale(.96)}' +
+    '.btn:focus-visible,.nav-cta:focus-visible,a:focus-visible{outline:2px solid currentColor;outline-offset:3px}';
   document.head.appendChild(style);
 
   if (reduce) return;
