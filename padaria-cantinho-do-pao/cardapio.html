@@ -5,16 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>Cardápio — Padaria Cantinho do Pão</title>
-<meta name="theme-color" content="#C1502E">
+<meta name="theme-color" content="#1C1712">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#FBF3E7; --surface:#FFFFFF; --surface2:#F3E7D5;
-  --line:rgba(58,36,23,0.12); --line-strong:rgba(58,36,23,0.2);
-  --accent:#C1502E; --accent-d:#9C3D22; --gold:#D4934A;
-  --text:#3A2417; --muted:#7A6250; --faint:#A6907E;
+  --bg:#FAF3E3; --surface:#FFFFFF; --surface2:#F1E3C4;
+  --line:rgba(28,23,18,0.12); --line-strong:rgba(28,23,18,0.22);
+  --accent:#A97D1C; --accent-d:#7D5C12; --ink:#1C1712; --gold-l:#E3C168;
+  --text:#2A2117; --muted:#7A6B54; --faint:#A79879;
   --disp:'Fraunces',serif;
 }
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.5;padding-bottom:90px}
@@ -23,7 +23,9 @@ a{color:inherit;text-decoration:none}
 .wrap{max-width:520px;margin:0 auto;padding:0 18px}
 img{max-width:100%;display:block}
 
-header.top{background:linear-gradient(160deg,var(--accent-d),var(--accent));color:#fff;padding:26px 0 34px;border-radius:0 0 22px 22px}
+header.top{background:linear-gradient(165deg,#100D0A,var(--ink) 60%,#2B2115);color:#fff;padding:26px 0 34px;border-radius:0 0 22px 22px;border-bottom:2px solid var(--accent)}
+.logo-img{width:34px;height:34px;border-radius:50%;display:block}
+.brand-row{display:flex;align-items:center;gap:8px}
 .top-row{display:flex;align-items:center;justify-content:space-between}
 .badge{font-family:'Inter',sans-serif;font-size:0.7rem;letter-spacing:0.06em;text-transform:uppercase;background:rgba(255,255,255,0.18);padding:5px 12px;border-radius:100px}
 .top h1{font-size:1.5rem;margin-top:14px;font-weight:700}
@@ -38,7 +40,7 @@ main{padding-top:6px}
 .cat-section{padding:22px 0 6px}
 .cat-title{display:flex;align-items:baseline;gap:8px;margin-bottom:4px}
 .cat-title h2{font-size:1.2rem}
-.cat-highlight{font-size:0.68rem;font-family:'Inter',sans-serif;font-weight:700;color:var(--accent);background:rgba(193,80,46,0.1);padding:3px 9px;border-radius:100px;letter-spacing:0.03em;text-transform:uppercase}
+.cat-highlight{font-size:0.68rem;font-family:'Inter',sans-serif;font-weight:700;color:var(--accent-d);background:rgba(169,125,28,0.12);padding:3px 9px;border-radius:100px;letter-spacing:0.03em;text-transform:uppercase}
 .cat-note{font-size:0.8rem;color:var(--muted);margin-bottom:14px}
 
 .item{display:flex;gap:14px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px}
@@ -52,7 +54,7 @@ main{padding-top:6px}
 .qty-btn:active{background:var(--surface2)}
 .qty-val{min-width:16px;text-align:center;font-weight:700;font-size:0.9rem}
 
-.cart-bar{position:fixed;left:0;right:0;bottom:0;background:var(--text);color:#fff;padding:14px 18px;display:none;align-items:center;justify-content:space-between;z-index:30;box-shadow:0 -8px 24px rgba(0,0,0,0.18)}
+.cart-bar{position:fixed;left:0;right:0;bottom:0;background:var(--ink);color:#fff;padding:14px 18px;display:none;align-items:center;justify-content:space-between;z-index:30;box-shadow:0 -8px 24px rgba(0,0,0,0.25);border-top:2px solid var(--accent)}
 .cart-bar.show{display:flex}
 .cart-bar .info{font-size:0.82rem}
 .cart-bar .info b{display:block;font-family:var(--disp);font-size:1.05rem}
@@ -66,7 +68,7 @@ footer{text-align:center;padding:34px 18px 10px;font-size:0.72rem;color:var(--fa
 <header class="top">
   <div class="wrap">
     <div class="top-row">
-      <div class="badge">🥖 Cantinho do Pão</div>
+      <div class="badge brand-row"><img class="logo-img" src="assets/logo.jpg" alt="Cantinho do Pão"> Cantinho do Pão</div>
       <div class="badge" id="status-badge">Aberto agora</div>
     </div>
     <h1>Monte seu pedido</h1>
@@ -74,6 +76,9 @@ footer{text-align:center;padding:34px 18px 10px;font-size:0.72rem;color:var(--fa
     <div class="top-info">
       <span>📍 R. do Catete, 500 — Mariana/MG</span>
       <span>⭐ 4,5 · 74 avaliações</span>
+    </div>
+    <div class="top-info" style="margin-top:6px">
+      <span>🛵 Delivery às quintas, 8h-16h · consulte a taxa do seu bairro</span>
     </div>
   </div>
 </header>
