@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Site Profissional — SyncTech Automation</title>
+<meta name="description" content="Site profissional pro seu negócio local, no ar em até 7 dias. Feito por quem já entregou site real pra cliente real na região.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Site Profissional pro seu negócio — SyncTech Automation">
+<meta property="og:description" content="Sua empresa aparece no Google, no Instagram e fecha mais venda. No ar em até 7 dias.">
+<meta property="og:url" content="https://pacoquinhagamer02-max.github.io/synctech-automation/sites/">
+<meta name="theme-color" content="#B44FFF">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23B44FFF'/><text y='72' font-size='58' text-anchor='middle' x='50' fill='white' font-family='Arial' font-weight='bold'>S</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Syne:wght@600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 16px; }
+
+:root {
+  --bg: #05030E; --surface: #0C0820; --surface2: #130B2B;
+  --border: rgba(180,79,255,0.18); --border-strong: rgba(180,79,255,0.38);
+  --primary: #B44FFF; --primary-l: #D07BFF; --primary-d: #8B2BE2;
+  --text: #F3EEFF; --muted: #B8A8D4; --faint: #8B7CAE;
+  --green: #22C55E; --yellow: #F59E0B; --cyan: #22D3EE;
+  --glow: rgba(180,79,255,0.55); --glow-soft: rgba(180,79,255,0.25);
+  --font-display: 'Syne', sans-serif; --font-head: 'Space Grotesk', sans-serif; --font-mono: 'JetBrains Mono', monospace;
+  --r: 8px; --r-sm: 6px;
+}
+body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; overflow-x: hidden; }
+h1 { font-family: var(--font-display), sans-serif; font-weight: 800; text-wrap: balance; }
+h2, h3, .logo { font-family: var(--font-head), sans-serif; font-weight: 700; text-wrap: balance; }
+a { color: inherit; }
+.container { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+img { max-width: 100%; display: block; }
+::selection { background: var(--primary); color: #fff; }
+
+/* ── NAV ── */
+nav { position: sticky; top: 0; z-index: 50; background: rgba(5,3,14,0.82); backdrop-filter: blur(14px); border-bottom: 1px solid var(--border); }
+.nav-inner { max-width: 1080px; margin: 0 auto; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; }
+.logo { font-size: 1.05rem; letter-spacing: -0.01em; }
+.logo span { background: linear-gradient(90deg, var(--primary-l), var(--cyan)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.nav-cta { display: inline-flex; align-items: center; gap: 7px; background: linear-gradient(135deg, var(--primary-d), var(--primary)); color: #fff; padding: 9px 18px; border-radius: 100px; font-weight: 600; font-size: 0.84rem; text-decoration: none; box-shadow: 0 4px 20px var(--glow-soft); }
+
+/* ── HERO ── */
+.hero { position: relative; padding: 80px 0 60px; text-align: left; overflow: hidden; }
+.hero::before { content: ''; position: absolute; top: -30%; right: -15%; width: 60vw; height: 60vw; max-width: 700px; max-height: 700px;
+  background: radial-gradient(circle, var(--glow-soft), transparent 68%); pointer-events: none; filter: blur(10px); }
+.eyebrow { display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--primary-l); background: rgba(180,79,255,0.1); border: 1px solid var(--border-strong); padding: 6px 14px; border-radius: 100px; margin-bottom: 22px; }
+.eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px var(--green); animation: pulse 1.8s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+.hero h1 { font-size: clamp(2.1rem, 5.4vw, 3.4rem); line-height: 1.08; max-width: 780px; }
+.hero h1 em { font-style: normal; background: linear-gradient(90deg, var(--primary-l), var(--cyan)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.hero-sub { margin-top: 22px; font-size: 1.1rem; color: var(--muted); max-width: 560px; }
+.hero-ctas { display: flex; gap: 14px; margin-top: 34px; flex-wrap: wrap; }
+.btn { display: inline-flex; align-items: center; gap: 9px; padding: 15px 28px; border-radius: 100px; font-weight: 700; font-size: 0.95rem; text-decoration: none; transition: transform .15s, box-shadow .15s; border: 1px solid transparent; }
+.btn-primary { background: linear-gradient(135deg, var(--primary-d), var(--primary)); color: #fff; box-shadow: 0 8px 30px var(--glow-soft); }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 36px var(--glow); }
+.btn-ghost { border-color: var(--border-strong); color: var(--text); }
+.btn-ghost:hover { border-color: var(--primary); background: rgba(180,79,255,0.06); }
+.hero-proof { margin-top: 40px; display: flex; gap: 28px; flex-wrap: wrap; }
+.proof-item { display: flex; flex-direction: column; }
+.proof-item b { font-family: var(--font-head), sans-serif; font-size: 1.6rem; color: var(--primary-l); }
+.proof-item span { font-size: 0.76rem; color: var(--faint); }
+
+/* ── SECTION shared ── */
+section { padding: 64px 0; }
+.section-tag { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--cyan); margin-bottom: 10px; }
+.section-title { font-size: clamp(1.5rem, 3.4vw, 2.1rem); max-width: 640px; }
+.section-sub { margin-top: 12px; color: var(--muted); max-width: 560px; font-size: 1rem; }
+
+/* ── DOR (3 cards) ── */
+.dor-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 36px; }
+.dor-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 24px; }
+.dor-card .num { font-family: var(--font-mono); font-size: 0.72rem; color: var(--faint); }
+.dor-card h3 { font-size: 1.02rem; margin: 10px 0 8px; }
+.dor-card p { font-size: 0.87rem; color: var(--muted); line-height: 1.6; }
+
+/* ── PROVA (case Martins) ── */
+.case { background: linear-gradient(135deg, var(--surface), var(--surface2)); border: 1px solid var(--border-strong); border-radius: 14px; padding: 40px; margin-top: 36px; display: grid; grid-template-columns: 1fr 1fr; gap: 36px; align-items: center; }
+.case-tag { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--green); background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); display: inline-block; padding: 4px 12px; border-radius: 100px; margin-bottom: 14px; }
+.case h3 { font-size: 1.3rem; margin-bottom: 10px; }
+.case p { color: var(--muted); font-size: 0.92rem; margin-bottom: 18px; }
+.case-stats { display: flex; gap: 22px; margin-bottom: 20px; }
+.case-stats div b { display: block; font-family: var(--font-head), sans-serif; font-size: 1.5rem; color: var(--primary-l); }
+.case-stats div span { font-size: 0.7rem; color: var(--faint); }
+.case-link { display: inline-flex; align-items: center; gap: 7px; color: var(--cyan); font-weight: 600; font-size: 0.88rem; text-decoration: none; }
+.case-visual { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 20px; font-family: var(--font-mono); font-size: 0.78rem; color: var(--faint); position: relative; min-height: 220px; display: flex; flex-direction: column; }
+.case-visual .bar { display: flex; gap: 5px; margin-bottom: 14px; }
+.case-visual .bar span { width: 9px; height: 9px; border-radius: 50%; background: var(--border-strong); }
+.case-visual .url { color: var(--muted); border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 14px; }
+.case-visual .line { height: 8px; background: var(--surface2); border-radius: 3px; margin-bottom: 8px; }
+.case-visual .line.w60 { width: 60%; } .case-visual .line.w80 { width: 80%; } .case-visual .line.w40 { width: 40%; }
+.case-visual .btn-mock { margin-top: auto; align-self: flex-start; background: var(--primary); color: #fff; font-family: 'Inter', sans-serif; font-size: 0.72rem; font-weight: 700; padding: 8px 16px; border-radius: 6px; }
+
+/* ── INCLUSO ── */
+.incluso-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 36px; }
+.incluso-item { display: flex; gap: 14px; align-items: flex-start; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 18px 20px; }
+.incluso-icon { flex-shrink: 0; width: 34px; height: 34px; border-radius: 8px; background: rgba(180,79,255,0.12); display: grid; place-items: center; color: var(--primary-l); }
+.incluso-item h3 { font-size: 0.92rem; margin-bottom: 4px; }
+.incluso-item p { font-size: 0.82rem; color: var(--muted); }
+
+/* ── PROCESSO ── */
+.proc-list { margin-top: 36px; display: flex; flex-direction: column; }
+.proc-item { display: grid; grid-template-columns: 56px 1fr; gap: 20px; padding: 22px 0; border-top: 1px solid var(--border); }
+.proc-item:last-child { border-bottom: 1px solid var(--border); }
+.proc-num { font-family: var(--font-display), sans-serif; font-size: 1.6rem; color: var(--border-strong); }
+.proc-item h3 { font-size: 1rem; margin-bottom: 5px; }
+.proc-item p { font-size: 0.87rem; color: var(--muted); max-width: 480px; }
+.proc-item .when { font-family: var(--font-mono); font-size: 0.72rem; color: var(--cyan); margin-top: 6px; display: block; }
+
+/* ── PREÇO ── */
+.price-box { max-width: 460px; margin: 36px auto 0; background: linear-gradient(160deg, var(--surface2), var(--surface)); border: 1px solid var(--border-strong); border-radius: 16px; padding: 36px; text-align: center; box-shadow: 0 20px 60px rgba(180,79,255,0.12); }
+.price-name { font-family: var(--font-mono); font-size: 0.76rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--primary-l); }
+.price-amount { font-family: var(--font-display), sans-serif; font-size: 3rem; margin: 12px 0 2px; }
+.price-amount span { font-size: 1rem; color: var(--faint); font-family: 'Inter', sans-serif; font-weight: 500; }
+.price-sub { font-size: 0.82rem; color: var(--faint); margin-bottom: 24px; }
+.price-list { list-style: none; text-align: left; margin-bottom: 28px; }
+.price-list li { display: flex; gap: 10px; padding: 9px 0; border-top: 1px solid var(--border); font-size: 0.87rem; color: var(--muted); }
+.price-list li:first-child { border-top: none; }
+.price-list svg { flex-shrink: 0; color: var(--green); margin-top: 2px; }
+.price-box .btn { width: 100%; justify-content: center; }
+
+/* ── FAQ ── */
+.faq-item { border-top: 1px solid var(--border); padding: 20px 0; }
+.faq-item:last-child { border-bottom: 1px solid var(--border); }
+.faq-q { font-weight: 600; font-size: 0.96rem; margin-bottom: 8px; }
+.faq-a { font-size: 0.87rem; color: var(--muted); max-width: 620px; }
+
+/* ── CTA final ── */
+.cta-final { text-align: center; padding: 76px 0; position: relative; }
+.cta-final::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 80% at 50% 50%, var(--glow-soft), transparent 70%); pointer-events: none; }
+.cta-final h2 { font-size: clamp(1.6rem, 4vw, 2.4rem); max-width: 620px; margin: 0 auto 16px; }
+.cta-final p { color: var(--muted); max-width: 460px; margin: 0 auto 30px; }
+
+footer { border-top: 1px solid var(--border); padding: 28px 0; text-align: center; color: var(--faint); font-size: 0.78rem; }
+
+@media (max-width: 760px) {
+  .dor-grid, .incluso-grid { grid-template-columns: 1fr; }
+  .case { grid-template-columns: 1fr; padding: 26px; }
+  .hero { padding: 56px 0 40px; }
+  .hero-proof { gap: 20px; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="logo">Sync<span>Tech</span> · Sites</div>
+    <a class="nav-cta" href="https://wa.me/5531986551626?text=Ol%C3%A1!%20Vi%20a%20p%C3%A1gina%20de%20sites%20da%20SyncTech%20e%20quero%20saber%20mais." target="_blank">Falar agora →</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="container">
+    <div class="eyebrow"><span class="dot"></span> Vagas limitadas este mês</div>
+    <h1>Sua empresa não aparece no Google. <em>Isso custa cliente todo dia.</em></h1>
+    <p class="hero-sub">Site profissional, no ar em até 7 dias, feito por quem já entregou site real pra negócio real da região — não é template genérico.</p>
+    <div class="hero-ctas">
+      <a class="btn btn-primary" href="https://wa.me/5531986551626?text=Ol%C3%A1!%20Vi%20a%20p%C3%A1gina%20de%20sites%20da%20SyncTech%20e%20quero%20fazer%20o%20site%20do%20meu%20neg%C3%B3cio." target="_blank">Quero meu site →</a>
+      <a class="btn btn-ghost" href="#case">Ver exemplo real</a>
+    </div>
+    <div class="hero-proof">
+      <div class="proof-item"><b>7 dias</b><span>do briefing ao ar</span></div>
+      <div class="proof-item"><b>100%</b><span>feito pra você, sem builder genérico</span></div>
+      <div class="proof-item"><b>1</b><span>pagamento único de setup</span></div>
+    </div>
+  </div>
+</header>
+
+<section id="dor">
+  <div class="container">
+    <div class="section-tag">O problema</div>
+    <h2 class="section-title">Enquanto seu negócio não tem site, o concorrente que tem está ganhando o cliente que pesquisou primeiro.</h2>
+    <div class="dor-grid">
+      <div class="dor-card">
+        <div class="num">01</div>
+        <h3>Invisível no Google</h3>
+        <p>Quem pesquisa "[seu serviço] perto de mim" só acha quem aparece — e sem site, quem aparece é o concorrente.</p>
+      </div>
+      <div class="dor-card">
+        <div class="num">02</div>
+        <h3>Sem credibilidade</h3>
+        <p>Cliente novo desconfia de negócio que só tem perfil de Instagram — site profissional passa segurança antes mesmo da primeira mensagem.</p>
+      </div>
+      <div class="dor-card">
+        <div class="num">03</div>
+        <h3>Vendendo por mensagem</h3>
+        <p>Sem site, toda pergunta ("quanto custa", "onde fica", "que horas abre") vira mensagem de WhatsApp que você tem que responder na mão.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="case">
+  <div class="container">
+    <div class="section-tag">Prova real, não promessa</div>
+    <h2 class="section-title">Já entreguei site assim pra negócio real da região.</h2>
+    <div class="case">
+      <div>
+        <span class="case-tag">Cliente ativo</span>
+        <h3>Barbearia Martins — Mariana/MG</h3>
+        <p>Site publicado, com os serviços, prótese capilar em destaque, vídeos reais do Instagram e botão direto de WhatsApp. No ar desde agosto de 2026.</p>
+        <div class="case-stats">
+          <div><b>+18%</b><span>seguidores em 23 dias após o site</span></div>
+          <div><b>502</b><span>seguidores hoje</span></div>
+        </div>
+        <a class="case-link" href="https://synctech-automation.github.io/barbearia-martins-site/" target="_blank">Ver o site ao vivo →</a>
+      </div>
+      <div class="case-visual">
+        <div class="bar"><span></span><span></span><span></span></div>
+        <div class="url">synctech-automation.github.io/barbearia-martins-site</div>
+        <div class="line w80"></div>
+        <div class="line w60"></div>
+        <div class="line w40"></div>
+        <div class="btn-mock">Agendar no WhatsApp</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="incluso">
+  <div class="container">
+    <div class="section-tag">O que está incluso</div>
+    <h2 class="section-title">Um site de verdade, não um cartão de visita digital.</h2>
+    <div class="incluso-grid">
+      <div class="incluso-item">
+        <div class="incluso-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="7" width="14" height="10" rx="1"/><path d="M16 9l6-4v14l-6-4"/></svg></div>
+        <div><h3>Feito pro seu negócio</h3><p>Design com sua identidade, seus serviços e suas fotos — não é um template genérico igual de todo mundo.</p></div>
+      </div>
+      <div class="incluso-item">
+        <div class="incluso-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2a15 15 0 000 20 15 15 0 000-20z"/><path d="M2 12h20"/></svg></div>
+        <div><h3>Otimizado pra Google local</h3><p>Estruturado pra aparecer em buscas com o nome da sua cidade e do seu serviço.</p></div>
+      </div>
+      <div class="incluso-item">
+        <div class="incluso-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 11l18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 11-5.8-1.6"/></svg></div>
+        <div><h3>Botão de WhatsApp direto</h3><p>Toda página leva o visitante pra uma conversa com você — sem formulário burocrático.</p></div>
+      </div>
+      <div class="incluso-item">
+        <div class="incluso-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="6" width="18" height="14" rx="2"/><path d="M3 10h18"/></svg></div>
+        <div><h3>Mapa e endereço embutidos</h3><p>Cliente acha seu endereço sem precisar perguntar, com rota direta pro Google Maps.</p></div>
+      </div>
+      <div class="incluso-item">
+        <div class="incluso-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M9 18h6"/></svg></div>
+        <div><h3>Funciona perfeito no celular</h3><p>A maioria de quem visita vem do Instagram no celular — o site é feito pensando nisso primeiro.</p></div>
+      </div>
+      <div class="incluso-item">
+        <div class="incluso-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg></div>
+        <div><h3>Suas avaliações em destaque</h3><p>Espaço pra mostrar sua nota do Google e depoimentos reais de cliente — constrói confiança na hora.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="processo">
+  <div class="container">
+    <div class="section-tag">Como funciona</div>
+    <h2 class="section-title">Do primeiro contato ao site no ar.</h2>
+    <div class="proc-list">
+      <div class="proc-item">
+        <div class="proc-num">01</div>
+        <div><h3>Conversa rápida</h3><p>Me conta sobre o negócio, os serviços e o que você quer que o site passe pro cliente.</p><span class="when">15 minutos, por WhatsApp ou chamada</span></div>
+      </div>
+      <div class="proc-item">
+        <div class="proc-num">02</div>
+        <div><h3>Envio de material</h3><p>Você manda logo, fotos e informações — se não tiver tudo pronto, eu ajudo a organizar.</p><span class="when">1-2 dias</span></div>
+      </div>
+      <div class="proc-item">
+        <div class="proc-num">03</div>
+        <div><h3>Construção do site</h3><p>Eu monto o site já com sua identidade — você acompanha e pede ajuste antes de publicar.</p><span class="when">3-4 dias</span></div>
+      </div>
+      <div class="proc-item">
+        <div class="proc-num">04</div>
+        <div><h3>No ar</h3><p>Site publicado com endereço próprio, pronto pra colocar no Instagram e no Google Meu Negócio.</p><span class="when">até o 7º dia</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="preco">
+  <div class="container">
+    <div class="section-tag">Investimento</div>
+    <h2 class="section-title">Preço fechado, sem letra miúda.</h2>
+    <div class="price-box">
+      <div class="price-name">Site Profissional</div>
+      <div class="price-amount">R$697<span> setup único</span></div>
+      <div class="price-sub">+ R$47/mês de hospedagem e manutenção</div>
+      <ul class="price-list">
+        <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> Site de 1 página, feito sob medida</li>
+        <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> Otimizado pra Google e celular</li>
+        <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> Botão de WhatsApp + mapa embutidos</li>
+        <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> Ajustes inclusos até você aprovar</li>
+        <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> No ar em até 7 dias</li>
+      </ul>
+      <a class="btn btn-primary" href="https://wa.me/5531986551626?text=Ol%C3%A1!%20Quero%20fazer%20o%20site%20profissional%20do%20meu%20neg%C3%B3cio." target="_blank">Quero esse site →</a>
+    </div>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="container">
+    <div class="section-tag">Dúvidas comuns</div>
+    <h2 class="section-title">Antes de perguntar, já te respondo.</h2>
+    <div style="margin-top:28px">
+      <div class="faq-item">
+        <div class="faq-q">Não tenho fotos boas do meu negócio, tem problema?</div>
+        <div class="faq-a">Não. Eu ajudo a organizar o que você já tem (celular já serve) e, se faltar algo, indico o caminho mais simples pra resolver antes de publicar.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">O site fica no meu nome, eu posso editar depois?</div>
+        <div class="faq-a">Sim. O site é seu — hospedado com seu domínio ou endereço próprio, e qualquer ajuste depois disso é comigo, sem complicação técnica da sua parte.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Depois do site, dá pra automatizar WhatsApp e Instagram também?</div>
+        <div class="faq-a">Dá, sim — o site é só o primeiro passo. Automação de atendimento, agendamento e CRM são serviços separados, você contrata quando fizer sentido pro seu momento.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Preciso pagar tudo de uma vez?</div>
+        <div class="faq-a">O setup (R$697) é único, na entrega do site. A manutenção (R$47/mês) só começa a contar depois que o site está no ar.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-final">
+  <div class="container">
+    <h2>Seu concorrente já pode ter site. Sua vez de aparecer também.</h2>
+    <p>15 minutos de conversa e eu já te digo exatamente como ficaria o site do seu negócio.</p>
+    <a class="btn btn-primary" href="https://wa.me/5531986551626?text=Ol%C3%A1!%20Vi%20a%20p%C3%A1gina%20de%20sites%20da%20SyncTech%20e%20quero%20fazer%20o%20site%20do%20meu%20neg%C3%B3cio." target="_blank">Quero meu site agora →</a>
+  </div>
+</section>
+
+<footer>
+  SyncTech Automation · Mariana/MG · <a href="https://pacoquinhagamer02-max.github.io/synctech-automation/">Conheça o hub completo de automação →</a>
+</footer>
+
+</body>
+</html>
