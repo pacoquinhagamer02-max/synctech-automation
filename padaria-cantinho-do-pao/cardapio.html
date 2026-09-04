@@ -40,8 +40,9 @@ button{font-family:inherit}
   border-bottom:1px dashed rgba(241,236,220,0.16)}
 .board-top{display:flex;align-items:center;justify-content:space-between}
 .stamp{display:flex;align-items:center;gap:10px}
-.stamp img{width:38px;height:38px;border-radius:50%;transform:rotate(-8deg);box-shadow:0 2px 8px rgba(0,0,0,0.4);border:2px solid rgba(241,236,220,0.15)}
-.stamp span{font-family:var(--mono);font-size:0.72rem;letter-spacing:0.03em;color:var(--chalk-dim);text-transform:uppercase}
+.stamp img{width:48px;height:48px;border-radius:50%;transform:rotate(-8deg);box-shadow:0 2px 8px rgba(0,0,0,0.4);border:2px solid rgba(241,236,220,0.2)}
+.stamp span{font-family:var(--mono);font-size:0.76rem;letter-spacing:0.03em;color:var(--chalk-dim);text-transform:uppercase}
+.big-stamp{position:absolute;right:-14px;bottom:-14px;width:92px;height:92px;border-radius:50%;transform:rotate(9deg);box-shadow:0 6px 18px rgba(0,0,0,0.5);border:3px solid var(--paper);z-index:3}
 .status{font-family:var(--mono);font-size:0.68rem;letter-spacing:0.03em;text-transform:uppercase;color:var(--chalk-dim);display:flex;align-items:center;gap:6px}
 .status .dot{width:7px;height:7px;border-radius:50%;background:#6FBF73;box-shadow:0 0 6px #6FBF73}
 .status.closed .dot{background:#C15B4E;box-shadow:0 0 6px #C15B4E}
@@ -179,6 +180,7 @@ footer{text-align:center;padding:28px 18px 10px;font-size:0.7rem;color:var(--ink
       <div class="board-photo-wrap">
         <div class="tape"></div>
         <div class="board-photo"><img src="assets/hero.jpg" alt="Pão fresquinho da casa"></div>
+        <img class="big-stamp" src="assets/logo.jpg" alt="Selo Cantinho do Pão">
       </div>
       <div class="board-text">
         <h1>Monte seu&nbsp;pedido</h1>
