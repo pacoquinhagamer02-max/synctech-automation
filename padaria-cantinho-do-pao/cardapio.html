@@ -91,6 +91,17 @@ button{font-family:inherit}
 .pin img{width:100%;height:96px;object-fit:cover;object-position:50% 50%}
 .pin span{position:absolute;left:6px;right:6px;bottom:5px;font-family:var(--disp);font-size:0.85rem;color:var(--ink);text-align:center;line-height:1.1}
 
+/* ── SOBRE ── */
+.sobre{background:var(--paper);color:var(--ink);padding:32px 0}
+.sobre-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:28px;align-items:center}
+.sobre-tag{font-family:var(--mono);font-size:0.68rem;letter-spacing:0.04em;text-transform:uppercase;color:var(--gold-d)}
+.sobre h2{font-family:var(--disp);font-size:1.9rem;margin-top:6px;font-weight:700}
+.sobre p{font-size:0.9rem;color:var(--ink-muted);margin-top:10px;max-width:420px}
+.sobre-quote{background:var(--paper2);border-left:3px solid var(--gold);padding:16px 18px}
+.sobre-quote p{font-family:var(--disp);font-size:1.15rem;color:var(--ink);line-height:1.35}
+.sobre-quote span{display:block;margin-top:8px;font-size:0.74rem;color:var(--ink-faint)}
+@media(max-width:560px){.sobre-grid{grid-template-columns:1fr}}
+
 /* ── PROVA (recibos) ── */
 .proof{padding:18px 0 4px}
 .proof-scroll{display:flex;gap:10px;overflow-x:auto;padding:0 18px 4px;scrollbar-width:none}
@@ -227,6 +238,20 @@ footer{text-align:center;padding:28px 18px 10px;font-size:0.7rem;color:var(--ink
     <div class="pin r2"><img src="assets/coxinha.jpg" alt="Coxinha de frango (imagem ilustrativa)"><span>coxinha</span></div>
   </div>
 </div>
+
+<section class="sobre">
+  <div class="wrap sobre-grid">
+    <div>
+      <span class="sobre-tag">Sobre a casa</span>
+      <h2>Padaria de bairro, do jeito que devia ser</h2>
+      <p>Abrimos às 5h30, todo santo dia, pra fornada sair quentinha antes de Mariana acordar. Não é rede, não é franquia — é o Cantinho do Pão, na Rua do Catete, com gente da casa te atendendo pelo nome.</p>
+    </div>
+    <div class="sobre-quote">
+      <p>"Lugarzinho muito aconchegante e muitas opções pra lanchar."</p>
+      <span>— Andréia O., avaliação real no Google</span>
+    </div>
+  </div>
+</section>
 
 <div class="proof">
   <div class="proof-scroll">
