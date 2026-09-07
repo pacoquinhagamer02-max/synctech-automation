@@ -7,6 +7,7 @@ DST="../cantinhodopao-site"
 
 cp "$SRC/cardapio.html" "$DST/index.html"
 cp "$SRC/manifest.json" "$DST/manifest.json" 2>/dev/null || true
+cp "$SRC/sw.js" "$DST/sw.js" 2>/dev/null || true
 rm -rf "$DST/assets"
 cp -r "$SRC/assets" "$DST/assets"
 
