@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Cantinho do Pão — Mariana/MG</title>
 <meta name="theme-color" content="#1B120D">
 <meta property="og:type" content="website">
@@ -40,8 +40,9 @@ img{max-width:100%;display:block}
 button{font-family:inherit}
 h1,h2,h3{font-family:var(--disp);font-weight:700;text-wrap:balance}
 :focus-visible{outline:2px solid var(--ember);outline-offset:2px}
-.btn{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:0.92rem;padding:13px 22px;border:none;cursor:pointer;transition:transform .12s ease}
+.btn{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:0.92rem;padding:13px 22px;border:none;cursor:pointer;transition:transform .12s ease,filter .12s ease;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .btn:active{transform:scale(.96)}
+.btn:hover{filter:brightness(1.1)}
 .btn-p{background:var(--ember-dim);color:#fff}
 .btn-o{background:transparent;color:var(--txt);border:1px solid var(--line-strong)}
 .eyebrow{font-family:var(--mono);font-size:0.68rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--crust)}
@@ -144,10 +145,18 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;text-wrap:balance}
 .item-info p{font-size:0.76rem;color:var(--ink-faint);margin-top:2px}
 .item-price{font-family:var(--mono);font-weight:700;font-size:0.86rem;margin-top:5px;color:var(--ink-mut)}
 .item-add{flex-shrink:0;display:flex;align-items:center;gap:10px}
-.qty-btn{width:28px;height:28px;border:1px solid rgba(43,32,22,0.22);background:none;font-family:var(--mono);font-size:1rem;font-weight:700;color:var(--ink);display:flex;align-items:center;justify-content:center}
+.qty-btn{width:28px;height:28px;border:1px solid rgba(43,32,22,0.22);background:none;font-family:var(--mono);font-size:1rem;font-weight:700;color:var(--ink);display:flex;align-items:center;justify-content:center;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .qty-btn:active{transform:scale(.85);background:var(--paper2)}
-.qty-val{min-width:14px;text-align:center;font-family:var(--mono);font-weight:700;font-size:0.86rem}
+.qty-val{min-width:14px;text-align:center;font-family:var(--mono);font-weight:700;font-size:0.86rem;font-variant-numeric:tabular-nums}
 .item.just-added .item-info h4{color:var(--stamp)}
+
+/* ── BUSCA (estilo iFood) ── */
+.search-w{position:relative;margin:18px 0 8px}
+.search-w svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:17px;height:17px;color:var(--ink-faint);pointer-events:none}
+.search-w input{width:100%;padding:12px 14px 12px 40px;border:1px solid rgba(43,32,22,0.18);background:#fff;font-family:var(--body);font-size:0.9rem;color:var(--ink)}
+.search-w input:focus-visible{outline:2px solid var(--ember);outline-offset:1px}
+.search-empty{padding:30px 0;text-align:center;color:var(--ink-mut);font-size:0.88rem;display:none}
+.search-empty.show{display:block}
 
 /* ── ENTREGA callout ── */
 .entrega-box{margin-top:44px;background:var(--ink);color:var(--paper);padding:28px 26px;display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
@@ -196,33 +205,41 @@ footer{padding:26px 0 90px;text-align:center;color:var(--dim);font-size:0.72rem;
 footer p{max-width:560px;margin:8px auto 0}
 
 /* ── CART BAR + MODAL (mesma lógica funcional, novo visual) ── */
-.cart-bar{position:fixed;left:0;right:0;bottom:0;background:var(--ink);color:var(--paper);padding:14px 20px;z-index:60;box-shadow:0 -8px 28px rgba(0,0,0,0.35);transform:translateY(110%);transition:transform .3s cubic-bezier(.16,.8,.3,1)}
+.cart-bar{position:fixed;left:0;right:0;bottom:0;background:var(--ink);color:var(--paper);padding:14px 20px calc(14px + env(safe-area-inset-bottom));z-index:60;box-shadow:0 -8px 28px rgba(0,0,0,0.35);transform:translateY(110%);transition:transform .3s cubic-bezier(.16,.8,.3,1)}
 .cart-bar.show{transform:translateY(0)}
 .cart-bar-row{max-width:1040px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:14px}
 .cart-bar .info{font-family:var(--mono);font-size:0.76rem;color:var(--paper2)}
-.cart-bar .info b{display:block;font-family:var(--disp);font-size:1.4rem;color:var(--crust);font-weight:700}
-.cart-bar .cart-btn{background:var(--ember-dim);color:#fff;font-weight:700;font-size:0.84rem;padding:12px 20px;border:none;display:flex;align-items:center;gap:6px;flex-shrink:0}
+.cart-bar .info b{display:block;font-family:var(--disp);font-size:1.4rem;color:var(--crust);font-weight:700;font-variant-numeric:tabular-nums}
+.cart-bar .cart-btn{background:var(--ember-dim);color:#fff;font-weight:700;font-size:0.84rem;padding:12px 20px;border:none;display:flex;align-items:center;gap:6px;flex-shrink:0;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .cart-bar .cart-btn:active{transform:scale(.95)}
 
 .modal-overlay{position:fixed;inset:0;background:rgba(16,10,7,0.7);z-index:70;display:none;align-items:flex-end;justify-content:center}
 .modal-overlay.show{display:flex}
-.modal{background:var(--paper);color:var(--ink);width:100%;max-width:540px;padding:26px 24px 30px;max-height:88vh;overflow-y:auto;position:relative}
+.modal{background:var(--paper);color:var(--ink);width:100%;max-width:540px;padding:26px 24px calc(30px + env(safe-area-inset-bottom));max-height:88vh;overflow-y:auto;overscroll-behavior:contain;position:relative}
 .modal-handle{width:40px;height:4px;background:rgba(43,32,22,0.2);border-radius:4px;margin:0 auto 18px}
 .modal h2{font-size:1.7rem;margin-bottom:14px}
-.modal-summary{border-top:1px solid rgba(43,32,22,0.16);border-bottom:1px solid rgba(43,32,22,0.16);padding:10px 0;margin-bottom:18px;max-height:140px;overflow-y:auto}
-.modal-summary .row{display:flex;justify-content:space-between;font-family:var(--mono);font-size:0.8rem;padding:4px 0;color:var(--ink-mut)}
-.modal-summary .row b{color:var(--ink);font-weight:700}
-.modal-total{display:flex;justify-content:space-between;margin-top:8px;padding-top:8px;font-weight:700;font-family:var(--mono);font-size:1rem}
+.modal-summary{border-top:1px solid rgba(43,32,22,0.16);border-bottom:1px solid rgba(43,32,22,0.16);padding:10px 0;margin-bottom:18px;max-height:220px;overflow-y:auto}
+.modal-summary .empty{padding:14px 0;color:var(--ink-faint);font-size:0.86rem;text-align:center}
+.msum-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0}
+.msum-row .nm{flex:1;min-width:0;font-size:0.84rem;color:var(--ink);word-break:break-word}
+.msum-row .px{font-family:var(--mono);font-size:0.78rem;color:var(--ink-mut);white-space:nowrap;font-variant-numeric:tabular-nums}
+.msum-qty{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.msum-qty button{width:24px;height:24px;border:1px solid rgba(43,32,22,0.22);background:none;font-family:var(--mono);font-weight:700;color:var(--ink);touch-action:manipulation}
+.msum-qty span{min-width:12px;text-align:center;font-family:var(--mono);font-size:0.8rem;font-weight:700}
+.modal-total{display:flex;justify-content:space-between;margin-top:8px;padding-top:8px;font-weight:700;font-family:var(--mono);font-size:1rem;font-variant-numeric:tabular-nums}
 .field{margin-bottom:14px}
 .field label{display:block;font-family:var(--mono);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.03em;color:var(--ink-mut);margin-bottom:6px}
-.field input{width:100%;padding:11px 0;border:none;border-bottom:1px solid rgba(43,32,22,0.24);background:none;font-family:var(--body);font-size:0.94rem;color:var(--ink)}
-.field input:focus{outline:none;border-color:var(--ember)}
+.field input,.field textarea{width:100%;padding:11px 0;border:none;border-bottom:1px solid rgba(43,32,22,0.24);background:none;font-family:var(--body);font-size:0.94rem;color:var(--ink);resize:vertical}
+.field input:focus-visible,.field textarea:focus-visible{outline:none;border-color:var(--ember)}
+.field-err{display:none;color:#A8433A;font-size:0.76rem;margin-top:5px}
+.field.has-err input{border-color:#A8433A}
+.field.has-err .field-err{display:block}
 .opt-group{display:flex;gap:10px}
-.opt{flex:1;border:1px solid rgba(43,32,22,0.24);padding:11px;text-align:center;font-size:0.82rem;font-weight:600;color:var(--ink-mut);cursor:pointer}
+.opt{flex:1;border:1px solid rgba(43,32,22,0.24);background:none;padding:11px;text-align:center;font-size:0.82rem;font-weight:600;color:var(--ink-mut);cursor:pointer;font-family:var(--body);touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .opt.sel{border-color:var(--ember);background:rgba(226,102,46,0.1);color:var(--ink)}
-.modal-send{width:100%;background:var(--ink);color:var(--crust);font-weight:700;font-size:0.9rem;padding:15px;border:none;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px;font-family:var(--mono)}
+.modal-send{width:100%;background:var(--ink);color:var(--crust);font-weight:700;font-size:0.9rem;padding:15px;border:none;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px;font-family:var(--mono);touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .modal-send:active{transform:scale(.98)}
-.modal-close{position:absolute;top:20px;right:20px;width:28px;height:28px;background:none;border:1px solid rgba(43,32,22,0.24);font-size:0.9rem;color:var(--ink)}
+.modal-close{position:absolute;top:20px;right:20px;width:28px;height:28px;background:none;border:1px solid rgba(43,32,22,0.24);font-size:0.9rem;color:var(--ink);touch-action:manipulation}
 
 @media(prefers-reduced-motion:reduce){.cart-bar,.gal img{transition:none}}
 </style>
@@ -332,6 +349,12 @@ footer p{max-width:560px;margin:8px auto 0}
       <p>Escolha os itens, diga seu nome e retirada ou entrega — o pedido cai pronto no nosso WhatsApp, com tudo descrito e o valor a pagar.</p>
     </div>
 
+    <div class="search-w">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
+      <label for="cardapio-search" class="visually-hidden" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">Buscar no cardápio</label>
+      <input type="search" id="cardapio-search" placeholder="Buscar no cardápio…" autocomplete="off">
+    </div>
+
     <nav class="cat-nav" id="cat-nav">
       <button class="cat-btn active" data-cat="salgados"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9c0-3 3.5-6 8-6s8 3 8 6c0 4-4 10-8 11-4-1-8-7-8-11z"/><path d="M9 10c1 1 5 1 6 0"/></svg>Salgados</button>
       <button class="cat-btn" data-cat="paes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 15c0-5 4-9 9-9s9 4 9 9c0 2-2 3-9 3s-9-1-9-3z"/><path d="M8 9.5c.5 1 .5 3 0 4M12 8c.5 1.5.5 4.5 0 6M16 9.5c.5 1 .5 3 0 4"/></svg>Pães</button>
@@ -345,21 +368,21 @@ footer p{max-width:560px;margin:8px auto 0}
       <div class="item" data-name="Coxinha de frango" data-price="8">
         <div class="item-ph"><img src="assets/coxinha.jpg" alt="Coxinha de frango (imagem ilustrativa)" loading="lazy" decoding="async"></div>
         <div class="item-info"><h4>Coxinha de frango</h4><p>Feita na hora, casquinha crocante — imagem ilustrativa</p><div class="item-price">R$8,00</div></div>
-        <div class="item-add"><button class="qty-btn minus">−</button><span class="qty-val">0</span><button class="qty-btn plus">+</button></div>
+        <div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div>
       </div>
       <div class="item" data-name="Empada de frango" data-price="7">
         <div class="item-ph"><img src="assets/empada.jpg" alt="Empada de frango (imagem ilustrativa)" loading="lazy" decoding="async"></div>
         <div class="item-info"><h4>Empada de frango</h4><p>Massa amanteigada, recheio generoso — imagem ilustrativa</p><div class="item-price">R$7,00</div></div>
-        <div class="item-add"><button class="qty-btn minus">−</button><span class="qty-val">0</span><button class="qty-btn plus">+</button></div>
+        <div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div>
       </div>
       <div class="item" data-name="Kibe" data-price="7">
         <div class="item-ph"><img src="assets/kibe.jpg" alt="Kibe (imagem ilustrativa)" loading="lazy" decoding="async"></div>
         <div class="item-info"><h4>Kibe</h4><p>Crocante por fora, suculento por dentro — imagem ilustrativa</p><div class="item-price">R$7,00</div></div>
-        <div class="item-add"><button class="qty-btn minus">−</button><span class="qty-val">0</span><button class="qty-btn plus">+</button></div>
+        <div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div>
       </div>
       <div class="item" data-name="Pastel de queijo" data-price="7">
         <div class="item-info"><h4>Pastel de queijo</h4><p>Assado, sem fritura</p><div class="item-price">R$7,00</div></div>
-        <div class="item-add"><button class="qty-btn minus">−</button><span class="qty-val">0</span><button class="qty-btn plus">+</button></div>
+        <div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div>
       </div>
     </section>
 
@@ -368,15 +391,15 @@ footer p{max-width:560px;margin:8px auto 0}
       <p class="cat-note">Fornada nova pela manhã e no fim da tarde.</p>
       <div class="item" data-name="Pão francês (unidade)" data-price="1">
         <div class="item-info"><h4>Pão francês (unidade)</h4><p>Quentinho, casca crocante</p><div class="item-price">R$1,00</div></div>
-        <div class="item-add"><button class="qty-btn minus">−</button><span class="qty-val">0</span><button class="qty-btn plus">+</button></div>
+        <div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div>
       </div>
       <div class="item" data-name="Pão de queijo (6un)" data-price="14">
         <div class="item-info"><h4>Pão de queijo (6un)</h4><p>Receita mineira, forno a lenha</p><div class="item-price">R$14,00</div></div>
-        <div class="item-add"><button class="qty-btn minus">−</button><span class="qty-val">0</span><button class="qty-btn plus">+</button></div>
+        <div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div>
       </div>
       <div class="item" data-name="Pão de forma integral" data-price="12">
         <div class="item-info"><h4>Pão de forma integral</h4><p>Fatiado, sem conservantes</p><div class="item-price">R$12,00</div></div>
-        <div class="item-add"><button class="qty-btn minus">−</button><span class="qty-val">0</span><button class="qty-btn plus">+</button></div>
+        <div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div>
       </div>
     </section>
 
@@ -386,21 +409,21 @@ footer p{max-width:560px;margin:8px auto 0}
       <div class="item" data-name="Fatia de bolo de chocolate" data-price="9">
         <div class="item-ph"><img src="assets/bolo-chocolate.jpg" alt="Bolo de chocolate da vitrine" loading="lazy" decoding="async"></div>
         <div class="item-info"><h4>Fatia de bolo de chocolate</h4><p>Cobertura cremosa — foto real da vitrine</p><div class="item-price">R$9,00</div></div>
-        <div class="item-add"><button class="qty-btn minus">−</button><span class="qty-val">0</span><button class="qty-btn plus">+</button></div>
+        <div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div>
       </div>
       <div class="item" data-name="Fatia de bolo de fubá" data-price="9">
         <div class="item-info"><h4>Fatia de bolo de fubá</h4><p>Com queijo, receita da casa</p><div class="item-price">R$9,00</div></div>
-        <div class="item-add"><button class="qty-btn minus">−</button><span class="qty-val">0</span><button class="qty-btn plus">+</button></div>
+        <div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div>
       </div>
       <div class="item" data-name="Sonho recheado" data-price="8">
         <div class="item-ph"><img src="assets/sonho.jpg" alt="Sonho recheado da vitrine" loading="lazy" decoding="async"></div>
         <div class="item-info"><h4>Sonho recheado</h4><p>Creme e cereja — foto real da vitrine</p><div class="item-price">R$8,00</div></div>
-        <div class="item-add"><button class="qty-btn minus">−</button><span class="qty-val">0</span><button class="qty-btn plus">+</button></div>
+        <div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div>
       </div>
       <div class="item" data-name="Cupcake gourmet" data-price="9">
         <div class="item-ph"><img src="assets/cupcake.jpg" alt="Cupcake gourmet da vitrine" loading="lazy" decoding="async"></div>
         <div class="item-info"><h4>Cupcake gourmet</h4><p>Cobertura e cereja — foto real da vitrine</p><div class="item-price">R$9,00</div></div>
-        <div class="item-add"><button class="qty-btn minus">−</button><span class="qty-val">0</span><button class="qty-btn plus">+</button></div>
+        <div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div>
       </div>
     </section>
 
@@ -409,13 +432,15 @@ footer p{max-width:560px;margin:8px auto 0}
       <p class="cat-note">Pra acompanhar o lanche.</p>
       <div class="item" data-name="Café coado" data-price="5">
         <div class="item-info"><h4>Café coado</h4><p>Passado na hora</p><div class="item-price">R$5,00</div></div>
-        <div class="item-add"><button class="qty-btn minus">−</button><span class="qty-val">0</span><button class="qty-btn plus">+</button></div>
+        <div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div>
       </div>
       <div class="item" data-name="Suco natural (copo 300ml)" data-price="7">
         <div class="item-info"><h4>Suco natural (300ml)</h4><p>Fruta da estação</p><div class="item-price">R$7,00</div></div>
-        <div class="item-add"><button class="qty-btn minus">−</button><span class="qty-val">0</span><button class="qty-btn plus">+</button></div>
+        <div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div>
       </div>
     </section>
+
+    <p class="search-empty" id="search-empty">Nenhum item encontrado. Tenta outro termo.</p>
 
     <div class="entrega-box">
       <div>
@@ -451,9 +476,9 @@ footer p{max-width:560px;margin:8px auto 0}
       <p>Não é rede, não é franquia — é o Cantinho do Pão, na Rua do Catete, com gente da casa te atendendo pelo nome. 4,5 estrelas em 74 avaliações reais no Google, com 2.488 seguidores reais no Instagram.</p>
     </div>
     <div class="reviews">
-      <div class="review"><p>"Lugarzinho muito aconchegante e muitas opções pra lanchar."</p><span>Andréia O. — Google</span></div>
-      <div class="review"><p>"Salgados de extrema qualidade e variedade e atendentes maravilhosos."</p><span>Felippe S. — Google</span></div>
-      <div class="review"><p>"Produtos novinhos, frescos e de qualidade."</p><span>Gabriella L. — Google</span></div>
+      <div class="review"><p>&#8220;Lugarzinho muito aconchegante e muitas opções pra lanchar.&#8221;</p><span>Andréia O. — Google</span></div>
+      <div class="review"><p>&#8220;Salgados de extrema qualidade e variedade e atendentes maravilhosos.&#8221;</p><span>Felippe S. — Google</span></div>
+      <div class="review"><p>&#8220;Produtos novinhos, frescos e de qualidade.&#8221;</p><span>Gabriella L. — Google</span></div>
     </div>
   </div>
 </section>
@@ -506,24 +531,30 @@ footer p{max-width:560px;margin:8px auto 0}
 
 <div class="modal-overlay" id="modal-overlay">
   <div class="modal">
-    <button class="modal-close" id="modal-close">✕</button>
+    <button class="modal-close" id="modal-close" aria-label="Fechar">✕</button>
     <div class="modal-handle"></div>
     <h2>Confirmar pedido</h2>
-    <div class="modal-summary" id="modal-summary"></div>
-    <div class="field">
+    <div class="modal-summary" id="modal-summary" aria-live="polite"></div>
+    <div class="field" id="f-name-field">
       <label for="f-name">Seu nome</label>
-      <input type="text" id="f-name" placeholder="Como podemos te chamar?">
+      <input type="text" id="f-name" name="nome" autocomplete="name" placeholder="Ex: Maria…">
+      <span class="field-err">Preenche seu nome pra gente confirmar o pedido.</span>
     </div>
     <div class="field">
-      <label>Retirada ou entrega</label>
-      <div class="opt-group">
-        <div class="opt sel" data-mode="Retirada na loja">Retirada na loja</div>
-        <div class="opt" data-mode="Entrega (quinta-feira)">Entrega (quinta)</div>
+      <label id="mode-label">Retirada ou entrega</label>
+      <div class="opt-group" role="group" aria-labelledby="mode-label">
+        <button type="button" class="opt sel" data-mode="Retirada na loja" aria-pressed="true">Retirada na loja</button>
+        <button type="button" class="opt" data-mode="Entrega (quinta-feira)" aria-pressed="false">Entrega (quinta)</button>
       </div>
     </div>
     <div class="field" id="f-address-field" style="display:none">
       <label for="f-address">Endereço de entrega</label>
-      <input type="text" id="f-address" placeholder="Rua, número, bairro">
+      <input type="text" id="f-address" name="endereco" autocomplete="street-address" placeholder="Rua, número, bairro…">
+      <span class="field-err">Preenche o endereço pra gente conseguir entregar.</span>
+    </div>
+    <div class="field">
+      <label for="f-notes">Observações (opcional)</label>
+      <textarea id="f-notes" name="observacoes" rows="2" placeholder="Ex: sem cebola, campainha quebrada, tocar interfone…"></textarea>
     </div>
     <button class="modal-send" id="modal-send">ENVIAR PEDIDO NO WHATSAPP →</button>
   </div>
@@ -556,38 +587,36 @@ footer p{max-width:560px;margin:8px auto 0}
     btn.addEventListener('click', function(){
       document.querySelectorAll('.cat-btn').forEach(function(b){ b.classList.remove('active'); });
       btn.classList.add('active');
-      var cat = btn.dataset.cat;
-      document.querySelectorAll('.cat-section').forEach(function(s){
-        s.style.display = (s.dataset.cat === cat) ? '' : 'none';
-      });
+      searchInput.value = '';
+      applyFilter();
     });
   });
 
+  var itemEls = {};
   document.querySelectorAll('.item').forEach(function(item){
     var name = item.dataset.name;
+    itemEls[name] = item;
     var price = parseFloat(item.dataset.price);
-    var valEl = item.querySelector('.qty-val');
-    var minus = item.querySelector('.minus');
-    var plus = item.querySelector('.plus');
-
-    function update(qty){
-      valEl.textContent = qty;
-      if (qty > 0) cart[name] = { qty: qty, price: price };
-      else delete cart[name];
-      renderCart();
-    }
-
-    plus.addEventListener('click', function(){
+    item.querySelector('.plus').addEventListener('click', function(){
       var q = (cart[name] ? cart[name].qty : 0) + 1;
-      update(q);
+      setQty(name, price, q);
       item.classList.add('just-added');
       setTimeout(function(){ item.classList.remove('just-added'); }, 500);
     });
-    minus.addEventListener('click', function(){
+    item.querySelector('.minus').addEventListener('click', function(){
       var q = Math.max(0, (cart[name] ? cart[name].qty : 0) - 1);
-      update(q);
+      setQty(name, price, q);
     });
   });
+
+  function setQty(name, price, qty){
+    var item = itemEls[name];
+    if (item) item.querySelector('.qty-val').textContent = qty;
+    if (qty > 0) cart[name] = { qty: qty, price: price };
+    else delete cart[name];
+    renderCart();
+    if (overlay.classList.contains('show')) renderModalSummary();
+  }
 
   function cartTotals(){
     var count = 0, total = 0;
@@ -611,15 +640,18 @@ footer p{max-width:560px;margin:8px auto 0}
     renderModalSummary();
     overlay.classList.add('show');
   });
-  document.getElementById('modal-close').addEventListener('click', function(){ overlay.classList.remove('show'); });
-  overlay.addEventListener('click', function(e){ if (e.target === overlay) overlay.classList.remove('show'); });
+  function closeModal(){ overlay.classList.remove('show'); }
+  document.getElementById('modal-close').addEventListener('click', closeModal);
+  overlay.addEventListener('click', function(e){ if (e.target === overlay) closeModal(); });
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && overlay.classList.contains('show')) closeModal(); });
 
   var addressField = document.getElementById('f-address-field');
   var addressInput = document.getElementById('f-address');
   document.querySelectorAll('.opt').forEach(function(opt){
     opt.addEventListener('click', function(){
-      document.querySelectorAll('.opt').forEach(function(o){ o.classList.remove('sel'); });
+      document.querySelectorAll('.opt').forEach(function(o){ o.classList.remove('sel'); o.setAttribute('aria-pressed', 'false'); });
       opt.classList.add('sel');
+      opt.setAttribute('aria-pressed', 'true');
       deliveryMode = opt.dataset.mode;
       addressField.style.display = (deliveryMode === 'Retirada na loja') ? 'none' : '';
     });
@@ -627,25 +659,55 @@ footer p{max-width:560px;margin:8px auto 0}
 
   function renderModalSummary(){
     var el = document.getElementById('modal-summary');
-    var html = '';
     var t = cartTotals();
-    Object.keys(cart).forEach(function(k){
+    var names = Object.keys(cart);
+    if (names.length === 0) {
+      el.innerHTML = '<p class="empty">Seu carrinho está vazio.</p>';
+      return;
+    }
+    var html = '';
+    names.forEach(function(k){
       var c = cart[k];
-      html += '<div class="row"><span>' + c.qty + 'x ' + k + '</span><b>R$' + (c.qty * c.price).toFixed(2).replace('.', ',') + '</b></div>';
+      html += '<div class="msum-row" data-name="' + k.replace(/"/g,'&quot;') + '">' +
+        '<span class="nm">' + k + '</span>' +
+        '<div class="msum-qty">' +
+          '<button type="button" class="m-minus" aria-label="Diminuir ' + k.replace(/"/g,'&quot;') + '">−</button>' +
+          '<span>' + c.qty + '</span>' +
+          '<button type="button" class="m-plus" aria-label="Aumentar ' + k.replace(/"/g,'&quot;') + '">+</button>' +
+        '</div>' +
+        '<span class="px">R$' + (c.qty * c.price).toFixed(2).replace('.', ',') + '</span>' +
+      '</div>';
     });
     html += '<div class="modal-total"><span>TOTAL</span><span>R$' + t.total.toFixed(2).replace('.', ',') + '</span></div>';
     el.innerHTML = html;
+    el.querySelectorAll('.msum-row').forEach(function(row){
+      var name = row.dataset.name;
+      var price = cart[name].price;
+      row.querySelector('.m-plus').addEventListener('click', function(){ setQty(name, price, cart[name].qty + 1); });
+      row.querySelector('.m-minus').addEventListener('click', function(){ setQty(name, price, cart[name].qty - 1); });
+    });
+  }
+
+  function setFieldError(fieldId, hasErr){
+    var el = document.getElementById(fieldId);
+    el.classList.toggle('has-err', hasErr);
   }
 
   document.getElementById('modal-send').addEventListener('click', function(){
     var t = cartTotals();
     if (t.count === 0) return;
-    var name = document.getElementById('f-name').value.trim();
+    var nameInput = document.getElementById('f-name');
+    var name = nameInput.value.trim();
     var address = addressInput.value.trim();
+    var notes = document.getElementById('f-notes').value.trim();
     var isDelivery = deliveryMode !== 'Retirada na loja';
 
-    if (!name) { document.getElementById('f-name').focus(); return; }
-    if (isDelivery && !address) { addressInput.focus(); return; }
+    var nameOk = !!name;
+    var addressOk = !isDelivery || !!address;
+    setFieldError('f-name-field', !nameOk);
+    setFieldError('f-address-field', !addressOk);
+    if (!nameOk) { nameInput.focus(); return; }
+    if (!addressOk) { addressInput.focus(); return; }
 
     var lines = ['Olá! Quero fazer um pedido:', ''];
     Object.keys(cart).forEach(function(k){
@@ -662,9 +724,46 @@ footer p{max-width:560px;margin:8px auto 0}
     } else {
       lines.push('Retirada na loja');
     }
+    if (notes) lines.push('Observações: ' + notes);
     var msg = encodeURIComponent(lines.join('\n'));
     window.open('https://wa.me/' + WHATSAPP + '?text=' + msg, '_blank');
   });
+
+  document.getElementById('f-name').addEventListener('input', function(){ setFieldError('f-name-field', false); });
+  addressInput.addEventListener('input', function(){ setFieldError('f-address-field', false); });
+
+  /* ── BUSCA ── */
+  var searchInput = document.getElementById('cardapio-search');
+  var searchEmpty = document.getElementById('search-empty');
+  var catNav = document.getElementById('cat-nav');
+  function normalize(s){ return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
+  function applyFilter(){
+    var q = normalize(searchInput.value.trim());
+    var activeCat = document.querySelector('.cat-btn.active').dataset.cat;
+    var anyVisible = false;
+    if (q) {
+      catNav.style.display = 'none';
+      document.querySelectorAll('.cat-section').forEach(function(sec){
+        var sectionHasMatch = false;
+        sec.querySelectorAll('.item').forEach(function(item){
+          var match = normalize(item.dataset.name).indexOf(q) !== -1;
+          item.style.display = match ? '' : 'none';
+          if (match) sectionHasMatch = true;
+        });
+        sec.style.display = sectionHasMatch ? '' : 'none';
+        if (sectionHasMatch) anyVisible = true;
+      });
+      searchEmpty.classList.toggle('show', !anyVisible);
+    } else {
+      catNav.style.display = '';
+      searchEmpty.classList.remove('show');
+      document.querySelectorAll('.cat-section').forEach(function(sec){
+        sec.style.display = (sec.dataset.cat === activeCat) ? '' : 'none';
+        sec.querySelectorAll('.item').forEach(function(item){ item.style.display = ''; });
+      });
+    }
+  }
+  searchInput.addEventListener('input', applyFilter);
 
   (function(){
     var badge = document.getElementById('status-badge');
