@@ -14,7 +14,8 @@
 <meta name="theme-color" content="#A855F7">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23A855F7'/><text y='72' font-size='58' text-anchor='middle' x='50' fill='white' font-family='Arial' font-weight='bold'>S</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Syne:wght@600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Syne:wght@600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; font-size: 16px; }
@@ -157,19 +158,11 @@ nav {
   50%  { border-color: rgba(34,211,238,0.4); }
   100% { border-color: rgba(180,79,255,0.4); }
 }
-.hero-eyebrow, .urgency-banner { font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.04em; }
+.hero-eyebrow { font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.04em; }
 .hero h1 em { background: linear-gradient(90deg,#D07BFF,#F0ABFC 50%,#22D3EE); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .btn-primary { box-shadow: 0 0 24px var(--glow-soft); animation: glow-pulse 3s ease-in-out infinite; }
 .btn-primary:hover { box-shadow: 0 0 40px var(--glow), 0 0 80px rgba(180,79,255,0.3); animation: none; }
 
-.urgency-banner {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 6px 12px; border-radius: var(--radius-sm);
-  border: 1px solid rgba(245,158,11,0.3); background: rgba(245,158,11,0.06);
-  font-size: 0.72rem; font-weight: 600; color: #FCD34D;
-  margin-bottom: 16px;
-}
-.urgency-banner .bracket { color: rgba(252,211,77,0.45); font-weight: 700; }
 
 .hero-eyebrow {
   display: inline-flex; align-items: center; gap: 8px;
@@ -205,12 +198,9 @@ nav {
 
 /* SOCIAL PROOF AVATARS */
 .social-proof { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 48px; }
-.sp-avatars { display: flex; }
-.sp-av { width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--bg); display: grid; place-items: center; font-size: 0.65rem; font-weight: 700; color: #fff; margin-left: -8px; }
-.sp-av:first-child { margin-left: 0; }
+.sp-av { width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--bg); display: grid; place-items: center; font-size: 0.65rem; font-weight: 700; color: #fff; flex-shrink: 0; }
 .sp-text { font-size: 0.78rem; color: var(--muted); }
 .sp-text strong { color: var(--text); }
-.sp-stars { color: var(--yellow); font-size: 0.7rem; letter-spacing: 1px; }
 
 /* HERO MOCKUP */
 .hero-mockup { margin: 0 auto; max-width: 700px; position: relative; }
@@ -556,6 +546,14 @@ footer { background: var(--surface); border-top: 1px solid var(--border); paddin
 /* ── REVEAL ── */
 .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.5s ease, transform 0.5s ease; }
 .reveal.visible { opacity: 1; transform: none; }
+
+/* ── REDUCED MOTION ── */
+@media (prefers-reduced-motion: reduce) {
+  .hero::after, .btn-primary, .typing-dot, .roi-result::before, .plan-card.featured {
+    animation: none !important;
+  }
+  .reveal { transition: none; opacity: 1; transform: none; }
+}
 </style>
 </head>
 <body>
@@ -600,10 +598,6 @@ footer { background: var(--surface); border-top: 1px solid var(--border); paddin
 <!-- HERO -->
 <section class="hero">
   <div class="container">
-    <div class="urgency-banner reveal">
-      <span class="bracket">[</span>5 vagas restantes para julho · garanta a sua<span class="bracket">]</span>
-    </div>
-
     <div class="hero-eyebrow reveal">
       <span class="live"></span>
       Hub de automação para empresas locais — feito no Brasil
@@ -629,16 +623,9 @@ footer { background: var(--surface); border-top: 1px solid var(--border); paddin
     <p class="hero-note reveal">Sem cartão de crédito · Resposta em até 2h · Configuração em 7 dias</p>
 
     <div class="social-proof reveal">
-      <div class="sp-avatars">
-        <div class="sp-av" style="background:#A855F7">MR</div>
-        <div class="sp-av" style="background:#06B6D4">AP</div>
-        <div class="sp-av" style="background:#22C55E">JS</div>
-        <div class="sp-av" style="background:#F59E0B">CD</div>
-        <div class="sp-av" style="background:#EF4444">LF</div>
-      </div>
+      <div class="sp-av" style="background:#A855F7">BM</div>
       <div>
-        <div class="sp-stars">★★★★★</div>
-        <div class="sp-text"><strong>+47 empresas</strong> já automatizadas</div>
+        <div class="sp-text"><strong>+18% em seguidores e agendamentos</strong> em 23 dias — case real: Barbearia Martins</div>
       </div>
     </div>
 
@@ -692,16 +679,16 @@ footer { background: var(--surface); border-top: 1px solid var(--border); paddin
     <!-- Stats -->
     <div class="hero-stats reveal">
       <div class="stat-item">
-        <div class="stat-val" data-count="300" data-suffix="%">+300%</div>
-        <div class="stat-lbl">Mais agendamentos</div>
+        <div class="stat-val">+18%</div>
+        <div class="stat-lbl">Crescimento real em 23 dias</div>
       </div>
       <div class="stat-item">
         <div class="stat-val">24h</div>
         <div class="stat-lbl">Atendimento contínuo</div>
       </div>
       <div class="stat-item">
-        <div class="stat-val" data-count="80" data-suffix="%">80%</div>
-        <div class="stat-lbl">Menos tempo perdido</div>
+        <div class="stat-val">R$197</div>
+        <div class="stat-lbl">A partir de, por mês</div>
       </div>
       <div class="stat-item">
         <div class="stat-val">7 dias</div>
@@ -714,7 +701,7 @@ footer { background: var(--surface); border-top: 1px solid var(--border); paddin
 <!-- LOGOS -->
 <div class="logos-section">
   <div class="container">
-    <div class="logos-label">Tipos de negócios que já automatizamos</div>
+    <div class="logos-label">Negócios que a SyncTech atende</div>
     <div class="logos-row">
       <div class="logo-pill"><span class="logo-pill-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="4.5" r="1.8"/><circle cx="5" cy="13.5" r="1.8"/><path d="M6.3 5.7L15.5 15M6.3 12.3L15.5 3"/></svg></span><span class="logo-pill-name">Barbearias</span></div>
       <div class="logo-pill"><span class="logo-pill-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="4" height="14" rx="1"/><rect x="2" y="7" width="14" height="4" rx="1"/></svg></span><span class="logo-pill-name">Clínicas</span></div>
@@ -811,19 +798,19 @@ footer { background: var(--surface); border-top: 1px solid var(--border); paddin
     <div class="roi-grid reveal">
       <div class="roi-inputs">
         <div class="roi-input-group">
-          <label>Clientes por mês: <span class="roi-val" id="rClientes">80</span></label>
+          <label for="sClientes">Clientes por mês: <span class="roi-val" id="rClientes">80</span></label>
           <input type="range" class="roi-slider" id="sClientes" min="20" max="300" value="80" oninput="calcROI()">
         </div>
         <div class="roi-input-group">
-          <label>Ticket médio: <span class="roi-val" id="rTicket">R$60</span></label>
+          <label for="sTicket">Ticket médio: <span class="roi-val" id="rTicket">R$60</span></label>
           <input type="range" class="roi-slider" id="sTicket" min="20" max="500" value="60" step="10" oninput="calcROI()">
         </div>
         <div class="roi-input-group">
-          <label>Taxa de retorno atual: <span class="roi-val" id="rRetorno">40%</span></label>
+          <label for="sRetorno">Taxa de retorno atual: <span class="roi-val" id="rRetorno">40%</span></label>
           <input type="range" class="roi-slider" id="sRetorno" min="10" max="80" value="40" step="5" oninput="calcROI()">
         </div>
         <div class="roi-input-group">
-          <label>Horas gastas respondendo por dia: <span class="roi-val" id="rHoras">2h</span></label>
+          <label for="sHoras">Horas gastas respondendo por dia: <span class="roi-val" id="rHoras">2h</span></label>
           <input type="range" class="roi-slider" id="sHoras" min="0.5" max="8" value="2" step="0.5" oninput="calcROI()">
         </div>
       </div>
@@ -1038,7 +1025,7 @@ footer { background: var(--surface); border-top: 1px solid var(--border); paddin
     </div>
     <div class="pricing-toggle reveal">
       <span class="toggle-option active" id="lbl-monthly">Mensal</span>
-      <button class="toggle-switch" id="pricing-toggle" onclick="togglePricing()"></button>
+      <button class="toggle-switch" id="pricing-toggle" onclick="togglePricing()" role="switch" aria-checked="false" aria-label="Alternar entre cobrança mensal e anual"></button>
       <span class="toggle-option" id="lbl-annual">Anual</span>
       <span class="save-badge">Economize 20%</span>
     </div>
@@ -1132,36 +1119,18 @@ footer { background: var(--surface); border-top: 1px solid var(--border); paddin
 <section id="depoimentos">
   <div class="container">
     <div class="reveal">
-      <div class="section-label">Resultados reais</div>
-      <h2 class="section-title">Empresas que já estão<br>no automático</h2>
+      <div class="section-label">Resultado real</div>
+      <h2 class="section-title">Um cliente real,<br>já no automático</h2>
+      <p class="section-sub">A SyncTech é nova — em vez de inventar uma dúzia de cases, aqui está o único cliente que já rodamos, com os números de verdade.</p>
     </div>
     <div class="testimonials-grid">
       <div class="testimonial-card reveal">
-        <div class="t-stars"><span class="t-star">★</span><span class="t-star">★</span><span class="t-star">★</span><span class="t-star">★</span><span class="t-star">★</span></div>
-        <p class="t-quote">"Em 2 semanas com o WhatsApp Bot, minha barbearia triplicou os agendamentos. Antes perdia cliente por não atender à noite. Agora o bot resolve tudo sozinho."</p>
+        <p class="t-quote">Depois de automatizar o atendimento e ligar tráfego pago segmentado, a barbearia cresceu em seguidores e agendamentos em pouco mais de três semanas — sem aumentar o investimento em anúncio.</p>
         <div class="t-author">
-          <div class="t-av">MR</div>
-          <div><div class="t-name">Marcos Rodrigues</div><div class="t-role">Barbearia Estilo · Plano Negócio</div></div>
+          <div class="t-av">BM</div>
+          <div><div class="t-name">Barbearia Martins</div><div class="t-role">Mariana/MG · Cliente ativo</div></div>
         </div>
-        <div class="t-result">+3x agendamentos em 2 semanas · R$4.200 a mais no mês</div>
-      </div>
-      <div class="testimonial-card reveal">
-        <div class="t-stars"><span class="t-star">★</span><span class="t-star">★</span><span class="t-star">★</span><span class="t-star">★</span><span class="t-star">★</span></div>
-        <p class="t-quote">"Minha clínica era uma bagunça de ligações. Hoje o bot agenda, manda lembrete e ainda pede avaliação no Google. Minha nota subiu de 3.8 para 4.9 em 2 meses."</p>
-        <div class="t-author">
-          <div class="t-av">AP</div>
-          <div><div class="t-name">Dra. Ana Paula</div><div class="t-role">Clínica Sorriso Perfeito · Plano Pro</div></div>
-        </div>
-        <div class="t-result">Google: 3.8 → 4.9 estrelas · 68% menos ligações</div>
-      </div>
-      <div class="testimonial-card reveal">
-        <div class="t-stars"><span class="t-star">★</span><span class="t-star">★</span><span class="t-star">★</span><span class="t-star">★</span><span class="t-star">★</span></div>
-        <p class="t-quote">"Achei que era caro, mas me paguei no primeiro mês. Meu pet shop vendeu 40% mais só com o catálogo digital integrado ao WhatsApp Bot."</p>
-        <div class="t-author">
-          <div class="t-av">JS</div>
-          <div><div class="t-name">Juliana Santos</div><div class="t-role">PetLove · Plano Negócio</div></div>
-        </div>
-        <div class="t-result">+40% em vendas no primeiro mês de uso</div>
+        <div class="t-result">+18% em seguidores e agendamentos em 23 dias · 10x ROAS médio em Meta Ads</div>
       </div>
     </div>
   </div>
@@ -1194,7 +1163,7 @@ footer { background: var(--surface); border-top: 1px solid var(--border); paddin
           Quanto tempo leva para ter resultado?
           <span class="faq-icon"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 1V9M1 5H9"/></svg></span>
         </button>
-        <div class="faq-a">A maioria dos nossos clientes vê os primeiros resultados na primeira semana. Mais agendamentos pelo bot, mais DMs respondidos no Instagram, menos ligações perdidas. O retorno completo do investimento geralmente ocorre em 30 dias.</div>
+        <div class="faq-a">O bot e a agenda começam a funcionar assim que ativados, na primeira semana. No nosso caso real (Barbearia Martins), o crescimento em seguidores e agendamentos apareceu em 23 dias.</div>
       </div>
       <div class="faq-item">
         <button class="faq-q" onclick="toggleFAQ(this)">
@@ -1208,7 +1177,7 @@ footer { background: var(--surface); border-top: 1px solid var(--border); paddin
           O sistema funciona para qualquer tipo de negócio?
           <span class="faq-icon"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 1V9M1 5H9"/></svg></span>
         </button>
-        <div class="faq-a">Sim. Já configuramos para barbearias, clínicas, salões, restaurantes, pet shops, imobiliárias, academias, fotógrafos e muito mais. O sistema é totalmente personalizado para o seu negócio específico.</div>
+        <div class="faq-a">Sim. O sistema foi desenhado pra negócios locais que atendem por WhatsApp e agenda — barbearia, clínica, salão, padaria, pet shop, academia, entre outros. É personalizado pro seu negócio específico durante a configuração.</div>
       </div>
       <div class="faq-item">
         <button class="faq-q" onclick="toggleFAQ(this)">
@@ -1228,11 +1197,13 @@ footer { background: var(--surface); border-top: 1px solid var(--border); paddin
       <div class="section-label" style="margin-bottom:16px">Pronto para começar?</div>
       <h2>Automatize seu negócio<br>ainda essa semana</h2>
       <p>Diagnóstico 100% gratuito e sem compromisso. Resposta em até 2 horas.</p>
-      <div class="cta-form">
-        <input class="cta-input" type="text" id="lead-nome" placeholder="Seu nome">
-        <input class="cta-input" type="tel" id="lead-tel" placeholder="WhatsApp (com DDD)">
-        <button class="btn-primary btn-lg" onclick="enviarLead()" style="width:100%;justify-content:center">Quero diagnóstico gratuito →</button>
-      </div>
+      <form class="cta-form" onsubmit="event.preventDefault(); enviarLead();">
+        <label for="lead-nome" class="sr-only">Seu nome</label>
+        <input class="cta-input" type="text" id="lead-nome" name="nome" autocomplete="name" placeholder="Seu nome">
+        <label for="lead-tel" class="sr-only">WhatsApp com DDD</label>
+        <input class="cta-input" type="tel" id="lead-tel" name="tel" autocomplete="tel" inputmode="tel" placeholder="WhatsApp (com DDD)">
+        <button class="btn-primary btn-lg" type="submit" style="width:100%;justify-content:center">Quero diagnóstico gratuito →</button>
+      </form>
       <div class="cta-trust">
         <span><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 1L2 3V7c0 2.5 1.8 4 4 4.5 2.2-.5 4-2 4-4.5V3L6 1z"/></svg> Sem cartão de crédito</span>
         <span><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="6" r="5"/><path d="M6 3.5V6L7.5 7.5"/></svg> Resposta em até 2h</span>
@@ -1333,6 +1304,7 @@ function togglePricing() {
   isAnnual = !isAnnual;
   var toggle = document.getElementById('pricing-toggle');
   toggle.classList.toggle('annual', isAnnual);
+  toggle.setAttribute('aria-checked', String(isAnnual));
   document.getElementById('lbl-monthly').classList.toggle('active', !isAnnual);
   document.getElementById('lbl-annual').classList.toggle('active', isAnnual);
 
@@ -1426,7 +1398,7 @@ function enviarLead() {
       timestamp: new Date().toISOString(),
       origem: 'Site SyncTech'
     })
-  }).catch(function(){});
+  }).catch(function(err){ console.error('Falha ao enviar lead pro webhook:', err); });
 
   // Feedback visual antes de abrir WhatsApp
   if (btn) { btn.textContent = '✓ Enviando para o WhatsApp...'; btn.disabled = true; }
