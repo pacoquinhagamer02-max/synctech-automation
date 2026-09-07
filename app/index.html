@@ -412,21 +412,21 @@ h1, h2, h3, .logo { font-family: var(--font-head), sans-serif; }
         <div class="card-sub">Cadastre aqui todo prospect que encontrar em Mariana/Ouro Preto — entra direto em "Novo Lead"</div>
         <div class="form-row2">
           <div class="form-group">
-            <label class="form-label">Nome do contato *</label>
+            <label class="form-label" for="pl-name">Nome do contato *</label>
             <input class="form-input" id="pl-name" placeholder="Ex: João Silva">
           </div>
           <div class="form-group">
-            <label class="form-label">Negócio *</label>
+            <label class="form-label" for="pl-biz">Negócio *</label>
             <input class="form-input" id="pl-biz" placeholder="Ex: Salão Beleza Pura">
           </div>
         </div>
         <div class="form-row2">
           <div class="form-group">
-            <label class="form-label">WhatsApp *</label>
+            <label class="form-label" for="pl-wpp">WhatsApp *</label>
             <input class="form-input" id="pl-wpp" placeholder="(31) 99999-9999">
           </div>
           <div class="form-group">
-            <label class="form-label">Cidade</label>
+            <label class="form-label" for="pl-city">Cidade</label>
             <select class="form-input" id="pl-city">
               <option value="Mariana/MG">Mariana/MG</option>
               <option value="Ouro Preto/MG">Ouro Preto/MG</option>
@@ -438,7 +438,7 @@ h1, h2, h3, .logo { font-family: var(--font-head), sans-serif; }
         </div>
         <div class="form-row2">
           <div class="form-group">
-            <label class="form-label">Origem</label>
+            <label class="form-label" for="pl-src">Origem</label>
             <select class="form-input" id="pl-src">
               <option value="wa">WhatsApp</option>
               <option value="ig">Instagram</option>
@@ -446,7 +446,7 @@ h1, h2, h3, .logo { font-family: var(--font-head), sans-serif; }
             </select>
           </div>
           <div class="form-group">
-            <label class="form-label">Plano estimado</label>
+            <label class="form-label" for="pl-val">Plano estimado</label>
             <select class="form-input" id="pl-val">
               <option value="197">Starter — R$197/mês</option>
               <option value="397" selected>Negócio — R$397/mês</option>
@@ -499,7 +499,7 @@ function doGet(e) {
 }</div>
         <button class="copy-btn" style="margin:8px 0 14px" onclick="copiarScriptSync()">Copiar código do script</button>
         <div class="form-group">
-          <label class="form-label">URL do App da Web (deixe vazio pra ficar só local)</label>
+          <label class="form-label" for="pl-sync-url">URL do App da Web (deixe vazio pra ficar só local)</label>
           <input class="form-input" id="pl-sync-url" placeholder="https://script.google.com/macros/s/..." value="">
         </div>
         <button class="btn btn-primary" onclick="salvarSyncUrl()">Salvar e sincronizar →</button>
@@ -577,21 +577,21 @@ function doGet(e) {
       </div>
       <div class="card">
         <div class="form-group">
-          <label class="form-label">Nome do negócio *</label>
+          <label class="form-label" for="nc-name">Nome do negócio *</label>
           <input class="form-input" id="nc-name" placeholder="Ex: Barbearia do João">
         </div>
         <div class="form-row2">
           <div class="form-group">
-            <label class="form-label">WhatsApp do dono *</label>
+            <label class="form-label" for="nc-wpp">WhatsApp do dono *</label>
             <input class="form-input" id="nc-wpp" placeholder="(11) 99999-9999">
           </div>
           <div class="form-group">
-            <label class="form-label">Instagram</label>
+            <label class="form-label" for="nc-ig">Instagram</label>
             <input class="form-input" id="nc-ig" placeholder="@seunegocio">
           </div>
         </div>
         <div class="form-group">
-          <label class="form-label">Plano</label>
+          <label class="form-label" for="nc-plan">Plano</label>
           <select class="form-input" id="nc-plan">
             <option value="Starter">Starter — R$197/mês</option>
             <option value="Negócio" selected>Negócio — R$397/mês</option>
@@ -603,9 +603,9 @@ function doGet(e) {
       <div class="card" id="nc-result" style="display:none">
         <div class="card-title">✓ Cliente pronto</div>
         <div class="card-sub">Envie os dois links abaixo — o cliente já pode receber agendamentos</div>
-        <label class="form-label">Link de agendamento</label>
+        <div class="form-label">Link de agendamento</div>
         <div class="result-link" id="nc-link-agend"></div>
-        <label class="form-label">Link na bio (Linktree do cliente)</label>
+        <div class="form-label">Link na bio (Linktree do cliente)</div>
         <div class="result-link" id="nc-link-bio"></div>
         <button class="copy-btn" onclick="copiarLinksCliente()">Copiar os dois links</button>
       </div>
@@ -1038,16 +1038,29 @@ function buildStatsHtml(c) {
   var statsHtml = '';
   if (c.stats) {
       var s = c.stats;
-      var growthPct = Math.round((s.followers - s.followersPrev) / s.followersPrev * 100);
-      var likesAvg = Math.round(s.likesTotal / s.posts60d);
+      var statCards = [];
+      if (s.followers != null) {
+        var followerLbl = 'seguidores';
+        if (s.followersPrev) {
+          var growthPct = Math.round((s.followers - s.followersPrev) / s.followersPrev * 100);
+          followerLbl += ' (+'+growthPct+'% desde '+s.followersPrevDate+')';
+        }
+        statCards.push('<div class="client-stat"><div class="client-stat-val">'+s.followers+'</div><div class="client-stat-lbl">'+followerLbl+'</div></div>');
+      }
+      if (s.googleRating != null) {
+        statCards.push('<div class="client-stat"><div class="client-stat-val">'+String(s.googleRating).replace('.',',')+'★</div><div class="client-stat-lbl">'+s.googleReviews+' avaliações Google</div></div>');
+      }
+      if (s.posts60d != null) {
+        statCards.push('<div class="client-stat"><div class="client-stat-val">'+s.posts60d+'</div><div class="client-stat-lbl">posts nos últimos 2 meses</div></div>');
+      }
+      if (s.likesTotal != null && s.posts60d) {
+        var likesAvg = Math.round(s.likesTotal / s.posts60d);
+        statCards.push('<div class="client-stat"><div class="client-stat-val">'+likesAvg+'</div><div class="client-stat-lbl">curtidas em média/post</div></div>');
+      }
       statsHtml =
-        '<div class="client-stats-title">Instagram — dados reais (coletado em '+s.collectedAt+')</div>' +
-        '<div class="client-stats-grid">' +
-          '<div class="client-stat"><div class="client-stat-val">'+s.followers+'</div><div class="client-stat-lbl">seguidores (+'+growthPct+'% desde '+s.followersPrevDate+')</div></div>' +
-          '<div class="client-stat"><div class="client-stat-val">'+s.posts60d+'</div><div class="client-stat-lbl">posts nos últimos 2 meses</div></div>' +
-          '<div class="client-stat"><div class="client-stat-val">'+likesAvg+'</div><div class="client-stat-lbl">curtidas em média/post</div></div>' +
-        '</div>' +
-        '<div class="client-best-post">🏆 Melhor post: <strong>'+s.bestPost.likes+' curtidas · '+s.bestPost.comments+' comentários</strong> ('+s.bestPost.date+') — '+s.bestPost.desc+'</div>';
+        '<div class="client-stats-title">Dados reais (coletado em '+s.collectedAt+')</div>' +
+        '<div class="client-stats-grid">' + statCards.join('') + '</div>' +
+        (s.bestPost ? '<div class="client-best-post">🏆 Melhor post: <strong>'+s.bestPost.likes+' curtidas · '+s.bestPost.comments+' comentários</strong> ('+s.bestPost.date+') — '+s.bestPost.desc+'</div>' : '');
 
       if (s.servicesUsed) {
         var sv = s.servicesUsed;
@@ -1141,11 +1154,27 @@ function renderReport() {
 
   document.getElementById('report-body').innerHTML = withData.map(function(c) {
     var s = c.stats;
-    var growthPct = Math.round((s.followers - s.followersPrev) / s.followersPrev * 100);
     var g = s.goal;
-    var resumo = c.name+' fechou '+s.collectedAt+' com <strong>'+s.followers+' seguidores</strong> no Instagram, um crescimento de <strong>+'+growthPct+'%</strong> desde '+s.followersPrevDate+'. '+
-      'Nos últimos '+ (s.posts && s.posts.length ? s.posts.length : s.posts60d) +' posts, o destaque foi o de '+s.bestPost.date+' ('+s.bestPost.likes+' curtidas — o reel sobre prótese) — sinal de que esse formato converte mais que foto/carrossel. ' +
-      (g ? 'Na meta de comissão, já são <strong>'+g.closed+' de '+g.target+' próteses</strong> fechadas via WhatsApp/Instagram, R$'+(g.closed*g.commissionPerUnit).toLocaleString('pt-BR')+' em comissão garantida até agora.' : '');
+    var partes = [];
+
+    if (s.followers != null) {
+      var followerTxt = c.name+' fechou '+s.collectedAt+' com <strong>'+s.followers+' seguidores</strong> no Instagram';
+      if (s.followersPrev) {
+        var growthPct = Math.round((s.followers - s.followersPrev) / s.followersPrev * 100);
+        followerTxt += ', um crescimento de <strong>+'+growthPct+'%</strong> desde '+s.followersPrevDate;
+      }
+      partes.push(followerTxt + '.');
+    }
+    if (s.googleRating != null) {
+      partes.push('No Google, nota <strong>'+String(s.googleRating).replace('.',',')+'★</strong> em '+s.googleReviews+' avaliações.');
+    }
+    if (s.bestPost) {
+      partes.push('Nos últimos '+ (s.posts && s.posts.length ? s.posts.length : s.posts60d) +' posts, o destaque foi o de '+s.bestPost.date+' ('+s.bestPost.likes+' curtidas) — '+s.bestPost.desc+'.');
+    }
+    if (g) {
+      partes.push('Na meta de comissão, já são <strong>'+g.closed+' de '+g.target+' próteses</strong> fechadas via WhatsApp/Instagram, R$'+(g.closed*g.commissionPerUnit).toLocaleString('pt-BR')+' em comissão garantida até agora.');
+    }
+    var resumo = partes.join(' ');
 
     return '<div class="card report-card">' +
       '<div class="report-card-head">' +
