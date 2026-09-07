@@ -1183,7 +1183,7 @@ function renderReport() {
     let partes = [];
 
     if (s.followers != null) {
-      let followerTxt = c.name+' fechou '+s.collectedAt+' com <strong>'+s.followers+' seguidores</strong> no Instagram';
+      let followerTxt = 'Em '+s.collectedAt+', '+c.name+' tinha <strong>'+s.followers+' seguidores</strong> no Instagram';
       if (s.followersPrev) {
         let growthPct = Math.round((s.followers - s.followersPrev) / s.followersPrev * 100);
         followerTxt += ', um crescimento de <strong>+'+growthPct+'%</strong> desde '+s.followersPrevDate;
