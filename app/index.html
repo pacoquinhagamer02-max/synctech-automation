@@ -658,6 +658,7 @@ var pipelineData = [
   { stage: 'Proposta', leads: [] },
   { stage: 'Fechado', leads: [
     { name:'Moisés Martins',  biz:'Barbearia Martins — R$1.200 fixo + 10% (R$160) por prótese fechada via WhatsApp/Instagram', val:1200, time:'Cliente ativo', src:'wa', phone:'31982800596' },
+    { name:'Padaria Cantinho do Pão', biz:'Padaria Cantinho do Pão — Plano Pro: R$1.000/mês (tráfego pago + aplicativo personalizado)', val:1000, time:'Cliente ativo', src:'wa', phone:'553137913010' },
   ]},
 ];
 
@@ -950,7 +951,7 @@ var CLIENTS_FIXED = [
         { date:'02/09', likes:12,  comments:null },
       ],
       cadence: { before: 0.6, after: 3.0, beforeLabel:'19 meses anteriores (11 posts)', afterLabel:'Últimos 2 meses (6 posts)' },
-      goal: { label:'Meta: próteses fechadas via WhatsApp/Instagram', target:10, closed:3, commissionPerUnit:160, fixedMonthly:1200 },
+      goal: { label:'Meta: próteses fechadas via WhatsApp/Instagram', target:10, closed:4, commissionPerUnit:160, fixedMonthly:1200 },
       // Mapeamento real dos 11 módulos do hub — quais fazem sentido pro porte/perfil da Martins (não é genérico).
       servicesUsed: {
         active: [
@@ -974,6 +975,39 @@ var CLIENTS_FIXED = [
         { done:false, text:'Ativar Google Meu Negócio — gratuito, o site já tem o schema pronto, só falta cadastrar.' },
         { done:false, text:'Configurar o link real de "Peça avaliações" do Google (hoje é placeholder na ferramenta de avaliação).' },
         { done:true, text:'Tráfego pago ligado — R$15–20/dia, raio 60km (Mariana + Ouro Preto/Itabirito/Congonhas), homens 30–55. Cobrança da gestão (R$297 setup + R$397/mês) ainda não decidida — hoje sem custo extra pra ela.' },
+      ],
+    }},
+    { name:'Padaria Cantinho do Pão', plan:'Plano Pro — R$1.000/mês + R$899 setup único (tráfego pago gerenciado + aplicativo personalizado)', links:[
+      { label:'Cardápio-app', url:'https://pacoquinhagamer02-max.github.io/cantinhodopao/' },
+      { label:'WhatsApp', url:'https://wa.me/553137913010' },
+      { label:'Instagram', url:'https://www.instagram.com/padaria__cantinho_do_pao/' },
+    ],
+    // Dados reais coletados do Google/Instagram durante a proposta, 05/09/2026 — foto do momento, não é live.
+    stats: {
+      collectedAt: '05/09/2026',
+      followers: 2488,
+      googleRating: 4.5,
+      googleReviews: 74,
+      servicesUsed: {
+        active: [
+          'Tráfego Pago (Meta Ads) — gerenciado, incluso no Plano Pro',
+          'Aplicativo Personalizado (cardápio-app com carrinho, checkout formatado direto no WhatsApp)',
+          'WhatsApp Bot 24/7',
+          'Agendamento Online',
+          'Instagram Automático',
+          'CRM com Pipeline',
+          'Gestão de Reputação',
+          'Email Marketing',
+        ],
+        pending: [],
+        notUsed: 'Conteúdo/Instagram fica por conta do próprio dono, por opção dele.',
+      },
+      actionPlan: [
+        { done:true,  text:'Cardápio-app publicado com carrinho e checkout formatado direto no WhatsApp (nome, endereço, itens, total) — dois links no ar: domínio limpo (cantinhodopao) e o original (synctech-automation).' },
+        { done:true,  text:'PWA instalável adicionado (favicon, apple-touch-icon, manifest.json).' },
+        { done:true,  text:'Proposta fechada no Plano Pro — R$1.000/mês + R$899 setup.' },
+        { done:false, text:'Configurar e ativar a campanha de tráfego pago (Meta Ads) — segmentação geográfica pra quem já conhece a padaria mas não sabe que tem entrega.' },
+        { done:false, text:'Gerar fotos dos itens do cardápio ainda sem imagem (pastel de queijo, pão francês, pão de queijo, pão de forma integral, bolo de fubá, café coado, suco natural).' },
       ],
     }},
   ];
