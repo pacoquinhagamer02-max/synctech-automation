@@ -51,6 +51,7 @@ body {
   min-height: 100vh; overflow-x: hidden; position: relative;
 }
 h1, h2, h3, .logo { font-family: var(--font-head), sans-serif; }
+:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; border-radius: 4px; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
 }
@@ -97,6 +98,7 @@ h1, h2, h3, .logo { font-family: var(--font-head), sans-serif; }
   display: flex; align-items: center; gap: 10px; padding: 10px 12px; margin-bottom: 3px;
   cursor: pointer; font-size: 0.84rem; color: var(--muted); border-radius: 10px;
   transition: all 0.15s; user-select: none; position: relative;
+  width: 100%; border: none; background: none; font-family: 'Inter', sans-serif; text-align: left;
 }
 .nav-item span { font-family: var(--font-head), sans-serif; font-weight: 600; letter-spacing: 0.03em; text-transform: uppercase; font-size: 0.88rem; }
 .nav-item:hover { color: var(--text); background: rgba(255,255,255,0.03); transform: translateX(2px); }
@@ -329,7 +331,7 @@ h1, h2, h3, .logo { font-family: var(--font-head), sans-serif; }
     background: rgba(13,9,23,0.88); backdrop-filter: blur(20px); border-top: 1px solid var(--border);
     padding-bottom: env(safe-area-inset-bottom);
   }
-  .bn-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: var(--faint); cursor: pointer; transition: color 0.15s; }
+  .bn-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: var(--faint); cursor: pointer; transition: color 0.15s; border: none; background: none; font-family: 'Inter', sans-serif; height: 100%; }
   .bn-item.active { color: var(--pl); }
   .bn-item svg { width: 20px; height: 20px; }
   .bn-item span { font-family: var(--font-head), sans-serif; font-size: 0.62rem; font-weight: 600; letter-spacing: 0.03em; text-transform: uppercase; }
@@ -630,20 +632,24 @@ var PAGES = [
 
 function renderNav() {
   document.getElementById('sidebar-nav').innerHTML = PAGES.map(function(p, i) {
-    return '<div class="nav-item'+(i===0?' active':'')+'" data-page="'+p.id+'" onclick="goPage(\''+p.id+'\')">' +
-      '<svg class="nav-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">'+p.icon+'</svg>' +
-      '<span>'+p.label+'</span></div>';
+    return '<button type="button" class="nav-item'+(i===0?' active':'')+'" data-page="'+p.id+'" aria-current="'+(i===0?'page':'false')+'" onclick="goPage(\''+p.id+'\')">' +
+      '<svg class="nav-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+p.icon+'</svg>' +
+      '<span>'+p.label+'</span></button>';
   }).join('');
   document.getElementById('bottom-nav').innerHTML = PAGES.map(function(p, i) {
-    return '<div class="bn-item'+(i===0?' active':'')+'" data-page="'+p.id+'" onclick="goPage(\''+p.id+'\')">' +
-      '<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">'+p.icon+'</svg>' +
-      '<span>'+p.label+'</span></div>';
+    return '<button type="button" class="bn-item'+(i===0?' active':'')+'" data-page="'+p.id+'" aria-current="'+(i===0?'page':'false')+'" onclick="goPage(\''+p.id+'\')">' +
+      '<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+p.icon+'</svg>' +
+      '<span>'+p.label+'</span></button>';
   }).join('');
 }
 
 function goPage(id) {
   document.querySelectorAll('.page').forEach(function(p){ p.classList.toggle('active', p.id==='page-'+id); });
-  document.querySelectorAll('.nav-item, .bn-item').forEach(function(n){ n.classList.toggle('active', n.dataset.page===id); });
+  document.querySelectorAll('.nav-item, .bn-item').forEach(function(n){
+    var isActive = n.dataset.page===id;
+    n.classList.toggle('active', isActive);
+    n.setAttribute('aria-current', isActive ? 'page' : 'false');
+  });
   var p = PAGES.filter(function(x){ return x.id===id; })[0];
   document.getElementById('topbar-title').textContent = p ? p.label : '';
   window.scrollTo(0,0);
@@ -777,7 +783,20 @@ var STAGE_ORDER = ['Novo Lead', 'Contato feito', 'Demo enviado', 'Proposta', 'Fe
 var PIPELINE_SYNC_URL = localStorage.getItem('synctech_pipeline_sync_url') || '';
 
 function getStoredLeads() {
-  return JSON.parse(localStorage.getItem('synctech_pipeline_leads') || '[]');
+  try {
+    return JSON.parse(localStorage.getItem('synctech_pipeline_leads') || '[]');
+  } catch (err) {
+    console.error('Dado corrompido em synctech_pipeline_leads, reiniciando lista:', err);
+    return [];
+  }
+}
+function getStoredClients() {
+  try {
+    return JSON.parse(localStorage.getItem('synctech_new_clients') || '[]');
+  } catch (err) {
+    console.error('Dado corrompido em synctech_new_clients, reiniciando lista:', err);
+    return [];
+  }
 }
 function saveStoredLeads(leads) {
   localStorage.setItem('synctech_pipeline_leads', JSON.stringify(leads));
@@ -798,7 +817,7 @@ function pushLeadToCloud(action, payload) {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain' }, // evita preflight CORS no Apps Script
     body: JSON.stringify(Object.assign({ action: action }, payload)),
-  }).catch(function(){});
+  }).catch(function(err){ console.error('Falha ao sincronizar lead com a planilha:', err); });
 }
 
 function syncPipelineFromCloud(callback) {
@@ -813,7 +832,7 @@ function syncPipelineFromCloud(callback) {
       saveStoredLeads(normalized);
       if (callback) callback();
     })
-    .catch(function(){ if (callback) callback(); });
+    .catch(function(err){ console.error('Falha ao buscar leads da planilha:', err); if (callback) callback(); });
 }
 
 function adicionarLead() {
@@ -1096,7 +1115,7 @@ function buildStatsHtml(c) {
 
 // ═══════════════ RENDER: CLIENTES ═══════════════
 function renderClients() {
-  var stored = JSON.parse(localStorage.getItem('synctech_new_clients') || '[]');
+  var stored = getStoredClients();
   var fixed = CLIENTS_FIXED;
   var all = fixed.concat(stored.map(function(c){
     return { name:c.bizName, plan:c.plan, links:[
@@ -1161,7 +1180,7 @@ function gerarCliente() {
   document.getElementById('nc-link-bio').textContent = bioLink;
   document.getElementById('nc-result').style.display = 'block';
 
-  var stored = JSON.parse(localStorage.getItem('synctech_new_clients') || '[]');
+  var stored = getStoredClients();
   stored.push({ bizName:name, plan:plan, agendLink:agendLink, bioLink:bioLink, createdAt:new Date().toISOString() });
   localStorage.setItem('synctech_new_clients', JSON.stringify(stored));
   renderClients();
@@ -1198,7 +1217,7 @@ function installApp() {
   deferredPrompt.userChoice.then(function(){ deferredPrompt = null; document.getElementById('install-btn').classList.add('hidden'); });
 }
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); });
+  window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js').catch(function(err){ console.error('Falha ao registrar service worker:', err); }); });
 }
 
 // ═══════════════ INIT ═══════════════
