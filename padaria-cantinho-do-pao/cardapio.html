@@ -17,7 +17,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Cantinho do Pão">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,600;0,700;1,500;1,600&family=Karla:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,600;0,700;1,500;1,600&family=Karla:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -29,7 +29,7 @@
   --paper:#F3EEE2; --paper2:#EAE1CC;
   --ink:#231C15; --ink-mut:#655A48; --ink-faint:#786C58;
   --stamp:#A6432E;
-  --disp:'Fraunces',serif; --body:'Karla',sans-serif; --mono:'Space Mono',monospace;
+  --disp:'Fraunces',serif; --body:'Karla',sans-serif;
 }
 html{scroll-behavior:smooth}
 body{font-family:var(--body);background:var(--bg);color:var(--txt);line-height:1.55;padding-top:80px;padding-bottom:calc(160px + env(safe-area-inset-bottom));-webkit-font-smoothing:antialiased}
@@ -117,13 +117,13 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;text-wrap:balance}
 @media(max-width:820px){.hero-in{grid-template-columns:1fr}.hero-photo-w{order:-1;max-width:280px;margin:0 auto 30px}}
 
 /* ── CABEÇALHO DA LOJA (topo do cardápio — padrão de app de pedido) ── */
-.store-head{display:flex;gap:14px;align-items:flex-start;padding:26px 0 20px}
-.store-thumb{flex-shrink:0;width:78px;aspect-ratio:4/5;border:2px solid var(--crust);border-radius:50% 50% 4px 4px/22% 22% 4px 4px;overflow:hidden}
+.store-head{display:flex;gap:16px;align-items:flex-start;padding:24px 0 18px}
+.store-thumb{flex-shrink:0;width:96px;aspect-ratio:4/5;border:2px solid var(--crust);border-radius:50% 50% 4px 4px/22% 22% 4px 4px;overflow:hidden}
 .store-thumb img{width:100%;height:100%;object-fit:cover}
 .store-info{min-width:0;flex:1}
-.store-info h1{font-family:var(--disp);font-size:clamp(1.5rem,5.5vw,2rem);line-height:1.1}
-.store-tag{font-size:0.86rem;color:var(--ink-mut);margin-top:4px}
-.store-meta{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;margin-top:10px;font-size:0.8rem;color:var(--ink-mut)}
+.store-info h1{font-family:var(--disp);font-size:clamp(1.45rem,5.2vw,1.95rem);line-height:1.08}
+.store-tag{font-size:0.88rem;color:var(--ink-mut);margin-top:6px;line-height:1.45;max-width:34ch}
+.store-meta{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;margin-top:12px;font-size:0.84rem;color:var(--ink-mut)}
 .store-meta .rating .rating-bg{color:rgba(43,32,22,0.22)}
 .store-meta b{color:var(--ink);font-weight:700}
 .store-status{display:inline-flex;align-items:center;gap:6px;font-weight:700;color:#2E7D4F}
@@ -145,7 +145,7 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;text-wrap:balance}
 .destaque-scroll::-webkit-scrollbar{display:none}
 .destaque-card{flex:0 0 148px}
 .destaque-card .item-ph{position:relative}
-.dest-tag{position:absolute;top:8px;left:8px;z-index:1;display:inline-flex;align-items:center;gap:4px;font-family:var(--body);font-size:0.62rem;font-weight:700;color:#fff;background:var(--stamp);padding:3px 7px;letter-spacing:0.02em;text-transform:uppercase}
+.dest-tag{position:absolute;top:8px;left:8px;z-index:1;font-family:var(--body);font-size:0.68rem;font-weight:700;color:#fff;background:var(--stamp);padding:3px 8px}
 
 /* ── DESTAQUE / HISTÓRIA (tela Loja) ── */
 .destaque{background:var(--bg2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
@@ -175,7 +175,7 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;text-wrap:balance}
 @media(max-width:760px){.dest-top,.pro-g{grid-template-columns:1fr}.dest-photo{order:-1}}
 
 /* ── CARDAPIO (tela Cardápio) ── */
-.cardapio{background-color:var(--paper);background-image:repeating-linear-gradient(135deg,rgba(43,32,22,0.025) 0 2px,transparent 2px 7px);color:var(--ink);padding-top:0}
+.cardapio{background-color:var(--paper);color:var(--ink);padding-top:0}
 .cardapio .sec-hd{max-width:560px}
 .cardapio .sec-hd p{color:var(--ink-mut)}
 .cat-nav{display:flex;gap:24px;overflow-x:auto;padding:0 0 16px;position:sticky;top:80px;background:var(--paper);z-index:20;scrollbar-width:none;border-bottom:1px solid rgba(43,32,22,0.14)}
@@ -188,28 +188,30 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;text-wrap:balance}
 .cat-section{padding:26px 0 10px}
 .cat-title{display:flex;align-items:baseline;gap:10px;margin-bottom:2px}
 .cat-title h3{font-family:var(--disp);font-size:1.7rem;font-weight:700}
-.cat-highlight{font-family:var(--body);font-size:0.66rem;font-weight:700;color:#fff;background:var(--stamp);padding:3px 8px;letter-spacing:0.02em;text-transform:uppercase}
 .cat-note{font-size:0.84rem;color:var(--ink-mut);margin-bottom:16px}
-.item-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.item-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:30px 18px}
 @media(min-width:560px){.item-grid{grid-template-columns:repeat(3,1fr)}}
 @media(min-width:900px){.item-grid{grid-template-columns:repeat(4,1fr)}}
-.item{display:flex;flex-direction:column;background:#fff;color:var(--ink);border:1px solid rgba(43,32,22,0.14);box-shadow:0 1px 0 rgba(43,32,22,0.05)}
-.item-ph{width:100%;aspect-ratio:4/3;overflow:hidden;background:var(--paper2);flex-shrink:0}
+/* Vitrine: a foto é o produto, sem moldura de card em volta */
+.item{display:flex;flex-direction:column;color:var(--ink)}
+.item-ph{position:relative;width:100%;aspect-ratio:4/3;overflow:hidden;background:var(--paper2);flex-shrink:0}
 .item-ph img{width:100%;height:100%;object-fit:cover}
 .item-ph.placeholder{display:flex;align-items:center;justify-content:center}
 .ph-ic{width:32%;height:32%;color:var(--ink-faint);opacity:.55}
-.item-info{flex:1;min-width:0;padding:10px 11px 0}
-.item-info h4{font-size:0.86rem;font-weight:700;font-family:var(--body);line-height:1.25}
-.item-info p{font-size:0.72rem;color:var(--ink-faint);margin-top:3px}
-.item-price{display:inline-block;font-family:var(--mono);font-weight:700;font-size:0.76rem;margin-top:7px;color:var(--crust);background:var(--ink);padding:3px 7px}
-.item-add{flex-shrink:0;display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:0 11px 11px}
-.qty-btn{width:28px;height:28px;border-radius:50%;border:none;background:var(--ember-dim);color:var(--ink);font-family:var(--body);font-size:1.1rem;font-weight:700;display:flex;align-items:center;justify-content:center;touch-action:manipulation;-webkit-tap-highlight-color:transparent;line-height:1}
+.item-info{flex:1;min-width:0;padding:10px 2px 0}
+.item-info h4{font-size:0.94rem;font-weight:700;font-family:var(--body);line-height:1.3}
+.item-info p{font-size:0.78rem;color:var(--ink-faint);margin-top:2px;line-height:1.4}
+.item-price{display:block;font-family:var(--disp);font-weight:700;font-size:1.1rem;margin-top:7px;color:var(--ink);font-variant-numeric:tabular-nums}
+.item-price .cur{font-size:0.68em;font-weight:600;margin-right:1px;color:var(--ink-mut)}
+/* Botão de adicionar flutua sobre a foto — sempre no mesmo canto */
+.item-add{position:absolute;right:8px;bottom:8px;display:flex;align-items:center;gap:9px;background:var(--paper);border-radius:999px;padding:4px;box-shadow:0 3px 10px rgba(35,28,21,0.3)}
+.qty-btn{width:30px;height:30px;border-radius:50%;border:none;background:var(--ember-dim);color:var(--ink);font-family:var(--body);font-size:1.15rem;font-weight:700;display:flex;align-items:center;justify-content:center;touch-action:manipulation;-webkit-tap-highlight-color:transparent;line-height:1}
 .qty-btn:active{transform:scale(.85)}
-.qty-btn.minus{display:none;background:none;border:1px solid rgba(43,32,22,0.28);color:var(--ink)}
-.qty-val{display:none;min-width:14px;text-align:center;font-family:var(--mono);font-weight:700;font-size:0.86rem;color:var(--ink);font-variant-numeric:tabular-nums}
-.item.has-qty .item-add{align-self:flex-end;justify-content:space-between;background:var(--paper2);border-radius:20px;padding:3px 4px 3px 10px;margin:0 11px 11px}
+.qty-btn.minus{display:none;background:none;color:var(--ink)}
+.qty-val{display:none;min-width:13px;text-align:center;font-family:var(--body);font-weight:700;font-size:0.92rem;color:var(--ink);font-variant-numeric:tabular-nums}
+.item.has-qty .item-add{padding-left:4px}
 .item.has-qty .qty-btn.minus,.item.has-qty .qty-val{display:flex}
-.item.just-added{outline:2px solid var(--stamp);outline-offset:-1px}
+.item.just-added .item-ph{outline:3px solid var(--crust);outline-offset:-3px}
 
 /* ── BUSCA (estilo iFood) ── */
 .search-w{position:relative;margin:4px 0 8px}
@@ -268,17 +270,17 @@ footer p{max-width:560px;margin:8px auto 0}
 .pedidos-list{display:flex;flex-direction:column;gap:14px}
 .pedido-card{background:var(--bg2);border:1px solid var(--line-strong);padding:18px}
 .pedido-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;gap:10px}
-.pedido-date{font-family:var(--mono);font-size:0.76rem;color:var(--dim)}
+.pedido-date{font-family:var(--body);font-size:0.76rem;color:var(--dim);font-variant-numeric:tabular-nums}
 .pedido-total{font-family:var(--disp);font-size:1.1rem;color:var(--crust);font-weight:700;white-space:nowrap}
 .pedido-items{font-size:0.9rem;color:var(--mut);margin-bottom:8px}
-.pedido-mode{display:inline-block;font-size:0.72rem;color:var(--dim);text-transform:uppercase;letter-spacing:0.02em;margin-bottom:14px}
+.pedido-mode{display:inline-block;font-size:0.78rem;color:var(--dim);margin-bottom:14px}
 .pedido-repeat{width:100%;justify-content:center}
 
 /* ── CART BAR + MODAL (mesma lógica funcional) ── */
 .cart-bar{position:fixed;left:0;right:0;bottom:calc(60px + env(safe-area-inset-bottom));background:var(--ink);color:var(--paper);padding:14px 20px;z-index:60;box-shadow:0 -8px 28px rgba(0,0,0,0.35);transform:translateY(calc(100% + 70px));transition:transform .3s cubic-bezier(.16,.8,.3,1)}
 .cart-bar.show{transform:translateY(0)}
 .cart-bar-row{max-width:1040px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:14px}
-.cart-bar .info{font-family:var(--mono);font-size:0.76rem;color:var(--paper2)}
+.cart-bar .info{font-family:var(--body);font-size:0.78rem;color:var(--paper2)}
 .cart-bar .info b{display:block;font-family:var(--disp);font-size:1.4rem;color:var(--crust);font-weight:700;font-variant-numeric:tabular-nums}
 .cart-bar .cart-btn{background:var(--ember-dim);color:var(--ink);font-weight:700;font-size:0.84rem;padding:12px 20px;border:none;display:flex;align-items:center;gap:6px;flex-shrink:0;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .cart-bar .cart-btn:active{transform:scale(.95)}
@@ -292,11 +294,11 @@ footer p{max-width:560px;margin:8px auto 0}
 .modal-summary .empty{padding:14px 0;color:var(--ink-faint);font-size:0.86rem;text-align:center}
 .msum-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0}
 .msum-row .nm{flex:1;min-width:0;font-size:0.84rem;color:var(--ink);word-break:break-word}
-.msum-row .px{font-family:var(--mono);font-size:0.78rem;color:var(--ink-mut);white-space:nowrap;font-variant-numeric:tabular-nums}
+.msum-row .px{font-family:var(--body);font-size:0.82rem;color:var(--ink-mut);white-space:nowrap;font-variant-numeric:tabular-nums}
 .msum-qty{display:flex;align-items:center;gap:8px;flex-shrink:0}
-.msum-qty button{width:24px;height:24px;border:1px solid rgba(43,32,22,0.22);background:none;font-family:var(--mono);font-weight:700;color:var(--ink);touch-action:manipulation}
-.msum-qty span{min-width:12px;text-align:center;font-family:var(--mono);font-size:0.8rem;font-weight:700}
-.modal-total{display:flex;justify-content:space-between;margin-top:8px;padding-top:8px;font-weight:700;font-family:var(--mono);font-size:1rem;font-variant-numeric:tabular-nums}
+.msum-qty button{width:24px;height:24px;border:1px solid rgba(43,32,22,0.22);background:none;font-family:var(--body);font-weight:700;color:var(--ink);touch-action:manipulation}
+.msum-qty span{min-width:12px;text-align:center;font-family:var(--body);font-size:0.85rem;font-weight:700;font-variant-numeric:tabular-nums}
+.modal-total{display:flex;justify-content:space-between;margin-top:8px;padding-top:8px;font-weight:700;font-family:var(--disp);font-size:1.15rem;font-variant-numeric:tabular-nums}
 .field{margin-bottom:14px}
 .field label{display:block;font-family:var(--body);font-weight:600;font-size:0.76rem;color:var(--ink-mut);margin-bottom:6px}
 .field input,.field textarea{width:100%;padding:11px 0;border:none;border-bottom:1px solid rgba(43,32,22,0.24);background:none;font-family:var(--body);font-size:0.94rem;color:var(--ink);resize:vertical}
@@ -348,15 +350,14 @@ footer p{max-width:560px;margin:8px auto 0}
           <p class="store-tag">Forno aceso desde as 5h30, na Rua do Catete.</p>
           <div class="store-meta">
             <span class="store-status"><span class="dot"></span>Aberto agora</span>
-            <span><span class="rating" role="img" aria-label="4,5 de 5 estrelas"><span class="rating-bg" aria-hidden="true">★★★★★</span><span class="rating-fg" aria-hidden="true" style="width:90%">★★★★★</span></span> <b>4,5</b> (74)</span>
-            <span>Retirada <b>todo dia</b></span>
+            <span><span class="rating" role="img" aria-label="4,5 de 5 estrelas"><span class="rating-bg" aria-hidden="true">★★★★★</span><span class="rating-fg" aria-hidden="true" style="width:90%">★★★★★</span></span> <b>4,5</b> em 74 avaliações</span>
           </div>
         </div>
       </div>
 
       <div class="entrega-strip">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="18" r="2.5"/><circle cx="17" cy="18" r="2.5"/><path d="M3 18h1l2-8h6l3 5h4M9 10V6h3"/></svg>
-        <span id="entrega-aviso">Entrega só na quinta, das 8h às 16h. Nos outros dias, retirada no balcão.</span>
+        <span id="entrega-aviso">Retirada todo dia desde as 5h30. Entrega só na quinta, 8h–16h.</span>
       </div>
 
       <section class="destaque-strip-sec">
@@ -368,19 +369,19 @@ footer p{max-width:560px;margin:8px auto 0}
         </div>
         <div class="destaque-scroll">
           <div class="item destaque-card" data-name="Coxinha de frango" data-price="8">
-            <div class="item-ph"><span class="dest-tag">★ Elogiado</span><img src="assets/coxinha.jpg" alt="Coxinha de frango (imagem ilustrativa)" loading="lazy" decoding="async"></div>
-            <div class="item-info"><h4>Coxinha de frango</h4><div class="item-price">R$8,00</div></div>
-            <div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div>
+            <div class="item-ph"><span class="dest-tag">Elogiado</span><img src="assets/coxinha.jpg" alt="Coxinha de frango (imagem ilustrativa)" loading="lazy" decoding="async"><div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div></div>
+            <div class="item-info"><h4>Coxinha de frango</h4><div class="item-price"><span class="cur">R$</span>8,00</div></div>
+            
           </div>
           <div class="item destaque-card" data-name="Fatia de bolo de chocolate" data-price="9">
-            <div class="item-ph"><span class="dest-tag">★ Elogiado</span><img src="assets/bolo-chocolate.jpg" alt="Bolo de chocolate da vitrine" loading="lazy" decoding="async"></div>
-            <div class="item-info"><h4>Fatia de bolo de chocolate</h4><div class="item-price">R$9,00</div></div>
-            <div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div>
+            <div class="item-ph"><span class="dest-tag">Elogiado</span><img src="assets/bolo-chocolate.jpg" alt="Bolo de chocolate da vitrine" loading="lazy" decoding="async"><div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div></div>
+            <div class="item-info"><h4>Fatia de bolo de chocolate</h4><div class="item-price"><span class="cur">R$</span>9,00</div></div>
+            
           </div>
           <div class="item destaque-card" data-name="Sonho recheado" data-price="8">
-            <div class="item-ph"><span class="dest-tag">★ Elogiado</span><img src="assets/sonho.jpg" alt="Sonho recheado da vitrine" loading="lazy" decoding="async"></div>
-            <div class="item-info"><h4>Sonho recheado</h4><div class="item-price">R$8,00</div></div>
-            <div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div>
+            <div class="item-ph"><span class="dest-tag">Elogiado</span><img src="assets/sonho.jpg" alt="Sonho recheado da vitrine" loading="lazy" decoding="async"><div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div></div>
+            <div class="item-info"><h4>Sonho recheado</h4><div class="item-price"><span class="cur">R$</span>8,00</div></div>
+            
           </div>
         </div>
       </section>
@@ -399,28 +400,28 @@ footer p{max-width:560px;margin:8px auto 0}
       </nav>
 
       <section class="cat-section" data-cat="salgados">
-        <div class="cat-title"><h3>Salgados</h3><span class="cat-highlight">+ elogiado</span></div>
+        <div class="cat-title"><h3>Salgados</h3></div>
         <p class="cat-note">O item que mais aparece nas avaliações dos clientes.</p>
         <div class="item-grid">
         <div class="item" data-name="Coxinha de frango" data-price="8">
-          <div class="item-ph"><img src="assets/coxinha.jpg" alt="Coxinha de frango (imagem ilustrativa)" loading="lazy" decoding="async"></div>
-          <div class="item-info"><h4>Coxinha de frango</h4><p>Feita na hora, casquinha crocante</p><div class="item-price">R$8,00</div></div>
-          <div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div>
+          <div class="item-ph"><img src="assets/coxinha.jpg" alt="Coxinha de frango (imagem ilustrativa)" loading="lazy" decoding="async"><div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div></div>
+          <div class="item-info"><h4>Coxinha de frango</h4><p>Feita na hora, casquinha crocante</p><div class="item-price"><span class="cur">R$</span>8,00</div></div>
+          
         </div>
         <div class="item" data-name="Empada de frango" data-price="7">
-          <div class="item-ph"><img src="assets/empada.jpg" alt="Empada de frango (imagem ilustrativa)" loading="lazy" decoding="async"></div>
-          <div class="item-info"><h4>Empada de frango</h4><p>Massa amanteigada, recheio generoso</p><div class="item-price">R$7,00</div></div>
-          <div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div>
+          <div class="item-ph"><img src="assets/empada.jpg" alt="Empada de frango (imagem ilustrativa)" loading="lazy" decoding="async"><div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div></div>
+          <div class="item-info"><h4>Empada de frango</h4><p>Massa amanteigada, recheio generoso</p><div class="item-price"><span class="cur">R$</span>7,00</div></div>
+          
         </div>
         <div class="item" data-name="Kibe" data-price="7">
-          <div class="item-ph"><img src="assets/kibe.jpg" alt="Kibe (imagem ilustrativa)" loading="lazy" decoding="async"></div>
-          <div class="item-info"><h4>Kibe</h4><p>Crocante por fora, suculento por dentro</p><div class="item-price">R$7,00</div></div>
-          <div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div>
+          <div class="item-ph"><img src="assets/kibe.jpg" alt="Kibe (imagem ilustrativa)" loading="lazy" decoding="async"><div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div></div>
+          <div class="item-info"><h4>Kibe</h4><p>Crocante por fora, suculento por dentro</p><div class="item-price"><span class="cur">R$</span>7,00</div></div>
+          
         </div>
         <div class="item" data-name="Pastel de queijo" data-price="7">
-          <div class="item-ph placeholder"><svg class="ph-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9c0-3 3.5-6 8-6s8 3 8 6c0 4-4 10-8 11-4-1-8-7-8-11z"/><path d="M9 10c1 1 5 1 6 0"/></svg></div>
-          <div class="item-info"><h4>Pastel de queijo</h4><p>Assado, sem fritura</p><div class="item-price">R$7,00</div></div>
-          <div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div>
+          <div class="item-ph placeholder"><svg class="ph-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9c0-3 3.5-6 8-6s8 3 8 6c0 4-4 10-8 11-4-1-8-7-8-11z"/><path d="M9 10c1 1 5 1 6 0"/></svg><div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div></div>
+          <div class="item-info"><h4>Pastel de queijo</h4><p>Assado, sem fritura</p><div class="item-price"><span class="cur">R$</span>7,00</div></div>
+          
         </div>
         </div>
       </section>
@@ -430,19 +431,19 @@ footer p{max-width:560px;margin:8px auto 0}
         <p class="cat-note">Fornada nova pela manhã e no fim da tarde.</p>
         <div class="item-grid">
         <div class="item" data-name="Pão francês (unidade)" data-price="1">
-          <div class="item-ph placeholder"><svg class="ph-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 15c0-5 4-9 9-9s9 4 9 9c0 2-2 3-9 3s-9-1-9-3z"/><path d="M8 9.5c.5 1 .5 3 0 4M12 8c.5 1.5.5 4.5 0 6M16 9.5c.5 1 .5 3 0 4"/></svg></div>
-          <div class="item-info"><h4>Pão francês (unidade)</h4><p>Quentinho, casca crocante</p><div class="item-price">R$1,00</div></div>
-          <div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div>
+          <div class="item-ph placeholder"><svg class="ph-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 15c0-5 4-9 9-9s9 4 9 9c0 2-2 3-9 3s-9-1-9-3z"/><path d="M8 9.5c.5 1 .5 3 0 4M12 8c.5 1.5.5 4.5 0 6M16 9.5c.5 1 .5 3 0 4"/></svg><div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div></div>
+          <div class="item-info"><h4>Pão francês (unidade)</h4><p>Quentinho, casca crocante</p><div class="item-price"><span class="cur">R$</span>1,00</div></div>
+          
         </div>
         <div class="item" data-name="Pão de queijo (6un)" data-price="14">
-          <div class="item-ph placeholder"><svg class="ph-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 15c0-5 4-9 9-9s9 4 9 9c0 2-2 3-9 3s-9-1-9-3z"/><path d="M8 9.5c.5 1 .5 3 0 4M12 8c.5 1.5.5 4.5 0 6M16 9.5c.5 1 .5 3 0 4"/></svg></div>
-          <div class="item-info"><h4>Pão de queijo (6un)</h4><p>Receita mineira, forno a lenha</p><div class="item-price">R$14,00</div></div>
-          <div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div>
+          <div class="item-ph placeholder"><svg class="ph-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 15c0-5 4-9 9-9s9 4 9 9c0 2-2 3-9 3s-9-1-9-3z"/><path d="M8 9.5c.5 1 .5 3 0 4M12 8c.5 1.5.5 4.5 0 6M16 9.5c.5 1 .5 3 0 4"/></svg><div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div></div>
+          <div class="item-info"><h4>Pão de queijo (6un)</h4><p>Receita mineira, forno a lenha</p><div class="item-price"><span class="cur">R$</span>14,00</div></div>
+          
         </div>
         <div class="item" data-name="Pão de forma integral" data-price="12">
-          <div class="item-ph placeholder"><svg class="ph-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 15c0-5 4-9 9-9s9 4 9 9c0 2-2 3-9 3s-9-1-9-3z"/><path d="M8 9.5c.5 1 .5 3 0 4M12 8c.5 1.5.5 4.5 0 6M16 9.5c.5 1 .5 3 0 4"/></svg></div>
-          <div class="item-info"><h4>Pão de forma integral</h4><p>Fatiado, sem conservantes</p><div class="item-price">R$12,00</div></div>
-          <div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div>
+          <div class="item-ph placeholder"><svg class="ph-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 15c0-5 4-9 9-9s9 4 9 9c0 2-2 3-9 3s-9-1-9-3z"/><path d="M8 9.5c.5 1 .5 3 0 4M12 8c.5 1.5.5 4.5 0 6M16 9.5c.5 1 .5 3 0 4"/></svg><div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div></div>
+          <div class="item-info"><h4>Pão de forma integral</h4><p>Fatiado, sem conservantes</p><div class="item-price"><span class="cur">R$</span>12,00</div></div>
+          
         </div>
         </div>
       </section>
@@ -452,24 +453,24 @@ footer p{max-width:560px;margin:8px auto 0}
         <p class="cat-note">Fatia pra hoje ou bolo inteiro por encomenda.</p>
         <div class="item-grid">
         <div class="item" data-name="Fatia de bolo de chocolate" data-price="9">
-          <div class="item-ph"><img src="assets/bolo-chocolate.jpg" alt="Bolo de chocolate da vitrine" loading="lazy" decoding="async"></div>
-          <div class="item-info"><h4>Fatia de bolo de chocolate</h4><p>Cobertura cremosa</p><div class="item-price">R$9,00</div></div>
-          <div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div>
+          <div class="item-ph"><img src="assets/bolo-chocolate.jpg" alt="Bolo de chocolate da vitrine" loading="lazy" decoding="async"><div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div></div>
+          <div class="item-info"><h4>Fatia de bolo de chocolate</h4><p>Cobertura cremosa</p><div class="item-price"><span class="cur">R$</span>9,00</div></div>
+          
         </div>
         <div class="item" data-name="Fatia de bolo de fubá" data-price="9">
-          <div class="item-ph placeholder"><svg class="ph-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14l-1.5 8h-11z"/><path d="M5 12c0-4 3-6 7-6s7 2 7 6"/><circle cx="12" cy="4.5" r="1.3"/></svg></div>
-          <div class="item-info"><h4>Fatia de bolo de fubá</h4><p>Com queijo, receita da casa</p><div class="item-price">R$9,00</div></div>
-          <div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div>
+          <div class="item-ph placeholder"><svg class="ph-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14l-1.5 8h-11z"/><path d="M5 12c0-4 3-6 7-6s7 2 7 6"/><circle cx="12" cy="4.5" r="1.3"/></svg><div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div></div>
+          <div class="item-info"><h4>Fatia de bolo de fubá</h4><p>Com queijo, receita da casa</p><div class="item-price"><span class="cur">R$</span>9,00</div></div>
+          
         </div>
         <div class="item" data-name="Sonho recheado" data-price="8">
-          <div class="item-ph"><img src="assets/sonho.jpg" alt="Sonho recheado da vitrine" loading="lazy" decoding="async"></div>
-          <div class="item-info"><h4>Sonho recheado</h4><p>Creme e cereja</p><div class="item-price">R$8,00</div></div>
-          <div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div>
+          <div class="item-ph"><img src="assets/sonho.jpg" alt="Sonho recheado da vitrine" loading="lazy" decoding="async"><div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div></div>
+          <div class="item-info"><h4>Sonho recheado</h4><p>Creme e cereja</p><div class="item-price"><span class="cur">R$</span>8,00</div></div>
+          
         </div>
         <div class="item" data-name="Cupcake gourmet" data-price="9">
-          <div class="item-ph"><img src="assets/cupcake.jpg" alt="Cupcake gourmet da vitrine" loading="lazy" decoding="async"></div>
-          <div class="item-info"><h4>Cupcake gourmet</h4><p>Cobertura e cereja</p><div class="item-price">R$9,00</div></div>
-          <div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div>
+          <div class="item-ph"><img src="assets/cupcake.jpg" alt="Cupcake gourmet da vitrine" loading="lazy" decoding="async"><div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div></div>
+          <div class="item-info"><h4>Cupcake gourmet</h4><p>Cobertura e cereja</p><div class="item-price"><span class="cur">R$</span>9,00</div></div>
+          
         </div>
         </div>
       </section>
@@ -479,14 +480,14 @@ footer p{max-width:560px;margin:8px auto 0}
         <p class="cat-note">Pra acompanhar o lanche.</p>
         <div class="item-grid">
         <div class="item" data-name="Café coado" data-price="5">
-          <div class="item-ph placeholder"><svg class="ph-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4h9l-1 12a3 3 0 01-3 3H10a3 3 0 01-3-3z"/><path d="M15 7h2.5a2 2 0 010 4H15"/><path d="M9 1.5c-.5 1 .5 1.3 0 2.5M12.5 1.5c-.5 1 .5 1.3 0 2.5"/></svg></div>
-          <div class="item-info"><h4>Café coado</h4><p>Passado na hora</p><div class="item-price">R$5,00</div></div>
-          <div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div>
+          <div class="item-ph placeholder"><svg class="ph-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4h9l-1 12a3 3 0 01-3 3H10a3 3 0 01-3-3z"/><path d="M15 7h2.5a2 2 0 010 4H15"/><path d="M9 1.5c-.5 1 .5 1.3 0 2.5M12.5 1.5c-.5 1 .5 1.3 0 2.5"/></svg><div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div></div>
+          <div class="item-info"><h4>Café coado</h4><p>Passado na hora</p><div class="item-price"><span class="cur">R$</span>5,00</div></div>
+          
         </div>
         <div class="item" data-name="Suco natural (copo 300ml)" data-price="7">
-          <div class="item-ph placeholder"><svg class="ph-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4h9l-1 12a3 3 0 01-3 3H10a3 3 0 01-3-3z"/><path d="M15 7h2.5a2 2 0 010 4H15"/><path d="M9 1.5c-.5 1 .5 1.3 0 2.5M12.5 1.5c-.5 1 .5 1.3 0 2.5"/></svg></div>
-          <div class="item-info"><h4>Suco natural (300ml)</h4><p>Fruta da estação</p><div class="item-price">R$7,00</div></div>
-          <div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div>
+          <div class="item-ph placeholder"><svg class="ph-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4h9l-1 12a3 3 0 01-3 3H10a3 3 0 01-3-3z"/><path d="M15 7h2.5a2 2 0 010 4H15"/><path d="M9 1.5c-.5 1 .5 1.3 0 2.5M12.5 1.5c-.5 1 .5 1.3 0 2.5"/></svg><div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div></div>
+          <div class="item-info"><h4>Suco natural (300ml)</h4><p>Fruta da estação</p><div class="item-price"><span class="cur">R$</span>7,00</div></div>
+          
         </div>
         </div>
       </section>
@@ -661,7 +662,7 @@ footer p{max-width:560px;margin:8px auto 0}
   </section>
 
   <footer>
-    <div>CANTINHO DO PÃO · PADARIA E LANCHONETE · MARIANA/MG</div>
+    <div>Cantinho do Pão · Padaria e Lanchonete · Mariana, MG</div>
     <p>Protótipo SyncTech Automation. Fotos do pão, bolo de chocolate, sonho, cupcake e da entrega no balcão são reais, tiradas do Instagram oficial. Fotos marcadas "imagem ilustrativa" (coxinha, empada, kibe) são geradas por IA só pra exemplo.</p>
   </footer>
 </div>
@@ -683,8 +684,8 @@ footer p{max-width:560px;margin:8px auto 0}
 
 <div class="cart-bar" id="cart-bar">
   <div class="cart-bar-row">
-    <div class="info">SEU PEDIDO<b id="cart-total">R$0,00</b></div>
-    <button class="cart-btn" id="cart-open">FECHAR PEDIDO</button>
+    <div class="info">Seu pedido<b id="cart-total">R$0,00</b></div>
+    <button class="cart-btn" id="cart-open">Fechar pedido</button>
   </div>
 </div>
 
@@ -715,7 +716,7 @@ footer p{max-width:560px;margin:8px auto 0}
       <label for="f-notes">Observações (opcional)</label>
       <textarea id="f-notes" name="observacoes" rows="2" placeholder="Ex: sem cebola, campainha quebrada, tocar interfone…"></textarea>
     </div>
-    <button class="modal-send" id="modal-send">MANDAR PEDIDO NO WHATSAPP</button>
+    <button class="modal-send" id="modal-send">Mandar pedido no WhatsApp</button>
     <p class="modal-note">A gente confirma na hora pelo WhatsApp. Sem cadastro e sem taxa de aplicativo.</p>
   </div>
 </div>
@@ -826,10 +827,10 @@ footer p{max-width:560px;margin:8px auto 0}
     let sendBtn = document.getElementById('modal-send');
     if (names.length === 0) {
       el.innerHTML = '<p class="empty">Seu carrinho está vazio.</p>';
-      sendBtn.textContent = 'MANDAR PEDIDO NO WHATSAPP';
+      sendBtn.textContent = 'Mandar pedido no WhatsApp';
       return;
     }
-    sendBtn.textContent = 'MANDAR PEDIDO — R$' + t.total.toFixed(2).replace('.', ',');
+    sendBtn.textContent = 'Mandar pedido — R$' + t.total.toFixed(2).replace('.', ',');
     let html = '';
     names.forEach(function(k){
       let c = cart[k];
@@ -1015,7 +1016,7 @@ footer p{max-width:560px;margin:8px auto 0}
     } else if (day === 0) {
       aviso.innerHTML = 'Domingo a padaria descansa. <b>Segunda o forno acende às 5h30.</b>';
     } else {
-      aviso.innerHTML = 'Entrega só na <b>quinta, 8h–16h</b>. Nos outros dias é retirada no balcão, desde as 5h30.';
+      aviso.innerHTML = 'Retirada todo dia desde as 5h30. Entrega só na <b>quinta, 8h–16h</b>.';
     }
   })();
 
