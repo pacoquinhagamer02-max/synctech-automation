@@ -42,7 +42,7 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;text-wrap:balance}
 :focus-visible{outline:2px solid var(--ember);outline-offset:2px}
 .btn{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:0.92rem;padding:13px 22px;border:none;cursor:pointer;transition:transform .12s ease}
 .btn:active{transform:scale(.96)}
-.btn-p{background:var(--ember);color:#fff}
+.btn-p{background:var(--ember-dim);color:#fff}
 .btn-o{background:transparent;color:var(--txt);border:1px solid var(--line-strong)}
 .eyebrow{font-family:var(--mono);font-size:0.68rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--crust)}
 .sec{padding:56px 0}
@@ -59,8 +59,17 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;text-wrap:balance}
 .nav-lk a:hover{color:var(--txt)}
 .nav-right{display:flex;align-items:center;gap:10px}
 .nav-btn{display:none;flex-direction:column;gap:4px;background:none;border:none;padding:6px}
-.nav-btn span{width:20px;height:2px;background:var(--txt)}
-@media(max-width:760px){.nav-lk{display:none}.nav-btn{display:flex}}
+.nav-btn span{width:20px;height:2px;background:var(--txt);transition:transform .15s ease,opacity .15s ease}
+@media(max-width:760px){
+  .nav-lk{display:none;position:absolute;top:100%;left:0;right:0;flex-direction:column;align-items:flex-start;gap:0;background:var(--bg2);border-bottom:1px solid var(--line-strong);padding:6px 22px}
+  .nav-lk.open{display:flex}
+  .nav-lk a{padding:12px 0;width:100%;border-top:1px solid var(--line)}
+  .nav-lk a:first-child{border-top:none}
+  .nav-btn{display:flex}
+  .nav-btn.open span:nth-child(1){transform:translateY(6px) rotate(45deg)}
+  .nav-btn.open span:nth-child(2){opacity:0}
+  .nav-btn.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+}
 
 /* ── HERO ── */
 .hero{padding:44px 0 40px;position:relative;overflow:hidden}
@@ -192,7 +201,7 @@ footer p{max-width:560px;margin:8px auto 0}
 .cart-bar-row{max-width:1040px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:14px}
 .cart-bar .info{font-family:var(--mono);font-size:0.76rem;color:var(--paper2)}
 .cart-bar .info b{display:block;font-family:var(--disp);font-size:1.4rem;color:var(--crust);font-weight:700}
-.cart-bar .cart-btn{background:var(--ember);color:#fff;font-weight:700;font-size:0.84rem;padding:12px 20px;border:none;display:flex;align-items:center;gap:6px;flex-shrink:0}
+.cart-bar .cart-btn{background:var(--ember-dim);color:#fff;font-weight:700;font-size:0.84rem;padding:12px 20px;border:none;display:flex;align-items:center;gap:6px;flex-shrink:0}
 .cart-bar .cart-btn:active{transform:scale(.95)}
 
 .modal-overlay{position:fixed;inset:0;background:rgba(16,10,7,0.7);z-index:70;display:none;align-items:flex-end;justify-content:center}
@@ -223,17 +232,17 @@ footer p{max-width:560px;margin:8px auto 0}
 <nav class="nav">
   <div class="wrap nav-in">
     <a href="#topo" class="nav-lg">
-      <img src="assets/logo.jpg" alt="Cantinho do Pão">
+      <img src="assets/logo.jpg" alt="Cantinho do Pão" loading="lazy" decoding="async">
       <b>Cantinho do Pão</b>
     </a>
-    <div class="nav-lk">
+    <div class="nav-lk" id="navLinks">
       <a href="#destaque">Sobre o pão</a>
       <a href="#cardapio">Cardápio</a>
       <a href="#visite">Visite</a>
     </div>
     <div class="nav-right">
       <a class="btn btn-p" href="#cardapio">Fazer pedido</a>
-      <button class="nav-btn" aria-label="Menu"><span></span><span></span><span></span></button>
+      <button class="nav-btn" id="navBtn" aria-label="Abrir menu" aria-expanded="false" aria-controls="navLinks"><span></span><span></span><span></span></button>
     </div>
   </div>
 </nav>
@@ -255,7 +264,7 @@ footer p{max-width:560px;margin:8px auto 0}
       </div>
     </div>
     <div class="hero-photo-w">
-      <div class="hero-photo"><img src="assets/hero.jpg" alt="Pão fresquinho, saído do forno da casa"></div>
+      <div class="hero-photo"><img src="assets/hero.jpg" alt="Pão fresquinho, saído do forno da casa" fetchpriority="high"></div>
     </div>
   </div>
 </header>
@@ -276,14 +285,14 @@ footer p{max-width:560px;margin:8px auto 0}
         </div>
         <a class="btn btn-o" href="https://wa.me/553137913010?text=Ol%C3%A1!%20Tenho%20uma%20d%C3%BAvida%20sobre%20o%20card%C3%A1pio." target="_blank" rel="noopener">Perguntar no WhatsApp</a>
       </div>
-      <div class="dest-photo"><img src="assets/equipe.jpg" alt="Nossa equipe entregando um pedido no balcão"></div>
+      <div class="dest-photo"><img src="assets/equipe.jpg" alt="Nossa equipe entregando um pedido no balcão" loading="lazy" decoding="async"></div>
     </div>
 
     <div class="res">
       <div class="res-lbl">Feito e entregue aqui</div>
       <div class="res-g">
-        <figure><img src="assets/hero.jpg" alt="Pão francês fresquinho"><figcaption>fornada da manhã</figcaption></figure>
-        <figure><img src="assets/equipe.jpg" alt="Entrega no balcão"><figcaption>feito à mão, entregue à mão</figcaption></figure>
+        <figure><img src="assets/hero.jpg" alt="Pão francês fresquinho" loading="lazy" decoding="async"><figcaption>fornada da manhã</figcaption></figure>
+        <figure><img src="assets/equipe.jpg" alt="Entrega no balcão" loading="lazy" decoding="async"><figcaption>feito à mão, entregue à mão</figcaption></figure>
       </div>
     </div>
 
@@ -334,17 +343,17 @@ footer p{max-width:560px;margin:8px auto 0}
       <div class="cat-title"><h3>Salgados</h3><span class="cat-highlight">+ elogiado</span></div>
       <p class="cat-note">O item que mais aparece nas avaliações dos clientes.</p>
       <div class="item" data-name="Coxinha de frango" data-price="8">
-        <div class="item-ph"><img src="assets/coxinha.jpg" alt="Coxinha de frango (imagem ilustrativa)"></div>
+        <div class="item-ph"><img src="assets/coxinha.jpg" alt="Coxinha de frango (imagem ilustrativa)" loading="lazy" decoding="async"></div>
         <div class="item-info"><h4>Coxinha de frango</h4><p>Feita na hora, casquinha crocante — imagem ilustrativa</p><div class="item-price">R$8,00</div></div>
         <div class="item-add"><button class="qty-btn minus">−</button><span class="qty-val">0</span><button class="qty-btn plus">+</button></div>
       </div>
       <div class="item" data-name="Empada de frango" data-price="7">
-        <div class="item-ph"><img src="assets/empada.jpg" alt="Empada de frango (imagem ilustrativa)"></div>
+        <div class="item-ph"><img src="assets/empada.jpg" alt="Empada de frango (imagem ilustrativa)" loading="lazy" decoding="async"></div>
         <div class="item-info"><h4>Empada de frango</h4><p>Massa amanteigada, recheio generoso — imagem ilustrativa</p><div class="item-price">R$7,00</div></div>
         <div class="item-add"><button class="qty-btn minus">−</button><span class="qty-val">0</span><button class="qty-btn plus">+</button></div>
       </div>
       <div class="item" data-name="Kibe" data-price="7">
-        <div class="item-ph"><img src="assets/kibe.jpg" alt="Kibe (imagem ilustrativa)"></div>
+        <div class="item-ph"><img src="assets/kibe.jpg" alt="Kibe (imagem ilustrativa)" loading="lazy" decoding="async"></div>
         <div class="item-info"><h4>Kibe</h4><p>Crocante por fora, suculento por dentro — imagem ilustrativa</p><div class="item-price">R$7,00</div></div>
         <div class="item-add"><button class="qty-btn minus">−</button><span class="qty-val">0</span><button class="qty-btn plus">+</button></div>
       </div>
@@ -375,7 +384,7 @@ footer p{max-width:560px;margin:8px auto 0}
       <div class="cat-title"><h3>Bolos & Doces</h3></div>
       <p class="cat-note">Fatia pra hoje ou bolo inteiro por encomenda.</p>
       <div class="item" data-name="Fatia de bolo de chocolate" data-price="9">
-        <div class="item-ph"><img src="assets/bolo-chocolate.jpg" alt="Bolo de chocolate da vitrine"></div>
+        <div class="item-ph"><img src="assets/bolo-chocolate.jpg" alt="Bolo de chocolate da vitrine" loading="lazy" decoding="async"></div>
         <div class="item-info"><h4>Fatia de bolo de chocolate</h4><p>Cobertura cremosa — foto real da vitrine</p><div class="item-price">R$9,00</div></div>
         <div class="item-add"><button class="qty-btn minus">−</button><span class="qty-val">0</span><button class="qty-btn plus">+</button></div>
       </div>
@@ -384,12 +393,12 @@ footer p{max-width:560px;margin:8px auto 0}
         <div class="item-add"><button class="qty-btn minus">−</button><span class="qty-val">0</span><button class="qty-btn plus">+</button></div>
       </div>
       <div class="item" data-name="Sonho recheado" data-price="8">
-        <div class="item-ph"><img src="assets/sonho.jpg" alt="Sonho recheado da vitrine"></div>
+        <div class="item-ph"><img src="assets/sonho.jpg" alt="Sonho recheado da vitrine" loading="lazy" decoding="async"></div>
         <div class="item-info"><h4>Sonho recheado</h4><p>Creme e cereja — foto real da vitrine</p><div class="item-price">R$8,00</div></div>
         <div class="item-add"><button class="qty-btn minus">−</button><span class="qty-val">0</span><button class="qty-btn plus">+</button></div>
       </div>
       <div class="item" data-name="Cupcake gourmet" data-price="9">
-        <div class="item-ph"><img src="assets/cupcake.jpg" alt="Cupcake gourmet da vitrine"></div>
+        <div class="item-ph"><img src="assets/cupcake.jpg" alt="Cupcake gourmet da vitrine" loading="lazy" decoding="async"></div>
         <div class="item-info"><h4>Cupcake gourmet</h4><p>Cobertura e cereja — foto real da vitrine</p><div class="item-price">R$9,00</div></div>
         <div class="item-add"><button class="qty-btn minus">−</button><span class="qty-val">0</span><button class="qty-btn plus">+</button></div>
       </div>
@@ -425,10 +434,10 @@ footer p{max-width:560px;margin:8px auto 0}
       <h2>Feito aqui, todo dia</h2>
     </div>
     <div class="gal">
-      <a href="assets/hero.jpg" target="_blank" rel="noopener"><figure><img src="assets/hero.jpg" alt="Pão francês fresquinho"><figcaption>pão de todo dia</figcaption></figure></a>
-      <a href="assets/bolo-chocolate.jpg" target="_blank" rel="noopener"><figure><img src="assets/bolo-chocolate.jpg" alt="Bolo de chocolate da vitrine"><figcaption>bolo de chocolate</figcaption></figure></a>
-      <a href="assets/sonho.jpg" target="_blank" rel="noopener"><figure><img src="assets/sonho.jpg" alt="Sonho recheado da vitrine"><figcaption>sonho recheado</figcaption></figure></a>
-      <a href="assets/cupcake.jpg" target="_blank" rel="noopener"><figure><img src="assets/cupcake.jpg" alt="Cupcake gourmet da vitrine"><figcaption>cupcake gourmet</figcaption></figure></a>
+      <a href="assets/hero.jpg" target="_blank" rel="noopener"><figure><img src="assets/hero.jpg" alt="Pão francês fresquinho" loading="lazy" decoding="async"><figcaption>pão de todo dia</figcaption></figure></a>
+      <a href="assets/bolo-chocolate.jpg" target="_blank" rel="noopener"><figure><img src="assets/bolo-chocolate.jpg" alt="Bolo de chocolate da vitrine" loading="lazy" decoding="async"><figcaption>bolo de chocolate</figcaption></figure></a>
+      <a href="assets/sonho.jpg" target="_blank" rel="noopener"><figure><img src="assets/sonho.jpg" alt="Sonho recheado da vitrine" loading="lazy" decoding="async"><figcaption>sonho recheado</figcaption></figure></a>
+      <a href="assets/cupcake.jpg" target="_blank" rel="noopener"><figure><img src="assets/cupcake.jpg" alt="Cupcake gourmet da vitrine" loading="lazy" decoding="async"><figcaption>cupcake gourmet</figcaption></figure></a>
     </div>
     <p class="gal-note">Fotos do pão, do bolo de chocolate, do sonho e do cupcake são reais, tiradas do Instagram oficial (@padaria__cantinho_do_pao). As fotos de salgados no cardápio (coxinha, empada, kibe) são geradas por IA só pra ilustração — as demais categorias ainda não têm foto.</p>
   </div>
@@ -525,6 +534,23 @@ footer p{max-width:560px;margin:8px auto 0}
   var WHATSAPP = '553137913010';
   var cart = {};
   var deliveryMode = 'Retirada na loja';
+
+  var navBtn = document.getElementById('navBtn');
+  var navLinks = document.getElementById('navLinks');
+  navBtn.addEventListener('click', function(){
+    var open = navLinks.classList.toggle('open');
+    navBtn.classList.toggle('open', open);
+    navBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    navBtn.setAttribute('aria-label', open ? 'Fechar menu' : 'Abrir menu');
+  });
+  navLinks.querySelectorAll('a').forEach(function(a){
+    a.addEventListener('click', function(){
+      navLinks.classList.remove('open');
+      navBtn.classList.remove('open');
+      navBtn.setAttribute('aria-expanded', 'false');
+      navBtn.setAttribute('aria-label', 'Abrir menu');
+    });
+  });
 
   document.querySelectorAll('.cat-btn').forEach(function(btn){
     btn.addEventListener('click', function(){
