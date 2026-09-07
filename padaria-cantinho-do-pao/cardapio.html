@@ -49,12 +49,16 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;text-wrap:balance}
 .sec-hd{max-width:480px;margin-bottom:30px}
 .sec-hd h2{font-size:clamp(1.7rem,4vw,2.3rem);margin-top:8px}
 
+/* ── TOLDO (identidade de loja) ── */
+.awning{height:9px;background:repeating-linear-gradient(-45deg,var(--crust) 0 16px,var(--ink) 16px 32px)}
+
 /* ── NAV ── */
 .nav{position:sticky;top:0;z-index:50;background:rgba(27,18,13,0.92);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
 .nav-in{display:flex;align-items:center;justify-content:space-between;padding:12px 0}
 .nav-lg{display:flex;align-items:center;gap:9px}
-.nav-lg img{width:34px;height:34px;border-radius:50%;border:1px solid var(--line-strong)}
-.nav-lg b{font-family:var(--disp);font-size:1.02rem}
+.nav-lg img{width:40px;height:40px;border-radius:50%;border:1.5px solid var(--crust)}
+.nav-lg b{font-family:var(--disp);font-size:1.02rem;line-height:1.1}
+.nav-lg small{display:block;font-family:var(--body);font-size:0.62rem;font-weight:600;letter-spacing:0.04em;color:var(--dim);text-transform:uppercase}
 .nav-lk{display:flex;align-items:center;gap:22px;font-size:0.86rem;color:var(--mut)}
 .nav-lk a:hover{color:var(--txt)}
 .nav-right{display:flex;align-items:center;gap:10px}
@@ -119,7 +123,7 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;text-wrap:balance}
 @media(max-width:760px){.dest-top,.pro-g{grid-template-columns:1fr}.dest-photo{order:-1}}
 
 /* ── CARDAPIO (a loja) ── */
-.cardapio{background:var(--paper);color:var(--ink)}
+.cardapio{background-color:var(--paper);background-image:repeating-linear-gradient(135deg,rgba(43,32,22,0.025) 0 2px,transparent 2px 7px);color:var(--ink)}
 .cardapio .sec-hd{max-width:560px}
 .cardapio .sec-hd p{color:var(--ink-mut);margin-top:10px;font-size:0.94rem}
 .cat-nav{display:flex;gap:24px;overflow-x:auto;padding:0 0 16px;position:sticky;top:57px;background:var(--paper);z-index:20;scrollbar-width:none;border-bottom:1px solid rgba(43,32,22,0.14)}
@@ -133,19 +137,24 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;text-wrap:balance}
 .cat-title{display:flex;align-items:baseline;gap:10px;margin-bottom:2px}
 .cat-title h3{font-family:var(--disp);font-size:1.7rem;font-weight:700}
 .cat-highlight{font-family:var(--body);font-size:0.66rem;font-weight:700;color:#fff;background:var(--stamp);padding:3px 8px;letter-spacing:0.02em;text-transform:uppercase}
-.cat-note{font-size:0.84rem;color:var(--ink-mut);margin-bottom:4px}
-.item{display:flex;gap:13px;align-items:center;padding:15px 0;border-bottom:1px solid rgba(43,32,22,0.12)}
-.item-ph{flex-shrink:0;width:50px;height:50px;overflow:hidden;border:1px solid rgba(43,32,22,0.14)}
+.cat-note{font-size:0.84rem;color:var(--ink-mut);margin-bottom:16px}
+.item-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+@media(min-width:560px){.item-grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:900px){.item-grid{grid-template-columns:repeat(4,1fr)}}
+.item{display:flex;flex-direction:column;background:#fff;border:1px solid rgba(43,32,22,0.14);box-shadow:0 1px 0 rgba(43,32,22,0.05)}
+.item-ph{width:100%;aspect-ratio:4/3;overflow:hidden;background:var(--paper2);flex-shrink:0}
 .item-ph img{width:100%;height:100%;object-fit:cover}
-.item-info{flex:1;min-width:0}
-.item-info h4{font-size:0.94rem;font-weight:700;font-family:var(--body)}
-.item-info p{font-size:0.76rem;color:var(--ink-faint);margin-top:2px}
-.item-price{font-family:var(--mono);font-weight:700;font-size:0.86rem;margin-top:5px;color:var(--ink-mut)}
-.item-add{flex-shrink:0;display:flex;align-items:center;gap:10px}
-.qty-btn{width:28px;height:28px;border:1px solid rgba(43,32,22,0.22);background:none;font-family:var(--mono);font-size:1rem;font-weight:700;color:var(--ink);display:flex;align-items:center;justify-content:center;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.item-ph.placeholder{display:flex;align-items:center;justify-content:center}
+.ph-ic{width:32%;height:32%;color:var(--ink-faint);opacity:.55}
+.item-info{flex:1;min-width:0;padding:10px 11px 0}
+.item-info h4{font-size:0.86rem;font-weight:700;font-family:var(--body);line-height:1.25}
+.item-info p{font-size:0.72rem;color:var(--ink-faint);margin-top:3px}
+.item-price{display:inline-block;font-family:var(--mono);font-weight:700;font-size:0.76rem;margin-top:7px;color:var(--crust);background:var(--ink);padding:3px 7px}
+.item-add{flex-shrink:0;display:flex;align-items:center;justify-content:center;gap:12px;padding:9px 11px 11px}
+.qty-btn{width:26px;height:26px;border:1px solid rgba(43,32,22,0.22);background:none;font-family:var(--mono);font-size:1rem;font-weight:700;color:var(--ink);display:flex;align-items:center;justify-content:center;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .qty-btn:active{transform:scale(.85);background:var(--paper2)}
 .qty-val{min-width:14px;text-align:center;font-family:var(--mono);font-weight:700;font-size:0.86rem;font-variant-numeric:tabular-nums}
-.item.just-added .item-info h4{color:var(--stamp)}
+.item.just-added{outline:2px solid var(--stamp);outline-offset:-1px}
 
 /* ── BUSCA (estilo iFood) ── */
 .search-w{position:relative;margin:18px 0 8px}
@@ -243,11 +252,12 @@ footer p{max-width:560px;margin:8px auto 0}
 </head>
 <body>
 
+<div class="awning" aria-hidden="true"></div>
 <nav class="nav">
   <div class="wrap nav-in">
     <a href="#topo" class="nav-lg">
       <img src="assets/logo.jpg" alt="Cantinho do Pão" loading="lazy" decoding="async">
-      <b>Cantinho do Pão</b>
+      <span><b>Cantinho do Pão</b><small>Padaria e Lanchonete</small></span>
     </a>
     <div class="nav-lk" id="navLinks">
       <a href="#cardapio">Cardápio</a>
@@ -273,7 +283,7 @@ footer p{max-width:560px;margin:8px auto 0}
         <span><svg class="fact-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="18" r="2.5"/><circle cx="17" cy="18" r="2.5"/><path d="M3 18h1l2-8h6l3 5h4M9 10V6h3"/></svg>Retirada <b>todo dia</b> · entrega só quintas, 8h–16h</span>
       </div>
       <div class="hero-act">
-        <a class="btn btn-p" href="#cardapio">Ver cardápio</a>
+        <a class="btn btn-p" href="#cardapio">Montar meu pedido</a>
         <a class="btn btn-o" href="https://wa.me/553137913010?text=Ol%C3%A1!%20Vim%20do%20site%20e%20quero%20fazer%20um%20pedido." target="_blank" rel="noopener">Chamar no WhatsApp</a>
       </div>
     </div>
@@ -306,6 +316,7 @@ footer p{max-width:560px;margin:8px auto 0}
     <section class="cat-section" data-cat="salgados">
       <div class="cat-title"><h3>Salgados</h3><span class="cat-highlight">+ elogiado</span></div>
       <p class="cat-note">O item que mais aparece nas avaliações dos clientes.</p>
+      <div class="item-grid">
       <div class="item" data-name="Coxinha de frango" data-price="8">
         <div class="item-ph"><img src="assets/coxinha.jpg" alt="Coxinha de frango (imagem ilustrativa)" loading="lazy" decoding="async"></div>
         <div class="item-info"><h4>Coxinha de frango</h4><p>Feita na hora, casquinha crocante</p><div class="item-price">R$8,00</div></div>
@@ -322,37 +333,46 @@ footer p{max-width:560px;margin:8px auto 0}
         <div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div>
       </div>
       <div class="item" data-name="Pastel de queijo" data-price="7">
+        <div class="item-ph placeholder"><svg class="ph-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9c0-3 3.5-6 8-6s8 3 8 6c0 4-4 10-8 11-4-1-8-7-8-11z"/><path d="M9 10c1 1 5 1 6 0"/></svg></div>
         <div class="item-info"><h4>Pastel de queijo</h4><p>Assado, sem fritura</p><div class="item-price">R$7,00</div></div>
         <div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div>
+      </div>
       </div>
     </section>
 
     <section class="cat-section" data-cat="paes" style="display:none">
       <div class="cat-title"><h3>Pães</h3></div>
       <p class="cat-note">Fornada nova pela manhã e no fim da tarde.</p>
+      <div class="item-grid">
       <div class="item" data-name="Pão francês (unidade)" data-price="1">
+        <div class="item-ph placeholder"><svg class="ph-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 15c0-5 4-9 9-9s9 4 9 9c0 2-2 3-9 3s-9-1-9-3z"/><path d="M8 9.5c.5 1 .5 3 0 4M12 8c.5 1.5.5 4.5 0 6M16 9.5c.5 1 .5 3 0 4"/></svg></div>
         <div class="item-info"><h4>Pão francês (unidade)</h4><p>Quentinho, casca crocante</p><div class="item-price">R$1,00</div></div>
         <div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div>
       </div>
       <div class="item" data-name="Pão de queijo (6un)" data-price="14">
+        <div class="item-ph placeholder"><svg class="ph-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 15c0-5 4-9 9-9s9 4 9 9c0 2-2 3-9 3s-9-1-9-3z"/><path d="M8 9.5c.5 1 .5 3 0 4M12 8c.5 1.5.5 4.5 0 6M16 9.5c.5 1 .5 3 0 4"/></svg></div>
         <div class="item-info"><h4>Pão de queijo (6un)</h4><p>Receita mineira, forno a lenha</p><div class="item-price">R$14,00</div></div>
         <div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div>
       </div>
       <div class="item" data-name="Pão de forma integral" data-price="12">
+        <div class="item-ph placeholder"><svg class="ph-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 15c0-5 4-9 9-9s9 4 9 9c0 2-2 3-9 3s-9-1-9-3z"/><path d="M8 9.5c.5 1 .5 3 0 4M12 8c.5 1.5.5 4.5 0 6M16 9.5c.5 1 .5 3 0 4"/></svg></div>
         <div class="item-info"><h4>Pão de forma integral</h4><p>Fatiado, sem conservantes</p><div class="item-price">R$12,00</div></div>
         <div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div>
+      </div>
       </div>
     </section>
 
     <section class="cat-section" data-cat="doces" style="display:none">
       <div class="cat-title"><h3>Bolos & Doces</h3></div>
       <p class="cat-note">Fatia pra hoje ou bolo inteiro por encomenda.</p>
+      <div class="item-grid">
       <div class="item" data-name="Fatia de bolo de chocolate" data-price="9">
         <div class="item-ph"><img src="assets/bolo-chocolate.jpg" alt="Bolo de chocolate da vitrine" loading="lazy" decoding="async"></div>
         <div class="item-info"><h4>Fatia de bolo de chocolate</h4><p>Cobertura cremosa</p><div class="item-price">R$9,00</div></div>
         <div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div>
       </div>
       <div class="item" data-name="Fatia de bolo de fubá" data-price="9">
+        <div class="item-ph placeholder"><svg class="ph-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14l-1.5 8h-11z"/><path d="M5 12c0-4 3-6 7-6s7 2 7 6"/><circle cx="12" cy="4.5" r="1.3"/></svg></div>
         <div class="item-info"><h4>Fatia de bolo de fubá</h4><p>Com queijo, receita da casa</p><div class="item-price">R$9,00</div></div>
         <div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div>
       </div>
@@ -366,18 +386,23 @@ footer p{max-width:560px;margin:8px auto 0}
         <div class="item-info"><h4>Cupcake gourmet</h4><p>Cobertura e cereja</p><div class="item-price">R$9,00</div></div>
         <div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div>
       </div>
+      </div>
     </section>
 
     <section class="cat-section" data-cat="bebidas" style="display:none">
       <div class="cat-title"><h3>Bebidas</h3></div>
       <p class="cat-note">Pra acompanhar o lanche.</p>
+      <div class="item-grid">
       <div class="item" data-name="Café coado" data-price="5">
+        <div class="item-ph placeholder"><svg class="ph-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4h9l-1 12a3 3 0 01-3 3H10a3 3 0 01-3-3z"/><path d="M15 7h2.5a2 2 0 010 4H15"/><path d="M9 1.5c-.5 1 .5 1.3 0 2.5M12.5 1.5c-.5 1 .5 1.3 0 2.5"/></svg></div>
         <div class="item-info"><h4>Café coado</h4><p>Passado na hora</p><div class="item-price">R$5,00</div></div>
         <div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div>
       </div>
       <div class="item" data-name="Suco natural (copo 300ml)" data-price="7">
+        <div class="item-ph placeholder"><svg class="ph-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4h9l-1 12a3 3 0 01-3 3H10a3 3 0 01-3-3z"/><path d="M15 7h2.5a2 2 0 010 4H15"/><path d="M9 1.5c-.5 1 .5 1.3 0 2.5M12.5 1.5c-.5 1 .5 1.3 0 2.5"/></svg></div>
         <div class="item-info"><h4>Suco natural (300ml)</h4><p>Fruta da estação</p><div class="item-price">R$7,00</div></div>
         <div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div>
+      </div>
       </div>
     </section>
 
@@ -407,7 +432,10 @@ footer p{max-width:560px;margin:8px auto 0}
           <div><b>Retirada a qualquer hora</b><span>Aberto todo dia da semana</span></div>
           <div><b>Entrega às quintas</b><span>8h–16h, direto no WhatsApp</span></div>
         </div>
-        <a class="btn btn-o" href="https://wa.me/553137913010?text=Ol%C3%A1!%20Tenho%20uma%20d%C3%BAvida%20sobre%20o%20card%C3%A1pio." target="_blank" rel="noopener">Perguntar no WhatsApp</a>
+        <div class="hero-act">
+          <a class="btn btn-p" href="#cardapio">Montar meu pedido</a>
+          <a class="btn btn-o" href="https://wa.me/553137913010?text=Ol%C3%A1!%20Tenho%20uma%20d%C3%BAvida%20sobre%20o%20card%C3%A1pio." target="_blank" rel="noopener">Perguntar no WhatsApp</a>
+        </div>
       </div>
       <div class="dest-photo"><img src="assets/equipe.jpg" alt="Nossa equipe entregando um pedido no balcão" loading="lazy" decoding="async"></div>
     </div>
