@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#A855F7">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23A855F7'/><text y='72' font-size='58' text-anchor='middle' x='50' fill='white' font-family='Arial' font-weight='bold'>S</text></svg>">
 <title>Link na Bio — SyncTech</title>
@@ -87,7 +87,7 @@ h1, h2, h3 { font-family: var(--font-head, 'Inter'), sans-serif; }
 .modal-title { font-size: 1.05rem; font-weight: 800; letter-spacing: -0.02em; text-align: center; margin-bottom: 6px; }
 .modal-sub { font-size: 0.8rem; color: var(--muted); text-align: center; margin-bottom: 20px; }
 .stars-row { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
-.star { font-size: 2.2rem; cursor: pointer; opacity: 0.3; transition: opacity 0.15s, transform 0.1s; }
+.star { font-size: 2.2rem; cursor: pointer; opacity: 0.3; transition: opacity 0.15s, transform 0.1s; background: none; border: none; padding: 0; color: inherit; font-family: inherit; }
 .star.lit { opacity: 1; }
 .star:hover { transform: scale(1.15); }
 .modal-feedback { display: none; flex-direction: column; gap: 10px; }
@@ -105,6 +105,10 @@ h1, h2, h3 { font-family: var(--font-head, 'Inter'), sans-serif; }
 .footer-link { font-size: 0.7rem; color: var(--faint); text-decoration: none; display: inline-flex; align-items: center; gap: 5px; }
 .footer-link:hover { color: var(--muted); }
 .footer-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--primary); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0.001ms !important; }
+}
 </style>
 </head>
 <body>
@@ -176,11 +180,11 @@ h1, h2, h3 { font-family: var(--font-head, 'Inter'), sans-serif; }
     <div class="modal-title">Como foi a sua experiência?</div>
     <div class="modal-sub" id="modal-sub">Sua avaliação ajuda outros clientes a conhecer o negócio.</div>
     <div class="stars-row" id="stars-row">
-      <span class="star" data-v="1" onclick="rateStar(1)">★</span>
-      <span class="star" data-v="2" onclick="rateStar(2)">★</span>
-      <span class="star" data-v="3" onclick="rateStar(3)">★</span>
-      <span class="star" data-v="4" onclick="rateStar(4)">★</span>
-      <span class="star" data-v="5" onclick="rateStar(5)">★</span>
+      <button type="button" class="star" data-v="1" onclick="rateStar(1)" aria-label="1 estrela">★</button>
+      <button type="button" class="star" data-v="2" onclick="rateStar(2)" aria-label="2 estrelas">★</button>
+      <button type="button" class="star" data-v="3" onclick="rateStar(3)" aria-label="3 estrelas">★</button>
+      <button type="button" class="star" data-v="4" onclick="rateStar(4)" aria-label="4 estrelas">★</button>
+      <button type="button" class="star" data-v="5" onclick="rateStar(5)" aria-label="5 estrelas">★</button>
     </div>
     <div class="modal-feedback" id="modal-feedback">
       <textarea id="feedback-text" placeholder="Nos conte o que aconteceu para podermos melhorar..."></textarea>
@@ -191,7 +195,7 @@ h1, h2, h3 { font-family: var(--font-head, 'Inter'), sans-serif; }
 </div>
 
 <script>
-var CONFIG = {
+let CONFIG = {
   bizName: 'Negócio Exemplo',
   bizType: 'Barbearia',
   bizEmoji: '✂️',
@@ -217,9 +221,9 @@ var CONFIG = {
 // ── Load config from URL hash ──
 (function(){
   try {
-    var hash = window.location.hash;
+    let hash = window.location.hash;
     if (hash && hash.indexOf('#config=') === 0) {
-      var dec = JSON.parse(decodeURIComponent(escape(atob(hash.slice(8)))));
+      let dec = JSON.parse(decodeURIComponent(escape(atob(hash.slice(8)))));
       ['bizName','bizType','bizEmoji','bizWpp','coverColor','rating','reviewCount',
        'city','address','schedule','about','instagram','website','googleReviewUrl','agendamentoUrl'].forEach(function(k){
         if (dec[k] !== undefined && dec[k] !== null && dec[k] !== '') CONFIG[k] = dec[k];
@@ -246,16 +250,16 @@ function render() {
   document.getElementById('biz-name').textContent = CONFIG.bizName;
 
   // Badges
-  var badgeType = document.getElementById('badge-type');
+  let badgeType = document.getElementById('badge-type');
   badgeType.textContent = (CONFIG.bizEmoji || '') + ' ' + (CONFIG.bizType || '');
 
   if (CONFIG.rating) {
-    var br = document.getElementById('badge-rating');
+    let br = document.getElementById('badge-rating');
     br.style.display = '';
     br.textContent = '⭐ ' + CONFIG.rating + (CONFIG.reviewCount ? ' (' + CONFIG.reviewCount + ')' : '');
   }
   if (CONFIG.city) {
-    var bc = document.getElementById('badge-city');
+    let bc = document.getElementById('badge-city');
     bc.style.display = '';
     bc.textContent = '📍 ' + CONFIG.city;
   }
@@ -268,7 +272,7 @@ function render() {
   }
 
   // CTA — agendar
-  var btnBook = document.getElementById('btn-book');
+  let btnBook = document.getElementById('btn-book');
   if (CONFIG.agendamentoUrl) {
     btnBook.href = CONFIG.agendamentoUrl;
     btnBook.style.display = 'block';
@@ -276,37 +280,37 @@ function render() {
   }
 
   // WhatsApp
-  var btnWpp = document.getElementById('btn-wpp');
+  let btnWpp = document.getElementById('btn-wpp');
   if (CONFIG.bizWpp) {
     btnWpp.href = 'https://wa.me/' + CONFIG.bizWpp.replace(/\D/g,'');
   }
 
   // Instagram
-  var btnInsta = document.getElementById('btn-insta');
+  let btnInsta = document.getElementById('btn-insta');
   if (CONFIG.instagram) {
-    var igHandle = CONFIG.instagram.replace('@','');
+    let igHandle = CONFIG.instagram.replace('@','');
     btnInsta.href = 'https://instagram.com/' + igHandle;
     btnInsta.style.display = 'flex';
   }
 
   // Site
-  var btnSite = document.getElementById('btn-site');
+  let btnSite = document.getElementById('btn-site');
   if (CONFIG.website) {
     btnSite.href = CONFIG.website;
     btnSite.style.display = 'flex';
   }
 
   // Adjust 2-col grid
-  var show2 = CONFIG.instagram || CONFIG.website;
+  let show2 = CONFIG.instagram || CONFIG.website;
   if (!show2) {
     document.querySelector('.btn-row-2').style.gridTemplateColumns = '1fr';
     btnWpp.style.padding = '14px';
   }
 
   // Services
-  var svcList = document.getElementById('svc-list');
+  let svcList = document.getElementById('svc-list');
   svcList.innerHTML = CONFIG.services.map(function(s) {
-    var agUrl = CONFIG.agendamentoUrl ?
+    let agUrl = CONFIG.agendamentoUrl ?
       CONFIG.agendamentoUrl + (CONFIG.agendamentoUrl.indexOf('#') > -1 ? '' : '') : '#';
     return '<a href="' + agUrl + '" class="svc-item">' +
       '<span class="svc-icon">' + (s.icon||'🔧') + '</span>' +
@@ -324,7 +328,7 @@ function render() {
   if (!CONFIG.services.length) document.getElementById('svc-section').style.display = 'none';
 
   // Info
-  var infoItems = [];
+  let infoItems = [];
   if (CONFIG.address) infoItems.push({ icon:'📍', text: CONFIG.address });
   if (CONFIG.schedule) infoItems.push({ icon:'🕐', text: CONFIG.schedule });
   if (infoItems.length) {
@@ -335,7 +339,7 @@ function render() {
   }
 
   // Social grid
-  var socialBtns = [];
+  let socialBtns = [];
   if (CONFIG.googleReviewUrl) {
     socialBtns.push('<button class="social-btn" onclick="openReviewModal()"><span class="social-icon">⭐</span>Avaliar no Google</button>');
   }
@@ -350,7 +354,7 @@ function render() {
 }
 
 // ── Review modal ──
-var _selectedStars = 0;
+let _selectedStars = 0;
 function openReviewModal() {
   _selectedStars = 0;
   document.querySelectorAll('.star').forEach(function(s){ s.classList.remove('lit'); });
@@ -382,10 +386,10 @@ function rateStar(n) {
   }, 300);
 }
 function sendFeedback() {
-  var txt = document.getElementById('feedback-text').value.trim();
+  let txt = document.getElementById('feedback-text').value.trim();
   if (!txt) return;
-  var stars = '★'.repeat(_selectedStars) + '☆'.repeat(5 - _selectedStars);
-  var msg = '⚠️ *Feedback Privado Recebido*\n\n' +
+  let stars = '★'.repeat(_selectedStars) + '☆'.repeat(5 - _selectedStars);
+  let msg = '⚠️ *Feedback Privado Recebido*\n\n' +
     'Nota: ' + stars + ' (' + _selectedStars + '/5)\n\n' +
     'Comentário: ' + txt + '\n\n_Via SyncTech Bio_';
   window.open('https://wa.me/' + CONFIG.bizWpp.replace(/\D/g,'') + '?text=' + encodeURIComponent(msg), '_blank');
@@ -394,13 +398,13 @@ function sendFeedback() {
 
 // ── Share page ──
 function sharePage() {
-  var url = window.location.href;
+  let url = window.location.href;
   if (navigator.share) {
     navigator.share({ title: CONFIG.bizName, url: url });
   } else {
     navigator.clipboard.writeText(url).then(function(){
-      var btn = document.querySelector('.share-btn-small');
-      var original = btn.innerHTML;
+      let btn = document.querySelector('.share-btn-small');
+      let original = btn.innerHTML;
       btn.textContent = '✓ Link copiado!';
       setTimeout(function(){ btn.innerHTML = original; }, 2000);
     });
