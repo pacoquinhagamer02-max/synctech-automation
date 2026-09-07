@@ -20,6 +20,13 @@ trocando o ID na primeira linha:
 ```javascript
 const SHEET_ID = 'COLE_O_ID_DA_PLANILHA_AQUI';
 
+// Serve só pra você testar: abrindo a URL no navegador, deve aparecer esta frase.
+function doGet() {
+  return ContentService
+    .createTextOutput('Medicao do Cantinho do Pao no ar.')
+    .setMimeType(ContentService.MimeType.TEXT);
+}
+
 function doPost(e) {
   try {
     const dados = JSON.parse(e.postData.contents);
@@ -62,10 +69,22 @@ function doPost(e) {
 ## Passo 3 — Publicar
 
 1. **Implantar → Nova implantação**
-2. Tipo: **App da Web**
+2. No ícone de engrenagem, escolha o tipo: **App da Web**
 3. Executar como: **Eu**
 4. Quem pode acessar: **Qualquer pessoa** ← precisa ser isso, senão o app não consegue gravar
-5. Copie a **URL do app da Web** que aparece no final
+5. Clique em **Implantar**
+
+**O Google vai pedir autorização e vai assustar.** Aparece uma tela dizendo
+que o app não foi verificado. Isso é normal — o "app" é o seu próprio script.
+Clique em **Avançado** e depois em **Acessar (nome do projeto) — não seguro**.
+Não é inseguro: é seu script, na sua planilha, na sua conta.
+
+6. Copie a **URL do app da Web** que aparece no final. Termina com `/exec`.
+
+### Confira antes de continuar
+Cole essa URL no navegador. Deve aparecer a frase
+`Medicao do Cantinho do Pao no ar.` Se aparecer, a publicação está certa.
+Se der erro de permissão, volte no item 4 — é onde quase sempre erra.
 
 ## Passo 4 — Ligar no app
 
