@@ -221,6 +221,15 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;text-wrap:balance}
 .search-empty{padding:30px 0;text-align:center;color:var(--ink-mut);font-size:0.88rem;display:none}
 .search-empty.show{display:block}
 
+/* ── ENCOMENDA DE BOLO (maior ticket da casa) ── */
+.encomenda{display:flex;gap:16px;align-items:center;margin-top:36px;padding:20px;background:var(--paper2);border-left:4px solid var(--crust)}
+.encomenda-ph{flex-shrink:0;width:88px;aspect-ratio:1;overflow:hidden;border-radius:50% 50% 4px 4px/22% 22% 4px 4px;border:2px solid var(--crust)}
+.encomenda-ph img{width:100%;height:100%;object-fit:cover}
+.encomenda-txt{flex:1;min-width:0}
+.encomenda-txt h3{font-family:var(--disp);font-size:1.25rem;color:var(--ink)}
+.encomenda-txt p{font-size:0.86rem;color:var(--ink-mut);margin:6px 0 14px;max-width:44ch}
+@media(max-width:520px){.encomenda{flex-direction:column;align-items:flex-start}}
+
 /* ── ENTREGA callout ── */
 .entrega-box{margin-top:44px;background:var(--ink);color:var(--paper);padding:28px 26px;display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
 .entrega-box b{display:block;font-family:var(--disp);font-size:1.15rem}
@@ -301,8 +310,10 @@ footer p{max-width:560px;margin:8px auto 0}
 .modal-total{display:flex;justify-content:space-between;margin-top:8px;padding-top:8px;font-weight:700;font-family:var(--disp);font-size:1.15rem;font-variant-numeric:tabular-nums}
 .field{margin-bottom:14px}
 .field label{display:block;font-family:var(--body);font-weight:600;font-size:0.76rem;color:var(--ink-mut);margin-bottom:6px}
-.field input,.field textarea{width:100%;padding:11px 0;border:none;border-bottom:1px solid rgba(43,32,22,0.24);background:none;font-family:var(--body);font-size:0.94rem;color:var(--ink);resize:vertical}
-.field input:focus-visible,.field textarea:focus-visible{outline:none;border-color:var(--ember)}
+.field input,.field textarea,.field select{width:100%;padding:11px 0;border:none;border-bottom:1px solid rgba(43,32,22,0.24);background:none;font-family:var(--body);font-size:0.94rem;color:var(--ink);resize:vertical}
+.field select{padding-right:18px}
+.field input:focus-visible,.field textarea:focus-visible,.field select:focus-visible{outline:none;border-color:var(--ember)}
+.field-hint{display:block;font-size:0.74rem;color:var(--ink-faint);margin-top:6px}
 .field-err{display:none;color:#A8433A;font-size:0.76rem;margin-top:5px}
 .field.has-err input{border-color:#A8433A}
 .field.has-err .field-err{display:block}
@@ -493,6 +504,15 @@ footer p{max-width:560px;margin:8px auto 0}
       </section>
 
       <p class="search-empty" id="search-empty">Nenhum item encontrado. Tenta outro termo.</p>
+
+      <div class="encomenda">
+        <div class="encomenda-ph"><img src="assets/bolo-chocolate.jpg" alt="Bolo de chocolate da vitrine" loading="lazy" decoding="async"></div>
+        <div class="encomenda-txt">
+          <h3>Bolo inteiro por encomenda</h3>
+          <p>Aniversário, café da tarde, festa da firma. Conta o sabor, o tamanho e o dia que você precisa — a gente confirma o valor e o prazo no WhatsApp.</p>
+          <button type="button" class="btn btn-p" id="encomenda-open">Pedir orçamento</button>
+        </div>
+      </div>
 
       <div class="entrega-box">
         <div>
@@ -721,12 +741,72 @@ footer p{max-width:560px;margin:8px auto 0}
   </div>
 </div>
 
+<div class="modal-overlay" id="encomenda-overlay">
+  <div class="modal">
+    <button class="modal-close" id="encomenda-close" aria-label="Fechar">✕</button>
+    <div class="modal-handle"></div>
+    <h2>Encomendar bolo</h2>
+    <div class="field">
+      <label for="enc-sabor">Sabor</label>
+      <select id="enc-sabor">
+        <option>Chocolate</option>
+        <option>Fubá com queijo</option>
+        <option>Outro sabor (conto no WhatsApp)</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="enc-tamanho">Tamanho</label>
+      <select id="enc-tamanho">
+        <option>Até 10 pessoas</option>
+        <option>De 10 a 20 pessoas</option>
+        <option>Mais de 20 pessoas</option>
+        <option>Não sei ainda, me ajuda a escolher</option>
+      </select>
+    </div>
+    <div class="field" id="enc-data-field">
+      <label for="enc-data">Para que dia</label>
+      <input type="date" id="enc-data">
+      <span class="field-err">Escolhe o dia que você precisa do bolo.</span>
+      <span class="field-hint">A gente confirma no WhatsApp se dá tempo pra essa data.</span>
+    </div>
+    <div class="field">
+      <label for="enc-escrita">Escrita no bolo (opcional)</label>
+      <input type="text" id="enc-escrita" placeholder="Ex: Parabéns, Ana!">
+    </div>
+    <div class="field" id="enc-nome-field">
+      <label for="enc-nome">Seu nome</label>
+      <input type="text" id="enc-nome" autocomplete="name" placeholder="Ex: Maria…">
+      <span class="field-err">Preenche seu nome pra gente responder.</span>
+    </div>
+    <button class="modal-send" id="encomenda-send">Pedir orçamento no WhatsApp</button>
+    <p class="modal-note">O valor depende do sabor e do tamanho — a gente responde com o preço e o prazo.</p>
+  </div>
+</div>
+
 <script>
 (function(){
   const WHATSAPP = '553137913010';
   const PEDIDOS_KEY = 'cantinho_pedidos';
+  // Cole aqui a URL do Apps Script pra registrar os pedidos numa planilha.
+  // Vazio = tudo continua funcionando, só não registra nada.
+  const PEDIDOS_LOG_URL = '';
   let cart = {};
   let deliveryMode = 'Retirada na loja';
+
+  /* ── REGISTRO DE PEDIDOS (planilha) ──
+     sendBeacon porque a página pula pro WhatsApp logo em seguida — um fetch
+     comum pode ser cancelado no meio do caminho e o pedido some do relatório. */
+  function logPedido(tipo, dados){
+    if (!PEDIDOS_LOG_URL) return;
+    let body = JSON.stringify(Object.assign({ tipo: tipo, data: new Date().toISOString() }, dados));
+    try {
+      if (navigator.sendBeacon && navigator.sendBeacon(PEDIDOS_LOG_URL, new Blob([body], { type: 'text/plain' }))) return;
+    } catch (err) {
+      console.error('sendBeacon falhou ao registrar pedido:', err);
+    }
+    fetch(PEDIDOS_LOG_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: body, keepalive: true })
+      .catch(function(err){ console.error('Falha ao registrar pedido na planilha:', err); });
+  }
 
   /* ── NAVEGAÇÃO ENTRE TELAS ── */
   function switchView(name){
@@ -949,6 +1029,14 @@ footer p{max-width:560px;margin:8px auto 0}
     let orderItems = Object.keys(cart).map(function(k){ return { name: k, qty: cart[k].qty, price: cart[k].price }; });
     let order = { items: orderItems, total: t.total, name: name, mode: deliveryMode, address: address, notes: notes };
 
+    logPedido('pedido', {
+      nome: name,
+      modo: deliveryMode,
+      endereco: isDelivery ? address : '',
+      itens: orderItems.map(function(it){ return it.qty + 'x ' + it.name; }).join(', '),
+      total: t.total,
+      observacoes: notes
+    });
     openWhatsApp(buildWhatsAppUrl(WHATSAPP, buildOrderMessage(order)));
 
     savePedido({ date: new Date().toISOString(), items: orderItems, total: t.total, mode: deliveryMode, name: name });
@@ -961,6 +1049,68 @@ footer p{max-width:560px;margin:8px auto 0}
 
   document.getElementById('f-name').addEventListener('input', function(){ setFieldError('f-name-field', false); });
   addressInput.addEventListener('input', function(){ setFieldError('f-address-field', false); });
+
+  /* ── ENCOMENDA DE BOLO ── */
+  (function(){
+    const encOverlay = document.getElementById('encomenda-overlay');
+    const encNome = document.getElementById('enc-nome');
+    const encData = document.getElementById('enc-data');
+
+    // não deixa escolher data que já passou
+    let hoje = new Date();
+    encData.min = hoje.getFullYear() + '-' + String(hoje.getMonth() + 1).padStart(2, '0') + '-' + String(hoje.getDate()).padStart(2, '0');
+
+    function fecharEncomenda(){ encOverlay.classList.remove('show'); }
+    document.getElementById('encomenda-open').addEventListener('click', function(){ encOverlay.classList.add('show'); });
+    document.getElementById('encomenda-close').addEventListener('click', fecharEncomenda);
+    encOverlay.addEventListener('click', function(e){ if (e.target === encOverlay) fecharEncomenda(); });
+    document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && encOverlay.classList.contains('show')) fecharEncomenda(); });
+    encNome.addEventListener('input', function(){ setFieldError('enc-nome-field', false); });
+    encData.addEventListener('input', function(){ setFieldError('enc-data-field', false); });
+
+    function buildEncomendaMessage(enc){
+      let linhas = ['Olá! Quero encomendar um bolo:', ''];
+      linhas.push('Sabor: ' + enc.sabor);
+      linhas.push('Tamanho: ' + enc.tamanho);
+      linhas.push('Para o dia: ' + enc.dataFormatada);
+      if (enc.escrita) linhas.push('Escrita no bolo: ' + enc.escrita);
+      linhas.push('');
+      linhas.push('Nome: ' + enc.nome);
+      return linhas.join('\n');
+    }
+
+    document.getElementById('encomenda-send').addEventListener('click', function(){
+      let nome = encNome.value.trim();
+      let data = encData.value;
+      setFieldError('enc-nome-field', !nome);
+      setFieldError('enc-data-field', !data);
+      if (!data) { encData.focus(); return; }
+      if (!nome) { encNome.focus(); return; }
+
+      let partes = data.split('-');
+      let enc = {
+        sabor: document.getElementById('enc-sabor').value,
+        tamanho: document.getElementById('enc-tamanho').value,
+        dataFormatada: partes[2] + '/' + partes[1] + '/' + partes[0],
+        escrita: document.getElementById('enc-escrita').value.trim(),
+        nome: nome
+      };
+
+      logPedido('encomenda-bolo', {
+        nome: enc.nome,
+        sabor: enc.sabor,
+        tamanho: enc.tamanho,
+        para_o_dia: enc.dataFormatada,
+        escrita: enc.escrita
+      });
+      openWhatsApp(buildWhatsAppUrl(WHATSAPP, buildEncomendaMessage(enc)));
+
+      fecharEncomenda();
+      encNome.value = '';
+      encData.value = '';
+      document.getElementById('enc-escrita').value = '';
+    });
+  })();
 
   /* ── BUSCA ── */
   const searchInput = document.getElementById('cardapio-search');
