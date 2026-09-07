@@ -621,7 +621,7 @@ function doGet(e) {
 
 <script>
 // ═══════════════ NAV ═══════════════
-var PAGES = [
+let PAGES = [
   { id:'inicio',   label:'Início',    icon:'<path d="M2 8L9 2L16 8M4 7V15H14V7"/>' },
   { id:'pipeline', label:'Pipeline',  icon:'<rect x="1" y="4" width="4" height="12"/><rect x="7" y="7" width="4" height="9"/><rect x="13" y="10" width="4" height="6"/>' },
   { id:'servicos', label:'Serviços',  icon:'<rect x="2" y="2" width="6" height="6" rx="1"/><rect x="10" y="2" width="6" height="6" rx="1"/><rect x="2" y="10" width="6" height="6" rx="1"/><rect x="10" y="10" width="6" height="6" rx="1"/>' },
@@ -646,18 +646,18 @@ function renderNav() {
 function goPage(id) {
   document.querySelectorAll('.page').forEach(function(p){ p.classList.toggle('active', p.id==='page-'+id); });
   document.querySelectorAll('.nav-item, .bn-item').forEach(function(n){
-    var isActive = n.dataset.page===id;
+    let isActive = n.dataset.page===id;
     n.classList.toggle('active', isActive);
     n.setAttribute('aria-current', isActive ? 'page' : 'false');
   });
-  var p = PAGES.filter(function(x){ return x.id===id; })[0];
+  let p = PAGES.filter(function(x){ return x.id===id; })[0];
   document.getElementById('topbar-title').textContent = p ? p.label : '';
   window.scrollTo(0,0);
   if (id === 'pipeline' && typeof syncPipelineFromCloud === 'function') { syncPipelineFromCloud(renderPipeline); }
 }
 
 // ═══════════════ DADOS ═══════════════
-var pipelineData = [
+let pipelineData = [
   { stage: 'Novo Lead', leads: [] },
   { stage: 'Contato feito', leads: [] },
   { stage: 'Demo enviado', leads: [] },
@@ -668,7 +668,7 @@ var pipelineData = [
   ]},
 ];
 
-var SERVICES = [
+let SERVICES = [
   { icon:'💬', name:'WhatsApp Bot 24/7',       status:'warn', desc:'Atende, agenda e responde clientes automaticamente. Requer Z-API conectado por cliente.' },
   { icon:'📸', name:'Instagram Automático',     status:'warn', desc:'Comentário→DM, seguiu→boas-vindas. Requer conta Business + Make.com conectados.' },
   { icon:'📅', name:'Agendamento Online',       status:'ok',   desc:'App completo: serviços, calendário, lista de espera e confirmação. Funcionando 100%.' },
@@ -683,7 +683,7 @@ var SERVICES = [
 ];
 
 // Mesmo conteúdo real da landing page pública (index.html raiz, seção #planos) — não duplicar com números diferentes.
-var PLANS = [
+let PLANS = [
   { name:'Starter', desc:'Para quem quer começar a automatizar com o essencial.', price:'R$197', setup:'+ R$299 de configuração (único)', features:[
     { on:true,  text:'WhatsApp Bot básico' },
     { on:true,  text:'Agendamento Online' },
@@ -732,35 +732,35 @@ function renderPlans() {
 function statusLabel(s) { return s==='ok' ? 'Ativo' : s==='warn' ? 'Requer config.' : 'Não implementado'; }
 
 function renderFooterStatus() {
-  var ativos = SERVICES.filter(function(s){ return s.status==='ok'; }).length;
-  var dot = document.getElementById('status-dot');
-  var txt = document.getElementById('status-text');
+  let ativos = SERVICES.filter(function(s){ return s.status==='ok'; }).length;
+  let dot = document.getElementById('status-dot');
+  let txt = document.getElementById('status-text');
   txt.textContent = ativos + ' de ' + SERVICES.length + ' módulos ativos';
-  dot.style.background = ativos === SERVICES.length ? 'var(--green)' : 'var(--yellow)';
-  dot.style.boxShadow = '0 0 6px ' + (ativos === SERVICES.length ? 'var(--green)' : 'var(--yellow)');
+  dot.style.background = ativos === SERVICES.length ? 'let(--green)' : 'let(--yellow)';
+  dot.style.boxShadow = '0 0 6px ' + (ativos === SERVICES.length ? 'let(--green)' : 'let(--yellow)');
 }
 
 // ═══════════════ RENDER: INÍCIO ═══════════════
 function renderHome() {
-  var fechados = pipelineData.filter(function(c){ return c.stage==='Fechado'; })[0].leads;
-  var abertos = pipelineData.filter(function(c){ return c.stage!=='Fechado'; }).reduce(function(s,c){ return s+c.leads.length; }, 0);
-  var mrr = fechados.reduce(function(s,l){ return s+l.val; }, 0);
-  var ativos = SERVICES.filter(function(s){ return s.status==='ok'; }).length;
-  var martinsStats = CLIENTS_FIXED[0] && CLIENTS_FIXED[0].stats ? CLIENTS_FIXED[0].stats : null;
-  var martinsGoal = martinsStats ? martinsStats.goal : null;
+  let fechados = pipelineData.filter(function(c){ return c.stage==='Fechado'; })[0].leads;
+  let abertos = pipelineData.filter(function(c){ return c.stage!=='Fechado'; }).reduce(function(s,c){ return s+c.leads.length; }, 0);
+  let mrr = fechados.reduce(function(s,l){ return s+l.val; }, 0);
+  let ativos = SERVICES.filter(function(s){ return s.status==='ok'; }).length;
+  let martinsStats = CLIENTS_FIXED[0] && CLIENTS_FIXED[0].stats ? CLIENTS_FIXED[0].stats : null;
+  let martinsGoal = martinsStats ? martinsStats.goal : null;
 
-  var kpis = [
+  let kpis = [
     { label:'Clientes fechados', val: fechados.length, delta: 'MRR ~R$'+mrr.toLocaleString('pt-BR'), cls:'up' },
     { label:'Leads em aberto',   val: abertos, delta: 'no funil agora', cls:'up' },
     { label:'Serviços ativos',   val: ativos+'/11', delta: (11-ativos)+' pendentes de config', cls: (11-ativos)>0 ? 'warn':'up' },
   ];
   if (martinsStats) {
-    var igGrowthPct = Math.round((martinsStats.followers - martinsStats.followersPrev) / martinsStats.followersPrev * 100);
+    let igGrowthPct = Math.round((martinsStats.followers - martinsStats.followersPrev) / martinsStats.followersPrev * 100);
     kpis.push({ label:'Instagram Martins', val: String(martinsStats.followers), delta: '+'+igGrowthPct+'% desde '+martinsStats.followersPrevDate, cls:'up' });
   }
   if (martinsGoal) {
-    var ganho = martinsGoal.closed * martinsGoal.commissionPerUnit;
-    var faturadoMartins = (martinsGoal.fixedMonthly||0) + ganho;
+    let ganho = martinsGoal.closed * martinsGoal.commissionPerUnit;
+    let faturadoMartins = (martinsGoal.fixedMonthly||0) + ganho;
     kpis.push({ label:'Meta de próteses (Martins)', val: martinsGoal.closed+'/'+martinsGoal.target, delta: 'R$'+ganho.toLocaleString('pt-BR')+' em comissão', cls:'up' });
     kpis.push({ label:'Faturamento Martins (mês)', val: 'R$'+faturadoMartins.toLocaleString('pt-BR'), delta: 'R$'+martinsGoal.fixedMonthly.toLocaleString('pt-BR')+' fixo + R$'+ganho.toLocaleString('pt-BR')+' comissão', cls:'up' });
   }
@@ -768,19 +768,19 @@ function renderHome() {
     return '<div class="kpi-card"><div class="kpi-label">'+k.label+'</div><div class="kpi-val">'+k.val+'</div><div class="kpi-delta '+k.cls+'">'+k.delta+'</div></div>';
   }).join('');
 
-  var todos = [
+  let todos = [
     { done:false, text:'Compartilhar a planilha Google publicamente (Dashboard mostra dados reais)' },
     { done:false, text:'Criar og.png da landing page' },
     { done:false, text:'Montar o cenário de resposta automática no Make.com (token do Instagram já gerado)' },
   ];
   document.getElementById('home-todos').innerHTML = todos.map(function(t){
-    return '<div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--border)"><span style="color:var(--yellow)">⚠️</span><span style="font-size:0.8rem;color:var(--muted)">'+t.text+'</span></div>';
+    return '<div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px solid let(--border)"><span style="color:let(--yellow)">⚠️</span><span style="font-size:0.8rem;color:let(--muted)">'+t.text+'</span></div>';
   }).join('');
 }
 
 // ═══════════════ PIPELINE: leads cadastrados manualmente (localStorage + sincronização em nuvem) ═══════════════
-var STAGE_ORDER = ['Novo Lead', 'Contato feito', 'Demo enviado', 'Proposta', 'Fechado'];
-var PIPELINE_SYNC_URL = localStorage.getItem('synctech_pipeline_sync_url') || '';
+let STAGE_ORDER = ['Novo Lead', 'Contato feito', 'Demo enviado', 'Proposta', 'Fechado'];
+let PIPELINE_SYNC_URL = localStorage.getItem('synctech_pipeline_sync_url') || '';
 
 function getStoredLeads() {
   try {
@@ -804,7 +804,7 @@ function saveStoredLeads(leads) {
 
 // Enquanto PIPELINE_SYNC_URL estiver vazia, tudo continua 100% local, sem quebrar nada.
 function salvarSyncUrl() {
-  var url = document.getElementById('pl-sync-url').value.trim();
+  let url = document.getElementById('pl-sync-url').value.trim();
   localStorage.setItem('synctech_pipeline_sync_url', url);
   PIPELINE_SYNC_URL = url;
   showToast(url ? 'Sincronização ativada!' : 'Sincronização desativada — voltou a ser só local', 'success');
@@ -825,7 +825,7 @@ function syncPipelineFromCloud(callback) {
   fetch(PIPELINE_SYNC_URL)
     .then(function(r){ return r.json(); })
     .then(function(cloudLeads){
-      var normalized = (cloudLeads||[]).map(function(l){ return {
+      let normalized = (cloudLeads||[]).map(function(l){ return {
         id: String(l.id), name: l.name, biz: l.biz, phone: String(l.phone||''), city: l.city,
         src: l.src, val: parseInt(l.val,10)||0, stage: l.stage, time: l.time,
       }; });
@@ -836,16 +836,16 @@ function syncPipelineFromCloud(callback) {
 }
 
 function adicionarLead() {
-  var name = document.getElementById('pl-name').value.trim();
-  var biz  = document.getElementById('pl-biz').value.trim();
-  var wpp  = document.getElementById('pl-wpp').value.trim();
-  var city = document.getElementById('pl-city').value;
-  var src  = document.getElementById('pl-src').value;
-  var val  = parseInt(document.getElementById('pl-val').value, 10);
+  let name = document.getElementById('pl-name').value.trim();
+  let biz  = document.getElementById('pl-biz').value.trim();
+  let wpp  = document.getElementById('pl-wpp').value.trim();
+  let city = document.getElementById('pl-city').value;
+  let src  = document.getElementById('pl-src').value;
+  let val  = parseInt(document.getElementById('pl-val').value, 10);
   if (!name || !biz || !wpp) { showToast('Preencha nome, negócio e WhatsApp', 'error'); return; }
 
-  var leads = getStoredLeads();
-  var novo = { id: 'ld'+Date.now()+'_'+wpp.replace(/\D/g,''), name:name, biz:biz+' — '+city, val:val, time:'Cadastrado agora', src:src, phone:wpp.replace(/\D/g,''), stage:'Novo Lead', city:city };
+  let leads = getStoredLeads();
+  let novo = { id: 'ld'+Date.now()+'_'+wpp.replace(/\D/g,''), name:name, biz:biz+' — '+city, val:val, time:'Cadastrado agora', src:src, phone:wpp.replace(/\D/g,''), stage:'Novo Lead', city:city };
   leads.push(novo);
   saveStoredLeads(leads);
   pushLeadToCloud('add', { lead: novo });
@@ -858,10 +858,10 @@ function adicionarLead() {
 }
 
 function avancarLead(id) {
-  var leads = getStoredLeads();
-  var lead = leads.filter(function(l){ return l.id===id; })[0];
+  let leads = getStoredLeads();
+  let lead = leads.filter(function(l){ return l.id===id; })[0];
   if (!lead) return;
-  var idx = STAGE_ORDER.indexOf(lead.stage);
+  let idx = STAGE_ORDER.indexOf(lead.stage);
   if (idx >= 0 && idx < STAGE_ORDER.length-1) {
     lead.stage = STAGE_ORDER[idx+1];
     lead.time = 'Movido p/ '+lead.stage+' agora';
@@ -874,43 +874,43 @@ function avancarLead(id) {
 
 // ═══════════════ RENDER: PIPELINE ═══════════════
 function renderPipeline() {
-  var storedLeads = getStoredLeads();
-  var el = document.getElementById('pipeline-board');
+  let storedLeads = getStoredLeads();
+  let el = document.getElementById('pipeline-board');
   el.innerHTML = pipelineData.map(function(col, colIdx) {
-    var colLeads = col.leads.concat(storedLeads.filter(function(l){ return l.stage===col.stage; }));
-    var cards = colLeads.map(function(l, li) {
-      var srcCls = l.src==='wa' ? 'lc-wa' : l.src==='ig' ? 'lc-ig' : 'lc-google';
-      var srcLabel = l.src==='wa' ? 'WhatsApp' : l.src==='ig' ? 'Instagram' : 'Google';
-      var cidadeTxt = l.city ? ' aqui em '+l.city : '';
-      var wppMsg = encodeURIComponent('Oi! Vi o '+l.name+cidadeTxt+'. Ajudei uma barbearia em Mariana a crescer 18% em agendamentos sem gastar mais com anúncio — usando automação de WhatsApp e Instagram. Posso te mostrar como funcionaria pro seu negócio? Leva 5 minutos.');
-      var wppNum = l.phone ? '55'+l.phone.replace(/\D/g,'') : '55';
-      var isStored = !!l.id;
-      var nextStage = isStored ? STAGE_ORDER[STAGE_ORDER.indexOf(l.stage)+1] : null;
+    let colLeads = col.leads.concat(storedLeads.filter(function(l){ return l.stage===col.stage; }));
+    let cards = colLeads.map(function(l, li) {
+      let srcCls = l.src==='wa' ? 'lc-wa' : l.src==='ig' ? 'lc-ig' : 'lc-google';
+      let srcLabel = l.src==='wa' ? 'WhatsApp' : l.src==='ig' ? 'Instagram' : 'Google';
+      let cidadeTxt = l.city ? ' aqui em '+l.city : '';
+      let wppMsg = encodeURIComponent('Oi! Vi o '+l.name+cidadeTxt+'. Ajudei uma barbearia em Mariana a crescer 18% em agendamentos sem gastar mais com anúncio — usando automação de WhatsApp e Instagram. Posso te mostrar como funcionaria pro seu negócio? Leva 5 minutos.');
+      let wppNum = l.phone ? '55'+l.phone.replace(/\D/g,'') : '55';
+      let isStored = !!l.id;
+      let nextStage = isStored ? STAGE_ORDER[STAGE_ORDER.indexOf(l.stage)+1] : null;
       return '<div class="lead-card">' +
         '<div class="lc-name">'+l.name+'</div>' +
         '<div class="lc-biz">'+l.biz+'</div>' +
         '<div class="lc-row"><span class="lc-val">R$'+l.val+'/mês</span><span class="lc-source '+srcCls+'">'+srcLabel+'</span></div>' +
         '<div class="lc-time">'+l.time+'</div>' +
         '<a href="https://wa.me/'+wppNum+'?text='+wppMsg+'" target="_blank" style="display:block;text-align:center;margin-top:10px;background:rgba(37,211,102,0.12);border:1px solid rgba(37,211,102,0.25);color:#25D366;border-radius:7px;padding:7px;font-size:0.7rem;font-weight:700;text-decoration:none">💬 WhatsApp</a>' +
-        (nextStage ? '<button onclick="avancarLead(\''+l.id+'\')" style="width:100%;margin-top:7px;background:var(--s3);border:1px solid var(--border-s);color:var(--pl);border-radius:7px;padding:7px;font-size:0.68rem;font-weight:700;cursor:pointer;font-family:var(--font-head),sans-serif;text-transform:uppercase;letter-spacing:0.03em">→ '+nextStage+'</button>' : '') +
+        (nextStage ? '<button onclick="avancarLead(\''+l.id+'\')" style="width:100%;margin-top:7px;background:let(--s3);border:1px solid let(--border-s);color:let(--pl);border-radius:7px;padding:7px;font-size:0.68rem;font-weight:700;cursor:pointer;font-family:let(--font-head),sans-serif;text-transform:uppercase;letter-spacing:0.03em">→ '+nextStage+'</button>' : '') +
       '</div>';
     }).join('');
-    var total = colLeads.reduce(function(s,l){ return s+l.val; }, 0);
+    let total = colLeads.reduce(function(s,l){ return s+l.val; }, 0);
     return '<div class="pipeline-col">' +
       '<div class="pipeline-col-header"><span class="pipeline-col-title">'+col.stage+'</span><span class="pipeline-count">'+colLeads.length+'</span></div>' +
-      (total ? '<div style="font-size:0.65rem;color:var(--muted);margin-bottom:8px">R$'+total.toLocaleString('pt-BR')+'/mês</div>' : '') +
+      (total ? '<div style="font-size:0.65rem;color:let(--muted);margin-bottom:8px">R$'+total.toLocaleString('pt-BR')+'/mês</div>' : '') +
       '<div class="pipeline-cards">'+cards+'</div>' +
     '</div>';
   }).join('');
 
-  var allLeads = pipelineData.reduce(function(s,c){ return s+c.leads.length; }, 0) + storedLeads.length;
-  var openVal = pipelineData.filter(function(c){ return c.stage!=='Fechado'; }).reduce(function(s,c){ return s+c.leads.reduce(function(s2,l){ return s2+l.val; },0); }, 0)
+  let allLeads = pipelineData.reduce(function(s,c){ return s+c.leads.length; }, 0) + storedLeads.length;
+  let openVal = pipelineData.filter(function(c){ return c.stage!=='Fechado'; }).reduce(function(s,c){ return s+c.leads.reduce(function(s2,l){ return s2+l.val; },0); }, 0)
     + storedLeads.filter(function(l){ return l.stage!=='Fechado'; }).reduce(function(s,l){ return s+l.val; }, 0);
   document.getElementById('pipeline-summary').textContent = allLeads+' leads no funil · R$'+openVal.toLocaleString('pt-BR')+'/mês em aberto';
 
-  var fechadosCount = pipelineData.filter(function(c){ return c.stage==='Fechado'; })[0].leads.length + storedLeads.filter(function(l){ return l.stage==='Fechado'; }).length;
-  var taxaConv = allLeads ? Math.round(fechadosCount/allLeads*100) : 0;
-  var mrrFechado = pipelineData.filter(function(c){ return c.stage==='Fechado'; })[0].leads.reduce(function(s,l){ return s+l.val; }, 0)
+  let fechadosCount = pipelineData.filter(function(c){ return c.stage==='Fechado'; })[0].leads.length + storedLeads.filter(function(l){ return l.stage==='Fechado'; }).length;
+  let taxaConv = allLeads ? Math.round(fechadosCount/allLeads*100) : 0;
+  let mrrFechado = pipelineData.filter(function(c){ return c.stage==='Fechado'; })[0].leads.reduce(function(s,l){ return s+l.val; }, 0)
     + storedLeads.filter(function(l){ return l.stage==='Fechado'; }).reduce(function(s,l){ return s+l.val; }, 0);
   document.getElementById('pipeline-kpis').innerHTML = [
     { val: allLeads, lbl: 'leads no funil (todos os estágios)' },
@@ -918,12 +918,12 @@ function renderPipeline() {
     { val: 'R$'+mrrFechado.toLocaleString('pt-BR'), lbl: 'MRR fechado via pipeline' },
   ].map(function(k){ return '<div class="client-stat"><div class="client-stat-val">'+k.val+'</div><div class="client-stat-lbl">'+k.lbl+'</div></div>'; }).join('');
 
-  var stageCounts = pipelineData.map(function(c){ return c.leads.length + storedLeads.filter(function(l){ return l.stage===c.stage; }).length; });
-  var maxCount = Math.max(1, Math.max.apply(null, stageCounts));
+  let stageCounts = pipelineData.map(function(c){ return c.leads.length + storedLeads.filter(function(l){ return l.stage===c.stage; }).length; });
+  let maxCount = Math.max(1, Math.max.apply(null, stageCounts));
   document.getElementById('pipeline-funnel').innerHTML = pipelineData.map(function(c, i) {
-    var count = stageCounts[i];
-    var h = Math.max(6, Math.round(count/maxCount*100));
-    var val = c.leads.concat(storedLeads.filter(function(l){ return l.stage===c.stage; })).reduce(function(s,l){ return s+l.val; }, 0);
+    let count = stageCounts[i];
+    let h = Math.max(6, Math.round(count/maxCount*100));
+    let val = c.leads.concat(storedLeads.filter(function(l){ return l.stage===c.stage; })).reduce(function(s,l){ return s+l.val; }, 0);
     return '<div class="client-bar-col" title="'+c.stage+' — '+count+' lead(s)'+(val?' · R$'+val.toLocaleString('pt-BR')+'/mês':'')+'">' +
       '<div class="client-bar-val">'+count+'</div>' +
       '<div class="client-bar'+(c.stage==='Fechado'&&count?' peak':'')+'" style="height:'+h+'%"></div>' +
@@ -944,7 +944,7 @@ function renderServicesGrid() {
 }
 
 // ═══════════════ DADOS: CLIENTES ═══════════════
-var CLIENTS_FIXED = [
+let CLIENTS_FIXED = [
     { name:'Barbearia Martins', plan:'R$1.200/mês fixo + R$160 por prótese (10% de R$1.600) fechada via WA/Instagram', links:[
       { label:'Site', url:'https://synctech-automation.github.io/barbearia-martins-site/' },
       { label:'WhatsApp', url:'https://wa.me/5531982800596' },
@@ -1035,14 +1035,14 @@ var CLIENTS_FIXED = [
 
 // ═══════════════ HELPER: gráficos/stats reais de um cliente (usado em Clientes e Relatório) ═══════════════
 function buildStatsHtml(c) {
-  var statsHtml = '';
+  let statsHtml = '';
   if (c.stats) {
-      var s = c.stats;
-      var statCards = [];
+      let s = c.stats;
+      let statCards = [];
       if (s.followers != null) {
-        var followerLbl = 'seguidores';
+        let followerLbl = 'seguidores';
         if (s.followersPrev) {
-          var growthPct = Math.round((s.followers - s.followersPrev) / s.followersPrev * 100);
+          let growthPct = Math.round((s.followers - s.followersPrev) / s.followersPrev * 100);
           followerLbl += ' (+'+growthPct+'% desde '+s.followersPrevDate+')';
         }
         statCards.push('<div class="client-stat"><div class="client-stat-val">'+s.followers+'</div><div class="client-stat-lbl">'+followerLbl+'</div></div>');
@@ -1054,7 +1054,7 @@ function buildStatsHtml(c) {
         statCards.push('<div class="client-stat"><div class="client-stat-val">'+s.posts60d+'</div><div class="client-stat-lbl">posts nos últimos 2 meses</div></div>');
       }
       if (s.likesTotal != null && s.posts60d) {
-        var likesAvg = Math.round(s.likesTotal / s.posts60d);
+        let likesAvg = Math.round(s.likesTotal / s.posts60d);
         statCards.push('<div class="client-stat"><div class="client-stat-val">'+likesAvg+'</div><div class="client-stat-lbl">curtidas em média/post</div></div>');
       }
       statsHtml =
@@ -1063,7 +1063,7 @@ function buildStatsHtml(c) {
         (s.bestPost ? '<div class="client-best-post">🏆 Melhor post: <strong>'+s.bestPost.likes+' curtidas · '+s.bestPost.comments+' comentários</strong> ('+s.bestPost.date+') — '+s.bestPost.desc+'</div>' : '');
 
       if (s.servicesUsed) {
-        var sv = s.servicesUsed;
+        let sv = s.servicesUsed;
         statsHtml += '<div class="client-chart-title">Serviços SyncTech em uso</div><div class="client-svc-pills">' +
           sv.active.map(function(name){ return '<span class="client-svc-pill active">✓ '+name+'</span>'; }).join('') +
           sv.pending.map(function(name){ return '<span class="client-svc-pill pending">⏳ '+name+'</span>'; }).join('') +
@@ -1072,11 +1072,11 @@ function buildStatsHtml(c) {
       }
 
       if (s.posts && s.posts.length) {
-        var maxLikes = Math.max.apply(null, s.posts.map(function(p){ return p.likes; }));
+        let maxLikes = Math.max.apply(null, s.posts.map(function(p){ return p.likes; }));
         statsHtml += '<div class="client-chart-title">Curtidas por post</div><div class="client-bars">' +
           s.posts.map(function(p) {
-            var h = Math.max(8, Math.round(p.likes / maxLikes * 100));
-            var isPeak = p.likes === maxLikes;
+            let h = Math.max(8, Math.round(p.likes / maxLikes * 100));
+            let isPeak = p.likes === maxLikes;
             return '<div class="client-bar-col" title="'+p.date+' — '+p.likes+' curtidas'+(p.comments!=null?' · '+p.comments+' comentários':'')+'">' +
               '<div class="client-bar-val">'+p.likes+'</div>' +
               '<div class="client-bar'+(isPeak?' peak':'')+'" style="height:'+h+'%"></div>' +
@@ -1087,8 +1087,8 @@ function buildStatsHtml(c) {
       }
 
       if (s.cadence) {
-        var cd = s.cadence;
-        var maxCad = Math.max(cd.before, cd.after);
+        let cd = s.cadence;
+        let maxCad = Math.max(cd.before, cd.after);
         statsHtml += '<div class="client-chart-title">Cadência de publicação</div><div class="client-compare">' +
           '<div class="client-compare-box"><div class="client-compare-lbl">'+cd.beforeLabel+'</div>' +
             '<div class="client-compare-track"><div class="client-compare-fill" style="height:'+Math.round(cd.before/maxCad*100)+'%"></div></div>' +
@@ -1100,11 +1100,11 @@ function buildStatsHtml(c) {
       }
 
       if (s.goal) {
-        var g = s.goal;
-        var pct = Math.min(100, Math.round(g.closed / g.target * 100));
-        var ganhoAtual = g.closed * g.commissionPerUnit;
-        var ganhoTotal = g.target * g.commissionPerUnit;
-        var faturadoMes = (g.fixedMonthly||0) + ganhoAtual;
+        let g = s.goal;
+        let pct = Math.min(100, Math.round(g.closed / g.target * 100));
+        let ganhoAtual = g.closed * g.commissionPerUnit;
+        let ganhoTotal = g.target * g.commissionPerUnit;
+        let faturadoMes = (g.fixedMonthly||0) + ganhoAtual;
         statsHtml += '<div class="client-chart-title">Faturamento e meta de comissão</div>' +
           '<div class="client-goal-box">' +
             '<div class="client-goal-earned"><div class="client-goal-earned-lbl">Faturamento total este mês</div><div class="client-goal-earned-val">R$'+faturadoMes.toLocaleString('pt-BR')+'</div>' +
@@ -1128,9 +1128,9 @@ function buildStatsHtml(c) {
 
 // ═══════════════ RENDER: CLIENTES ═══════════════
 function renderClients() {
-  var stored = getStoredClients();
-  var fixed = CLIENTS_FIXED;
-  var all = fixed.concat(stored.map(function(c){
+  let stored = getStoredClients();
+  let fixed = CLIENTS_FIXED;
+  let all = fixed.concat(stored.map(function(c){
     return { name:c.bizName, plan:c.plan, links:[
       { label:'Agendamento', url:c.agendLink },
       { label:'Bio', url:c.bioLink },
@@ -1147,20 +1147,20 @@ function renderClients() {
 
 // ═══════════════ RENDER: RELATÓRIO MENSAL ═══════════════
 function renderReport() {
-  var withData = CLIENTS_FIXED.filter(function(c){ return c.stats; });
+  let withData = CLIENTS_FIXED.filter(function(c){ return c.stats; });
   document.getElementById('report-sub').textContent = withData.length
     ? 'Atualizado todo dia 30 — dados reais coletados manualmente até a data indicada em cada relatório'
     : 'Ainda sem clientes com dados coletados';
 
   document.getElementById('report-body').innerHTML = withData.map(function(c) {
-    var s = c.stats;
-    var g = s.goal;
-    var partes = [];
+    let s = c.stats;
+    let g = s.goal;
+    let partes = [];
 
     if (s.followers != null) {
-      var followerTxt = c.name+' fechou '+s.collectedAt+' com <strong>'+s.followers+' seguidores</strong> no Instagram';
+      let followerTxt = c.name+' fechou '+s.collectedAt+' com <strong>'+s.followers+' seguidores</strong> no Instagram';
       if (s.followersPrev) {
-        var growthPct = Math.round((s.followers - s.followersPrev) / s.followersPrev * 100);
+        let growthPct = Math.round((s.followers - s.followersPrev) / s.followersPrev * 100);
         followerTxt += ', um crescimento de <strong>+'+growthPct+'%</strong> desde '+s.followersPrevDate;
       }
       partes.push(followerTxt + '.');
@@ -1174,7 +1174,7 @@ function renderReport() {
     if (g) {
       partes.push('Na meta de comissão, já são <strong>'+g.closed+' de '+g.target+' próteses</strong> fechadas via WhatsApp/Instagram, R$'+(g.closed*g.commissionPerUnit).toLocaleString('pt-BR')+' em comissão garantida até agora.');
     }
-    var resumo = partes.join(' ');
+    let resumo = partes.join(' ');
 
     return '<div class="card report-card">' +
       '<div class="report-card-head">' +
@@ -1190,26 +1190,26 @@ function renderReport() {
 
 // ═══════════════ CONFIG: NOVO CLIENTE ═══════════════
 function gerarCliente() {
-  var name = document.getElementById('nc-name').value.trim();
-  var wpp  = document.getElementById('nc-wpp').value.trim();
-  var ig   = document.getElementById('nc-ig').value.trim();
-  var plan = document.getElementById('nc-plan').value;
+  let name = document.getElementById('nc-name').value.trim();
+  let wpp  = document.getElementById('nc-wpp').value.trim();
+  let ig   = document.getElementById('nc-ig').value.trim();
+  let plan = document.getElementById('nc-plan').value;
   if (!name || !wpp) { showToast('Preencha nome e WhatsApp', 'error'); return; }
 
-  var cfg = { bizName:name, bizWpp:wpp, instagram:ig, services:[], professionals:[{id:0,name:'Qualquer',emoji:'⭐',color:'#A855F7',rating:null,reviews:null}] };
-  var base = 'https://pacoquinhagamer02-max.github.io/synctech-automation';
-  var encoded = btoa(unescape(encodeURIComponent(JSON.stringify(cfg))));
-  var cfgBio = Object.assign({}, cfg, { agendamentoUrl: base+'/agendamento/#config='+encoded });
-  var encodedBio = btoa(unescape(encodeURIComponent(JSON.stringify(cfgBio))));
+  let cfg = { bizName:name, bizWpp:wpp, instagram:ig, services:[], professionals:[{id:0,name:'Qualquer',emoji:'⭐',color:'#A855F7',rating:null,reviews:null}] };
+  let base = 'https://pacoquinhagamer02-max.github.io/synctech-automation';
+  let encoded = btoa(unescape(encodeURIComponent(JSON.stringify(cfg))));
+  let cfgBio = Object.assign({}, cfg, { agendamentoUrl: base+'/agendamento/#config='+encoded });
+  let encodedBio = btoa(unescape(encodeURIComponent(JSON.stringify(cfgBio))));
 
-  var agendLink = base+'/agendamento/#config='+encoded;
-  var bioLink   = base+'/bio/#config='+encodedBio;
+  let agendLink = base+'/agendamento/#config='+encoded;
+  let bioLink   = base+'/bio/#config='+encodedBio;
 
   document.getElementById('nc-link-agend').textContent = agendLink;
   document.getElementById('nc-link-bio').textContent = bioLink;
   document.getElementById('nc-result').style.display = 'block';
 
-  var stored = getStoredClients();
+  let stored = getStoredClients();
   stored.push({ bizName:name, plan:plan, agendLink:agendLink, bioLink:bioLink, createdAt:new Date().toISOString() });
   localStorage.setItem('synctech_new_clients', JSON.stringify(stored));
   renderClients();
@@ -1217,24 +1217,24 @@ function gerarCliente() {
 }
 
 function copiarLinksCliente() {
-  var txt = document.getElementById('nc-link-agend').textContent + '\n' + document.getElementById('nc-link-bio').textContent;
+  let txt = document.getElementById('nc-link-agend').textContent + '\n' + document.getElementById('nc-link-bio').textContent;
   navigator.clipboard.writeText(txt).then(function(){ showToast('Links copiados!', 'success'); });
 }
 
 function copiarScriptSync() {
-  var txt = document.getElementById('sync-script-code').textContent;
+  let txt = document.getElementById('sync-script-code').textContent;
   navigator.clipboard.writeText(txt).then(function(){ showToast('Código copiado! Cole no Apps Script.', 'success'); });
 }
 
 function showToast(msg, type) {
-  var t = document.getElementById('toast');
+  let t = document.getElementById('toast');
   t.textContent = msg;
   t.className = 'toast ' + (type||'') + ' show';
   setTimeout(function(){ t.classList.remove('show'); }, 3200);
 }
 
 // ═══════════════ PWA INSTALL ═══════════════
-var deferredPrompt = null;
+let deferredPrompt = null;
 window.addEventListener('beforeinstallprompt', function(e) {
   e.preventDefault();
   deferredPrompt = e;
