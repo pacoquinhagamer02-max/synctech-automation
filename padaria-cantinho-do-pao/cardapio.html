@@ -78,10 +78,12 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;text-wrap:balance}
 .app-lg small{font-family:var(--body);font-size:0.6rem;font-weight:600;letter-spacing:0.04em;color:var(--dim);text-transform:uppercase}
 .install-btn{display:flex;align-items:center;gap:6px;background:var(--ember-dim);color:var(--ink);border:none;padding:9px 13px;font-size:0.76rem;font-weight:700;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .install-btn svg{width:15px;height:15px}
+.install-btn[hidden]{display:none}
 
 /* ── AVISO iOS ── */
 .ios-hint{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--crust);color:var(--ink);font-size:0.78rem;font-weight:600;padding:10px 22px}
 .ios-hint button{background:none;border:none;color:var(--ink);font-size:0.95rem;flex-shrink:0;line-height:1}
+.ios-hint[hidden]{display:none}
 
 /* ── TABBAR (navegação do app) ── */
 .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:55;display:flex;background:rgba(22,31,38,0.97);backdrop-filter:blur(6px);border-top:1px solid var(--line-strong);padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
@@ -254,7 +256,7 @@ footer p{max-width:560px;margin:8px auto 0}
 .pedido-repeat{width:100%;justify-content:center}
 
 /* ── CART BAR + MODAL (mesma lógica funcional) ── */
-.cart-bar{position:fixed;left:0;right:0;bottom:calc(60px + env(safe-area-inset-bottom));background:var(--ink);color:var(--paper);padding:14px 20px;z-index:60;box-shadow:0 -8px 28px rgba(0,0,0,0.35);transform:translateY(130%);transition:transform .3s cubic-bezier(.16,.8,.3,1)}
+.cart-bar{position:fixed;left:0;right:0;bottom:calc(60px + env(safe-area-inset-bottom));background:var(--ink);color:var(--paper);padding:14px 20px;z-index:60;box-shadow:0 -8px 28px rgba(0,0,0,0.35);transform:translateY(calc(100% + 70px));transition:transform .3s cubic-bezier(.16,.8,.3,1)}
 .cart-bar.show{transform:translateY(0)}
 .cart-bar-row{max-width:1040px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:14px}
 .cart-bar .info{font-family:var(--mono);font-size:0.76rem;color:var(--paper2)}
