@@ -181,6 +181,10 @@ h1, h2, h3, .logo { font-family: var(--font-head, 'Inter'), sans-serif; }
 .toast.show { transform: translateX(-50%) translateY(0); }
 .toast.error { border-color: rgba(239,68,68,0.4); color: var(--red); }
 .toast.success { border-color: rgba(34,197,94,0.4); color: var(--green); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+}
 </style>
 </head>
 <body>
@@ -226,9 +230,9 @@ h1, h2, h3, .logo { font-family: var(--font-head, 'Inter'), sans-serif; }
     <div class="step-title">Escolha data e horário</div>
     <div class="step-sub">Selecione quando você quer ser atendido</div>
     <div class="cal-header">
-      <button class="cal-nav" onclick="changeMonth(-1)">‹</button>
+      <button class="cal-nav" onclick="changeMonth(-1)" aria-label="Mês anterior">‹</button>
       <span class="cal-month" id="cal-month"></span>
-      <button class="cal-nav" onclick="changeMonth(1)">›</button>
+      <button class="cal-nav" onclick="changeMonth(1)" aria-label="Próximo mês">›</button>
     </div>
     <div class="weekdays"><div class="wd">Dom</div><div class="wd">Seg</div><div class="wd">Ter</div><div class="wd">Qua</div><div class="wd">Qui</div><div class="wd">Sex</div><div class="wd">Sáb</div></div>
     <div class="days-grid" id="days-grid"></div>
@@ -245,22 +249,22 @@ h1, h2, h3, .logo { font-family: var(--font-head, 'Inter'), sans-serif; }
     <div class="step-title">Seus dados</div>
     <div class="step-sub" id="step3-sub"></div>
     <div class="form-group">
-      <label class="form-label">Nome completo *</label>
+      <label class="form-label" for="f-name">Nome completo *</label>
       <input class="form-input" id="f-name" placeholder="Seu nome completo" type="text">
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label class="form-label">WhatsApp *</label>
+        <label class="form-label" for="f-wpp">WhatsApp *</label>
         <input class="form-input" id="f-wpp" placeholder="(11) 99999-9999" type="tel">
       </div>
       <div class="form-group">
-        <label class="form-label">E-mail</label>
+        <label class="form-label" for="f-email">E-mail</label>
         <input class="form-input" id="f-email" placeholder="seu@email.com" type="email">
         <div class="form-note">Para receber confirmação por e-mail</div>
       </div>
     </div>
     <div class="form-group">
-      <label class="form-label">Observações (opcional)</label>
+      <label class="form-label" for="f-obs">Observações (opcional)</label>
       <input class="form-input" id="f-obs" placeholder="Ex: primeira vez, alergias, preferências...">
     </div>
     <!-- Intake questions (Acuity pattern) — preenchido dinamicamente -->
@@ -310,11 +314,11 @@ h1, h2, h3, .logo { font-family: var(--font-head, 'Inter'), sans-serif; }
     <div class="modal-sheet-title">⏳ Entrar na lista de espera</div>
     <div class="modal-sheet-sub" id="waitlist-slot-info">Este horário está ocupado. Se alguém cancelar, avisamos você primeiro.</div>
     <div class="form-group">
-      <label class="form-label">Seu nome *</label>
+      <label class="form-label" for="wl-name">Seu nome *</label>
       <input class="form-input" id="wl-name" placeholder="Nome completo">
     </div>
     <div class="form-group">
-      <label class="form-label">WhatsApp *</label>
+      <label class="form-label" for="wl-wpp">WhatsApp *</label>
       <input class="form-input" id="wl-wpp" placeholder="(11) 99999-9999" type="tel">
     </div>
     <button class="modal-btn modal-btn-green" onclick="submitWaitlist()" style="margin-top:4px">✓ Entrar na lista de espera</button>
@@ -328,11 +332,11 @@ h1, h2, h3, .logo { font-family: var(--font-head, 'Inter'), sans-serif; }
     <div class="modal-sheet-title" id="review-modal-title">Como foi a sua experiência?</div>
     <div class="modal-sheet-sub" id="review-modal-sub">Sua avaliação ajuda outros clientes a nos conhecer.</div>
     <div class="stars-row" id="review-stars">
-      <button class="star-btn" data-v="1" onclick="rateStar(1)">★</button>
-      <button class="star-btn" data-v="2" onclick="rateStar(2)">★</button>
-      <button class="star-btn" data-v="3" onclick="rateStar(3)">★</button>
-      <button class="star-btn" data-v="4" onclick="rateStar(4)">★</button>
-      <button class="star-btn" data-v="5" onclick="rateStar(5)">★</button>
+      <button class="star-btn" data-v="1" onclick="rateStar(1)" aria-label="1 estrela">★</button>
+      <button class="star-btn" data-v="2" onclick="rateStar(2)" aria-label="2 estrelas">★</button>
+      <button class="star-btn" data-v="3" onclick="rateStar(3)" aria-label="3 estrelas">★</button>
+      <button class="star-btn" data-v="4" onclick="rateStar(4)" aria-label="4 estrelas">★</button>
+      <button class="star-btn" data-v="5" onclick="rateStar(5)" aria-label="5 estrelas">★</button>
     </div>
     <div id="review-feedback-area" style="display:none">
       <textarea class="modal-textarea" id="review-feedback-text" placeholder="Nos conte o que aconteceu para podermos melhorar..."></textarea>
@@ -354,7 +358,7 @@ h1, h2, h3, .logo { font-family: var(--font-head, 'Inter'), sans-serif; }
 </footer>
 
 <script>
-var CONFIG = {
+let CONFIG = {
   bizName: 'Barbearia Exemplo',
   bizWpp: '5511999990000',
   webhookUrl: '', // demo pública não grava na planilha real — cada cliente recebe seu próprio webhookUrl via #config
@@ -380,8 +384,8 @@ var CONFIG = {
   bookedSlots:    ['09:00','10:00','13:30','15:30'],
 };
 
-var S = { svc:null, prof:0, day:null, slot:null, month:new Date().getMonth(), year:new Date().getFullYear() };
-var MONTHS = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+let S = { svc:null, prof:0, day:null, slot:null, month:new Date().getMonth(), year:new Date().getFullYear() };
+let MONTHS = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
 
 // Services
 function renderServices() {
@@ -413,10 +417,10 @@ function pickSvc(id) {
 // Professionals
 function renderProfs() {
   document.getElementById('prof-grid').innerHTML = CONFIG.professionals.map(function(p) {
-    var av = p.emoji
+    let av = p.emoji
       ? '<div class="prof-av" style="background:'+p.color+'22;font-size:1.4rem">'+p.emoji+'</div>'
       : '<div class="prof-av" style="background:'+p.color+'33;color:'+p.color+'">'+p.initials+'</div>';
-    var info = p.rating
+    let info = p.rating
       ? '<div class="prof-stars">★ '+p.rating+'</div><div class="prof-count">'+p.reviews+' avaliações</div>'
       : '<div class="prof-count" style="margin-top:4px">Disponível</div>';
     return '<div class="prof-card'+(p.id===0?' selected':'')+'" id="prof-'+p.id+'" onclick="pickProf('+p.id+')">'+av+'<div class="prof-name">'+p.name+'</div>'+info+'</div>';
@@ -441,17 +445,17 @@ function changeMonth(d) {
 
 function renderCalendar() {
   document.getElementById('cal-month').textContent = MONTHS[S.month]+' '+S.year;
-  var first = new Date(S.year, S.month, 1).getDay();
-  var total = new Date(S.year, S.month+1, 0).getDate();
-  var today = new Date();
-  var html = '';
-  for (var i=0; i<first; i++) html += '<div class="day-btn empty"></div>';
-  for (var d=1; d<=total; d++) {
-    var dt   = new Date(S.year, S.month, d);
-    var past = dt < new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    var isSun = dt.getDay()===0;
-    var isTod = d===today.getDate() && S.month===today.getMonth() && S.year===today.getFullYear();
-    var isSel = S.day===d;
+  let first = new Date(S.year, S.month, 1).getDay();
+  let total = new Date(S.year, S.month+1, 0).getDate();
+  let today = new Date();
+  let html = '';
+  for (let i=0; i<first; i++) html += '<div class="day-btn empty"></div>';
+  for (let d=1; d<=total; d++) {
+    let dt   = new Date(S.year, S.month, d);
+    let past = dt < new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    let isSun = dt.getDay()===0;
+    let isTod = d===today.getDate() && S.month===today.getMonth() && S.year===today.getFullYear();
+    let isSel = S.day===d;
     html += '<button class="day-btn'+(isSel?' selected':'')+(isTod&&!isSel?' today':'')+'"'+(past||isSun?' disabled':' onclick="pickDay('+d+')"')+'>'+d+'</button>';
   }
   document.getElementById('days-grid').innerHTML = html;
@@ -469,13 +473,13 @@ function renderSlots() {
     document.getElementById('slots-grid').innerHTML = '';
     return;
   }
-  var dt = new Date(S.year, S.month, S.day);
-  var dn = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'][dt.getDay()];
+  let dt = new Date(S.year, S.month, S.day);
+  let dn = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'][dt.getDay()];
   document.getElementById('slots-title').textContent = 'Horários — '+dn+', '+S.day+'/'+(S.month+1);
-  var all = CONFIG.morningSlots.concat(CONFIG.afternoonSlots);
+  let all = CONFIG.morningSlots.concat(CONFIG.afternoonSlots);
   document.getElementById('slots-grid').innerHTML = all.map(function(t) {
-    var booked  = CONFIG.bookedSlots.indexOf(t) !== -1;
-    var popular = CONFIG.popularSlots.indexOf(t) !== -1;
+    let booked  = CONFIG.bookedSlots.indexOf(t) !== -1;
+    let popular = CONFIG.popularSlots.indexOf(t) !== -1;
     return '<button class="slot-btn'+(S.slot===t?' selected':'')+(popular?' popular':'')+(booked?' booked':'')+'"'+(booked?' onclick="openWaitlist(\''+t+'\')" title="Ocupado — entrar na lista de espera"':' onclick="pickSlot(\''+t+'\')"')+'>'+t+(booked?'<span style="display:block;font-size:0.55rem;margin-top:1px;opacity:0.8">lista</span>':'')+'</button>';
   }).join('');
 }
@@ -487,22 +491,22 @@ function pickSlot(t) {
 
 // Intake form (Acuity pattern: perguntas configuráveis antes de confirmar)
 function renderIntakeQuestions() {
-  var el = document.getElementById('intake-questions');
+  let el = document.getElementById('intake-questions');
   if (!CONFIG.intakeQuestions || !CONFIG.intakeQuestions.length) { el.innerHTML = ''; return; }
   el.innerHTML = CONFIG.intakeQuestions.map(function(q, i) {
-    var inp = q.type === 'textarea'
+    let inp = q.type === 'textarea'
       ? '<textarea class="form-input" id="iq-'+i+'" placeholder="'+(q.placeholder||'')+'" style="min-height:70px;resize:none"></textarea>'
       : q.type === 'select' && q.options
       ? '<select class="form-input" id="iq-'+i+'"><option value="">Selecione...</option>'+q.options.map(function(o){ return '<option>'+o+'</option>'; }).join('')+'</select>'
       : '<input class="form-input" id="iq-'+i+'" placeholder="'+(q.placeholder||'')+'" type="text">';
-    return '<div class="form-group"><label class="form-label">'+q.label+(q.required?' *':'')+'</label>'+inp+'</div>';
+    return '<div class="form-group"><label class="form-label" for="iq-'+i+'">'+q.label+(q.required?' *':'')+'</label>'+inp+'</div>';
   }).join('');
 }
 function collectIntakeAnswers() {
   if (!CONFIG.intakeQuestions || !CONFIG.intakeQuestions.length) return {};
-  var ans = {};
+  let ans = {};
   CONFIG.intakeQuestions.forEach(function(q, i) {
-    var el = document.getElementById('iq-'+i);
+    let el = document.getElementById('iq-'+i);
     if (el) ans[q.label] = el.value.trim();
   });
   return ans;
@@ -510,13 +514,13 @@ function collectIntakeAnswers() {
 
 // Step 3 summary header
 function renderSummaryHeader() {
-  var svc = CONFIG.services.filter(function(s){ return s.id===S.svc; })[0];
+  let svc = CONFIG.services.filter(function(s){ return s.id===S.svc; })[0];
   document.getElementById('step3-sub').textContent = svc.name+' · '+S.day+'/'+(S.month+1)+'/'+S.year+' às '+S.slot;
 }
 
 // Toast helper
 function showToast(msg, type) {
-  var t = document.getElementById('toast');
+  let t = document.getElementById('toast');
   t.textContent = msg;
   t.className = 'toast ' + (type||'');
   t.classList.add('show');
@@ -525,9 +529,9 @@ function showToast(msg, type) {
 
 // Phone mask: (XX) XXXXX-XXXX
 document.addEventListener('DOMContentLoaded', function(){
-  var wpp = document.getElementById('f-wpp');
+  let wpp = document.getElementById('f-wpp');
   if(wpp) wpp.addEventListener('input', function(){
-    var v = this.value.replace(/\D/g,'').slice(0,11);
+    let v = this.value.replace(/\D/g,'').slice(0,11);
     if(v.length > 10) v = v.replace(/^(\d{2})(\d{5})(\d{4})$/, '($1) $2-$3');
     else if(v.length > 6) v = v.replace(/^(\d{2})(\d{4})(\d+)$/, '($1) $2-$3');
     else if(v.length > 2) v = v.replace(/^(\d{2})(\d+)$/, '($1) $2');
@@ -537,20 +541,20 @@ document.addEventListener('DOMContentLoaded', function(){
 
 // Confirm — POST para webhook se configurado
 function confirmBooking() {
-  var name  = document.getElementById('f-name').value.trim();
-  var phone = document.getElementById('f-wpp').value.trim();
-  var email = document.getElementById('f-email').value.trim();
-  var obs   = document.getElementById('f-obs').value.trim();
+  let name  = document.getElementById('f-name').value.trim();
+  let phone = document.getElementById('f-wpp').value.trim();
+  let email = document.getElementById('f-email').value.trim();
+  let obs   = document.getElementById('f-obs').value.trim();
 
   if (!name) { showToast('⚠️ Preencha seu nome', 'error'); return; }
   if (!phone || phone.replace(/\D/g,'').length < 10) { showToast('⚠️ WhatsApp inválido', 'error'); return; }
 
-  var svc  = CONFIG.services.filter(function(s){ return s.id===S.svc; })[0];
-  var prof = CONFIG.professionals.filter(function(p){ return p.id===S.prof; })[0];
-  var pad2 = function(n){ return String(n).padStart(2,'0'); };
-  var dateStr = pad2(S.day)+'/'+pad2(S.month+1)+'/'+S.year;
+  let svc  = CONFIG.services.filter(function(s){ return s.id===S.svc; })[0];
+  let prof = CONFIG.professionals.filter(function(p){ return p.id===S.prof; })[0];
+  let pad2 = function(n){ return String(n).padStart(2,'0'); };
+  let dateStr = pad2(S.day)+'/'+pad2(S.month+1)+'/'+S.year;
 
-  var payload = {
+  let payload = {
     nome:        name,
     telefone:    phone,
     email:       email,
@@ -579,7 +583,7 @@ function confirmBooking() {
       return '<div class="confirm-card-row"><div class="cc-icon">'+r.icon+'</div><div><div class="cc-text">'+r.text+'</div><div class="cc-sub">'+r.sub+'</div></div></div>';
     }).join('');
 
-    var msg = encodeURIComponent(
+    let msg = encodeURIComponent(
       '✅ *Agendamento Confirmado!*\n\n'+
       '👤 *Nome:* '+name+'\n'+
       '💈 *Serviço:* '+svc.name+'\n'+
@@ -598,7 +602,7 @@ function confirmBooking() {
   }
 
   // Se tem webhook configurado, envia os dados
-  var webhook = CONFIG.webhookUrl || '';
+  let webhook = CONFIG.webhookUrl || '';
   if (webhook) {
     document.getElementById('loading-overlay').classList.add('active');
     fetch(webhook, {
@@ -622,13 +626,13 @@ function confirmBooking() {
 }
 
 function addToCalendar() {
-  var svc = CONFIG.services.filter(function(s){ return s.id===S.svc; })[0];
-  var parts = S.slot.split(':');
-  var start = new Date(S.year, S.month, S.day, parseInt(parts[0]), parseInt(parts[1]));
-  var end   = new Date(start.getTime() + svc.duration*60000);
+  let svc = CONFIG.services.filter(function(s){ return s.id===S.svc; })[0];
+  let parts = S.slot.split(':');
+  let start = new Date(S.year, S.month, S.day, parseInt(parts[0]), parseInt(parts[1]));
+  let end   = new Date(start.getTime() + svc.duration*60000);
   // Usa horário local (sem Z) + timezone Brasília para evitar 3h de diferença
-  var pad = function(n){ return String(n).padStart(2,'0'); };
-  var f = function(d){ return d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'T'+pad(d.getHours())+pad(d.getMinutes())+'00'; };
+  let pad = function(n){ return String(n).padStart(2,'0'); };
+  let f = function(d){ return d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'T'+pad(d.getHours())+pad(d.getMinutes())+'00'; };
   window.open('https://calendar.google.com/calendar/r/eventedit?text='+encodeURIComponent(svc.name+' — '+CONFIG.bizName)+'&dates='+f(start)+'/'+f(end)+'&ctz=America/Sao_Paulo&details='+encodeURIComponent('Agendado via SyncTech Automation\n\nLocal: '+CONFIG.bizName),'_blank');
 }
 
@@ -640,7 +644,7 @@ function closeModal(id, e) {
 }
 
 // Review modal (GatherUp pattern: pesquisa privada primeiro, depois roteamento)
-var _reviewStars = 0;
+let _reviewStars = 0;
 function openReview() {
   _reviewStars = 0;
   document.querySelectorAll('.star-btn').forEach(function(s){ s.classList.remove('lit'); });
@@ -669,17 +673,17 @@ function rateStar(n) {
   }, 350);
 }
 function sendPrivateFeedback() {
-  var txt = document.getElementById('review-feedback-text').value.trim();
+  let txt = document.getElementById('review-feedback-text').value.trim();
   if (!txt) { showToast('Escreva seu feedback primeiro', 'error'); return; }
-  var stars = '★'.repeat(_reviewStars) + '☆'.repeat(5 - _reviewStars);
-  var msg = '⚠️ *Feedback Privado Recebido*\n\nNota: '+stars+' ('+_reviewStars+'/5)\n\nServiço: '+(S.svc ? (CONFIG.services.filter(function(s){return s.id===S.svc;})[0]||{name:'—'}).name : '—')+'\n\nComentário: '+txt+'\n\n_Via SyncTech Agendamento_';
+  let stars = '★'.repeat(_reviewStars) + '☆'.repeat(5 - _reviewStars);
+  let msg = '⚠️ *Feedback Privado Recebido*\n\nNota: '+stars+' ('+_reviewStars+'/5)\n\nServiço: '+(S.svc ? (CONFIG.services.filter(function(s){return s.id===S.svc;})[0]||{name:'—'}).name : '—')+'\n\nComentário: '+txt+'\n\n_Via SyncTech Agendamento_';
   window.open('https://wa.me/'+CONFIG.bizWpp+'?text='+encodeURIComponent(msg), '_blank');
   closeModal('review-overlay');
   showToast('Feedback enviado! Obrigado.', 'success');
 }
 
 // Waitlist (SimplyBook pattern: lista de espera para slots cheios)
-var _waitlistSlot = '';
+let _waitlistSlot = '';
 function openWaitlist(slot) {
   _waitlistSlot = slot;
   document.getElementById('waitlist-slot-info').textContent = 'Horário das '+slot+' está ocupado. Se alguém cancelar, avisamos você primeiro via WhatsApp!';
@@ -688,30 +692,30 @@ function openWaitlist(slot) {
   document.getElementById('waitlist-overlay').classList.add('open');
 }
 function submitWaitlist() {
-  var name = document.getElementById('wl-name').value.trim();
-  var wpp  = document.getElementById('wl-wpp').value.replace(/\D/g,'');
+  let name = document.getElementById('wl-name').value.trim();
+  let wpp  = document.getElementById('wl-wpp').value.replace(/\D/g,'');
   if (!name || wpp.length < 10) { showToast('Preencha nome e WhatsApp', 'error'); return; }
-  var payload = { tipo:'waitlist', nome:name, telefone:wpp, horario:_waitlistSlot, negocio:CONFIG.bizName, timestamp:new Date().toISOString() };
+  let payload = { tipo:'waitlist', nome:name, telefone:wpp, horario:_waitlistSlot, negocio:CONFIG.bizName, timestamp:new Date().toISOString() };
   if (CONFIG.webhookUrl) {
-    fetch(CONFIG.webhookUrl, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) }).catch(function(){});
+    fetch(CONFIG.webhookUrl, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) }).catch(function(err){ console.error('Falha ao enviar lista de espera:', err); });
   }
   closeModal('waitlist-overlay');
   showToast('✓ Você entrou na lista! Te avisamos se abrir vaga.', 'success');
 }
 
 function shareReferral() {
-  var svc = CONFIG.services.filter(function(s){ return s.id===S.svc; })[0];
-  var msg = 'Acabei de agendar ' + (svc ? svc.name : 'um serviço') + ' em ' + CONFIG.bizName + ' pelo link deles! Super fácil, recomendo: ' + window.location.href.split('#')[0];
+  let svc = CONFIG.services.filter(function(s){ return s.id===S.svc; })[0];
+  let msg = 'Acabei de agendar ' + (svc ? svc.name : 'um serviço') + ' em ' + CONFIG.bizName + ' pelo link deles! Super fácil, recomendo: ' + window.location.href.split('#')[0];
   window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
 }
 
 // Navigation
 function goTo(n) {
   if (n===3) { renderSummaryHeader(); renderIntakeQuestions(); }
-  for (var i=1; i<=4; i++) {
+  for (let i=1; i<=4; i++) {
     document.getElementById('step'+i).classList.toggle('active', i===n);
-    var sc = document.getElementById('sc'+i);
-    var sl = document.getElementById('sl'+i);
+    let sc = document.getElementById('sc'+i);
+    let sl = document.getElementById('sl'+i);
     sc.className = 'step-circle'+(i<n?' done':i===n?' active':'');
     sl.className = 'step-label'+(i<n?' done':i===n?' active':'');
     sc.innerHTML = i<n ? '✓' : String(i);
@@ -723,10 +727,10 @@ function goTo(n) {
 // Init — lê config do hash da URL (#config=BASE64) — gerado pelo setup.html
 (function(){
   try {
-    var hash = window.location.hash;
+    let hash = window.location.hash;
     if (hash && hash.indexOf('#config=') === 0) {
-      var encoded = hash.slice(8);
-      var decoded = JSON.parse(decodeURIComponent(escape(atob(encoded))));
+      let encoded = hash.slice(8);
+      let decoded = JSON.parse(decodeURIComponent(escape(atob(encoded))));
       if (decoded.bizName)    CONFIG.bizName    = decoded.bizName;
       if (decoded.bizWpp)          CONFIG.bizWpp          = decoded.bizWpp.replace(/\D/g,'');
       if (decoded.webhookUrl)      CONFIG.webhookUrl      = decoded.webhookUrl;
@@ -739,7 +743,7 @@ function goTo(n) {
   } catch(e){}
   // Fallback: sobrescreve CONFIG com dados salvos no dashboard
   try {
-    var saved = JSON.parse(localStorage.getItem('synctech_config') || '{}');
+    let saved = JSON.parse(localStorage.getItem('synctech_config') || '{}');
     if (saved.bizName)          CONFIG.bizName          = saved.bizName;
     if (saved.bizWpp)           CONFIG.bizWpp           = saved.bizWpp.replace(/\D/g,'');
     if (saved.webhookUrl)       CONFIG.webhookUrl       = saved.webhookUrl;
