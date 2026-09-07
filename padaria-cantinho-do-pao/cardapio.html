@@ -45,7 +45,6 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;text-wrap:balance}
 .btn:hover{filter:brightness(1.1)}
 .btn-p{background:var(--ember-dim);color:#fff}
 .btn-o{background:transparent;color:var(--txt);border:1px solid var(--line-strong)}
-.eyebrow{font-family:var(--mono);font-size:0.68rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--crust)}
 .sec{padding:56px 0}
 .sec-hd{max-width:480px;margin-bottom:30px}
 .sec-hd h2{font-size:clamp(1.7rem,4vw,2.3rem);margin-top:8px}
@@ -76,13 +75,12 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;text-wrap:balance}
 .hero{padding:44px 0 40px;position:relative;overflow:hidden}
 .hero::before{content:'';position:absolute;top:-30%;right:-15%;width:60vw;height:60vw;max-width:640px;max-height:640px;background:radial-gradient(circle,rgba(226,102,46,0.22),transparent 68%);pointer-events:none}
 .hero-in{display:grid;grid-template-columns:1.15fr 1fr;gap:40px;align-items:center;position:relative}
-.status{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:0.72rem;letter-spacing:0.03em;text-transform:uppercase;color:var(--mut);margin-bottom:16px}
+.status{display:inline-flex;align-items:center;gap:7px;font-family:var(--body);font-weight:600;font-size:0.78rem;letter-spacing:0.02em;color:var(--mut);margin-bottom:16px}
 .status .dot{width:7px;height:7px;border-radius:50%;background:#6FBF73;box-shadow:0 0 6px #6FBF73}
 .status.closed .dot{background:#C1503E;box-shadow:0 0 6px #C1503E}
 .hero h1{font-size:clamp(2.1rem,5vw,3.1rem);line-height:1.05}
-.hero h1 em{font-style:italic;color:var(--ember)}
 .hero-sub{margin-top:16px;color:var(--mut);font-size:1rem;max-width:440px}
-.hero-facts{display:flex;flex-direction:column;gap:8px;margin-top:20px;font-family:var(--mono);font-size:0.78rem;color:var(--mut)}
+.hero-facts{display:flex;flex-direction:column;gap:8px;margin-top:20px;font-family:var(--body);font-size:0.88rem;color:var(--mut)}
 .hero-facts span{display:inline-flex;align-items:center;gap:8px}
 .hero-facts b{color:var(--crust)}
 .fact-ic{width:15px;height:15px;flex-shrink:0;color:var(--crust)}
@@ -95,7 +93,6 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;text-wrap:balance}
 
 /* ── DESTAQUE (flagship) ── */
 .destaque{background:var(--bg2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
-.selo{display:inline-block;font-family:var(--mono);font-size:0.66rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--stamp);background:rgba(140,47,30,0.15);border:1px solid rgba(140,47,30,0.4);padding:4px 12px;margin-bottom:12px}
 .dest-top{display:grid;grid-template-columns:1fr 1fr;gap:44px;align-items:center}
 .dest-photo{border:1px solid var(--line-strong)}
 .dest-photo img{width:100%;aspect-ratio:16/11;object-fit:cover}
@@ -105,11 +102,10 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;text-wrap:balance}
 .pontos b{display:block;font-family:var(--disp);font-size:1rem}
 .pontos span{display:block;font-size:0.78rem;color:var(--dim);margin-top:2px}
 .res{margin-top:44px}
-.res-lbl{font-family:var(--mono);font-size:0.7rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--dim);margin-bottom:14px}
 .res-g{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;max-width:520px}
 .res-g figure{border:1px solid var(--line-strong);position:relative}
 .res-g img{width:100%;aspect-ratio:1/1;object-fit:cover}
-.res-g figcaption{position:absolute;left:0;right:0;bottom:0;padding:8px 10px;font-family:var(--mono);font-size:0.68rem;background:linear-gradient(0deg,rgba(0,0,0,0.7),transparent);color:#fff}
+.res-g figcaption{position:absolute;left:0;right:0;bottom:0;padding:8px 10px;font-family:var(--body);font-size:0.76rem;background:linear-gradient(0deg,rgba(0,0,0,0.7),transparent);color:#fff}
 .pro-g{display:grid;grid-template-columns:1fr 1.15fr;gap:44px;margin-top:52px;align-items:start}
 .pro-g h2{font-size:1.6rem;margin-top:6px}
 .pro-g > .txt p{color:var(--mut);margin-top:10px;max-width:340px}
@@ -125,7 +121,6 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;text-wrap:balance}
 /* ── CARDAPIO (a loja) ── */
 .cardapio{background:var(--paper);color:var(--ink)}
 .cardapio .sec-hd{max-width:560px}
-.cardapio .eyebrow{color:var(--stamp)}
 .cardapio .sec-hd p{color:var(--ink-mut);margin-top:10px;font-size:0.94rem}
 .cat-nav{display:flex;gap:24px;overflow-x:auto;padding:0 0 16px;position:sticky;top:57px;background:var(--paper);z-index:20;scrollbar-width:none;border-bottom:1px solid rgba(43,32,22,0.14)}
 .cat-nav::-webkit-scrollbar{display:none}
@@ -137,7 +132,7 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;text-wrap:balance}
 .cat-section{padding:26px 0 10px}
 .cat-title{display:flex;align-items:baseline;gap:10px;margin-bottom:2px}
 .cat-title h3{font-family:var(--disp);font-size:1.7rem;font-weight:700}
-.cat-highlight{font-family:var(--mono);font-size:0.6rem;font-weight:700;color:#fff;background:var(--stamp);padding:3px 8px;letter-spacing:0.03em;text-transform:uppercase}
+.cat-highlight{font-family:var(--body);font-size:0.66rem;font-weight:700;color:#fff;background:var(--stamp);padding:3px 8px;letter-spacing:0.02em;text-transform:uppercase}
 .cat-note{font-size:0.84rem;color:var(--ink-mut);margin-bottom:4px}
 .item{display:flex;gap:13px;align-items:center;padding:15px 0;border-bottom:1px solid rgba(43,32,22,0.12)}
 .item-ph{flex-shrink:0;width:50px;height:50px;overflow:hidden;border:1px solid rgba(43,32,22,0.14)}
@@ -172,7 +167,7 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;text-wrap:balance}
 .gal figure{position:relative;overflow:hidden}
 .gal img{width:100%;aspect-ratio:1/1;object-fit:cover;transition:transform .3s ease}
 .gal a:hover img{transform:scale(1.06)}
-.gal figcaption{position:absolute;left:0;right:0;bottom:0;padding:8px;font-family:var(--mono);font-size:0.62rem;background:linear-gradient(0deg,rgba(0,0,0,0.75),transparent);color:#fff}
+.gal figcaption{position:absolute;left:0;right:0;bottom:0;padding:8px;font-family:var(--body);font-size:0.72rem;background:linear-gradient(0deg,rgba(0,0,0,0.75),transparent);color:#fff}
 .gal-note{margin-top:16px;font-size:0.76rem;color:var(--dim)}
 @media(max-width:640px){.gal{grid-template-columns:repeat(2,1fr)}}
 
@@ -183,7 +178,7 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;text-wrap:balance}
 .reviews{display:flex;flex-direction:column;gap:14px}
 .review{border-left:2px solid var(--crust);padding-left:16px}
 .review p{font-family:var(--disp);font-style:italic;font-size:1.05rem;color:var(--txt)}
-.review span{display:block;margin-top:6px;font-family:var(--mono);font-size:0.7rem;color:var(--dim)}
+.review span{display:block;margin-top:6px;font-family:var(--body);font-size:0.78rem;color:var(--dim)}
 @media(max-width:760px){.sobre-grid{grid-template-columns:1fr}}
 
 /* ── VISITE ── */
@@ -203,7 +198,7 @@ h1,h2,h3{font-family:var(--disp);font-weight:700;text-wrap:balance}
 .cta-final h2{font-size:clamp(1.5rem,3.6vw,2rem);max-width:520px;margin:0 auto 14px}
 .cta-final p{color:var(--mut);margin-bottom:24px}
 
-footer{padding:26px 0 90px;text-align:center;color:var(--dim);font-size:0.72rem;font-family:var(--mono);background:var(--bg2)}
+footer{padding:26px 0 90px;text-align:center;color:var(--dim);font-size:0.78rem;font-family:var(--body);background:var(--bg2)}
 footer p{max-width:560px;margin:8px auto 0}
 
 /* ── CART BAR + MODAL (mesma lógica funcional, novo visual) ── */
@@ -230,7 +225,7 @@ footer p{max-width:560px;margin:8px auto 0}
 .msum-qty span{min-width:12px;text-align:center;font-family:var(--mono);font-size:0.8rem;font-weight:700}
 .modal-total{display:flex;justify-content:space-between;margin-top:8px;padding-top:8px;font-weight:700;font-family:var(--mono);font-size:1rem;font-variant-numeric:tabular-nums}
 .field{margin-bottom:14px}
-.field label{display:block;font-family:var(--mono);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.03em;color:var(--ink-mut);margin-bottom:6px}
+.field label{display:block;font-family:var(--body);font-weight:600;font-size:0.76rem;color:var(--ink-mut);margin-bottom:6px}
 .field input,.field textarea{width:100%;padding:11px 0;border:none;border-bottom:1px solid rgba(43,32,22,0.24);background:none;font-family:var(--body);font-size:0.94rem;color:var(--ink);resize:vertical}
 .field input:focus-visible,.field textarea:focus-visible{outline:none;border-color:var(--ember)}
 .field-err{display:none;color:#A8433A;font-size:0.76rem;margin-top:5px}
@@ -239,7 +234,7 @@ footer p{max-width:560px;margin:8px auto 0}
 .opt-group{display:flex;gap:10px}
 .opt{flex:1;border:1px solid rgba(43,32,22,0.24);background:none;padding:11px;text-align:center;font-size:0.82rem;font-weight:600;color:var(--ink-mut);cursor:pointer;font-family:var(--body);touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .opt.sel{border-color:var(--ember);background:rgba(226,102,46,0.1);color:var(--ink)}
-.modal-send{width:100%;background:var(--ink);color:var(--crust);font-weight:700;font-size:0.9rem;padding:15px;border:none;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px;font-family:var(--mono);touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.modal-send{width:100%;background:var(--ink);color:var(--crust);font-weight:700;font-size:0.94rem;padding:15px;border:none;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px;font-family:var(--body);touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .modal-send:active{transform:scale(.98)}
 .modal-close{position:absolute;top:20px;right:20px;width:28px;height:28px;background:none;border:1px solid rgba(43,32,22,0.24);font-size:0.9rem;color:var(--ink);touch-action:manipulation}
 
@@ -270,7 +265,7 @@ footer p{max-width:560px;margin:8px auto 0}
   <div class="wrap hero-in">
     <div>
       <div class="status" id="status-badge"><span class="dot"></span>Aberto agora</div>
-      <h1>Pão quentinho,<br>direto do <em>forno</em> desde as 5h30</h1>
+      <h1>Pão quentinho, direto do forno desde as 5h30</h1>
       <p class="hero-sub">O Cantinho do Pão é da Rua do Catete, sem rede nem franquia por trás. É gente da casa te atendendo pelo nome. Monte seu pedido aqui e finalize direto no WhatsApp.</p>
       <div class="hero-facts">
         <span><svg class="fact-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.5 7-12a7 7 0 10-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.3"/></svg><b>R. do Catete, 500</b> — Mariana/MG</span>
@@ -278,7 +273,7 @@ footer p{max-width:560px;margin:8px auto 0}
         <span><svg class="fact-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="18" r="2.5"/><circle cx="17" cy="18" r="2.5"/><path d="M3 18h1l2-8h6l3 5h4M9 10V6h3"/></svg>Entrega <b>às quintas, 8h–16h</b> · retirada todo dia</span>
       </div>
       <div class="hero-act">
-        <a class="btn btn-p" href="#cardapio">Ver cardápio →</a>
+        <a class="btn btn-p" href="#cardapio">Ver cardápio</a>
         <a class="btn btn-o" href="https://wa.me/553137913010?text=Ol%C3%A1!%20Vim%20do%20site%20e%20quero%20fazer%20um%20pedido." target="_blank" rel="noopener">Chamar no WhatsApp</a>
       </div>
     </div>
@@ -291,8 +286,7 @@ footer p{max-width:560px;margin:8px auto 0}
 <section class="sec cardapio" id="cardapio">
   <div class="wrap">
     <div class="sec-hd">
-      <span class="eyebrow">Monte seu pedido</span>
-      <h2>Cardápio</h2>
+      <h2>Monte seu pedido</h2>
       <p>Escolha os itens, diga seu nome e se é retirada ou entrega. O pedido cai pronto no nosso WhatsApp, com tudo descrito e o valor a pagar.</p>
     </div>
 
@@ -314,17 +308,17 @@ footer p{max-width:560px;margin:8px auto 0}
       <p class="cat-note">O item que mais aparece nas avaliações dos clientes.</p>
       <div class="item" data-name="Coxinha de frango" data-price="8">
         <div class="item-ph"><img src="assets/coxinha.jpg" alt="Coxinha de frango (imagem ilustrativa)" loading="lazy" decoding="async"></div>
-        <div class="item-info"><h4>Coxinha de frango</h4><p>Feita na hora, casquinha crocante · imagem ilustrativa</p><div class="item-price">R$8,00</div></div>
+        <div class="item-info"><h4>Coxinha de frango</h4><p>Feita na hora, casquinha crocante</p><div class="item-price">R$8,00</div></div>
         <div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div>
       </div>
       <div class="item" data-name="Empada de frango" data-price="7">
         <div class="item-ph"><img src="assets/empada.jpg" alt="Empada de frango (imagem ilustrativa)" loading="lazy" decoding="async"></div>
-        <div class="item-info"><h4>Empada de frango</h4><p>Massa amanteigada, recheio generoso · imagem ilustrativa</p><div class="item-price">R$7,00</div></div>
+        <div class="item-info"><h4>Empada de frango</h4><p>Massa amanteigada, recheio generoso</p><div class="item-price">R$7,00</div></div>
         <div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div>
       </div>
       <div class="item" data-name="Kibe" data-price="7">
         <div class="item-ph"><img src="assets/kibe.jpg" alt="Kibe (imagem ilustrativa)" loading="lazy" decoding="async"></div>
-        <div class="item-info"><h4>Kibe</h4><p>Crocante por fora, suculento por dentro · imagem ilustrativa</p><div class="item-price">R$7,00</div></div>
+        <div class="item-info"><h4>Kibe</h4><p>Crocante por fora, suculento por dentro</p><div class="item-price">R$7,00</div></div>
         <div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div>
       </div>
       <div class="item" data-name="Pastel de queijo" data-price="7">
@@ -355,7 +349,7 @@ footer p{max-width:560px;margin:8px auto 0}
       <p class="cat-note">Fatia pra hoje ou bolo inteiro por encomenda.</p>
       <div class="item" data-name="Fatia de bolo de chocolate" data-price="9">
         <div class="item-ph"><img src="assets/bolo-chocolate.jpg" alt="Bolo de chocolate da vitrine" loading="lazy" decoding="async"></div>
-        <div class="item-info"><h4>Fatia de bolo de chocolate</h4><p>Cobertura cremosa · foto real da vitrine</p><div class="item-price">R$9,00</div></div>
+        <div class="item-info"><h4>Fatia de bolo de chocolate</h4><p>Cobertura cremosa</p><div class="item-price">R$9,00</div></div>
         <div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div>
       </div>
       <div class="item" data-name="Fatia de bolo de fubá" data-price="9">
@@ -364,12 +358,12 @@ footer p{max-width:560px;margin:8px auto 0}
       </div>
       <div class="item" data-name="Sonho recheado" data-price="8">
         <div class="item-ph"><img src="assets/sonho.jpg" alt="Sonho recheado da vitrine" loading="lazy" decoding="async"></div>
-        <div class="item-info"><h4>Sonho recheado</h4><p>Creme e cereja · foto real da vitrine</p><div class="item-price">R$8,00</div></div>
+        <div class="item-info"><h4>Sonho recheado</h4><p>Creme e cereja</p><div class="item-price">R$8,00</div></div>
         <div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div>
       </div>
       <div class="item" data-name="Cupcake gourmet" data-price="9">
         <div class="item-ph"><img src="assets/cupcake.jpg" alt="Cupcake gourmet da vitrine" loading="lazy" decoding="async"></div>
-        <div class="item-info"><h4>Cupcake gourmet</h4><p>Cobertura e cereja · foto real da vitrine</p><div class="item-price">R$9,00</div></div>
+        <div class="item-info"><h4>Cupcake gourmet</h4><p>Cobertura e cereja</p><div class="item-price">R$9,00</div></div>
         <div class="item-add"><button class="qty-btn minus" aria-label="Diminuir quantidade">−</button><span class="qty-val">0</span><button class="qty-btn plus" aria-label="Aumentar quantidade">+</button></div>
       </div>
     </section>
@@ -402,7 +396,6 @@ footer p{max-width:560px;margin:8px auto 0}
 
 <section class="sec destaque" id="destaque">
   <div class="wrap">
-    <span class="selo">Por que a vizinhança vem aqui</span>
     <div class="dest-top">
       <div class="dest-txt">
         <h2>Fornada nova antes de<br>Mariana acordar</h2>
@@ -420,7 +413,6 @@ footer p{max-width:560px;margin:8px auto 0}
     </div>
 
     <div class="res">
-      <div class="res-lbl">Feito e entregue aqui</div>
       <div class="res-g">
         <figure><img src="assets/hero.jpg" alt="Pão francês fresquinho" loading="lazy" decoding="async"><figcaption>fornada da manhã</figcaption></figure>
         <figure><img src="assets/equipe.jpg" alt="Entrega no balcão" loading="lazy" decoding="async"><figcaption>feito à mão, entregue à mão</figcaption></figure>
@@ -429,7 +421,6 @@ footer p{max-width:560px;margin:8px auto 0}
 
     <div class="pro-g">
       <div class="txt">
-        <div class="eyebrow">Perguntas frequentes</div>
         <h2>Dúvida antes de pedir?</h2>
         <p>Se a sua dúvida não estiver aqui, chama no WhatsApp que a gente responde na hora.</p>
       </div>
@@ -459,7 +450,6 @@ footer p{max-width:560px;margin:8px auto 0}
 <section class="sec galeria">
   <div class="wrap">
     <div class="sec-hd">
-      <span class="eyebrow">Direto da nossa vitrine</span>
       <h2>Feito aqui, todo dia</h2>
     </div>
     <div class="gal">
@@ -475,7 +465,6 @@ footer p{max-width:560px;margin:8px auto 0}
 <section class="sec sobre" id="sobre">
   <div class="wrap sobre-grid">
     <div>
-      <span class="eyebrow">Sobre a casa</span>
       <h2>Padaria de bairro, do jeito que devia ser</h2>
       <p>Quem entra vira cliente pelo nome, não pelo número da comanda. É esse cuidado que faz vizinho voltar toda semana e comentar na avaliação. 74 avaliações no Google somam nota 4,5, e no Instagram já são 2.488 seguidores reais.</p>
     </div>
@@ -490,7 +479,6 @@ footer p{max-width:560px;margin:8px auto 0}
 <section class="sec" id="visite">
   <div class="wrap">
     <div class="sec-hd">
-      <span class="eyebrow">Onde e quando</span>
       <h2>Passa na padaria</h2>
     </div>
     <div class="vis-g">
@@ -507,7 +495,7 @@ footer p{max-width:560px;margin:8px auto 0}
       <div class="vis-c addr">
         <h3>Endereço</h3>
         <p>R. do Catete, 500 — Mariana/MG</p>
-        <a href="https://www.google.com/maps/search/?api=1&query=R.+do+Catete,+500,+Mariana,+MG" target="_blank" rel="noopener">Ver no mapa →</a>
+        <a href="https://www.google.com/maps/search/?api=1&query=R.+do+Catete,+500,+Mariana,+MG" target="_blank" rel="noopener">Ver no mapa</a>
       </div>
     </div>
   </div>
@@ -517,7 +505,7 @@ footer p{max-width:560px;margin:8px auto 0}
   <div class="wrap">
     <h2>Bora pedir o pão de hoje?</h2>
     <p>Retirada a qualquer hora, ou entrega às quintas das 8h às 16h.</p>
-    <a class="btn btn-p" href="#cardapio">Montar meu pedido →</a>
+    <a class="btn btn-p" href="#cardapio">Montar meu pedido</a>
   </div>
 </section>
 
@@ -529,7 +517,7 @@ footer p{max-width:560px;margin:8px auto 0}
 <div class="cart-bar" id="cart-bar">
   <div class="cart-bar-row">
     <div class="info">PEDIDO<b id="cart-total">R$0,00</b></div>
-    <button class="cart-btn" id="cart-open">VER PEDIDO →</button>
+    <button class="cart-btn" id="cart-open">VER PEDIDO</button>
   </div>
 </div>
 
@@ -560,7 +548,7 @@ footer p{max-width:560px;margin:8px auto 0}
       <label for="f-notes">Observações (opcional)</label>
       <textarea id="f-notes" name="observacoes" rows="2" placeholder="Ex: sem cebola, campainha quebrada, tocar interfone…"></textarea>
     </div>
-    <button class="modal-send" id="modal-send">ENVIAR PEDIDO NO WHATSAPP →</button>
+    <button class="modal-send" id="modal-send">ENVIAR PEDIDO NO WHATSAPP</button>
   </div>
 </div>
 
