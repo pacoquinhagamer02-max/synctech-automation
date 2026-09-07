@@ -671,7 +671,7 @@ let pipelineData = [
   { stage: 'Proposta', leads: [] },
   { stage: 'Fechado', leads: [
     { name:'Moisés Martins',  biz:'Barbearia Martins — R$1.200 fixo + 10% (R$160) por prótese fechada via WhatsApp/Instagram', val:1200, time:'Cliente ativo', src:'wa', phone:'31982800596' },
-    { name:'Padaria Cantinho do Pão', biz:'Padaria Cantinho do Pão — Plano Pro: R$1.000/mês (tráfego pago + aplicativo personalizado)', val:1000, time:'Cliente ativo', src:'wa', phone:'553137913010' },
+    { name:'Padaria Cantinho do Pão', biz:'Padaria Cantinho do Pão — Plano Pro: R$1.000/mês (tráfego pago + aplicativo personalizado)', val:1000, time:'Contrato de 3 meses a assinar em 10/09/2026', src:'wa', phone:'553137913010' },
   ]},
 ];
 
@@ -1016,10 +1016,12 @@ let CLIENTS_FIXED = [
         { done:true, text:'Tráfego pago ligado — R$15–20/dia, raio 60km (Mariana + Ouro Preto/Itabirito/Congonhas), homens 30–55. Cobrança da gestão (R$297 setup + R$397/mês) ainda não decidida — hoje sem custo extra pra ela.' },
       ],
     }},
-    { name:'Padaria Cantinho do Pão', plan:'Plano Pro — R$1.000/mês + R$899 setup único (tráfego pago gerenciado + aplicativo personalizado)', links:[
+    { name:'Padaria Cantinho do Pão', plan:'Plano Pro — R$1.000/mês, contrato de 3 meses (assinatura prevista 10/09/2026) + R$899 de implantação já quitado. Verba de anúncio custeada pela cliente, direto na plataforma.', links:[
       { label:'Cardápio-app', url:'https://pacoquinhagamer02-max.github.io/cantinhodopao/' },
       { label:'WhatsApp', url:'https://wa.me/553137913010' },
       { label:'Instagram', url:'https://www.instagram.com/padaria__cantinho_do_pao/' },
+      { label:'Contrato', url:'https://claude.ai/code/artifact/3319631c-c16f-4d5b-a1c9-2062feb25819' },
+      { label:'Proposta', url:'https://claude.ai/code/artifact/96406329-605b-45b0-b6aa-71fb68fd54bd' },
     ],
     // Dados reais coletados do Google/Instagram durante a proposta, 05/09/2026 — foto do momento, não é live.
     stats: {
@@ -1027,26 +1029,29 @@ let CLIENTS_FIXED = [
       followers: 2488,
       googleRating: 4.5,
       googleReviews: 74,
+      // Só entra em "active" o que está de fato no ar e sendo entregue. O que está
+      // contratado mas ainda não ligado fica em "pending" — este bloco alimenta o
+      // relatório que a cliente recebe, então não pode inflar entrega.
       servicesUsed: {
         active: [
-          'Tráfego Pago (Meta Ads) — gerenciado, incluso no Plano Pro',
-          'Aplicativo Personalizado (cardápio-app com carrinho, checkout formatado direto no WhatsApp)',
-          'WhatsApp Bot 24/7',
-          'Agendamento Online',
-          'Instagram Automático',
-          'CRM com Pipeline',
-          'Gestão de Reputação',
-          'Email Marketing',
+          'Aplicativo Personalizado — cardápio-app no ar, com carrinho, encomenda de bolo e checkout formatado direto no WhatsApp',
         ],
-        pending: [],
-        notUsed: 'Conteúdo/Instagram fica por conta do próprio dono, por opção dele.',
+        pending: [
+          'Tráfego Pago (Meta Ads) — incluso no plano, campanha ainda não ativada (verba custeada pela cliente, direto na plataforma)',
+          'Medição de pedidos — registro implementado no app, falta criar a planilha e ligar a URL',
+          'Relatório mensal — começa no primeiro dia 30 após a assinatura',
+        ],
+        notUsed: 'WhatsApp Bot 24/7 (exige Z-API, serviço pago à parte) · Agendamento Online e Link na Bio (padaria não trabalha com horário marcado) · Instagram Automático, Gestão de Reputação e Email Marketing (não contratados) · Conteúdo de Instagram fica por conta da própria dona, por opção dela.',
       },
       actionPlan: [
         { done:true,  text:'Cardápio-app publicado com carrinho e checkout formatado direto no WhatsApp (nome, endereço, itens, total) — dois links no ar: domínio limpo (cantinhodopao) e o original (synctech-automation).' },
-        { done:true,  text:'PWA instalável adicionado (favicon, apple-touch-icon, manifest.json).' },
-        { done:true,  text:'Proposta fechada no Plano Pro — R$1.000/mês + R$899 setup.' },
-        { done:false, text:'Configurar e ativar a campanha de tráfego pago (Meta Ads) — segmentação geográfica pra quem já conhece a padaria mas não sabe que tem entrega.' },
-        { done:false, text:'Gerar fotos dos itens do cardápio ainda sem imagem (pastel de queijo, pão francês, pão de queijo, pão de forma integral, bolo de fubá, café coado, suco natural).' },
+        { done:true,  text:'App instalável na tela inicial do celular, com service worker e histórico de pedidos por aparelho.' },
+        { done:true,  text:'Encomenda de bolo inteiro: formulário com sabor, tamanho, data e escrita no bolo, sem preço fixo — pede orçamento e a padaria confirma.' },
+        { done:false, text:'ASSINAR o contrato de 3 meses (previsto para 10/09/2026) — proposta aceita, contrato ainda não assinado.' },
+        { done:false, text:'Ligar a medição de pedidos: criar a planilha, publicar o Apps Script e colar a URL em PEDIDOS_LOG_URL. Guia pronto em padaria-cantinho-do-pao/MEDICAO-DE-PEDIDOS.md.' },
+        { done:false, text:'Criar conta de anúncios separada no Business Manager da cliente, com o cartão dela, e ativar a campanha de tráfego pago — segmentação para quem já conhece a padaria mas não sabe que tem entrega.' },
+        { done:false, text:'Substituir as 3 fotos geradas por computador (coxinha, empada, kibe) e fotografar os 7 itens sem imagem (pastel de queijo, pão francês, pão de queijo, pão de forma integral, bolo de fubá, café coado, suco natural).' },
+        { done:false, text:'Definir taxa e área de entrega com a cliente — o app hoje aceita qualquer endereço, sem cobrar taxa.' },
       ],
     }},
   ];
