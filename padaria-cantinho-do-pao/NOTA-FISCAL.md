@@ -41,6 +41,34 @@ faturamento — é questão tributária de verdade, não uma escolha de
 ferramenta, e eu não vou arriscar te dar uma resposta errada sobre
 obrigação legal. O contador dela sabe exatamente o enquadramento dela.
 
+## Checklist pra levar pra ela (08/09/2026: ela já tem CNPJ; o resto ainda não foi confirmado)
+
+Três perguntas separadas — CNPJ sozinho não responde nenhuma delas:
+
+1. **"Você tem certificado digital A1 (às vezes chamado e-CNPJ)?"**
+   É um arquivo (`.pfx` ou `.p12`) com senha, não um cartão físico. Se ela
+   já emite qualquer nota fiscal eletrônica hoje — mesmo NF-e avulsa pra
+   outra empresa, não precisa ser NFC-e — ela já tem isso, e é só
+   perguntar pro contador onde está guardado.
+
+2. **"A empresa está credenciada pra emitir NFC-e na Sefaz-MG?"**
+   Essa é melhor perguntar direto pro contador — ele consulta isso rápido
+   num portal do governo. Ter CNPJ ou até ter certificado digital **não
+   confirma** isso; é um cadastro à parte, específico pra NFC-e.
+   Pergunta de sondagem: "hoje, quando você vende, sai algum cupom fiscal
+   de verdade (não recibo de caderno)?" — se sim, ela provavelmente já é
+   credenciada.
+
+3. **"Prefere qual emissor?"** — ainda em aberto, sem escolha ainda.
+   Entre os citados acima, pra um app pequeno e independente como este,
+   **Focus NFe e eNotas tendem a encaixar melhor** que Bling/Tiny: são
+   focados só em emissão (API simples de plugar), enquanto Bling/Tiny são
+   ERPs completos (estoque, financeiro, etc.) que duplicariam coisa que o
+   Hub da SyncTech já cobre. Isso é uma sugestão de encaixe técnico, não
+   recomendação de preço — comparem os planos atuais direto com cada um.
+
+Assim que tiver as 3 respostas, é só voltar aqui que eu sigo.
+
 ## Quando ela tiver isso resolvido
 
 Assim que a padaria tiver CNPJ credenciado, certificado digital e tiver
