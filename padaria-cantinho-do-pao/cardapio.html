@@ -829,10 +829,10 @@ const products = [
   { id:'coxinha',        name:'Coxinha de frango',          description:'Feita na hora, casquinha crocante',  price:8,  category:'salgados', image:'assets/coxinha.jpg',        badge:'Mais elogiado', ia:true },
   { id:'empada',         name:'Empada de frango',           description:'Massa amanteigada, recheio generoso',price:7,  category:'salgados', image:'assets/empada.jpg',         ia:true },
   { id:'kibe',           name:'Kibe',                       description:'Crocante por fora, suculento por dentro', price:7, category:'salgados', image:'assets/kibe.jpg',    ia:true },
-  { id:'pastel-queijo',  name:'Pastel de queijo',           description:'Assado, sem fritura',                price:7,  category:'salgados' },
+  { id:'pastel-queijo',  name:'Pastel de queijo',           description:'Assado, sem fritura',                price:7,  category:'salgados', image:'assets/pastel-queijo.jpg',  ia:true },
   { id:'pao-frances',    name:'Pão francês (unidade)',      description:'Quentinho, casca crocante',          price:1,  category:'paes',     image:'assets/hero.jpg',           badge:'Fornada 5h30' },
-  { id:'pao-de-queijo',  name:'Pão de queijo (6un)',        description:'Receita mineira, forno a lenha',     price:14, category:'paes' },
-  { id:'pao-integral',   name:'Pão de forma integral',      description:'Fatiado, sem conservantes',          price:12, category:'paes' },
+  { id:'pao-de-queijo',  name:'Pão de queijo (6un)',        description:'Receita mineira, forno a lenha',     price:14, category:'paes',     image:'assets/pao-de-queijo.jpg',  ia:true },
+  { id:'pao-integral',   name:'Pão de forma integral',      description:'Fatiado, sem conservantes',          price:12, category:'paes',     image:'assets/pao-integral.jpg',   ia:true },
   { id:'bolo-chocolate', name:'Fatia de bolo de chocolate', description:'Cobertura cremosa',                  price:9,  category:'doces',    image:'assets/bolo-chocolate.jpg', badge:'Elogiado' },
   { id:'bolo-fuba',      name:'Fatia de bolo de fubá',      description:'Com queijo, receita da casa',        price:9,  category:'doces' },
   { id:'sonho',          name:'Sonho recheado',             description:'Creme e cereja',                     price:8,  category:'doces',    image:'assets/sonho.jpg',          badge:'Elogiado' },
@@ -1434,8 +1434,9 @@ document.getElementById('visita-whats').href = wa('Olá! Vim pelo cardápio e qu
 document.getElementById('rodape').innerHTML =
   '© ' + new Date().getFullYear() + ' Padaria Cantinho do Pão · R. do Catete, 500 — Mariana/MG<br>' +
   'As fotos do pão, do bolo de chocolate, do sonho, do cupcake e do balcão são reais, tiradas do Instagram oficial ' +
-  '(@padaria__cantinho_do_pao). As fotos de salgados marcadas “imagem ilustrativa” (coxinha, empada, kibe) são geradas ' +
-  'por computador só pra exemplo. Itens sem foto aparecem com o nome da categoria.<br>' +
+  '(@padaria__cantinho_do_pao). As fotos marcadas “imagem ilustrativa” (coxinha, empada, kibe, pastel de queijo, ' +
+  'pão de queijo e pão de forma integral) são geradas por computador só pra exemplo. Itens sem foto aparecem com ' +
+  'o nome da categoria.<br>' +
   'Cardápio digital por SyncTech Automation.';
 
 /* ═══════════════════════════════════════════════════════════
