@@ -1,0 +1,326 @@
+<title>Ficha de Vistoria — Cantinho do Pão</title>
+<style>
+:root {
+  --paper: #EDF1EA;
+  --paper-2: #E4EAE0;
+  --paper-3: #DCE4D6;
+  --rule: #C7D0BE;
+  --rule-soft: #D6DECE;
+  --ink: #1D2A21;
+  --ink-soft: #55635A;
+  --ink-faint: #7C897F;
+  --accent: #2C3E5C;
+  --accent-soft: #2C3E5C1A;
+  --ok: #2F6B45;
+  --ok-bg: #2F6B451A;
+  --wait: #9A6B1E;
+  --wait-bg: #9A6B1E1A;
+  --act: #9A3324;
+  --act-bg: #9A33241A;
+  --mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', monospace;
+  --sans: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #141A17;
+    --paper-2: #1B231D;
+    --paper-3: #212B23;
+    --rule: #37453A;
+    --rule-soft: #2B372F;
+    --ink: #DCE5D8;
+    --ink-soft: #9FAFA0;
+    --ink-faint: #708072;
+    --accent: #8FA6CC;
+    --accent-soft: #8FA6CC22;
+    --ok: #6FBE8A;
+    --ok-bg: #6FBE8A1F;
+    --wait: #E0AE55;
+    --wait-bg: #E0AE551F;
+    --act: #E0897A;
+    --act-bg: #E0897A1F;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #141A17;
+  --paper-2: #1B231D;
+  --paper-3: #212B23;
+  --rule: #37453A;
+  --rule-soft: #2B372F;
+  --ink: #DCE5D8;
+  --ink-soft: #9FAFA0;
+  --ink-faint: #708072;
+  --accent: #8FA6CC;
+  --accent-soft: #8FA6CC22;
+  --ok: #6FBE8A;
+  --ok-bg: #6FBE8A1F;
+  --wait: #E0AE55;
+  --wait-bg: #E0AE551F;
+  --act: #E0897A;
+  --act-bg: #E0897A1F;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 15.5px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+.sheet { max-width: 760px; margin: 0 auto; padding: 48px 24px 80px; }
+@media (max-width: 620px) { .sheet { padding: 32px 16px 64px; } }
+
+.eyebrow {
+  font-family: var(--mono); font-size: .72rem; font-weight: 500;
+  letter-spacing: .11em; text-transform: uppercase; color: var(--accent);
+}
+
+/* ── Cabeçalho ── */
+.head { border-bottom: 2px solid var(--ink); padding-bottom: 22px; margin-bottom: 28px; }
+.head-top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+h1 {
+  font-size: clamp(1.7rem, 5vw, 2.15rem); font-weight: 700; letter-spacing: -0.01em;
+  margin: 10px 0 0; text-wrap: balance; line-height: 1.15;
+}
+.head-meta {
+  margin-top: 14px; display: flex; gap: 18px; flex-wrap: wrap;
+  font-family: var(--mono); font-size: .78rem; color: var(--ink-soft);
+}
+.head-meta b { color: var(--ink); font-weight: 500; }
+
+/* ── Tira de resumo ── */
+.stats {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px;
+  background: var(--rule); border: 1px solid var(--rule); border-radius: 10px;
+  overflow: hidden; margin-bottom: 32px;
+}
+@media (max-width: 560px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+.stat { background: var(--paper-2); padding: 16px 14px; }
+.stat .n {
+  font-family: var(--mono); font-size: 1.7rem; font-weight: 500;
+  font-variant-numeric: tabular-nums; line-height: 1;
+}
+.stat .l { margin-top: 7px; font-size: .74rem; color: var(--ink-soft); line-height: 1.35; }
+.stat.act .n { color: var(--act); } .stat.wait .n { color: var(--wait); }
+.stat.comigo .n { color: var(--accent); } .stat.ok .n { color: var(--ok); }
+
+/* ── Ordem recomendada ── */
+.ordem { background: var(--paper-2); border: 1px solid var(--rule); border-radius: 12px; padding: 22px 22px 20px; margin-bottom: 40px; }
+.ordem h2 { font-size: 1.02rem; margin: 8px 0 14px; }
+.ordem ol { margin: 0; padding: 0; list-style: none; counter-reset: passo; }
+.ordem li {
+  counter-increment: passo; display: flex; gap: 12px; padding: 9px 0;
+  border-top: 1px solid var(--rule-soft);
+}
+.ordem li:first-child { border-top: none; }
+.ordem li::before {
+  content: counter(passo); font-family: var(--mono); font-size: .78rem; font-weight: 500;
+  color: var(--accent); background: var(--accent-soft); border-radius: 999px;
+  width: 22px; height: 22px; flex: 0 0 auto; display: grid; place-items: center;
+  margin-top: 1px;
+}
+.ordem li span { font-size: .93rem; }
+
+/* ── Frentes ── */
+.frente { margin-bottom: 36px; }
+.frente-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 14px; }
+.frente-head h2 { font-size: 1.08rem; font-weight: 600; margin: 0; }
+
+.item {
+  display: grid; grid-template-columns: auto 1fr; gap: 4px 14px;
+  padding: 14px 0; border-top: 1px solid var(--rule-soft);
+}
+.item:first-child { border-top: none; }
+.chip {
+  font-family: var(--mono); font-size: .68rem; font-weight: 500; letter-spacing: .04em;
+  text-transform: uppercase; padding: 3px 8px; border-radius: 5px; white-space: nowrap;
+  height: fit-content; align-self: start; grid-row: 1;
+}
+.chip.act { color: var(--act); background: var(--act-bg); }
+.chip.wait { color: var(--wait); background: var(--wait-bg); }
+.chip.comigo { color: var(--accent); background: var(--accent-soft); }
+.item-title { font-weight: 600; font-size: .96rem; grid-column: 2; grid-row: 1; }
+.item-detail { grid-column: 2; grid-row: 2; font-size: .88rem; color: var(--ink-soft); line-height: 1.5; }
+.item-detail code {
+  font-family: var(--mono); font-size: .82em; background: var(--paper-3);
+  padding: 1px 5px; border-radius: 4px; color: var(--ink);
+}
+
+/* ── Feito (recapitulação) ── */
+.feito-box { background: var(--ok-bg); border: 1px solid color-mix(in srgb, var(--ok) 35%, var(--rule)); border-radius: 12px; padding: 20px 22px; }
+.feito-box h2 { font-size: 1.02rem; margin: 0 0 12px; color: var(--ok); }
+.feito-lista { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+.feito-lista li { font-size: .88rem; padding-left: 20px; position: relative; }
+.feito-lista li::before {
+  content: '✓'; position: absolute; left: 0; top: 1px; color: var(--ok);
+  font-weight: 700; font-size: .82rem;
+}
+
+/* ── Rodapé ── */
+.rodape {
+  margin-top: 48px; padding-top: 20px; border-top: 2px solid var(--ink);
+  font-size: .82rem; color: var(--ink-soft); line-height: 1.6;
+}
+.rodape b { color: var(--ink); }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<div class="sheet">
+
+  <header class="head">
+    <div class="head-top">
+      <span class="eyebrow">Ficha de vistoria operacional</span>
+    </div>
+    <h1>O que falta pra automatizar o Cantinho do Pão de ponta a ponta</h1>
+    <div class="head-meta">
+      <span>Vistoriado por <b>SyncTech Automation</b></span>
+      <span>08/09/2026</span>
+      <span>Cobre o app do cardápio + os processos do contrato</span>
+    </div>
+  </header>
+
+  <div class="stats">
+    <div class="stat act"><div class="n">4</div><div class="l">Ação sua</div></div>
+    <div class="stat wait"><div class="n">6</div><div class="l">Aguardando resposta da dona</div></div>
+    <div class="stat comigo"><div class="n">5</div><div class="l">Comigo, sem bloqueio</div></div>
+    <div class="stat ok"><div class="n">8</div><div class="l">Já entregue e no ar</div></div>
+  </div>
+
+  <section class="ordem">
+    <span class="eyebrow">Por onde começar</span>
+    <h2>Ordem recomendada</h2>
+    <ol>
+      <li><span><b>Assinar o contrato de 3 meses</b> (previsto 10/09) — é o que destrava tudo formal: cobrança, relatório, verba.</span></li>
+      <li><span>Na mesma reunião de quinta, <b>perguntar as 6 coisas da lista "aguardando resposta"</b> de uma vez — não precisa ser 6 conversas separadas.</span></li>
+      <li><span><b>Criar a planilha de medição de pedidos</b> e colar a URL — sem isso não existe dado real de venda pra alimentar nenhum dos outros itens.</span></li>
+      <li><span><b>Separar a conta de anúncio</b> dela no Business Manager, só depois de assinado (pra não gastar verba sem contrato).</span></li>
+      <li><span>Eu <b>sincronizo o painel do Hub</b> e <b>amplio o relatório mensal automático</b> pra cobrir a padaria, antes do dia 30.</span></li>
+      <li><span>Conforme as respostas da dona chegam (nota fiscal, chave Pix, taxa de entrega), eu vou <b>implementando cada uma</b> — nenhuma delas depende de código novo grande.</span></li>
+    </ol>
+  </section>
+
+  <section class="frente">
+    <div class="frente-head">
+      <span class="eyebrow">Frente</span><h2>Ação sua</h2>
+    </div>
+
+    <div class="item">
+      <span class="chip act">ação sua</span>
+      <div class="item-title">Separar a conta de anúncio dela no Business Manager</div>
+      <div class="item-detail">Hoje o tráfego pago (R$15–20/dia) roda numa conta compartilhada com a Barbearia Martins. Sem conta própria, não dá pra medir CPA por cliente nem fechar a cobrança de gestão de tráfego direito.</div>
+    </div>
+    <div class="item">
+      <span class="chip act">ação sua</span>
+      <div class="item-title">Assinar o contrato de 3 meses</div>
+      <div class="item-detail">Previsto pra 10/09/2026 — proposta já aceita, falta a assinatura formal. Toda a parte de cobrança e relatório mensal depende disso.</div>
+    </div>
+    <div class="item">
+      <span class="chip act">ação sua</span>
+      <div class="item-title">Criar a planilha de medição de pedidos</div>
+      <div class="item-detail">Guia pronto em <code>MEDICAO-DE-PEDIDOS.md</code> — cria a planilha, cola o Apps Script, publica, e cola a URL em <code>PEDIDOS_LOG_URL</code> no app. É o item que mais destrava outros (break-even real, itens campeões, CPA por pedido).</div>
+    </div>
+    <div class="item">
+      <span class="chip act">ação sua</span>
+      <div class="item-title">Domínio próprio</div>
+      <div class="item-detail">O link "limpo" ainda carrega <code>pacoquinhagamer02-max</code> no meio. Falta o token de acesso do Netlify (nunca fornecido) ou comprar um domínio (~R$40/ano) — decisão e compra são suas.</div>
+    </div>
+  </section>
+
+  <section class="frente">
+    <div class="frente-head">
+      <span class="eyebrow">Frente</span><h2>Aguardando resposta da dona</h2>
+    </div>
+
+    <div class="item">
+      <span class="chip wait">aguardando</span>
+      <div class="item-title">Qual sistema emite a nota fiscal das vendas locais</div>
+      <div class="item-detail">Ela já emite no balcão, o que indica certificado digital e credenciamento na Sefaz-MG resolvidos. Falta saber se é um emissor em nuvem com API (reaproveita direto) ou um SAT/impressora física (precisaria de um segundo emissor só pro app).</div>
+    </div>
+    <div class="item">
+      <span class="chip wait">aguardando</span>
+      <div class="item-title">Taxa e área de entrega</div>
+      <div class="item-detail">O checkout aceita qualquer endereço, sem cobrar taxa nem checar raio. Achado na auditoria de CRO — segue sem definição.</div>
+    </div>
+    <div class="item">
+      <span class="chip wait">aguardando</span>
+      <div class="item-title">Valor mínimo de pedido pra entrega</div>
+      <div class="item-detail">Hoje dá pra pedir R$1 de pão francês com entrega de quinta-feira.</div>
+    </div>
+    <div class="item">
+      <span class="chip wait">aguardando</span>
+      <div class="item-title">Ticket médio e margem reais</div>
+      <div class="item-detail">A conta de break-even da proposta (67 a 87 pedidos/mês pra pagar o fee) ainda usa estimativa minha — R$30 de ticket, 50% de margem — tirada dos preços do cardápio, não dado dela.</div>
+    </div>
+    <div class="item">
+      <span class="chip wait">aguardando</span>
+      <div class="item-title">3 itens campeões de venda de verdade</div>
+      <div class="item-detail">A faixa "Mais elogiados" hoje é honestamente baseada em reviews, não em venda. Com o dado real vira "Mais pedidos" — que converte mais e continua sendo verdade.</div>
+    </div>
+    <div class="item">
+      <span class="chip wait">aguardando</span>
+      <div class="item-title">Chave Pix</div>
+      <div class="item-detail">O QR de pagamento já está pronto e testado no código (<code>PIX_CHAVE</code>). Só falta ela informar a chave — qualquer tipo (CPF, CNPJ, e-mail, telefone, aleatória).</div>
+    </div>
+  </section>
+
+  <section class="frente">
+    <div class="frente-head">
+      <span class="eyebrow">Frente</span><h2>Comigo, sem bloqueio</h2>
+    </div>
+
+    <div class="item">
+      <span class="chip comigo">comigo</span>
+      <div class="item-title">Ampliar o relatório mensal automático pra cobrir a padaria</div>
+      <div class="item-detail">Achado nesta análise: a tarefa agendada <code>synctech-relatorio-mensal</code> (todo dia 30) só recoleta dados da Barbearia Martins hoje. Não existe nada configurado pra puxar os dados da padaria — precisa ser ampliada antes do próximo dia 30, e vai depender da planilha de pedidos existir primeiro.</div>
+    </div>
+    <div class="item">
+      <span class="chip comigo">comigo</span>
+      <div class="item-title">Sincronizar o painel do Hub com o estado real</div>
+      <div class="item-detail">O card da padaria em <code>app/index.html</code> ainda lista "3 fotos geradas + 7 faltando" (na real são 3 restantes agora) e não menciona o Pix, a acessibilidade nem o checklist de nota fiscal. Esse painel alimenta o relatório que ela recebe.</div>
+    </div>
+    <div class="item">
+      <span class="chip comigo">comigo</span>
+      <div class="item-title">Retomar as 3 fotos de produto que faltam</div>
+      <div class="item-detail">Bolo de fubá, café coado e suco natural — bateu o limite diário de geração de imagem na sessão anterior. Retomável a qualquer momento.</div>
+    </div>
+    <div class="item">
+      <span class="chip comigo">comigo</span>
+      <div class="item-title">Ícone do PWA em resolução maior</div>
+      <div class="item-detail">Hoje é 150×150 real (lido do próprio logo). Um ícone 192/512 melhoraria o critério de instalação do navegador.</div>
+    </div>
+    <div class="item">
+      <span class="chip comigo">comigo</span>
+      <div class="item-title">Backlog de CRO ainda não implementado</div>
+      <div class="item-detail">Cardápio esconde categoria atrás de aba em vez de rolagem única (café e suco ficam escondidos); falta sugestão de "vai bem junto" no checkout.</div>
+    </div>
+  </section>
+
+  <section class="feito-box">
+    <h2>Já entregue e funcionando</h2>
+    <ul class="feito-lista">
+      <li>App publicado nos 2 links, PWA instalável, service worker em v5</li>
+      <li>Carrinho persistente, nome e endereço lembrados, confirmação depois do envio</li>
+      <li>Encomenda de bolo inteiro com formulário completo (sabor, tamanho, data, escrita)</li>
+      <li>QR de pagamento Pix funcional no código — só falta a chave dela</li>
+      <li>Auditoria de acessibilidade WCAG 2.2 — bug real de foco no teclado achado e corrigido</li>
+      <li>10 de 13 itens do cardápio já com foto</li>
+      <li>Tráfego pago já ligado pra padaria (R$15–20/dia) — numa conta a separar, ver ação sua</li>
+      <li>Landing da SyncTech reescrita com todos os dados reais migrados</li>
+    </ul>
+  </section>
+
+  <p class="rodape">
+    <b>Metodologia:</b> esta ficha cruza o estado atual do código (<code>cardapio.html</code>, <code>app/index.html</code>, a tarefa agendada <code>synctech-relatorio-mensal</code>) com o histórico desta conversa e a memória do projeto. Todo item marcado como pendente foi conferido no arquivo real antes de entrar aqui — nada aqui é lembrança não verificada.
+  </p>
+
+</div>
