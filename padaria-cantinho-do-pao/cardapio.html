@@ -441,6 +441,18 @@ a { color: inherit; }
 
 .vazio-msg { text-align: center; color: hsl(var(--muted-foreground)); padding: 30px 0; font-size: .92rem; }
 
+.pix-box {
+  display: grid; justify-items: center; gap: 12px; text-align: center;
+  border: 1px solid hsl(var(--border)); background: hsl(var(--muted));
+  border-radius: 16px; padding: 18px; margin-bottom: 18px;
+}
+.pix-box[hidden] { display: none; }
+.pix-head { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: .92rem; }
+.pix-head .ico { color: hsl(var(--primary)); }
+.pix-qr-wrap { background: #fff; padding: 10px; border-radius: 12px; line-height: 0; }
+.pix-qr-wrap svg { display: block; width: 168px; height: 168px; }
+.pix-copiado { color: hsl(var(--whatsapp)); }
+
 .campo { display: grid; gap: 7px; }
 .campo label { font-size: .84rem; font-weight: 600; }
 .campo input, .campo textarea, .campo select {
@@ -750,6 +762,16 @@ a { color: inherit; }
   <div class="drawer-body" id="drawer-body">
     <div id="linhas"></div>
 
+    <div class="pix-box" id="pix-box" hidden>
+      <p class="pix-head">
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.2"/><rect x="14" y="3" width="7" height="7" rx="1.2"/><rect x="3" y="14" width="7" height="7" rx="1.2"/><path d="M14 14h3v3h-3zM20 14v3M14 20h3M20 20v.01"/></svg>
+        Pagar com Pix — <span id="pix-valor">R$ 0,00</span>
+      </p>
+      <div class="pix-qr-wrap" id="pix-qr" aria-hidden="true"></div>
+      <button type="button" class="btn btn-outline" id="pix-copiar" style="width:100%">Copiar código Pix</button>
+      <p class="foot-nota">Depois de pagar, toque em "Enviar pedido" pra avisar a padaria.</p>
+    </div>
+
     <div id="drawer-form" hidden>
       <div class="campo" style="margin-bottom:18px">
         <label id="modo-label">Como você quer receber</label>
@@ -842,6 +864,7 @@ a { color: inherit; }
   <p class="foot-nota">O valor depende do sabor e do tamanho — a gente responde com o preço e o prazo.</p>
 </div>
 
+<script src="assets/qrcode-lib.js"></script>
 <script>
 (function(){
 'use strict';
@@ -850,6 +873,18 @@ a { color: inherit; }
    DADOS — preços reais da padaria, não alterar sem falar com ela
    ═══════════════════════════════════════════════════════════ */
 const WHATSAPP = '553137913010';
+
+/* Chave Pix da padaria. Vazio = a seção de pagamento fica escondida e
+   tudo continua igual a antes (combinar no WhatsApp). Guia completo em
+   PIX-QR-CODE.md — é só colar a chave aqui e sincronizar.
+   Aceita qualquer tipo: CPF, CNPJ, e-mail, telefone ou chave aleatória. */
+const PIX_CHAVE = '';
+/* Nome e cidade que aparecem no QR (padrão Pix: só A-Z 0-9 espaço, sem
+   acento — normalizado sozinho por paraPixTexto()). Bancos modernos
+   confirmam o nome de verdade do dono da chave direto no Banco Central
+   na hora de pagar, então esse campo é só um rótulo de exibição. */
+const PIX_NOME = 'Cantinho do Pao';
+const PIX_CIDADE = 'Mariana';
 
 /* Cole aqui a URL do Apps Script pra registrar os pedidos numa planilha.
    Vazio = tudo continua funcionando, só não registra nada.
@@ -1001,6 +1036,90 @@ function mensagemEncomenda(enc){
   l.push('', '*Nome:* ' + enc.nome);
   return l.join('\n');
 }
+/* ── PIX (BR Code / EMV, padrão Banco Central) ──
+   Gera um "Pix Copia e Cola" com QR, com o valor do pedido já
+   preenchido. Roda inteiramente no navegador — nenhuma chave, senha
+   ou dado bancário sai daqui. É Pix ESTÁTICO: sem integração com um
+   PSP não existe confirmação automática de pagamento — a padaria
+   confere o recebimento no próprio banco antes de preparar o pedido,
+   do mesmo jeito que já faz com qualquer Pix recebido hoje. */
+function paraPixTexto(s, max){
+  const limpo = s.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .toUpperCase().replace(/[^A-Z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
+  return limpo.slice(0, max);
+}
+function campoEMV(id, valor){
+  return id + String(valor.length).padStart(2, '0') + valor;
+}
+function crc16(texto){
+  let crc = 0xFFFF;
+  for (let i = 0; i < texto.length; i++){
+    crc ^= texto.charCodeAt(i) << 8;
+    for (let b = 0; b < 8; b++){
+      crc = (crc & 0x8000) ? ((crc << 1) ^ 0x1021) : (crc << 1);
+      crc &= 0xFFFF;
+    }
+  }
+  return crc.toString(16).toUpperCase().padStart(4, '0');
+}
+function pixPayload(valor){
+  const valorFmt = (Math.round(valor * 100) / 100).toFixed(2);
+  const infoConta = campoEMV('00', 'BR.GOV.BCB.PIX') + campoEMV('01', PIX_CHAVE.trim());
+  let p =
+    campoEMV('00', '01') +                                    // formato do payload
+    campoEMV('01', '12') +                                    // QR de uso único (tem valor fixo)
+    campoEMV('26', infoConta) +                                // conta Pix
+    campoEMV('52', '0000') +                                   // categoria do comerciante
+    campoEMV('53', '986') +                                    // moeda: real
+    campoEMV('54', valorFmt) +                                 // valor do pedido
+    campoEMV('58', 'BR') +                                     // país
+    campoEMV('59', paraPixTexto(PIX_NOME, 25) || 'PADARIA') +  // nome do recebedor
+    campoEMV('60', paraPixTexto(PIX_CIDADE, 15) || 'BRASIL') + // cidade
+    campoEMV('62', campoEMV('05', '***'));                     // sem identificador de cobrança
+  p += '6304';
+  return p + crc16(p);
+}
+
+function renderPix(valor){
+  const caixa = document.getElementById('pix-box');
+  if (!PIX_CHAVE.trim() || !(valor > 0)) { caixa.hidden = true; return; }
+  caixa.hidden = false;
+  document.getElementById('pix-valor').textContent = formatBRL(valor);
+  const payload = pixPayload(valor);
+  const qr = qrcode(0, 'M');
+  qr.addData(payload);
+  qr.make();
+  document.getElementById('pix-qr').innerHTML = qr.createSvgTag({ scalable: true });
+  const btn = document.getElementById('pix-copiar');
+  btn.onclick = function(){
+    copiarTexto(payload).then(function(){
+      const original = btn.textContent;
+      btn.textContent = 'Código copiado!';
+      btn.classList.add('pix-copiado');
+      setTimeout(function(){ btn.textContent = original; btn.classList.remove('pix-copiado'); }, 2200);
+    });
+  };
+}
+function copiarTexto(texto){
+  if (navigator.clipboard && window.isSecureContext) {
+    return navigator.clipboard.writeText(texto).catch(function(){ return copiarTextoAntigo(texto); });
+  }
+  return copiarTextoAntigo(texto);
+}
+function copiarTextoAntigo(texto){
+  return new Promise(function(resolve){
+    const area = document.createElement('textarea');
+    area.value = texto;
+    area.style.position = 'fixed';
+    area.style.opacity = '0';
+    document.body.appendChild(area);
+    area.select();
+    try { document.execCommand('copy'); } catch(e){ console.error('Falha ao copiar código Pix:', e); }
+    document.body.removeChild(area);
+    resolve();
+  });
+}
+
 function abrirWhatsApp(url){
   const janela = window.open(url, '_blank');
   if (!janela) window.location.href = url;   // popup bloqueado
@@ -1147,6 +1266,7 @@ function pintarDrawer(){
   elTotal.textContent = formatBRL(t);
   elEnviar.disabled = ls.length === 0;
   elForm.hidden = ls.length === 0;
+  renderPix(t);
 
   if (ls.length === 0) {
     elLinhas.innerHTML = '<p class="vazio-msg">Seu pedido está vazio.<br>Escolha os itens no cardápio.</p>';
