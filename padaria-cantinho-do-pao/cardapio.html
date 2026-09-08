@@ -274,6 +274,11 @@ footer{padding:26px 0 10px;text-align:center;color:var(--dim);font-size:0.78rem;
 footer p{max-width:560px;margin:8px auto 0}
 
 /* ── PEDIDOS (tela Pedidos) ── */
+.pedido-ok{display:flex;gap:12px;align-items:flex-start;background:var(--bg2);border:1px solid var(--line-strong);border-left:4px solid var(--ember);padding:16px 18px;margin-bottom:22px}
+.pedido-ok[hidden]{display:none}
+.pedido-ok svg{width:22px;height:22px;flex:0 0 22px;color:var(--ember);margin-top:2px}
+.pedido-ok b{display:block;margin-bottom:3px}
+.pedido-ok span{color:var(--mut);font-size:.92rem;line-height:1.45}
 .pedidos-empty{text-align:center;padding:50px 20px;color:var(--mut)}
 .pedidos-empty p{margin-bottom:18px}
 .pedidos-list{display:flex;flex-direction:column;gap:14px}
@@ -534,6 +539,10 @@ footer p{max-width:560px;margin:8px auto 0}
         <h2>Meus pedidos</h2>
         <p>Pedidos feitos por aqui, guardados neste aparelho.</p>
       </div>
+      <div class="pedido-ok" id="pedido-ok" role="status" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+        <div><b>Pedido enviado!</b><span>Agora é só confirmar o horário e o pagamento no WhatsApp. Ele também ficou salvo aqui embaixo.</span></div>
+      </div>
       <div class="pedidos-empty" id="pedidos-empty">
         <p>Você ainda não fez nenhum pedido por aqui. Bora montar o primeiro?</p>
         <button type="button" class="btn btn-p" data-goto="cardapio">Ver cardápio</button>
@@ -789,6 +798,8 @@ footer p{max-width:560px;margin:8px auto 0}
 (function(){
   const WHATSAPP = '553137913010';
   const PEDIDOS_KEY = 'cantinho_pedidos';
+  const CART_KEY = 'cantinho_carrinho';
+  const NOME_KEY = 'cantinho_nome';
   // Cole aqui a URL do Apps Script pra registrar os pedidos numa planilha.
   // Vazio = tudo continua funcionando, só não registra nada.
   const PEDIDOS_LOG_URL = '';
@@ -820,6 +831,7 @@ footer p{max-width:560px;margin:8px auto 0}
     });
     window.scrollTo(0, 0);
     if (name === 'pedidos') renderPedidos();
+    else document.getElementById('pedido-ok').hidden = true;
   }
   document.querySelectorAll('[data-goto]').forEach(function(el){
     el.addEventListener('click', function(){ switchView(el.dataset.goto); });
@@ -859,8 +871,29 @@ footer p{max-width:560px;margin:8px auto 0}
     });
     if (qty > 0) cart[name] = { qty: qty, price: price };
     else delete cart[name];
+    saveCart();
     renderCart();
     if (overlay.classList.contains('show')) renderModalSummary();
+  }
+
+  /* ── CARRINHO QUE SOBREVIVE A FECHAR O APP ──
+     Sem isso, quem monta o pedido e sai (uma ligação, outro app) volta pro
+     carrinho vazio e precisa refazer tudo — abandono puro no celular. */
+  function saveCart(){
+    try { localStorage.setItem(CART_KEY, JSON.stringify(cart)); }
+    catch(e){ console.error('Falha ao salvar carrinho:', e); }
+  }
+  function restoreCart(){
+    let saved;
+    try { saved = JSON.parse(localStorage.getItem(CART_KEY)) || {}; }
+    catch(e){ console.error('Falha ao ler carrinho salvo:', e); return; }
+    Object.keys(saved).forEach(function(name){
+      let els = itemEls[name];
+      if (!els || !els.length) return; // item saiu do cardápio desde a última visita
+      let qty = Math.max(0, Math.min(99, parseInt(saved[name] && saved[name].qty, 10) || 0));
+      // o preço vem sempre do cardápio de agora, nunca do que ficou salvo
+      if (qty > 0) setQty(name, parseFloat(els[0].dataset.price), qty);
+    });
   }
 
   function cartTotals(){
@@ -881,10 +914,20 @@ footer p{max-width:560px;margin:8px auto 0}
   }
 
   const overlay = document.getElementById('modal-overlay');
-  document.getElementById('cart-open').addEventListener('click', function(){
+  /* Abre o checkout já com o nome de quem pediu da última vez: o cliente
+     recorrente confere e manda, em vez de digitar o nome todo pedido. */
+  function openCheckout(){
+    let nameInput = document.getElementById('f-name');
+    if (!nameInput.value.trim()) {
+      try {
+        let salvo = localStorage.getItem(NOME_KEY);
+        if (salvo) nameInput.value = salvo;
+      } catch(e){ console.error('Falha ao ler nome salvo:', e); }
+    }
     renderModalSummary();
     overlay.classList.add('show');
-  });
+  }
+  document.getElementById('cart-open').addEventListener('click', openCheckout);
   function closeModal(){ overlay.classList.remove('show'); }
   document.getElementById('modal-close').addEventListener('click', closeModal);
   overlay.addEventListener('click', function(e){ if (e.target === overlay) closeModal(); });
@@ -978,8 +1021,7 @@ footer p{max-width:560px;margin:8px auto 0}
         let order = list[parseInt(btn.dataset.idx, 10)];
         order.items.forEach(function(it){ setQty(it.name, it.price, it.qty); });
         switchView('cardapio');
-        renderModalSummary();
-        overlay.classList.add('show');
+        openCheckout();
       });
     });
   }
@@ -1035,18 +1077,29 @@ footer p{max-width:560px;margin:8px auto 0}
       total: t.total,
       observacoes: notes
     });
+    // Grava antes de abrir o WhatsApp: quando o popup é bloqueado, openWhatsApp
+    // troca a página e pode levar embora o resto do handler.
+    savePedido({ date: new Date().toISOString(), items: orderItems, total: t.total, mode: deliveryMode, name: name });
+    try { localStorage.setItem(NOME_KEY, name); } catch(e){ console.error('Falha ao salvar nome:', e); }
+
     openWhatsApp(buildWhatsAppUrl(WHATSAPP, buildOrderMessage(order)));
 
-    savePedido({ date: new Date().toISOString(), items: orderItems, total: t.total, mode: deliveryMode, name: name });
     orderItems.forEach(function(it){ setQty(it.name, it.price, 0); });
     closeModal();
     nameInput.value = '';
     addressInput.value = '';
     document.getElementById('f-notes').value = '';
+
+    // Fecha o ciclo: sem isso o cliente cai de volta no cardápio sem saber se enviou.
+    document.getElementById('pedido-ok').hidden = false;
+    switchView('pedidos');
   });
 
   document.getElementById('f-name').addEventListener('input', function(){ setFieldError('f-name-field', false); });
   addressInput.addEventListener('input', function(){ setFieldError('f-address-field', false); });
+
+  // Só aqui: restoreCart usa setQty, que depende de itemEls e de overlay.
+  restoreCart();
 
   /* ── ENCOMENDA DE BOLO ── */
   (function(){
