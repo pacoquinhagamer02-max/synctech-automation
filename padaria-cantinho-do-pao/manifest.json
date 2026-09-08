@@ -7,9 +7,14 @@
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#FBF8F4",
-  "theme_color": "#84411F",
+  "theme_color": "#FBF8F4",
   "lang": "pt-BR",
   "icons": [
-    { "src": "assets/logo.jpg", "sizes": "150x150", "type": "image/jpeg", "purpose": "any" }
+    {
+      "src": "assets/logo.jpg",
+      "sizes": "150x150",
+      "type": "image/jpeg",
+      "purpose": "any"
+    }
   ]
 }

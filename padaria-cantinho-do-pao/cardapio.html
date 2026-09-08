@@ -16,7 +16,7 @@
 <meta name="twitter:card" content="summary_large_image">
 
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#84411F">
+<meta name="theme-color" content="#FBF8F4">
 <link rel="apple-touch-icon" href="assets/logo.jpg">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -50,6 +50,10 @@
   --crust: 24 58% 26%;
   --butter: 42 92% 88%;
   --whatsapp: 142 60% 38%;
+
+  /* Pagina e clara de proposito: sem isto o navegador em modo escuro
+     inverte controles nativos (select, date) e eles somem no fundo creme. */
+  color-scheme: light;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -72,6 +76,7 @@ body {
 }
 img { max-width: 100%; display: block; }
 h1, h2, h3, .font-display {
+  text-wrap: balance;
   font-family: 'Fraunces', Georgia, serif;
   font-variation-settings: "opsz" 96;
   font-weight: 700;
@@ -81,6 +86,13 @@ h1, h2, h3, .font-display {
 }
 p { margin: 0; }
 button { font: inherit; color: inherit; }
+
+/* Tira o atraso de ~300ms do toque (duplo-toque pra zoom) nos controles e
+   troca o flash cinza padrao do Android por um realce da propria marca. */
+a, button, input, select, textarea, [role="button"] {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: hsl(var(--accent) / .25);
+}
 a { color: inherit; }
 
 /* ── Utilitárias reutilizáveis ── */
@@ -126,6 +138,20 @@ a { color: inherit; }
 :where(a, button, input, textarea, select):focus-visible {
   outline: 2px solid hsl(var(--ring)); outline-offset: 2px; border-radius: 8px;
 }
+.skip-link {
+  position: absolute; left: -9999px; top: 0; z-index: 100;
+  background: hsl(var(--primary)); color: hsl(var(--primary-foreground));
+  padding: 13px 22px; border-radius: 0 0 12px 0; font-weight: 600; text-decoration: none;
+}
+.skip-link:focus { left: 0; }
+
+/* WCAG 2.4.11: o header (69px) e a barra de categorias (126px) sao fixos.
+   Sem esta margem, tabular pra um item rola ele pra baixo das duas barras. */
+:where(a, button, input, select, textarea, [tabindex]) {
+  scroll-margin-top: 205px;
+  scroll-margin-bottom: 96px;
+}
+
 .sr-only {
   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
   overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
@@ -272,7 +298,7 @@ a { color: inherit; }
 .item-body h4 { margin: 0; font-size: 1rem; font-weight: 600; }
 .item-body p { margin-top: 5px; font-size: .84rem; color: hsl(var(--muted-foreground)); flex: 1; }
 .item-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 16px; }
-.item-price { font-family: 'Fraunces', Georgia, serif; font-weight: 700; font-size: 1.2rem; color: hsl(var(--primary)); }
+.item-price { font-family: 'Fraunces', Georgia, serif; font-weight: 700; font-size: 1.2rem; color: hsl(var(--primary)); font-variant-numeric: tabular-nums; }
 
 .stepper { display: flex; align-items: center; gap: 9px; }
 .step-add {
@@ -357,7 +383,8 @@ a { color: inherit; }
 
 /* ═══════════════ CARRINHO FLUTUANTE ═══════════════ */
 .cart-float {
-  position: fixed; z-index: 45; left: 16px; right: 16px; bottom: 16px;
+  position: fixed; z-index: 45; left: 16px; right: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom));
   display: none; align-items: center; justify-content: space-between; gap: 14px;
   background: hsl(var(--primary)); color: hsl(var(--primary-foreground));
   border: none; border-radius: 999px; padding: 15px 22px; cursor: pointer;
@@ -392,8 +419,15 @@ a { color: inherit; }
 .drawer-head h2 { font-size: 1.3rem; }
 .drawer-x { background: none; border: none; cursor: pointer; padding: 6px; border-radius: 999px; }
 .drawer-x:hover { background: hsl(var(--muted)); }
-.drawer-body { flex: 1; overflow-y: auto; padding: 20px 22px; display: grid; gap: 22px; align-content: start; }
-.drawer-foot { padding: 18px 22px 22px; border-top: 1px solid hsl(var(--border)); background: hsl(var(--card)); }
+.drawer-body {
+  flex: 1; overflow-y: auto; overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: 20px 22px; display: grid; gap: 22px; align-content: start;
+}
+.drawer-foot {
+  padding: 18px 22px calc(22px + env(safe-area-inset-bottom));
+  border-top: 1px solid hsl(var(--border)); background: hsl(var(--card));
+}
 
 .linha { display: flex; gap: 12px; align-items: center; }
 .linha-img { width: 58px; height: 58px; border-radius: 12px; overflow: hidden; background: hsl(var(--secondary)); flex: 0 0 auto; display: grid; place-items: center; }
@@ -430,10 +464,11 @@ a { color: inherit; }
 
 .limpar { background: none; border: none; cursor: pointer; font-size: .82rem; color: hsl(var(--muted-foreground)); text-decoration: underline; text-underline-offset: 3px; justify-self: start; padding: 0; }
 .limpar:hover { color: hsl(var(--destructive)); }
+.limpar.armado { color: hsl(var(--destructive)); font-weight: 600; text-decoration: none; }
 
 .total-row { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 14px; }
 .total-row span { font-size: .88rem; color: hsl(var(--muted-foreground)); }
-.total-row b { font-family: 'Fraunces', Georgia, serif; font-size: 1.7rem; }
+.total-row b { font-family: 'Fraunces', Georgia, serif; font-size: 1.7rem; font-variant-numeric: tabular-nums; }
 .foot-nota { font-size: .76rem; color: hsl(var(--muted-foreground)); text-align: center; margin-top: 11px; }
 
 .enviado { text-align: center; padding: 34px 6px; display: grid; gap: 14px; justify-items: center; }
@@ -444,10 +479,10 @@ a { color: inherit; }
 /* ═══════════════ MODAL DE ENCOMENDA ═══════════════ */
 .modal-enc {
   position: fixed; z-index: 55; inset: auto 0 0 0;
-  max-height: 92vh; overflow-y: auto;
+  max-height: 92vh; overflow-y: auto; overscroll-behavior: contain;
   background: hsl(var(--background));
   border-radius: calc(var(--radius) * 1.5) calc(var(--radius) * 1.5) 0 0;
-  padding: 24px 22px 28px;
+  padding: 24px 22px calc(28px + env(safe-area-inset-bottom));
   transform: translateY(100%); transition: transform .3s cubic-bezier(.3,.8,.3,1);
   display: grid; gap: 16px; align-content: start;
 }
@@ -465,6 +500,8 @@ a { color: inherit; }
 </style>
 </head>
 <body>
+
+<a class="skip-link" href="#cardapio">Pular para o cardapio</a>
 
 <header class="site-header">
   <div class="shop-section header-in">
@@ -495,6 +532,7 @@ a { color: inherit; }
       <span id="cart-btn-label">Pedido</span>
       <span class="cart-count" id="cart-btn-count" hidden>0</span>
     </button>
+    <p class="sr-only" id="cart-status" role="status" aria-live="polite"></p>
   </div>
 </header>
 
@@ -538,7 +576,7 @@ a { color: inherit; }
       </div>
     </div>
     <div class="hero-img">
-      <img src="assets/hero.jpg" alt="Pães fresquinhos saídos do forno da padaria" fetchpriority="high">
+      <img src="assets/hero.jpg" alt="Pães fresquinhos saídos do forno da padaria" width="900" height="675" fetchpriority="high">
     </div>
   </div>
 </section>
@@ -572,7 +610,7 @@ a { color: inherit; }
   <p class="busca-vazia" id="busca-vazia">Nenhum item encontrado. Tenta outro termo.</p>
 
   <div class="shop-card encomenda">
-    <div class="encomenda-img"><img src="assets/bolo-chocolate.jpg" alt="Bolo de chocolate da vitrine" loading="lazy" decoding="async"></div>
+    <div class="encomenda-img"><img src="assets/bolo-chocolate.jpg" alt="Bolo de chocolate da vitrine" width="900" height="675" loading="lazy" decoding="async"></div>
     <div class="encomenda-txt">
       <span class="shop-pill">Por encomenda</span>
       <h3>Bolo inteiro pra sua data</h3>
@@ -587,7 +625,7 @@ a { color: inherit; }
   <div class="shop-section">
     <div class="hist-grid">
       <div class="hist-img">
-        <img src="assets/equipe.jpg" alt="Atendimento no balcão da padaria" loading="lazy" decoding="async">
+        <img src="assets/equipe.jpg" alt="Atendimento no balcão da padaria" width="900" height="675" loading="lazy" decoding="async">
       </div>
       <div>
         <span class="shop-pill">A padaria</span>
@@ -700,7 +738,8 @@ a { color: inherit; }
 <div class="overlay" id="overlay"></div>
 
 <!-- ═══════════ DRAWER DO PEDIDO ═══════════ -->
-<aside class="drawer" id="drawer" aria-labelledby="drawer-titulo" aria-hidden="true">
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true"
+       aria-labelledby="drawer-titulo" tabindex="-1" aria-hidden="true" inert>
   <div class="drawer-head">
     <h2 id="drawer-titulo">Seu pedido</h2>
     <button type="button" class="drawer-x" id="drawer-close" aria-label="Fechar pedido">
@@ -727,13 +766,13 @@ a { color: inherit; }
       <div class="campo" id="c-nome" style="margin-bottom:18px">
         <label for="f-nome">Seu nome</label>
         <input type="text" id="f-nome" autocomplete="name" placeholder="Ex: Maria Silva">
-        <span class="erro">Preenche seu nome pra gente confirmar o pedido.</span>
+        <span class="erro" id="err-f-nome" role="alert" data-msg="Preenche seu nome pra gente confirmar o pedido."></span>
       </div>
 
       <div class="campo" id="c-end" hidden style="margin-bottom:18px">
         <label for="f-end">Endereço de entrega</label>
         <input type="text" id="f-end" autocomplete="street-address" placeholder="Rua, número, bairro e referência">
-        <span class="erro">Preenche o endereço pra gente conseguir entregar.</span>
+        <span class="erro" id="err-f-end" role="alert" data-msg="Preenche o endereço pra gente conseguir entregar."></span>
       </div>
 
       <div class="campo" style="margin-bottom:18px">
@@ -759,7 +798,8 @@ a { color: inherit; }
 </aside>
 
 <!-- ═══════════ MODAL DE ENCOMENDA ═══════════ -->
-<div class="modal-enc shop-card" id="modal-enc" aria-labelledby="enc-titulo" aria-hidden="true">
+<div class="modal-enc shop-card" id="modal-enc" role="dialog" aria-modal="true"
+     aria-labelledby="enc-titulo" tabindex="-1" aria-hidden="true" inert>
   <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
     <h2 id="enc-titulo">Encomendar bolo</h2>
     <button type="button" class="drawer-x" id="enc-close" aria-label="Fechar">
@@ -786,7 +826,7 @@ a { color: inherit; }
   <div class="campo" id="c-enc-data">
     <label for="enc-data">Para que dia</label>
     <input type="date" id="enc-data">
-    <span class="erro">Escolhe o dia que você precisa do bolo.</span>
+    <span class="erro" id="err-enc-data" role="alert" data-msg="Escolhe o dia que você precisa do bolo."></span>
     <span class="dica">A gente confirma no WhatsApp se dá tempo pra essa data.</span>
   </div>
   <div class="campo">
@@ -796,7 +836,7 @@ a { color: inherit; }
   <div class="campo" id="c-enc-nome">
     <label for="enc-nome">Seu nome</label>
     <input type="text" id="enc-nome" autocomplete="name" placeholder="Ex: Maria Silva">
-    <span class="erro">Preenche seu nome pra gente responder.</span>
+    <span class="erro" id="err-enc-nome" role="alert" data-msg="Preenche seu nome pra gente responder."></span>
   </div>
   <button type="button" class="btn btn-whats" id="enc-enviar" style="width:100%">Pedir orçamento no WhatsApp</button>
   <p class="foot-nota">O valor depende do sabor e do tamanho — a gente responde com o preço e o prazo.</p>
@@ -1014,7 +1054,7 @@ function montarMenu(){
 function cardHTML(p){
   const cat = categories.find(function(c){ return c.id === p.category; });
   const foto = p.image
-    ? '<div class="item-ph"><img src="' + p.image + '" alt="' + p.name + (p.ia ? ' (imagem ilustrativa)' : '') + '" loading="lazy" decoding="async">' + (p.badge ? '<span class="shop-pill item-badge">' + p.badge + '</span>' : '') + '</div>'
+    ? '<div class="item-ph"><img src="' + p.image + '" alt="' + p.name + (p.ia ? ' (imagem ilustrativa)' : '') + '" width="900" height="675" loading="lazy" decoding="async">' + (p.badge ? '<span class="shop-pill item-badge">' + p.badge + '</span>' : '') + '</div>'
     : '<div class="item-ph vazio"><span>' + cat.label + '</span>' + (p.badge ? '<span class="shop-pill item-badge">' + p.badge + '</span>' : '') + '</div>';
   return '<article class="shop-card item" data-id="' + p.id + '" data-busca="' + normalizar(p.name + ' ' + p.description) + '">' +
     foto +
@@ -1098,6 +1138,8 @@ function pintarBotoes(){
   elFloat.classList.toggle('show', c > 0 && !aberto);
   elCfItens.textContent = c === 1 ? '1 item' : c + ' itens';
   elCfTotal.textContent = formatBRL(t);
+  const aviso = document.getElementById('cart-status');
+  if (aviso) aviso.textContent = c === 0 ? '' : (c === 1 ? '1 item' : c + ' itens') + ' no pedido, total ' + formatBRL(t);
 }
 
 function pintarDrawer(){
@@ -1115,7 +1157,7 @@ function pintarDrawer(){
     const p = l.product;
     const cat = categories.find(function(c){ return c.id === p.category; });
     const mini = p.image
-      ? '<img src="' + p.image + '" alt="" loading="lazy" decoding="async">'
+      ? '<img src="' + p.image + '" alt="" width="58" height="58" loading="lazy" decoding="async">'
       : '<span>' + cat.label + '</span>';
     const menosIco = l.qty === 1
       ? '<path d="M4 7h16M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2M6 7l1 13h10l1-13"/>'
@@ -1150,7 +1192,29 @@ function pintarTudo(){
 /* ═══════════════════════════════════════════════════════════
    DRAWER
    ═══════════════════════════════════════════════════════════ */
+/* Fechados, o drawer e o modal continuam no DOM (so deslocados por
+   transform), entao sem o atributo inert o teclado tabula pra dentro
+   deles — foi o que acontecia: um Tab depois do rodape caia no drawer
+   invisivel. Aberto, o inverso: o resto da pagina fica inerte. */
+const painelEnc = document.getElementById('modal-enc');
+let focoAnterior = null;
+
+function sincronizarInert(painelAberto){
+  Array.prototype.forEach.call(document.body.children, function(el){
+    if (el.tagName === 'SCRIPT' || el === overlay) return;
+    el.inert = painelAberto ? (el !== painelAberto) : (el === drawer || el === painelEnc);
+    if (el === drawer || el === painelEnc) el.setAttribute('aria-hidden', String(el !== painelAberto));
+  });
+}
+
+function guardarFoco(){ focoAnterior = document.activeElement; }
+function devolverFoco(){
+  if (focoAnterior && document.contains(focoAnterior)) focoAnterior.focus();
+  focoAnterior = null;
+}
+
 function abrirDrawer(){
+  guardarFoco();
   restaurarEnvio();
   /* Pré-preenche com quem pediu da última vez: o cliente recorrente
      confere e manda, em vez de redigitar tudo todo pedido. */
@@ -1159,24 +1223,48 @@ function abrirDrawer(){
   if (!fNome.value.trim()) fNome.value = lerSalvo(K_NOME);
   if (!fEnd.value.trim()) fEnd.value = lerSalvo(K_END);
   drawer.classList.add('show');
-  drawer.setAttribute('aria-hidden', 'false');
+  sincronizarInert(drawer);
   overlay.classList.add('show');
   document.body.style.overflow = 'hidden';
+  drawer.focus();          // leitor de tela anuncia "Seu pedido, dialogo"
   pintarBotoes();
 }
 function fecharDrawer(){
+  if (!drawer.classList.contains('show')) return;
   drawer.classList.remove('show');
-  drawer.setAttribute('aria-hidden', 'true');
-  if (!document.getElementById('modal-enc').classList.contains('show')) {
-    overlay.classList.remove('show');
-    document.body.style.overflow = '';
-  }
+  sincronizarInert(null);
+  overlay.classList.remove('show');
+  document.body.style.overflow = '';
+  devolverFoco();
   pintarBotoes();
 }
 document.getElementById('cart-open').addEventListener('click', abrirDrawer);
 document.getElementById('cart-float').addEventListener('click', abrirDrawer);
 document.getElementById('drawer-close').addEventListener('click', fecharDrawer);
-document.getElementById('limpar').addEventListener('click', clear);
+/* Apagar o pedido inteiro num toque acidental e caro: pede confirmacao no
+   proprio botao (dois toques) em vez de abrir mais um dialogo por cima. */
+(function(){
+  const btn = document.getElementById('limpar');
+  const rotulo = btn.textContent;
+  let armado = false, volta = null;
+  function desarmar(){
+    armado = false;
+    btn.textContent = rotulo;
+    btn.classList.remove('armado');
+    if (volta) { clearTimeout(volta); volta = null; }
+  }
+  btn.addEventListener('click', function(){
+    if (!armado) {
+      armado = true;
+      btn.textContent = 'Tem certeza? Toque de novo';
+      btn.classList.add('armado');
+      volta = setTimeout(desarmar, 4000);
+      return;
+    }
+    desarmar();
+    clear();
+  });
+})();
 overlay.addEventListener('click', function(){ fecharDrawer(); fecharEncomenda(); });
 document.addEventListener('keydown', function(e){
   if (e.key !== 'Escape') return;
@@ -1195,8 +1283,24 @@ document.querySelectorAll('.modo-btn').forEach(function(b){
   });
 });
 
+/* Erro so em vermelho nao serve: quem usa leitor de tela precisa que o
+   campo se declare invalido e aponte pro texto do erro. Reescrever o
+   textContent (em vez de so mostrar) e o que faz o role="alert" falar. */
 function marcarErro(idCampo, tem){
-  document.getElementById(idCampo).classList.toggle('tem-erro', tem);
+  const campo = document.getElementById(idCampo);
+  campo.classList.toggle('tem-erro', tem);
+  const entrada = campo.querySelector('input, select, textarea');
+  const aviso = campo.querySelector('.erro');
+  if (!entrada || !aviso) return;
+  if (tem) {
+    entrada.setAttribute('aria-invalid', 'true');
+    entrada.setAttribute('aria-describedby', aviso.id);
+    aviso.textContent = aviso.dataset.msg;
+  } else {
+    entrada.removeAttribute('aria-invalid');
+    entrada.removeAttribute('aria-describedby');
+    aviso.textContent = '';
+  }
 }
 document.getElementById('f-nome').addEventListener('input', function(){ marcarErro('c-nome', false); });
 document.getElementById('f-end').addEventListener('input', function(){ marcarErro('c-end', false); });
@@ -1269,7 +1373,9 @@ function mostrarEnviado(){
     '<p>Confirme o horário e o pagamento na conversa do WhatsApp. Ele também ficou salvo em “Peça de novo”.</p>' +
     '<button type="button" class="btn btn-outline" id="enviado-fechar">Voltar ao cardápio</button>';
   document.getElementById('drawer-body').appendChild(box);
-  document.getElementById('enviado-fechar').addEventListener('click', fecharDrawer);
+  const fechar = document.getElementById('enviado-fechar');
+  fechar.addEventListener('click', fecharDrawer);
+  fechar.focus();   // leva o foco pra confirmacao em vez de deixa-lo no ar
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -1323,20 +1429,22 @@ function montarRepeticao(){
    ═══════════════════════════════════════════════════════════ */
 const modalEnc = document.getElementById('modal-enc');
 function abrirEncomenda(){
+  guardarFoco();
   const encNome = document.getElementById('enc-nome');
   if (!encNome.value.trim()) encNome.value = lerSalvo(K_NOME);
   modalEnc.classList.add('show');
-  modalEnc.setAttribute('aria-hidden', 'false');
+  sincronizarInert(modalEnc);
   overlay.classList.add('show');
   document.body.style.overflow = 'hidden';
+  modalEnc.focus();
 }
 function fecharEncomenda(){
+  if (!modalEnc.classList.contains('show')) return;
   modalEnc.classList.remove('show');
-  modalEnc.setAttribute('aria-hidden', 'true');
-  if (!drawer.classList.contains('show')) {
-    overlay.classList.remove('show');
-    document.body.style.overflow = '';
-  }
+  sincronizarInert(null);
+  overlay.classList.remove('show');
+  document.body.style.overflow = '';
+  devolverFoco();
 }
 document.getElementById('encomenda-open').addEventListener('click', abrirEncomenda);
 document.getElementById('enc-close').addEventListener('click', fecharEncomenda);
@@ -1479,6 +1587,7 @@ if ('serviceWorker' in navigator) {
 /* ═══════════════════════════════════════════════════════════
    PARTIDA
    ═══════════════════════════════════════════════════════════ */
+sincronizarInert(null);   // drawer e modal nascem fora da ordem de foco
 montarFiltros();
 montarMenu();
 aplicarFiltro();
