@@ -1,0 +1,1175 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SyncTech Automation | Atendimento no automático 24h</title>
+<meta name="description" content="WhatsApp Bot, agendamento automático, Instagram e CRM para pequenos negócios. Setup em 7 dias, a partir de R$197/mês.">
+<meta name="theme-color" content="#0A0714">
+<link rel="canonical" href="https://pacoquinhagamer02-max.github.io/synctech-automation/landing-v2/">
+
+<meta property="og:type" content="website">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:title" content="SyncTech Automation | Atendimento no automático 24h">
+<meta property="og:description" content="WhatsApp Bot, agendamento automático, Instagram e CRM para pequenos negócios. Setup em 7 dias, a partir de R$197/mês.">
+<meta property="og:url" content="https://pacoquinhagamer02-max.github.io/synctech-automation/landing-v2/">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Manrope:wght@400;500;600;700&display=swap">
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        base:    '#0A0714',
+        surf:    '#160F28',
+        surf2:   '#20163A',
+        linha:   '#42306F',
+        violeta: '#9B5CFF',
+        lilas:   '#CDAAFF',
+        txt:     '#ECE6FA',
+        txt2:    '#B6AACF',
+        txt3:    '#8C7FA8'
+      },
+      fontFamily: {
+        disp:  ['Sora', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        corpo: ['Manrope', 'ui-sans-serif', 'system-ui', 'sans-serif']
+      }
+    }
+  }
+};
+</script>
+
+<style>
+  html { scroll-behavior: smooth; scroll-padding-top: 90px; }
+  body { background:#0A0714; color:#ECE6FA; font-family:'Manrope',ui-sans-serif,system-ui,sans-serif; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+  h1,h2,h3,.disp { font-family:'Sora',ui-sans-serif,system-ui,sans-serif; }
+
+  /* ── Fundo: brilho radial central + grade com máscara + orbs ── */
+  .fundo { position:fixed; inset:0; z-index:0; pointer-events:none; }
+  .brilho-central {
+    position:absolute; left:50%; top:38%; width:min(1100px,150vw); aspect-ratio:1;
+    transform:translate(-50%,-50%);
+    background:radial-gradient(circle, rgba(155,92,255,.20) 0%, rgba(155,92,255,.08) 38%, transparent 68%);
+  }
+  .grade {
+    position:absolute; inset:0;
+    background-image:
+      linear-gradient(rgba(155,92,255,.13) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(155,92,255,.13) 1px, transparent 1px);
+    background-size:56px 56px;
+    -webkit-mask-image:radial-gradient(ellipse 75% 60% at 50% 28%, #000 35%, transparent 100%);
+    mask-image:radial-gradient(ellipse 75% 60% at 50% 28%, #000 35%, transparent 100%);
+  }
+  .orb { position:absolute; border-radius:9999px; filter:blur(90px); opacity:.55; will-change:transform; }
+  .orb-a { width:420px; height:420px; left:-90px;  top:-120px; background:#9B5CFF; animation:flutuar 22s ease-in-out infinite; }
+  .orb-b { width:360px; height:360px; right:-70px; top:-60px;  background:#6E3BD1; animation:flutuar 27s ease-in-out infinite reverse; }
+  .orb-c { width:300px; height:300px; left:45%;    top:120px;  background:#CDAAFF; opacity:.28; animation:flutuar 33s ease-in-out infinite; }
+
+  @keyframes flutuar {
+    0%,100% { transform:translate(0,0) scale(1); }
+    33%     { transform:translate(40px,-45px) scale(1.09); }
+    66%     { transform:translate(-30px,30px) scale(.94); }
+  }
+  @keyframes correr { from { transform:translateX(0); } to { transform:translateX(-50%); } }
+  @keyframes pulsar-brilho {
+    0%,100% { box-shadow:0 0 0 0 rgba(155,92,255,.50), 0 8px 30px -8px rgba(155,92,255,.55); }
+    50%     { box-shadow:0 0 34px 8px rgba(155,92,255,.30), 0 8px 34px -6px rgba(155,92,255,.70); }
+  }
+  @keyframes surgir-msg { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+  .marquee-faixa { display:flex; width:max-content; animation:correr 34s linear infinite; }
+  .glow-cta { animation:pulsar-brilho 3.2s ease-in-out infinite; }
+  .msg-anim { animation:surgir-msg .5s ease-out both; }
+
+  /* ── Cartões com hover-lift ── */
+  .card {
+    background:linear-gradient(160deg,#160F28 0%,#20163A 100%);
+    border:1px solid #42306F;
+    transition:transform .3s cubic-bezier(.2,.7,.3,1), box-shadow .3s ease, border-color .3s ease;
+  }
+  .card:hover {
+    transform:translateY(-6px);
+    border-color:#9B5CFF;
+    box-shadow:0 18px 46px -14px rgba(155,92,255,.45);
+  }
+
+  .texto-gradiente {
+    background:linear-gradient(100deg,#ECE6FA 0%,#CDAAFF 42%,#9B5CFF 100%);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+
+  /* ── Sliders ── */
+  input[type=range] {
+    -webkit-appearance:none; appearance:none; width:100%; height:6px; border-radius:999px;
+    background:linear-gradient(90deg,#9B5CFF var(--pct,50%), #2A1D48 var(--pct,50%));
+    outline:none;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance:none; appearance:none; width:22px; height:22px; border-radius:999px;
+    background:#CDAAFF; border:3px solid #9B5CFF; cursor:pointer;
+    box-shadow:0 0 0 4px rgba(155,92,255,.20); transition:transform .15s ease;
+  }
+  input[type=range]::-webkit-slider-thumb:hover { transform:scale(1.14); }
+  input[type=range]::-moz-range-thumb {
+    width:18px; height:18px; border-radius:999px; background:#CDAAFF; border:3px solid #9B5CFF; cursor:pointer;
+  }
+  input[type=range]:focus-visible { box-shadow:0 0 0 3px rgba(205,170,255,.55); }
+
+  :where(a,button,input,textarea,select,summary):focus-visible {
+    outline:2px solid #CDAAFF; outline-offset:3px; border-radius:6px;
+  }
+
+  .scrollbar-fina::-webkit-scrollbar { height:6px; }
+  .scrollbar-fina::-webkit-scrollbar-thumb { background:#42306F; border-radius:999px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior:auto; }
+    *, *::before, *::after {
+      animation-duration:.001ms !important; animation-iteration-count:1 !important;
+      transition-duration:.001ms !important;
+    }
+    .orb, .marquee-faixa, .glow-cta { animation:none !important; }
+    .card:hover { transform:none; }
+  }
+</style>
+</head>
+<body>
+  <div class="fundo" aria-hidden="true">
+    <div class="brilho-central"></div>
+    <div class="grade"></div>
+    <div class="orb orb-a"></div>
+    <div class="orb orb-b"></div>
+    <div class="orb orb-c"></div>
+  </div>
+
+  <div id="root" class="relative z-10"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/htm/3.1.1/htm.js"></script>
+<script>
+(function(){
+'use strict';
+const html = htm.bind(React.createElement);
+const { useState, useEffect, useRef, useMemo } = React;
+
+/* ═══════════════════════════════════════════════════════════════════
+   AFIRMAÇÕES SOBRE A EMPRESA — o único lugar da página com número
+   sobre a SyncTech. Os valores aqui são os REAIS (2 clientes fechados
+   em Mariana/MG). O briefing pedia "+120 negócios"; se trocar, está
+   publicando afirmação falsa numa página que vai pra cliente real —
+   a landing antiga já teve conteúdo assim removido numa auditoria.
+   ═══════════════════════════════════════════════════════════════════ */
+const PROVA = {
+  negocios: '2 negócios reais no automático',
+  destaquesMarquee: [
+    '2 negócios reais no automático',
+    'Setup em 7 dias',
+    'Atendimento 24/7',
+    'WhatsApp',
+    'Instagram',
+    'Agendamento',
+    'CRM integrado'
+  ],
+  /* Caso real: dados verificáveis da Barbearia Martins.
+     `citacao` fica null de propósito — quando tiver a frase real do
+     cliente, cole aqui e o bloco de depoimento aparece sozinho.
+     Nada de citação inventada assinada por uma pessoa real. */
+  caso: {
+    cliente: 'Barbearia Martins',
+    lugar: 'Mariana / MG',
+    iniciais: 'BM',
+    citacao: null,
+    autor: 'Barbearia Martins',
+    cargo: 'Cliente SyncTech'
+  }
+};
+
+const WPP = '5531986551626';
+const wa = (msg) => 'https://wa.me/' + WPP + '?text=' + encodeURIComponent(msg);
+const MSG_DIAG = 'Olá! Vim pelo site e quero o diagnóstico gratuito da SyncTech.';
+
+const semMovimento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const brl = (n) => Number(n).toLocaleString('pt-BR', { style:'currency', currency:'BRL', maximumFractionDigits:0 });
+const num = (n) => Math.round(Number(n)).toLocaleString('pt-BR');
+
+/* ── Ícones (stroke, herdam currentColor) ── */
+const Ico = ({ d, className = 'w-6 h-6' }) => html`
+  <svg className=${className} viewBox="0 0 24 24" fill="none" stroke="currentColor"
+       strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    ${d.map((p, i) => html`<path key=${i} d=${p} />`)}
+  </svg>`;
+
+const ICONES = {
+  whats:   ['M21 11.5a8.4 8.4 0 01-12.3 7.4L3.5 20.5l1.7-5A8.5 8.5 0 1121 11.5z','M8.6 9.4c.3 1.6 2.4 3.7 4 4l1-1.2 2 .9-.3 1.6c-2.6.5-5.9-2.8-6.4-5.4l1.6-.3.9 2z'],
+  agenda:  ['M4 6.5A1.5 1.5 0 015.5 5h13A1.5 1.5 0 0120 6.5v12A1.5 1.5 0 0118.5 20h-13A1.5 1.5 0 014 18.5z','M4 10h16M8.5 3v4M15.5 3v4','M9 14.5l1.8 1.8 3.7-3.7'],
+  insta:   ['M4 8a4 4 0 014-4h8a4 4 0 014 4v8a4 4 0 01-4 4H8a4 4 0 01-4-4z','M12 15.2A3.2 3.2 0 1012 8.8a3.2 3.2 0 000 6.4z','M17.2 6.9h.01'],
+  crm:     ['M4 6h16M4 12h10M4 18h7','M18 15l2 2 3-3'],
+  grafico: ['M4 19V5M4 19h16','M8 16V11M12.5 16V7.5M17 16v-3.5'],
+  plug:    ['M9 3v6M15 3v6','M7 9h10v3a5 5 0 01-10 0z','M12 17v4'],
+  raio:    ['M13 2L4.5 13.5H11l-1 8.5L18.5 10H12z'],
+  check:   ['M20 6L9 17l-5-5'],
+  x:       ['M18 6L6 18M6 6l12 12'],
+  relogio: ['M12 21a9 9 0 100-18 9 9 0 000 18z','M12 7v5l3.2 2'],
+  seta:    ['M5 12h14M13 6l6 6-6 6'],
+  tesoura: ['M6 4l12 12M6 20L18 8','M6.5 8a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM6.5 21a2.5 2.5 0 100-5 2.5 2.5 0 000 5z'],
+  coracao: ['M12 20s-7-4.4-7-9.2A4 4 0 0112 8a4 4 0 017 2.8C19 15.6 12 20 12 20z'],
+  pata:    ['M5.5 12.5a2 2 0 100-4 2 2 0 000 4zM18.5 12.5a2 2 0 100-4 2 2 0 000 4zM9.5 8a2 2 0 100-4 2 2 0 000 4zM14.5 8a2 2 0 100-4 2 2 0 000 4z','M12 12c-3 0-5 2.2-5 4.5S9 20 12 20s5-1.2 5-3.5S15 12 12 12z'],
+  garfo:   ['M7 3v7a2 2 0 004 0V3M9 12v9','M17 3c-1.5 1.5-2 3.5-2 5.5S16 12 17 12v9'],
+  sacola:  ['M6 8h12l-1 12H7z','M9 8V6a3 3 0 016 0v2'],
+  estetos: ['M6 3v5a4 4 0 008 0V3','M10 15v1a5 5 0 0010 0v-2','M20 12.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3z'],
+  balao:   ['M20 12a7.5 7.5 0 01-11 6.6L4 20l1.4-4.4A7.5 7.5 0 1120 12z'],
+  mais:    ['M12 5v14M5 12h14'],
+  menu:    ['M4 7h16M4 12h16M4 17h16']
+};
+
+/* ── Reveal por IntersectionObserver, com rede de segurança ── */
+function Reveal({ children, delay = 0, className = '', as = 'div' }) {
+  const ref = useRef(null);
+  const [visivel, setVisivel] = useState(semMovimento);
+  useEffect(() => {
+    if (semMovimento) return;
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) { setVisivel(true); obs.disconnect(); }
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+    obs.observe(el);
+    /* Se o observer falhar por qualquer motivo, o conteúdo não pode ficar
+       preso invisível — landing em branco é pior que landing sem animação. */
+    const rede = setTimeout(() => setVisivel(true), 1600);
+    return () => { obs.disconnect(); clearTimeout(rede); };
+  }, []);
+  return html`
+    <${as} ref=${ref}
+      className=${className + ' transition-all duration-700 ease-out ' + (visivel ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8')}
+      style=${{ transitionDelay: visivel ? delay + 'ms' : '0ms' }}>
+      ${children}
+    <//>`;
+}
+
+/* Anima do zero na primeira aparição; depois acompanha o slider na hora. */
+function useNumeroAnimado(alvo, ativo) {
+  const [v, setV] = useState(0);
+  const jaAnimou = useRef(false);
+  useEffect(() => {
+    if (!ativo) return;
+    if (semMovimento || jaAnimou.current) { setV(alvo); return; }
+    jaAnimou.current = true;
+    const t0 = performance.now(), dur = 1100;
+    let raf;
+    const passo = (t) => {
+      const p = Math.min(1, (t - t0) / dur);
+      setV(alvo * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(passo); else setV(alvo);
+    };
+    raf = requestAnimationFrame(passo);
+    /* requestAnimationFrame não roda em aba oculta (nem quando o navegador
+       resolve estrangular). Sem esta rede, a calculadora ficaria travada em
+       R$ 0 — um número errado é pior que um número sem animação. */
+    const rede = setTimeout(() => setV(alvo), dur + 400);
+    return () => { cancelAnimationFrame(raf); clearTimeout(rede); };
+  }, [alvo, ativo]);
+  return v;
+}
+
+/* ── Botões ── */
+const BtnPrimario = ({ href, children, glow, className = '' }) => html`
+  <a href=${href} target="_blank" rel="noopener"
+     className=${'inline-flex items-center justify-center gap-2 rounded-xl bg-violeta px-6 py-3.5 font-corpo font-bold text-white ' +
+       'transition hover:bg-[#8A46F5] hover:-translate-y-0.5 active:translate-y-0 ' + (glow ? 'glow-cta ' : '') + className}>
+     ${children}</a>`;
+
+const BtnSecundario = ({ href, children, className = '' }) => html`
+  <a href=${href}
+     className=${'inline-flex items-center justify-center gap-2 rounded-xl border border-linha bg-surf/60 px-6 py-3.5 ' +
+       'font-corpo font-semibold text-txt backdrop-blur transition hover:border-violeta hover:bg-surf2 hover:-translate-y-0.5 ' + className}>
+     ${children}</a>`;
+
+const Badge = ({ children }) => html`
+  <span className="inline-flex items-center gap-2 rounded-full border border-linha bg-surf/70 px-4 py-1.5 text-sm font-semibold text-lilas backdrop-blur">
+    <span className="h-1.5 w-1.5 rounded-full bg-violeta"></span>${children}
+  </span>`;
+
+const TituloSecao = ({ tag, titulo, sub }) => html`
+  <div className="mx-auto mb-14 max-w-2xl text-center">
+    <${Badge}>${tag}<//>
+    <h2 className="mt-5 text-3xl font-extrabold leading-tight sm:text-4xl md:text-[2.7rem]">${titulo}</h2>
+    ${sub && html`<p className="mt-4 text-lg leading-relaxed text-txt2">${sub}</p>`}
+  </div>`;
+
+/* ═══════════════ Barra de progresso de leitura ═══════════════ */
+function BarraProgresso() {
+  const [pct, setPct] = useState(0);
+  useEffect(() => {
+    let raf = null;
+    const calcular = () => {
+      raf = null;
+      const alcance = document.documentElement.scrollHeight - window.innerHeight;
+      setPct(alcance > 0 ? Math.min(100, (window.scrollY / alcance) * 100) : 0);
+    };
+    const aoRolar = () => { if (raf === null) raf = requestAnimationFrame(calcular); };
+    calcular();
+    window.addEventListener('scroll', aoRolar, { passive: true });
+    window.addEventListener('resize', aoRolar);
+    return () => {
+      window.removeEventListener('scroll', aoRolar);
+      window.removeEventListener('resize', aoRolar);
+      if (raf !== null) cancelAnimationFrame(raf);
+    };
+  }, []);
+  return html`
+    <div className="fixed inset-x-0 top-0 z-[60] h-[3px]" aria-hidden="true">
+      <div className="h-full bg-gradient-to-r from-violeta to-lilas transition-[width] duration-150 ease-out"
+           style=${{ width: pct + '%' }}></div>
+    </div>`;
+}
+
+/* ═══════════════ Navbar ═══════════════ */
+const LINKS = [
+  ['Serviços', '#servicos'], ['Calculadora', '#calculadora'], ['Processo', '#processo'],
+  ['Planos', '#planos'], ['FAQ', '#faq'], ['Contato', '#contato']
+];
+
+function Navbar() {
+  const [aberto, setAberto] = useState(false);
+  const [rolou, setRolou] = useState(false);
+  useEffect(() => {
+    const f = () => setRolou(window.scrollY > 16);
+    f();
+    window.addEventListener('scroll', f, { passive: true });
+    return () => window.removeEventListener('scroll', f);
+  }, []);
+  useEffect(() => {
+    document.body.style.overflow = aberto ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [aberto]);
+
+  return html`
+    <header className=${'fixed inset-x-0 top-0 z-50 transition-all duration-300 ' +
+        (rolou ? 'border-b border-linha/70 bg-base/80 backdrop-blur-xl' : 'border-b border-transparent')}>
+      <nav className="mx-auto flex h-[68px] max-w-6xl items-center justify-between px-5" aria-label="Principal">
+        <a href="#topo" className="flex items-center gap-1 font-disp text-lg font-extrabold tracking-tight text-txt">
+          Sync<${Ico} d=${ICONES.raio} className="h-4 w-4 fill-violeta text-violeta" />Tech
+        </a>
+        <ul className="hidden items-center gap-7 lg:flex">
+          ${LINKS.map(([rot, href]) => html`
+            <li key=${href}>
+              <a href=${href} className="text-sm font-semibold text-txt2 transition hover:text-lilas">${rot}</a>
+            </li>`)}
+        </ul>
+        <div className="flex items-center gap-3">
+          <a href=${wa(MSG_DIAG)} target="_blank" rel="noopener"
+             className="hidden rounded-xl bg-violeta px-5 py-2.5 text-sm font-bold text-white transition hover:bg-[#8A46F5] sm:inline-flex">
+            Diagnóstico grátis
+          </a>
+          <button type="button" onClick=${() => setAberto((v) => !v)}
+                  className="rounded-lg border border-linha p-2 text-txt lg:hidden"
+                  aria-expanded=${aberto} aria-controls="menu-mobile"
+                  aria-label=${aberto ? 'Fechar menu' : 'Abrir menu'}>
+            <${Ico} d=${aberto ? ICONES.x : ICONES.menu} />
+          </button>
+        </div>
+      </nav>
+
+      <div id="menu-mobile" hidden=${!aberto}
+           className="border-t border-linha bg-base/95 px-5 pb-7 pt-4 backdrop-blur-xl lg:hidden">
+        <ul className="flex flex-col gap-1">
+          ${LINKS.map(([rot, href]) => html`
+            <li key=${href}>
+              <a href=${href} onClick=${() => setAberto(false)}
+                 className="block rounded-lg px-3 py-3 font-semibold text-txt2 transition hover:bg-surf hover:text-lilas">${rot}</a>
+            </li>`)}
+        </ul>
+        <a href=${wa(MSG_DIAG)} target="_blank" rel="noopener" onClick=${() => setAberto(false)}
+           className="mt-3 flex justify-center rounded-xl bg-violeta px-5 py-3 font-bold text-white">
+          Diagnóstico grátis
+        </a>
+      </div>
+    </header>`;
+}
+
+/* ═══════════════ Marquee ═══════════════ */
+function Marquee() {
+  const fila = html`
+    <div className="flex shrink-0 items-center">
+      ${PROVA.destaquesMarquee.map((t, i) => html`
+        <span key=${i} className="flex items-center whitespace-nowrap px-6 py-3 text-sm font-semibold text-txt2">
+          ${t}<span className="ml-6 text-violeta" aria-hidden="true">·</span>
+        </span>`)}
+    </div>`;
+  return html`
+    <div className="relative overflow-hidden border-y border-linha/60 bg-surf/40" aria-label="Destaques da SyncTech">
+      <div className="marquee-faixa">${fila}${fila}</div>
+      <div className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-base to-transparent"></div>
+      <div className="pointer-events-none absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-base to-transparent"></div>
+    </div>`;
+}
+
+/* ═══════════════ Hero ═══════════════ */
+function MockWhatsApp() {
+  const msgs = [
+    { de: 'cliente', txt: 'Oi, vocês têm horário pra amanhã de manhã?', h: '09:41' },
+    { de: 'bot', txt: 'Oi! Tenho sim. Amanhã tem 9h, 10h30 e 14h. Qual fica melhor?', h: '09:41' },
+    { de: 'cliente', txt: 'Pode ser 10h30', h: '09:42' },
+    { de: 'bot', txt: 'Fechado! Agendei pra amanhã às 10h30 e te mando um lembrete 1h antes.', h: '09:42' }
+  ];
+  return html`
+    <div className="card relative w-full max-w-sm rounded-3xl p-5 shadow-2xl">
+      <div className="mb-4 flex items-center gap-3 border-b border-linha/70 pb-4">
+        <div className="grid h-10 w-10 place-items-center rounded-full bg-violeta/20 text-violeta">
+          <${Ico} d=${ICONES.whats} className="h-5 w-5" />
+        </div>
+        <div className="min-w-0">
+          <p className="truncate font-disp text-sm font-bold">Atendimento SyncTech</p>
+          <p className="flex items-center gap-1.5 text-xs text-txt3">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>respondendo agora
+          </p>
+        </div>
+      </div>
+      <div className="flex flex-col gap-2.5">
+        ${msgs.map((m, i) => html`
+          <div key=${i} className=${'msg-anim max-w-[85%] rounded-2xl border px-3.5 py-2.5 text-sm leading-relaxed ' +
+              (m.de === 'bot'
+                ? 'self-end rounded-br-md border-violeta/40 bg-violeta/25 text-txt'
+                : 'self-start rounded-bl-md border-linha bg-surf2 text-txt2')}
+               style=${{ animationDelay: (0.25 + i * 0.32) + 's' }}>
+            ${m.txt}
+            <span className="mt-1 block text-[10px] text-txt3">${m.h}</span>
+          </div>`)}
+      </div>
+      <div className="mt-4 flex items-center gap-2 rounded-full border border-linha bg-base/60 px-4 py-2.5 text-xs text-txt3">
+        <${Ico} d=${ICONES.balao} className="h-4 w-4" /> Respondido em segundos, sem ninguém no celular
+      </div>
+    </div>`;
+}
+
+function Hero() {
+  return html`
+    <section id="topo" className="relative px-5 pb-16 pt-32 sm:pt-36 lg:pb-24 lg:pt-44">
+      <div className="mx-auto grid max-w-6xl items-center gap-14 lg:grid-cols-[1.05fr_.95fr]">
+        <${Reveal}>
+          <${Badge}>Automação para pequenos negócios<//>
+          <h1 className="mt-6 font-disp text-[2.6rem] font-extrabold leading-[1.05] tracking-tight sm:text-6xl lg:text-[4.1rem]">
+            <span className="texto-gradiente">Seu atendimento no automático,</span><br/>
+            <span className="text-txt">24 horas por dia.</span>
+          </h1>
+          <p className="mt-6 max-w-xl text-lg leading-relaxed text-txt2">
+            Um robô que responde na hora, manda o catálogo, agenda o horário e confirma no seu
+            calendário — no WhatsApp e no Instagram, enquanto você trabalha ou dorme.
+          </p>
+          <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+            <${BtnPrimario} href=${wa(MSG_DIAG)} glow=${true}>
+              Quero meu diagnóstico grátis <${Ico} d=${ICONES.seta} className="h-4 w-4" />
+            <//>
+            <${BtnSecundario} href="#processo">Ver como funciona<//>
+          </div>
+          <ul className="mt-9 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-txt3">
+            ${[PROVA.negocios, 'Resposta em segundos', 'Setup em 7 dias'].map((t, i) => html`
+              <li key=${i} className="flex items-center gap-2">
+                ${i > 0 && html`<span className="text-linha" aria-hidden="true">|</span>`}
+                <${Ico} d=${ICONES.check} className="h-4 w-4 text-violeta" />${t}
+              </li>`)}
+          </ul>
+        <//>
+        <${Reveal} delay=${140} className="flex justify-center lg:justify-end">
+          <${MockWhatsApp} />
+        <//>
+      </div>
+    </section>`;
+}
+
+/* ═══════════════ Serviços (bento) ═══════════════ */
+const SERVICOS = [
+  { ico: ICONES.whats, nome: 'WhatsApp Bot', grande: true,
+    txt: 'O coração da operação: responde 24/7, manda o catálogo, tira dúvida de preço, agenda o horário e confirma no calendário. Sem você tocar no celular.',
+    itens: ['Responde em segundos, a qualquer hora', 'Envia catálogo e tabela de preços', 'Agenda e confirma sozinho', 'Passa pra você quando o caso é complexo'] },
+  { ico: ICONES.agenda, nome: 'Agendamento Inteligente',
+    txt: 'Horários oferecidos automaticamente, lembrete antes da hora e muito menos no-show.' },
+  { ico: ICONES.insta, nome: 'Instagram Automation',
+    txt: 'Responde DM e comentário, e captura o lead direto da bio pro seu funil.' },
+  { ico: ICONES.crm, nome: 'CRM Leve',
+    txt: 'Histórico de cada cliente e cada conversa organizado, sem planilha bagunçada.' },
+  { ico: ICONES.grafico, nome: 'Relatórios Semanais',
+    txt: 'O que funcionou, quanto vendeu e quantos agendou — em português, não em gráfico enfeitado.' },
+  { ico: ICONES.plug, nome: 'Integrações',
+    txt: 'Google Calendar, WhatsApp Business, Instagram e planilhas conversando entre si.' }
+];
+
+function Servicos() {
+  return html`
+    <section id="servicos" className="relative px-5 py-24 lg:py-32">
+      <div className="mx-auto max-w-6xl">
+        <${Reveal}>
+          <${TituloSecao} tag="Serviços"
+            titulo=${html`O que entra <span className="texto-gradiente">no automático</span>`}
+            sub="Não é um chatbot genérico. É o seu atendimento, com as suas respostas, rodando sozinho." />
+        <//>
+        <div className="grid gap-4 md:grid-cols-3">
+          ${SERVICOS.map((s, i) => html`
+            <${Reveal} key=${s.nome} delay=${i * 70}
+                       className=${s.grande ? 'md:col-span-2 md:row-span-2' : ''}>
+              <article className=${'card h-full rounded-3xl p-7 ' + (s.grande ? 'md:p-9' : '')}>
+                <div className=${'mb-5 grid place-items-center rounded-2xl bg-violeta/15 text-violeta ' +
+                    (s.grande ? 'h-14 w-14' : 'h-12 w-12')}>
+                  <${Ico} d=${s.ico} className=${s.grande ? 'h-7 w-7' : 'h-6 w-6'} />
+                </div>
+                <h3 className=${'font-disp font-bold ' + (s.grande ? 'text-2xl md:text-3xl' : 'text-lg')}>${s.nome}</h3>
+                <p className=${'mt-3 leading-relaxed text-txt2 ' + (s.grande ? 'text-lg' : 'text-sm')}>${s.txt}</p>
+                ${s.itens && html`
+                  <ul className="mt-7 grid gap-3 sm:grid-cols-2">
+                    ${s.itens.map((it) => html`
+                      <li key=${it} className="flex items-start gap-2.5 text-sm text-txt2">
+                        <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-violeta/20 text-violeta">
+                          <${Ico} d=${ICONES.check} className="h-3 w-3" />
+                        </span>${it}
+                      </li>`)}
+                  </ul>`}
+              </article>
+            <//>`)}
+        </div>
+      </div>
+    </section>`;
+}
+
+/* ═══════════════ Calculadora de ROI ═══════════════ */
+const CUSTO_MES = 397;
+
+function Slider({ rotulo, valor, min, max, passo, onChange, formata, dica }) {
+  const pct = ((valor - min) / (max - min)) * 100;
+  const id = 'sl-' + rotulo.replace(/\W+/g, '-').toLowerCase();
+  return html`
+    <div>
+      <div className="mb-3 flex items-baseline justify-between gap-3">
+        <label htmlFor=${id} className="text-sm font-semibold text-txt2">${rotulo}</label>
+        <output htmlFor=${id} className="font-disp text-xl font-bold text-lilas">${formata(valor)}</output>
+      </div>
+      <input id=${id} type="range" min=${min} max=${max} step=${passo} value=${valor}
+             onInput=${(e) => onChange(Number(e.target.value))}
+             onChange=${(e) => onChange(Number(e.target.value))}
+             style=${{ '--pct': pct + '%' }} />
+      ${dica && html`<p className="mt-2 text-xs text-txt3">${dica}</p>`}
+    </div>`;
+}
+
+function CartaoResultado({ rotulo, valor, sufixo, destaque, ativo, formata }) {
+  const v = useNumeroAnimado(valor, ativo);
+  return html`
+    <div className=${'card rounded-2xl p-6 ' + (destaque ? 'border-violeta/70 shadow-[0_0_40px_-14px_rgba(155,92,255,.6)]' : '')}>
+      <p className="text-xs font-semibold uppercase tracking-wider text-txt3">${rotulo}</p>
+      <p className=${'mt-2 font-disp font-extrabold leading-none ' + (destaque ? 'text-4xl text-lilas sm:text-5xl' : 'text-3xl text-txt sm:text-4xl')}>
+        ${formata(v)}${sufixo && html`<span className="ml-1 text-lg font-bold text-txt3">${sufixo}</span>`}
+      </p>
+    </div>`;
+}
+
+function Calculadora() {
+  const [clientes, setClientes] = useState(80);
+  const [ticket, setTicket] = useState(60);
+  const [retorno, setRetorno] = useState(40);
+  const [horas, setHoras] = useState(2);
+  const [ativo, setAtivo] = useState(semMovimento);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    if (semMovimento) return;
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) { setAtivo(true); obs.disconnect(); }
+    }, { threshold: 0.25 });
+    obs.observe(el);
+    const rede = setTimeout(() => setAtivo(true), 2500);
+    return () => { obs.disconnect(); clearTimeout(rede); };
+  }, []);
+
+  const r = useMemo(() => {
+    /* Ganho extra = recuperação de quem ficava sem resposta (15%)
+       + reativação de quem não voltava (8% dos que não retornam). */
+    const porResposta = clientes * 0.15 * ticket;
+    const porReativacao = clientes * ((100 - retorno) / 100) * 0.08 * ticket;
+    const ganhoMes = porResposta + porReativacao;
+    const horasAno = horas * 22 * 12;
+    const sobraAno = (ganhoMes - CUSTO_MES) * 12;
+    const roi = ((ganhoMes - CUSTO_MES) / CUSTO_MES) * 100;
+    return { ganhoMes, horasAno, sobraAno, roi };
+  }, [clientes, ticket, retorno, horas]);
+
+  return html`
+    <section id="calculadora" className="relative px-5 py-24 lg:py-32">
+      <div className="mx-auto max-w-6xl">
+        <${Reveal}>
+          <${TituloSecao} tag="Calculadora"
+            titulo=${html`Quanto você <span className="texto-gradiente">deixa na mesa</span> hoje`}
+            sub="Mexe nos números do seu negócio e vê a estimativa na hora." />
+        <//>
+        <${Reveal} delay=${90}>
+          <div ref=${ref} className="card overflow-hidden rounded-3xl p-7 sm:p-10">
+            <div className="grid gap-10 lg:grid-cols-[1fr_1.05fr] lg:gap-14">
+              <div className="grid content-start gap-8">
+                <${Slider} rotulo="Clientes atendidos por mês" valor=${clientes} min=${10} max=${600} passo=${5}
+                           onChange=${setClientes} formata=${num} />
+                <${Slider} rotulo="Ticket médio" valor=${ticket} min=${10} max=${600} passo=${5}
+                           onChange=${setTicket} formata=${brl} />
+                <${Slider} rotulo="Clientes que voltam" valor=${retorno} min=${0} max=${100} passo=${5}
+                           onChange=${setRetorno} formata=${(v) => v + '%'}
+                           dica="Quanto menor, mais gente tem pra reativar." />
+                <${Slider} rotulo="Horas por dia no WhatsApp" valor=${horas} min=${0.5} max=${10} passo=${0.5}
+                           onChange=${setHoras} formata=${(v) => String(v).replace('.', ',') + 'h'} />
+              </div>
+
+              <div className="grid content-start gap-4 sm:grid-cols-2">
+                <div className="sm:col-span-2">
+                  <${CartaoResultado} rotulo="Ganho extra estimado por mês" valor=${r.ganhoMes}
+                                      destaque=${true} ativo=${ativo} formata=${brl} />
+                </div>
+                <${CartaoResultado} rotulo="Retorno sobre o investimento" valor=${r.roi} sufixo="%"
+                                    ativo=${ativo} formata=${num} />
+                <${CartaoResultado} rotulo="Horas devolvidas por ano" valor=${r.horasAno} sufixo="h"
+                                    ativo=${ativo} formata=${num} />
+                <div className="sm:col-span-2">
+                  <${CartaoResultado} rotulo=${'Sobra no ano, já pagando o plano de ' + brl(CUSTO_MES) + '/mês'}
+                                      valor=${r.sobraAno} ativo=${ativo} formata=${brl} />
+                </div>
+                <p className="text-xs leading-relaxed text-txt3 sm:col-span-2">
+                  Estimativa calculada a partir dos números que você informou — não é promessa de
+                  resultado. O que a SyncTech garante é a operação rodando, não o faturamento do seu negócio.
+                </p>
+                <div className="sm:col-span-2">
+                  <${BtnPrimario} href=${wa('Olá! Fiz a simulação no site e quero o diagnóstico gratuito da SyncTech.')}
+                                  className="w-full">
+                    Quero validar esses números <${Ico} d=${ICONES.seta} className="h-4 w-4" />
+                  <//>
+                </div>
+              </div>
+            </div>
+          </div>
+        <//>
+      </div>
+    </section>`;
+}
+
+/* ═══════════════ Processo ═══════════════ */
+const PASSOS = [
+  { t: 'Diagnóstico grátis', d: 'A gente conversa 20 minutos, olha como seu atendimento funciona hoje e mostra onde está vazando cliente. Sem compromisso.' },
+  { t: 'Configuração em 7 dias', d: 'Montamos o robô com as suas respostas, seus preços e sua agenda. Você não precisa mexer em nada técnico.' },
+  { t: 'Treinamento do robô', d: 'Rodamos junto com você, ajustamos o jeito de falar e ensinamos o que fazer em cada tipo de pergunta.' },
+  { t: 'Operação e ajustes', d: 'No ar, com relatório toda semana e ajuste contínuo conforme o negócio muda.' }
+];
+
+function Processo() {
+  return html`
+    <section id="processo" className="relative px-5 py-24 lg:py-32">
+      <div className="mx-auto max-w-6xl">
+        <${Reveal}>
+          <${TituloSecao} tag="Processo"
+            titulo=${html`Do primeiro papo ao <span className="texto-gradiente">robô no ar</span>`}
+            sub="Quatro passos. Nenhum deles exige que você entenda de tecnologia." />
+        <//>
+        <ol className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          ${PASSOS.map((p, i) => html`
+            <${Reveal} key=${p.t} delay=${i * 90} as="li">
+              <div className="card h-full rounded-3xl p-7">
+                <span className="font-disp text-5xl font-extrabold text-violeta/25">${String(i + 1).padStart(2, '0')}</span>
+                <h3 className="mt-3 font-disp text-lg font-bold">${p.t}</h3>
+                <p className="mt-2.5 text-sm leading-relaxed text-txt2">${p.d}</p>
+              </div>
+            <//>`)}
+        </ol>
+      </div>
+    </section>`;
+}
+
+/* ═══════════════ Comparativo ═══════════════ */
+const COMPARA = [
+  ['Tempo de resposta', 'De minutos a horas', 'Segundos, sempre'],
+  ['Disponibilidade', 'Só no horário comercial', '24 horas, 7 dias'],
+  ['Agendamentos', 'No caderno, com no-show', 'Automático, com lembrete'],
+  ['Custo', 'Salário + encargos', 'A partir de R$197/mês'],
+  ['Escala', 'Uma conversa por vez', 'Conversas simultâneas']
+];
+
+function Comparativo() {
+  return html`
+    <section className="relative px-5 py-24 lg:py-32">
+      <div className="mx-auto max-w-5xl">
+        <${Reveal}>
+          <${TituloSecao} tag="Comparativo"
+            titulo=${html`Atendimento manual <span className="text-txt3">vs</span> <span className="texto-gradiente">SyncTech</span>`} />
+        <//>
+        <${Reveal} delay=${90}>
+          <div className="card scrollbar-fina overflow-x-auto rounded-3xl">
+            <table className="w-full min-w-[560px] border-collapse text-left">
+              <caption className="sr-only">Comparação entre atendimento manual e atendimento com a SyncTech</caption>
+              <thead>
+                <tr className="border-b border-linha">
+                  <th scope="col" className="p-5 text-sm font-semibold text-txt3">Item</th>
+                  <th scope="col" className="p-5 font-disp text-base font-bold text-txt2">Manual</th>
+                  <th scope="col" className="p-5 font-disp text-base font-bold text-lilas">SyncTech</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${COMPARA.map(([campo, manual, sync], i) => html`
+                  <tr key=${campo} className=${i < COMPARA.length - 1 ? 'border-b border-linha/50' : ''}>
+                    <th scope="row" className="p-5 text-sm font-semibold text-txt">${campo}</th>
+                    <td className="p-5 text-sm text-txt2">
+                      <span className="flex items-center gap-2.5">
+                        <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-red-500/15 text-red-400">
+                          <${Ico} d=${ICONES.x} className="h-3 w-3" />
+                        </span>${manual}
+                      </span>
+                    </td>
+                    <td className="p-5 text-sm font-semibold text-txt">
+                      <span className="flex items-center gap-2.5">
+                        <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-violeta/25 text-violeta">
+                          <${Ico} d=${ICONES.check} className="h-3 w-3" />
+                        </span>${sync}
+                      </span>
+                    </td>
+                  </tr>`)}
+              </tbody>
+            </table>
+          </div>
+        <//>
+      </div>
+    </section>`;
+}
+
+/* ═══════════════ Públicos ═══════════════ */
+const PUBLICOS = [
+  ['Salões de beleza', ICONES.coracao], ['Barbearias', ICONES.tesoura], ['Clínicas', ICONES.estetos],
+  ['Pet shops', ICONES.pata], ['Restaurantes', ICONES.garfo], ['Lojas online', ICONES.sacola]
+];
+
+function Publicos() {
+  return html`
+    <section className="relative px-5 py-24 lg:py-32">
+      <div className="mx-auto max-w-5xl">
+        <${Reveal}>
+          <${TituloSecao} tag="Para quem é"
+            titulo=${html`Feito pra quem <span className="texto-gradiente">atende no WhatsApp</span>`}
+            sub="Se o seu cliente marca horário ou pede pelo celular, encaixa." />
+        <//>
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+          ${PUBLICOS.map(([nome, ico], i) => html`
+            <${Reveal} key=${nome} delay=${i * 60}>
+              <div className="card flex h-full items-center gap-3.5 rounded-2xl p-5">
+                <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-violeta/15 text-violeta">
+                  <${Ico} d=${ico} className="h-5 w-5" />
+                </span>
+                <span className="font-disp text-sm font-bold sm:text-base">${nome}</span>
+              </div>
+            <//>`)}
+        </div>
+        <${Reveal} delay=${400}>
+          <p className="mt-8 text-center text-sm text-txt3">
+            Não está na lista?
+            <a href=${wa('Olá! Meu negócio não está na lista do site. Vocês atendem meu nicho?')}
+               target="_blank" rel="noopener"
+               className="ml-1 font-semibold text-lilas underline decoration-violeta/60 underline-offset-4 hover:text-violeta">
+              Pergunta no WhatsApp
+            </a> — o robô se adapta ao seu jeito de atender.
+          </p>
+        <//>
+      </div>
+    </section>`;
+}
+
+/* ═══════════════ Planos ═══════════════ */
+const PLANOS = [
+  { nome: 'Starter', mes: 197, dest: false, resumo: 'Pra sair do zero e parar de perder mensagem.',
+    itens: ['WhatsApp Bot 24/7', 'Respostas automáticas personalizadas', 'Envio de catálogo e preços', 'Setup incluso'] },
+  { nome: 'Pro', mes: 397, dest: true, resumo: 'O mais pedido: atendimento, agenda e Instagram juntos.',
+    itens: ['Tudo do Starter', 'Agendamento inteligente + lembretes', 'Instagram Automation (DM e comentários)', 'CRM leve com histórico', 'Relatórios semanais'] },
+  { nome: 'Premium', mes: 697, dest: false, resumo: 'Pra quem já tem volume e precisa de tudo conectado.',
+    itens: ['Tudo do Pro', 'Integrações (Google Calendar, planilhas)', 'Fluxos personalizados', 'Suporte prioritário', 'Ajustes ilimitados'] }
+];
+
+function Planos() {
+  const [anual, setAnual] = useState(false);
+  const preco = (p) => (anual ? Math.round(p.mes * 0.8) : p.mes);
+
+  return html`
+    <section id="planos" className="relative px-5 py-24 lg:py-32">
+      <div className="mx-auto max-w-6xl">
+        <${Reveal}>
+          <${TituloSecao} tag="Planos"
+            titulo=${html`Preço fechado, <span className="texto-gradiente">sem surpresa</span>`}
+            sub="Setup incluso em todos. Sem fidelidade — se não servir, você cancela." />
+        <//>
+
+        <${Reveal} delay=${60}>
+          <div className="mb-12 flex justify-center">
+            <div className="inline-flex items-center gap-1 rounded-full border border-linha bg-surf p-1.5"
+                 role="group" aria-label="Forma de cobrança">
+              ${[['Mensal', false], ['Anual', true]].map(([rot, v]) => html`
+                <button key=${rot} type="button" onClick=${() => setAnual(v)} aria-pressed=${anual === v}
+                        className=${'rounded-full px-6 py-2.5 text-sm font-bold transition ' +
+                          (anual === v ? 'bg-violeta text-white shadow-lg shadow-violeta/30' : 'text-txt2 hover:text-lilas')}>
+                  ${rot}${v && html`<span className="ml-2 rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-extrabold">-20%</span>`}
+                </button>`)}
+            </div>
+          </div>
+        <//>
+
+        <div className="grid items-start gap-5 lg:grid-cols-3">
+          ${PLANOS.map((p, i) => html`
+            <${Reveal} key=${p.nome} delay=${i * 90}>
+              <article className=${'card relative h-full rounded-3xl p-8 ' +
+                  (p.dest ? 'border-violeta shadow-[0_0_54px_-16px_rgba(155,92,255,.85)] lg:-translate-y-3' : '')}>
+                ${p.dest && html`
+                  <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-violeta px-4 py-1.5 text-xs font-extrabold uppercase tracking-wide text-white">
+                    Mais popular
+                  </span>`}
+                <h3 className="font-disp text-xl font-bold">${p.nome}</h3>
+                <p className="mt-2 min-h-[42px] text-sm text-txt2">${p.resumo}</p>
+                <p className="mt-6 flex items-end gap-1.5">
+                  <span className="font-disp text-5xl font-extrabold text-txt">${brl(preco(p))}</span>
+                  <span className="mb-1.5 text-sm font-semibold text-txt3">/mês</span>
+                </p>
+                <p className="mt-2 text-xs text-txt3">
+                  ${anual
+                    ? 'Cobrado ' + brl(preco(p) * 12) + ' por ano · economia de ' + brl((p.mes - preco(p)) * 12)
+                    : 'Cobrança mensal, cancele quando quiser'}
+                </p>
+                <ul className="mt-7 grid gap-3">
+                  ${p.itens.map((it) => html`
+                    <li key=${it} className="flex items-start gap-2.5 text-sm text-txt2">
+                      <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-violeta/20 text-violeta">
+                        <${Ico} d=${ICONES.check} className="h-3 w-3" />
+                      </span>${it}
+                    </li>`)}
+                </ul>
+                <a href=${wa('Olá! Tenho interesse no plano ' + p.nome + ' da SyncTech e quero o diagnóstico gratuito.')}
+                   target="_blank" rel="noopener"
+                   className=${'mt-8 flex justify-center rounded-xl px-5 py-3.5 font-bold transition hover:-translate-y-0.5 ' +
+                     (p.dest ? 'bg-violeta text-white hover:bg-[#8A46F5]' : 'border border-linha bg-surf2 text-txt hover:border-violeta')}>
+                  Começar com o ${p.nome}
+                </a>
+              </article>
+            <//>`)}
+        </div>
+
+        <${Reveal} delay=${330}>
+          <p className="mt-10 text-center text-sm text-txt3">
+            Setup incluso · Sem fidelidade · Cancele quando quiser
+          </p>
+        <//>
+      </div>
+    </section>`;
+}
+
+/* ═══════════════ Caso real ═══════════════ */
+function CasoReal() {
+  const c = PROVA.caso;
+  const antes = [
+    'Cerca de 3 horas por dia respondendo mensagem no meio do expediente',
+    'Mensagem fora do horário ficava sem resposta até o dia seguinte',
+    'Agendamento no caderno, com horário esquecido e no-show'
+  ];
+  const depois = [
+    'Resposta em segundos, inclusive de madrugada',
+    'Agenda e lembrete automáticos, sem caderno',
+    'Presença digital crescendo com conteúdo publicado toda semana'
+  ];
+  return html`
+    <section className="relative px-5 py-24 lg:py-32">
+      <div className="mx-auto max-w-5xl">
+        <${Reveal}>
+          <${TituloSecao} tag="Caso real"
+            titulo=${html`Antes e depois de <span className="texto-gradiente">virar a chave</span>`} />
+        <//>
+        <${Reveal} delay=${90}>
+          <div className="card rounded-3xl p-8 sm:p-11">
+            <div className="flex items-center gap-4">
+              <div className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-violeta/20 font-disp text-lg font-extrabold text-lilas"
+                   aria-hidden="true">${c.iniciais}</div>
+              <div>
+                <p className="font-disp text-lg font-bold">${c.cliente}</p>
+                <p className="text-sm text-txt3">${c.lugar}</p>
+              </div>
+            </div>
+
+            <div className="mt-9 grid gap-4 md:grid-cols-2">
+              <div className="rounded-2xl border border-linha/70 bg-base/50 p-6">
+                <p className="mb-4 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-txt3">
+                  <${Ico} d=${ICONES.relogio} className="h-4 w-4" /> Antes
+                </p>
+                <ul className="grid gap-3 text-sm text-txt2">
+                  ${antes.map((t) => html`
+                    <li key=${t} className="flex items-start gap-2.5">
+                      <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-red-500/15 text-red-400">
+                        <${Ico} d=${ICONES.x} className="h-3 w-3" />
+                      </span>${t}
+                    </li>`)}
+                </ul>
+              </div>
+              <div className="rounded-2xl border border-violeta/50 bg-violeta/[.07] p-6">
+                <p className="mb-4 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-lilas">
+                  <${Ico} d=${ICONES.raio} className="h-4 w-4" /> Depois
+                </p>
+                <ul className="grid gap-3 text-sm text-txt">
+                  ${depois.map((t) => html`
+                    <li key=${t} className="flex items-start gap-2.5">
+                      <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-violeta/25 text-violeta">
+                        <${Ico} d=${ICONES.check} className="h-3 w-3" />
+                      </span>${t}
+                    </li>`)}
+                </ul>
+              </div>
+            </div>
+
+            ${c.citacao && html`
+              <figure className="mt-9 border-l-2 border-violeta pl-6">
+                <blockquote className="font-disp text-xl font-semibold leading-relaxed text-txt">
+                  &ldquo;${c.citacao}&rdquo;
+                </blockquote>
+                <figcaption className="mt-3 text-sm text-txt3">
+                  <span className="font-semibold text-txt2">${c.autor}</span> · ${c.cargo}
+                </figcaption>
+              </figure>`}
+          </div>
+        <//>
+      </div>
+    </section>`;
+}
+
+/* ═══════════════ FAQ ═══════════════ */
+const PERGUNTAS = [
+  ['Preciso entender de tecnologia?', 'Não. A gente configura tudo, testa junto com você e entrega funcionando. Você só precisa saber usar o WhatsApp que já usa hoje.'],
+  ['Quanto tempo leva pra ficar no ar?', 'Sete dias a partir do diagnóstico. Nesse período a gente monta o robô com as suas respostas, seus preços e a sua agenda.'],
+  ['Funciona pro meu nicho?', 'Se o seu cliente marca horário, pede orçamento ou compra pelo WhatsApp, funciona. O robô é montado com as suas respostas, não com um script pronto de prateleira.'],
+  ['Posso cancelar quando quiser?', 'Pode. Não tem fidelidade nem multa: avisa e a gente encerra no fim do ciclo já pago.'],
+  ['Isso substitui minha equipe?', 'Não é a ideia. O robô tira da sua equipe a parte repetitiva — horário, preço, endereço, agendamento — pra que ela cuide do que precisa de gente de verdade.'],
+  ['Meus clientes vão saber que é robô?', 'O robô fala do jeito do seu negócio e passa a conversa pra uma pessoa sempre que o caso foge do padrão. A gente não finge que é humano quando não é.']
+];
+
+function FAQ() {
+  const [aberta, setAberta] = useState(0);
+  return html`
+    <section id="faq" className="relative px-5 py-24 lg:py-32">
+      <div className="mx-auto max-w-3xl">
+        <${Reveal}>
+          <${TituloSecao} tag="FAQ" titulo=${html`Dúvidas <span className="texto-gradiente">antes de começar</span>`} />
+        <//>
+        <div className="grid gap-3">
+          ${PERGUNTAS.map(([q, a], i) => {
+            const ab = aberta === i;
+            return html`
+              <${Reveal} key=${q} delay=${i * 55}>
+                <div className=${'card overflow-hidden rounded-2xl ' + (ab ? 'border-violeta/70' : '')}>
+                  <h3>
+                    <button type="button" onClick=${() => setAberta(ab ? -1 : i)}
+                            aria-expanded=${ab} aria-controls=${'faq-' + i}
+                            className="flex w-full items-center justify-between gap-4 p-6 text-left font-disp text-base font-bold text-txt">
+                      ${q}
+                      <span className=${'grid h-7 w-7 shrink-0 place-items-center rounded-full bg-violeta/20 text-violeta transition-transform duration-300 ' + (ab ? 'rotate-45' : '')}>
+                        <${Ico} d=${ICONES.mais} className="h-4 w-4" />
+                      </span>
+                    </button>
+                  </h3>
+                  <div id=${'faq-' + i} hidden=${!ab} className="px-6 pb-6 text-sm leading-relaxed text-txt2">${a}</div>
+                </div>
+              <//>`;
+          })}
+        </div>
+      </div>
+    </section>`;
+}
+
+/* ═══════════════ Contato ═══════════════ */
+function Contato() {
+  const [nome, setNome] = useState('');
+  const [tel, setTel] = useState('');
+  const [erros, setErros] = useState({});
+  const [enviado, setEnviado] = useState(false);
+
+  const soDigitos = (s) => s.replace(/\D/g, '');
+  const mascarar = (v) => {
+    const d = soDigitos(v).slice(0, 11);
+    if (d.length <= 2) return d;
+    if (d.length <= 6) return '(' + d.slice(0, 2) + ') ' + d.slice(2);
+    if (d.length <= 10) return '(' + d.slice(0, 2) + ') ' + d.slice(2, 6) + '-' + d.slice(6);
+    return '(' + d.slice(0, 2) + ') ' + d.slice(2, 7) + '-' + d.slice(7);
+  };
+
+  const enviar = (e) => {
+    e.preventDefault();
+    const novos = {};
+    if (nome.trim().length < 2) novos.nome = 'Escreve seu nome pra gente saber com quem fala.';
+    const d = soDigitos(tel);
+    if (d.length < 10 || d.length > 11) novos.tel = 'Coloca o WhatsApp com DDD, ex: (31) 98655-1626.';
+    setErros(novos);
+    if (Object.keys(novos).length) return;
+
+    /* Sem parênteses em volta: a máscara já traz o DDD entre parênteses,
+       e "Sou Maria ((31) 9...)" sai com parêntese duplo no WhatsApp. */
+    const url = wa('Olá! Sou ' + nome.trim() + ', WhatsApp ' + mascarar(tel) + '. Quero o diagnóstico gratuito da SyncTech.');
+    setEnviado(true);
+    /* Se o navegador bloquear o popup, não deixa o usuário na mão. */
+    const janela = window.open(url, '_blank', 'noopener');
+    if (!janela) window.location.href = url;
+  };
+
+  const campo = (id, rot, valor, setar, tipo, ph, auto, erro) => html`
+    <div>
+      <label htmlFor=${id} className="mb-2 block text-sm font-semibold text-txt2">${rot}</label>
+      <input id=${id} type=${tipo} value=${valor} placeholder=${ph} autoComplete=${auto}
+             inputMode=${tipo === 'tel' ? 'numeric' : undefined}
+             aria-invalid=${erro ? 'true' : 'false'} aria-describedby=${erro ? id + '-erro' : undefined}
+             onInput=${(e) => { setar(e.target.value); setErros((x) => Object.assign({}, x, { [id]: undefined })); }}
+             className=${'w-full rounded-xl border bg-base/60 px-4 py-3.5 text-txt placeholder:text-txt3 transition ' +
+               'focus:border-violeta focus:outline-none focus:ring-2 focus:ring-violeta/40 ' +
+               (erro ? 'border-red-400' : 'border-linha')} />
+      ${erro && html`<p id=${id + '-erro'} role="alert" className="mt-2 text-sm text-red-400">${erro}</p>`}
+    </div>`;
+
+  const passos = [
+    'Abre o WhatsApp com a mensagem já escrita — é só apertar enviar.',
+    'A gente responde e marca os 20 minutos de diagnóstico.',
+    'Você recebe o que dá pra automatizar no seu caso, com preço fechado.'
+  ];
+
+  return html`
+    <section id="contato" className="relative px-5 py-24 lg:py-32">
+      <div className="mx-auto max-w-5xl">
+        <${Reveal}>
+          <${TituloSecao} tag="Contato"
+            titulo=${html`Comece pelo <span className="texto-gradiente">diagnóstico grátis</span>`}
+            sub="Vinte minutos de conversa. Você sai sabendo onde está perdendo cliente — contratando ou não." />
+        <//>
+        <${Reveal} delay=${90}>
+          <div className="card grid gap-10 rounded-3xl p-8 sm:p-11 lg:grid-cols-2 lg:gap-14">
+            <div>
+              <h3 className="font-disp text-2xl font-bold">O que acontece depois que você envia</h3>
+              <ol className="mt-7 grid gap-5">
+                ${passos.map((t, i) => html`
+                  <li key=${i} className="flex items-start gap-3.5">
+                    <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-violeta/20 font-disp text-sm font-extrabold text-lilas">${i + 1}</span>
+                    <span className="text-sm leading-relaxed text-txt2">${t}</span>
+                  </li>`)}
+              </ol>
+              <div className="mt-8 rounded-2xl border border-linha bg-base/50 p-5 text-sm text-txt3">
+                Prefere ir direto?
+                <a href=${wa(MSG_DIAG)} target="_blank" rel="noopener"
+                   className="ml-1 font-semibold text-lilas underline decoration-violeta/60 underline-offset-4 hover:text-violeta">
+                  Chamar no WhatsApp agora
+                </a>
+              </div>
+            </div>
+
+            <form onSubmit=${enviar} noValidate className="grid content-start gap-5">
+              ${campo('nome', 'Seu nome', nome, setNome, 'text', 'Ex: Maria Silva', 'name', erros.nome)}
+              ${campo('tel', 'Seu WhatsApp', mascarar(tel), setTel, 'tel', '(31) 98655-1626', 'tel', erros.tel)}
+              <button type="submit"
+                      className="glow-cta mt-1 flex items-center justify-center gap-2 rounded-xl bg-violeta px-6 py-4 font-bold text-white transition hover:bg-[#8A46F5]">
+                Receber diagnóstico grátis <${Ico} d=${ICONES.seta} className="h-4 w-4" />
+              </button>
+              <p role="status" aria-live="polite" className="min-h-[20px] text-sm text-txt3">
+                ${enviado
+                  ? html`<span className="font-semibold text-lilas">Abrimos o WhatsApp com sua mensagem pronta.</span> Se não abriu, toque no botão verde no canto da tela.`
+                  : 'Seus dados vão direto pro WhatsApp da SyncTech. Não guardamos nada neste site.'}
+              </p>
+            </form>
+          </div>
+        <//>
+      </div>
+    </section>`;
+}
+
+/* ═══════════════ Rodapé ═══════════════ */
+function Rodape() {
+  return html`
+    <footer className="relative border-t border-linha bg-surf/40 px-5 py-14">
+      <div className="mx-auto grid max-w-6xl gap-10 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="lg:col-span-2">
+          <p className="flex items-center gap-1 font-disp text-lg font-extrabold text-txt">
+            Sync<${Ico} d=${ICONES.raio} className="h-4 w-4 fill-violeta text-violeta" />Tech
+          </p>
+          <p className="mt-4 max-w-sm text-sm leading-relaxed text-txt2">
+            Automação de atendimento para pequenos negócios brasileiros. WhatsApp, Instagram,
+            agendamento e CRM funcionando sozinhos — pra você voltar a cuidar do negócio.
+          </p>
+        </div>
+        <nav aria-label="Links rápidos">
+          <p className="mb-4 font-disp text-sm font-bold text-txt">Navegar</p>
+          <ul className="grid gap-2.5 text-sm">
+            ${LINKS.map(([rot, href]) => html`
+              <li key=${href}><a href=${href} className="text-txt2 transition hover:text-lilas">${rot}</a></li>`)}
+          </ul>
+        </nav>
+        <div>
+          <p className="mb-4 font-disp text-sm font-bold text-txt">Contato</p>
+          <ul className="grid gap-2.5 text-sm">
+            <li>
+              <a href=${wa(MSG_DIAG)} target="_blank" rel="noopener"
+                 className="flex items-center gap-2 text-txt2 transition hover:text-lilas">
+                <${Ico} d=${ICONES.whats} className="h-4 w-4" /> (31) 98655-1626
+              </a>
+            </li>
+            <li className="text-txt3">Mariana e Ouro Preto · MG</li>
+            <li className="text-txt3">Atendimento remoto pro Brasil todo</li>
+          </ul>
+        </div>
+      </div>
+      <div className="mx-auto mt-12 flex max-w-6xl flex-col items-center justify-between gap-3 border-t border-linha/60 pt-7 text-xs text-txt3 sm:flex-row">
+        <p>© ${new Date().getFullYear()} SyncTech Automation. Todos os direitos reservados.</p>
+        <p>Feito em Minas Gerais.</p>
+      </div>
+    </footer>`;
+}
+
+/* ═══════════════ Botão flutuante ═══════════════ */
+function BotaoFlutuante() {
+  const [visivel, setVisivel] = useState(false);
+  useEffect(() => {
+    const f = () => setVisivel(window.scrollY > 420);
+    f();
+    window.addEventListener('scroll', f, { passive: true });
+    return () => window.removeEventListener('scroll', f);
+  }, []);
+  return html`
+    <a href=${wa(MSG_DIAG)} target="_blank" rel="noopener"
+       className=${'fixed bottom-5 right-5 z-50 flex items-center gap-2.5 rounded-full bg-[#25D366] px-5 py-3.5 font-bold text-[#0A0714] shadow-2xl transition-all duration-300 hover:scale-105 ' +
+         (visivel ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-6 opacity-0')}>
+      <${Ico} d=${ICONES.whats} className="h-5 w-5" />
+      <span className="hidden sm:inline">Falar agora</span>
+      <span className="sr-only sm:hidden">Falar agora no WhatsApp</span>
+    </a>`;
+}
+
+/* ═══════════════ App ═══════════════ */
+function App() {
+  return html`
+    <${React.Fragment}>
+      <${BarraProgresso} />
+      <${Navbar} />
+      <main>
+        <${Hero} />
+        <${Marquee} />
+        <${Servicos} />
+        <${Calculadora} />
+        <${Processo} />
+        <${Comparativo} />
+        <${Publicos} />
+        <${Planos} />
+        <${CasoReal} />
+        <${FAQ} />
+        <${Contato} />
+      </main>
+      <${Rodape} />
+      <${BotaoFlutuante} />
+    <//>`;
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(html`<${App} />`);
+})();
+</script>
+</body>
+</html>
