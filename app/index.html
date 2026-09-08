@@ -452,9 +452,9 @@ details[open] summary { margin-bottom: 4px; }
           <div class="form-group">
             <label class="form-label" for="pl-val">Plano estimado</label>
             <select class="form-input" id="pl-val">
-              <option value="197">Starter — R$197/mês</option>
-              <option value="397" selected>Negócio — R$397/mês</option>
-              <option value="797">Pro — R$797/mês</option>
+              <option value="250">Starter — R$250/mês</option>
+              <option value="500" selected>Negócio — R$500/mês</option>
+              <option value="1000">Pro — R$1.000/mês</option>
             </select>
           </div>
         </div>
@@ -600,9 +600,9 @@ function doGet(e) {
         <div class="form-group">
           <label class="form-label" for="nc-plan">Plano</label>
           <select class="form-input" id="nc-plan">
-            <option value="Starter">Starter — R$197/mês</option>
-            <option value="Negócio" selected>Negócio — R$397/mês</option>
-            <option value="Pro">Pro — R$797/mês</option>
+            <option value="Starter">Starter — R$250/mês</option>
+            <option value="Negócio" selected>Negócio — R$500/mês</option>
+            <option value="Pro">Pro — R$1.000/mês</option>
           </select>
         </div>
         <button class="btn btn-primary" onclick="gerarCliente()">Gerar links do cliente →</button>
@@ -691,7 +691,7 @@ let SERVICES = [
 
 // Mesmo conteúdo real da landing page pública (index.html raiz, seção #planos) — não duplicar com números diferentes.
 let PLANS = [
-  { name:'Starter', desc:'Para quem quer começar a automatizar com o essencial.', price:'R$197', setup:'+ R$299 de configuração (único)', features:[
+  { name:'Starter', desc:'Para quem quer começar a automatizar com o essencial.', price:'R$250', setup:'+ R$300 de configuração (único)', features:[
     { on:true,  text:'WhatsApp Bot básico' },
     { on:true,  text:'Agendamento Online' },
     { on:true,  text:'Link Bio Profissional' },
@@ -699,7 +699,7 @@ let PLANS = [
     { on:false, text:'Instagram Automático' },
     { on:false, text:'CRM e Métricas' },
   ]},
-  { name:'Negócio', badge:'Mais popular', featured:true, desc:'O pacote completo para quem quer crescer de verdade.', price:'R$397', setup:'+ R$499 de configuração (único)', features:[
+  { name:'Negócio', badge:'Mais popular', featured:true, desc:'O pacote completo para quem quer crescer de verdade.', price:'R$500', setup:'+ R$600 de configuração (único)', features:[
     { on:true, text:'WhatsApp Bot completo com IA' },
     { on:true, text:'Instagram Auto (DM + comentários)' },
     { on:true, text:'Agendamento Online completo' },
@@ -708,7 +708,7 @@ let PLANS = [
     { on:true, text:'Dashboard de Métricas' },
     { on:true, text:'Suporte prioritário' },
   ]},
-  { name:'Pro', desc:'Para empresas que querem automação total e resultado máximo.', price:'R$797', setup:'+ R$799 de configuração (único)', features:[
+  { name:'Pro', desc:'Para empresas que querem automação total e resultado máximo.', price:'R$1.000', setup:'+ R$1.000 de configuração (único)', features:[
     { on:true, text:'Tudo do Negócio' },
     { on:true, text:'Email Marketing' },
     { on:true, text:'Chat ao Vivo no Site' },
