@@ -1,13 +1,13 @@
 {
   "name": "Cantinho do Pão — Padaria e Lanchonete",
   "short_name": "Cantinho do Pão",
-  "description": "Monte seu pedido, acompanhe seus pedidos anteriores e finalize direto no WhatsApp",
+  "description": "Monte seu pedido no cardápio e finalize direto no WhatsApp",
   "start_url": ".",
   "scope": ".",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#161F26",
-  "theme_color": "#161F26",
+  "background_color": "#FBF8F4",
+  "theme_color": "#84411F",
   "lang": "pt-BR",
   "icons": [
     { "src": "assets/logo.jpg", "sizes": "150x150", "type": "image/jpeg", "purpose": "any" }

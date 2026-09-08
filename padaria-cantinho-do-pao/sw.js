@@ -1,4 +1,4 @@
-const CACHE = 'cantinho-app-v1';
+const CACHE = 'cantinho-app-v2';
 const SHELL = [
   './manifest.json',
   './assets/logo.jpg',
