@@ -242,6 +242,10 @@ details[open] summary { margin-bottom: 4px; }
 .client-bar.peak { background: linear-gradient(180deg, var(--pl), var(--primary)); }
 .client-bar-col:hover .client-bar { filter: brightness(1.25); }
 .client-bar-lbl { font-size: 0.58rem; color: var(--faint); margin-top: 5px; }
+.client-history-chart { background: var(--s2); border: 1px solid var(--border); border-radius: 9px; padding: 10px 12px 8px; margin-bottom: 10px; }
+.client-history-svg { width: 100%; height: 56px; display: block; }
+.client-history-legend { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; font-size: 0.68rem; font-family: var(--font-mono); color: var(--muted); }
+.client-history-delta { font-weight: 700; color: var(--primary); }
 .client-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
 .client-compare-box { background: var(--s2); border: 1px solid var(--border); border-radius: 9px; padding: 10px 12px; }
 .client-compare-lbl { font-size: 0.62rem; color: var(--faint); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
@@ -977,6 +981,13 @@ let CLIENTS_FIXED = [
       followers: 502,
       followersPrev: 424,
       followersPrevDate: '10/08/2026',
+      // Seguidores dia a dia via WebFetch (tarefa synctech-dados-diarios).
+      // Independente do collectedAt acima (esse é da tarefa mensal, que faz
+      // uma auditoria mais funda de posts/curtidas uma vez por mês) — os
+      // dois nunca se sobrescrevem.
+      history: [
+        { date: '08/09/2026', followers: 515 },
+      ],
       posts60d: 6,
       likesTotal: 243,
       commentsTotal: 45,
@@ -1029,6 +1040,12 @@ let CLIENTS_FIXED = [
       followers: 2488,
       googleRating: 4.5,
       googleReviews: 74,
+      // Seguidores dia a dia via WebFetch (tarefa synctech-dados-diarios).
+      // É o único dado diário real que existe pra ela hoje — pedidos/vendas
+      // só entram aqui quando PEDIDOS_LOG_URL estiver ligado.
+      history: [
+        { date: '08/09/2026', followers: 2487 },
+      ],
       // Só entra em "active" o que está de fato no ar e sendo entregue. O que está
       // contratado mas ainda não ligado fica em "pending" — este bloco alimenta o
       // relatório que a cliente recebe, então não pode inflar entrega.
@@ -1064,6 +1081,32 @@ let CLIENTS_FIXED = [
 // sem site publicado — não linkar aqui até estarem hospedados, senão quebra no celular.
 
 // ═══════════════ HELPER: gráficos/stats reais de um cliente (usado em Clientes e Relatório) ═══════════════
+// Gráfico de seguidores dia a dia. Escala pro min/max da própria janela
+// (não de 0) de propósito — um número que só muda 1-5 por dia num total
+// de milhares fica achatado e ilegível numa escala que começa em zero.
+function buildFollowerHistorySvg(hist) {
+  let W = 320, H = 64, padX = 6, padY = 10;
+  let vals = hist.map(function(h){ return h.followers; });
+  let min = Math.min.apply(null, vals), max = Math.max.apply(null, vals);
+  if (min === max) { min -= 1; max += 1; }
+  let n = hist.length;
+  let pts = hist.map(function(h, i){
+    let x = n > 1 ? padX + (i / (n - 1)) * (W - padX * 2) : W / 2;
+    let y = padY + (1 - (h.followers - min) / (max - min)) * (H - padY * 2);
+    return { x: x, y: y };
+  });
+  let poly = pts.map(function(p){ return p.x.toFixed(1) + ',' + p.y.toFixed(1); }).join(' ');
+  let dots = pts.map(function(p, i){
+    let isEnd = i === 0 || i === n - 1;
+    return '<circle cx="' + p.x.toFixed(1) + '" cy="' + p.y.toFixed(1) + '" r="' + (isEnd ? 3 : 2) +
+      '" fill="' + (isEnd ? '#fff' : '#8B5CF6') + '"' + (isEnd ? ' stroke="#8B5CF6" stroke-width="2"' : '') + ' />';
+  }).join('');
+  return '<svg viewBox="0 0 ' + W + ' ' + H + '" class="client-history-svg" preserveAspectRatio="none" role="img" aria-label="Seguidores ao longo dos últimos dias">' +
+    '<polyline points="' + poly + '" fill="none" stroke="#8B5CF6" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>' +
+    dots +
+  '</svg>';
+}
+
 function buildStatsHtml(c) {
   let statsHtml = '';
   if (c.stats) {
@@ -1091,6 +1134,23 @@ function buildStatsHtml(c) {
         '<div class="client-stats-title">Dados reais (coletado em '+s.collectedAt+')</div>' +
         '<div class="client-stats-grid">' + statCards.join('') + '</div>' +
         (s.bestPost ? '<div class="client-best-post">🏆 Melhor post: <strong>'+s.bestPost.likes+' curtidas · '+s.bestPost.comments+' comentários</strong> ('+s.bestPost.date+') — '+s.bestPost.desc+'</div>' : '');
+
+      // Coletado por WebFetch (não pelo Browser pane) numa tarefa diária —
+      // o Browser pane já confirmou não anexar em execução agendada/cron
+      // neste ambiente (ver shopee-afiliado-diario). Escala própria por
+      // cliente: cada card lê só o próprio s.history.
+      if (s.history && s.history.length >= 2) {
+        let hist = s.history.slice(-14);
+        let delta = hist[hist.length-1].followers - hist[0].followers;
+        let deltaStr = (delta > 0 ? '+' : '') + delta;
+        statsHtml += '<div class="client-chart-title">Seguidores dia a dia (' + hist[0].date + ' – ' + hist[hist.length-1].date + ')</div>' +
+          '<div class="client-history-chart">' +
+            buildFollowerHistorySvg(hist) +
+            '<div class="client-history-legend"><span>' + hist[0].followers + '</span><span class="client-history-delta">' + deltaStr + '</span><span>' + hist[hist.length-1].followers + '</span></div>' +
+          '</div>';
+      } else if (s.history && s.history.length === 1) {
+        statsHtml += '<div class="client-chart-title">Seguidores dia a dia</div><p style="font-size:.72rem;color:var(--faint);margin:0 0 10px">Primeiro dado coletado em ' + s.history[0].date + ' — o gráfico aparece a partir do segundo dia.</p>';
+      }
 
       if (s.servicesUsed) {
         let sv = s.servicesUsed;
