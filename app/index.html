@@ -132,6 +132,10 @@ h1, h2, h3, .logo { font-family: var(--font-head), sans-serif; }
   border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 30;
   display: flex; align-items: center; padding: 0 22px; gap: 12px;
 }
+.back-btn { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; margin-right: 4px; border-radius: 8px; border: 1px solid var(--border-s); background: var(--s1); color: var(--muted); cursor: pointer; flex-shrink: 0; transition: all 0.15s; }
+.back-btn:hover { color: var(--pl); border-color: var(--primary); }
+.back-btn svg { width: 16px; height: 16px; }
+.back-btn.hidden { display: none; }
 .topbar-title { font-family: var(--font-head), sans-serif; font-size: 1.05rem; font-weight: 700; letter-spacing: 0.02em; text-transform: uppercase; }
 .topbar-right { display: flex; align-items: center; gap: 10px; margin-left: auto; }
 .topbar-date { font-size: 0.74rem; color: var(--muted); }
@@ -142,6 +146,8 @@ h1, h2, h3, .logo { font-family: var(--font-head), sans-serif; }
 
 .hero { margin-bottom: 22px; }
 .hero-greet { font-family: var(--font-head), sans-serif; font-size: 1.7rem; font-weight: 700; letter-spacing: 0.01em; }
+.home-summary { background: linear-gradient(120deg, rgba(168,85,247,0.14), rgba(34,211,238,0.05)); border: 1px solid var(--border-s); border-radius: var(--r); padding: 14px 20px; margin: 16px 0 20px; font-size: 0.9rem; line-height: 1.5; }
+.home-summary b { color: var(--pl); font-family: var(--font-head), sans-serif; font-weight: 700; }
 .hero-greet .accent { background: linear-gradient(90deg, var(--pl), var(--cyan)); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .hero-sub { font-size: 0.82rem; color: var(--muted); margin-top: 4px; }
 
@@ -381,6 +387,9 @@ details[open] summary { margin-bottom: 4px; }
 
 <div class="main">
   <div class="topbar">
+    <button class="back-btn hidden" id="back-btn" onclick="goPage('inicio')" aria-label="Voltar para o Início">
+      <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 3.5L5 9l6 5.5"/></svg>
+    </button>
     <div class="topbar-title" id="topbar-title">Início</div>
     <div class="topbar-right">
       <span class="topbar-date" id="topbar-date"></span>
@@ -395,6 +404,7 @@ details[open] summary { margin-bottom: 4px; }
         <h1 class="hero-greet">Olá, <span class="accent">Rafael</span> 👋</h1>
         <div class="hero-sub">Aqui está o resumo do seu hub de automação hoje.</div>
       </div>
+      <div class="home-summary" id="home-summary"></div>
       <div class="kpi-grid" id="home-kpis"></div>
       <div class="quick-actions">
         <button class="qa-btn primary" onclick="goPage('pipeline')">📋 Ver Pipeline</button>
@@ -686,6 +696,7 @@ function goPage(id) {
   });
   let p = PAGES.filter(function(x){ return x.id===id; })[0];
   document.getElementById('topbar-title').textContent = p ? p.label : '';
+  document.getElementById('back-btn').classList.toggle('hidden', id === 'inicio');
   window.scrollTo(0,0);
   if (id === 'pipeline' && typeof syncPipelineFromCloud === 'function') { syncPipelineFromCloud(renderPipeline); }
 }
@@ -804,6 +815,9 @@ function renderHome() {
   document.getElementById('home-kpis').innerHTML = kpis.map(function(k){
     return '<div class="kpi-card"><div class="kpi-label">'+k.label+'</div><div class="kpi-val">'+k.val+'</div><div class="kpi-delta '+k.cls+'">'+k.delta+'</div></div>';
   }).join('');
+
+  document.getElementById('home-summary').innerHTML =
+    'Você tem <b>'+CLIENTS_FIXED.length+' cliente'+(CLIENTS_FIXED.length===1?'':'s')+' fixo'+(CLIENTS_FIXED.length===1?'':'s')+'</b> e já soma <b>R$'+(mrr+avulsosMes).toLocaleString('pt-BR')+'</b> pra receber este mês.';
 
   let avulsosDoMes = AVULSOS.filter(function(a){ return a.month === currentMonthKey(); });
   document.getElementById('home-avulsos').innerHTML = avulsosDoMes.length
