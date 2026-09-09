@@ -1,0 +1,176 @@
+<title>Contrato Cantinho do Pão</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<style>
+  :root{
+    --paper:#FBFBF9;
+    --sheet:#FFFFFF;
+    --ink:#16181A;
+    --mut:#565B60;
+    --faint:#8A9096;
+    --rule:#D6D9DC;
+    --rule-soft:#E8EAEC;
+    --mark:#1E4E6B;
+    --flag:#8A5A12;
+    --flag-bg:rgba(138,90,18,.09);
+    --serif:'Source Serif 4',Georgia,serif;
+    --sans:'Source Sans 3',system-ui,-apple-system,sans-serif;
+    color-scheme:light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#101315; --sheet:#171B1E; --ink:#E9ECEE; --mut:#A6ADB3; --faint:#7B838A;
+      --rule:#2D3438; --rule-soft:#232A2E; --mark:#7FB4D4; --flag:#D9A857; --flag-bg:rgba(217,168,87,.12);
+      color-scheme:dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#101315; --sheet:#171B1E; --ink:#E9ECEE; --mut:#A6ADB3; --faint:#7B838A;
+    --rule:#2D3438; --rule-soft:#232A2E; --mark:#7FB4D4; --flag:#D9A857; --flag-bg:rgba(217,168,87,.12);
+    color-scheme:dark;
+  }
+
+  *,*::before,*::after{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--serif);font-size:16px;line-height:1.62;-webkit-font-smoothing:antialiased}
+  p{margin:0}
+
+  .sheet{max-width:740px;margin:0 auto;background:var(--sheet);padding:52px 56px 60px;border-left:1px solid var(--rule-soft);border-right:1px solid var(--rule-soft);min-height:100vh}
+
+  .todo{
+    font-family:var(--sans);font-size:.88rem;line-height:1.5;
+    background:var(--flag-bg);border-left:4px solid var(--flag);
+    padding:16px 18px;margin-bottom:38px;color:var(--ink);
+  }
+  .todo b{display:block;font-weight:700;margin-bottom:7px}
+  .todo ul{margin:8px 0 0;padding-left:19px}
+  .todo li{margin-bottom:4px;color:var(--mut)}
+
+  h1{
+    font-family:var(--sans);font-size:1.28rem;font-weight:700;letter-spacing:.01em;
+    text-align:center;text-wrap:balance;margin:0 0 6px;line-height:1.3;
+  }
+  .subtitle{font-family:var(--sans);font-size:.86rem;color:var(--faint);text-align:center;margin-bottom:32px}
+
+  .parties{margin-bottom:28px}
+  .party{margin-bottom:14px}
+  .party .role{font-family:var(--sans);font-size:.72rem;font-weight:700;letter-spacing:.09em;color:var(--mark);margin-bottom:3px}
+
+  h2{
+    font-family:var(--sans);font-size:.92rem;font-weight:700;
+    margin:28px 0 9px;padding-bottom:6px;border-bottom:1px solid var(--rule);
+    break-after:avoid;page-break-after:avoid;
+  }
+  .clause{margin-bottom:10px;break-inside:avoid;page-break-inside:avoid}
+  ul.plain{margin:8px 0 4px;padding-left:22px}
+  ul.plain li{margin-bottom:7px;break-inside:avoid}
+  ul.plain li b{color:var(--ink)}
+
+  .fill{
+    display:inline-block;min-width:130px;border-bottom:1px dotted var(--flag);
+    color:var(--flag);font-family:var(--sans);font-size:.9em;padding:0 3px;
+  }
+
+  .destaque{
+    font-family:var(--sans);font-size:.85rem;background:var(--flag-bg);
+    border-left:3px solid var(--flag);padding:11px 15px;margin:12px 0 4px;color:var(--mut);
+  }
+  .destaque b{color:var(--ink)}
+
+  .sign{margin-top:46px;break-inside:avoid;page-break-inside:avoid}
+  .sign .place{margin-bottom:36px}
+  .sig-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px 36px;margin-top:18px}
+  .sig{border-top:1px solid var(--ink);padding-top:7px;font-family:var(--sans);font-size:.82rem;line-height:1.45}
+  .sig b{display:block;font-weight:700}
+  .sig span{color:var(--faint)}
+
+  @media print{
+    :root{--paper:#fff;--sheet:#fff;--ink:#000;--mut:#222;--faint:#555;--rule:#999;--rule-soft:#ccc;--mark:#000;--flag:#000;--flag-bg:#fff}
+    .todo{display:none}
+    body{font-size:10.8pt;line-height:1.5}
+    .sheet{max-width:none;padding:0;border:none;min-height:0}
+    @page{margin:20mm 18mm}
+    h2{margin-top:18px}
+    .destaque{border-left:2px solid #000;background:#fff}
+    .fill{border-bottom:1px dotted #000;color:#000}
+  }
+  @media (max-width:640px){.sheet{padding:30px 20px 44px}.sig-grid{grid-template-columns:1fr;gap:32px}}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="sheet">
+
+  <div class="todo">
+    <b>Antes de assinar — o que falta preencher</b>
+    Os trechos <span class="fill">em pontilhado</span> precisam ser completados à mão ou digitados antes de imprimir. Este aviso não sai na impressão.
+    <ul>
+      <li>CNPJ/CPF e nome de quem assina por cada uma das partes</li>
+      <li>Data de início (cláusula 5) e forma de pagamento (cláusula 4)</li>
+      <li>Valor sugerido da verba de anúncios, se já tiver sido combinado (cláusula 3)</li>
+    </ul>
+  </div>
+
+  <h1>Contrato de Prestação de Serviços</h1>
+  <p class="subtitle">SyncTech Automation e Padaria Cantinho do Pão — versão simplificada, prazo de 3 meses</p>
+
+  <div class="parties">
+    <div class="party">
+      <p class="role">CONTRATADA</p>
+      <p><b>SyncTech Automation</b>, inscrita no <span class="fill">CNPJ/CPF nº</span>, representada por <b>Rafael Santos</b>, CPF <span class="fill">&nbsp;</span>.</p>
+    </div>
+    <div class="party">
+      <p class="role">CONTRATANTE</p>
+      <p><b>Padaria Cantinho do Pão</b>, inscrita no <span class="fill">CNPJ nº</span>, com estabelecimento na Rua do Catete, nº 500, Mariana/MG, representada por <span class="fill">nome do responsável</span>, CPF <span class="fill">&nbsp;</span>.</p>
+    </div>
+    <p>As partes acima firmam este contrato, que se rege pelas cláusulas abaixo.</p>
+  </div>
+
+  <h2>1. O que está incluso no plano (R$ 1.000/mês)</h2>
+  <p class="clause">Pela mensalidade da cláusula 4, a CONTRATADA presta:</p>
+  <ul class="plain">
+    <li><b>Aplicativo de pedidos.</b> Manutenção do cardápio-app já entregue e em funcionamento — cardápio, carrinho, encomenda de bolo e envio do pedido pronto pro WhatsApp da padaria. Correção de falhas e atualização de itens, preços e fotos.</li>
+    <li><b>Pagamento por Pix no app.</b> Recurso já pronto no aplicativo; entra em uso assim que a padaria informar a chave Pix a ser usada.</li>
+    <li><b>Registro de pedidos.</b> Cada pedido feito pelo app é registrado numa planilha de titularidade da padaria (data, itens, valor, retirada ou entrega).</li>
+    <li><b>Gestão de tráfego pago.</b> Criação e acompanhamento de campanhas de anúncio no Instagram e Facebook (Meta Ads) — peças, textos e ajuste de segmentação.</li>
+    <li><b>Relatório mensal.</b> Até o dia 30 de cada mês, resumo dos pedidos do período e do desempenho dos anúncios.</li>
+  </ul>
+  <p class="clause">Não incluso no valor mensal, e a combinar à parte se algum dia fizer sentido: fotos e vídeos profissionais, nova funcionalidade grande no app, ou emissão de nota fiscal pelo app (depende de um sistema que a padaria ainda vai confirmar).</p>
+
+  <h2>2. Manutenção da vitrine e da agenda</h2>
+  <p class="clause">A padaria fornece fotos, preços e condições de entrega atualizados. Sem essa informação, o item correspondente do app fica como estava até ser enviado — isso não altera o prazo nem o valor do contrato.</p>
+
+  <h2>3. Verba de anúncios</h2>
+  <p class="clause">A verba paga aos anúncios <b>não está incluída</b> na mensalidade. A padaria paga essa verba <b>direto na plataforma Meta</b>, com cartão próprio numa conta de anúncios sob seu controle — o dinheiro do anúncio nunca passa pelo caixa da SyncTech, e a SyncTech não fica com nenhum percentual sobre ele. Sugestão de início: <span class="fill">R$</span>/dia, ajustável a qualquer momento pela padaria.</p>
+
+  <h2>4. Valor e pagamento</h2>
+  <p class="clause">Mensalidade de <b>R$ 1.000,00 (mil reais)</b>, com vencimento <b>todo dia 10</b> de cada mês, por <span class="fill">Pix / transferência</span>. Atraso maior que 10 dias soma multa de 2% sobre o valor em aberto.</p>
+
+  <h2>5. Prazo</h2>
+  <p class="clause">3 (três) meses, começando em <span class="fill">&nbsp;&nbsp;/&nbsp;&nbsp;/2026</span>. Passado esse prazo, o contrato continua mês a mês nas mesmas condições, até que uma das partes decida encerrar.</p>
+
+  <h2>6. Cancelamento</h2>
+  <p class="clause"><b>Qualquer uma das partes pode encerrar este contrato a qualquer momento</b> — inclusive antes dos 3 meses — se sentir que o serviço não está atendendo às expectativas. Basta avisar a outra parte por escrito (mensagem já vale) com <b>15 dias de antecedência</b>. Não há multa por cancelar.</p>
+  <p class="clause">O que já foi prestado até a data do aviso continua sendo devido e pago normalmente — o cancelamento vale só daí pra frente.</p>
+  <div class="destaque"><b>O que isso significa na prática.</b> Sem multa dos dois lados, o compromisso de 3 meses vira mais uma expectativa do que uma obrigação — qualquer um pode sair com 15 dias de aviso. Foi assim que o Rafael pediu; é a opção mais simples e mais fácil de vender, com a troca de que não há nenhuma proteção financeira contratual caso a padaria saia logo no início.</div>
+
+  <h2>7. Outros pontos</h2>
+  <ul class="plain">
+    <li><b>Sem garantia de resultado.</b> A SyncTech presta serviço de meio, não de resultado — não garante número de pedidos ou de vendas, que dependem também da padaria e das plataformas de anúncio.</li>
+    <li><b>Dados dos clientes.</b> Nome e endereço coletados no pedido são usados só pra entregar aquele pedido; a padaria é a responsável por esses dados perante a lei (LGPD), e a SyncTech só os trata a pedido dela.</li>
+    <li><b>Sigilo.</b> A SyncTech mantém sigilo sobre as informações comerciais da padaria a que tiver acesso.</li>
+    <li><b>Foro.</b> Fica eleita a Comarca de Mariana/MG para resolver qualquer questão deste contrato.</li>
+  </ul>
+
+  <div class="sign">
+    <p class="place">Mariana/MG, <span class="fill">&nbsp;&nbsp;</span> de <span class="fill">&nbsp;&nbsp;&nbsp;&nbsp;</span> de 2026.</p>
+    <div class="sig-grid">
+      <div class="sig">
+        <b>SyncTech Automation</b>
+        <span>Rafael Santos — CPF:</span>
+      </div>
+      <div class="sig">
+        <b>Padaria Cantinho do Pão</b>
+        <span>CPF:</span>
+      </div>
+    </div>
+  </div>
+
+</div>
