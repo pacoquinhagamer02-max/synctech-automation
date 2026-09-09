@@ -537,7 +537,7 @@ const SERVICOS = [
     txt: 'Agenda 24h integrada ao WhatsApp. O cliente marca pelo link, pelo site ou pelo bot — com lembrete automático.' },
   { ico: ICONES.crm, nome: 'CRM com Pipeline',
     txt: 'Kanban de leads (Novo, Contatado, Fechado) e histórico por cliente: visitas, total gasto, último serviço. Envio em massa por estágio.' },
-  { ico: ICONES.email, nome: 'Email Marketing',
+  { ico: ICONES.email, nome: 'Email Marketing', tag: 'Em breve',
     txt: 'Sequências automáticas para clientes e leads. Templates prontos e métricas em tempo real.' },
   { ico: ICONES.link, nome: 'Link na Bio', tag: 'Novo',
     txt: 'Página mobile-first pro Instagram: serviços com preço, agendar, WhatsApp e avaliação do Google num link só.' },
@@ -545,7 +545,7 @@ const SERVICOS = [
     txt: 'Pede avaliação depois do atendimento. Nota 1 a 3 vira feedback privado; nota 4 e 5 vai direto pro Google.' },
   { ico: ICONES.catalogo, nome: 'Catálogo Digital',
     txt: 'Cardápio ou catálogo visual online. O cliente vê, escolhe e pede direto pelo WhatsApp — sem PDF.' },
-  { ico: ICONES.chat, nome: 'Chat ao Vivo no Site',
+  { ico: ICONES.chat, nome: 'Chat ao Vivo no Site', tag: 'Em breve',
     txt: 'Widget que captura visitante, responde dúvida e encaminha pro WhatsApp automaticamente.' },
   { ico: ICONES.grafico, nome: 'Dashboard de Métricas',
     txt: 'Agendamentos, receita, clientes novos e performance do bot — em tempo real.' },
@@ -569,7 +569,7 @@ function Servicos() {
               <article className=${'card relative h-full rounded-3xl p-7 ' + (s.grande ? 'md:p-9' : '')}>
                 ${s.tag && html`
                   <span className=${'absolute right-5 top-5 rounded-full px-3 py-1 text-[10px] font-extrabold uppercase tracking-wide ' +
-                      (s.tag === 'Mais popular' ? 'bg-violeta text-white' : 'border border-linha bg-surf text-lilas')}>
+                      (s.tag === 'Mais popular' ? 'bg-violeta text-white' : s.tag === 'Em breve' ? 'border border-amber-400/40 bg-amber-400/10 text-amber-300' : 'border border-linha bg-surf text-lilas')}>
                     ${s.tag}
                   </span>`}
                 <div className=${'mb-5 grid place-items-center rounded-2xl bg-violeta/15 text-violeta ' +
@@ -899,17 +899,17 @@ const PLANOS = [
   { chave: 'starter', nome: 'Starter', mensal: 250, anual: 200, setup: 300, dest: false,
     desc: 'Para quem quer começar a automatizar com o essencial.',
     inclui: ['WhatsApp Bot básico', 'Agendamento Online', 'Link Bio Profissional', 'Suporte via WhatsApp'],
-    fora: ['Instagram Automático', 'CRM e Métricas'] },
+    emBreve: [], fora: ['Instagram Automático', 'CRM e Métricas'] },
   { chave: 'negocio', nome: 'Negócio', mensal: 500, anual: 400, setup: 600, dest: true,
     desc: 'O pacote completo para quem quer crescer de verdade.',
     inclui: ['WhatsApp Bot completo com IA', 'Instagram Auto (DM + comentários)', 'Agendamento Online completo',
              'CRM com pipeline de vendas', 'Catálogo Digital', 'Dashboard de Métricas', 'Suporte prioritário'],
-    fora: [] },
+    emBreve: [], fora: [] },
   { chave: 'pro', nome: 'Pro', mensal: 1000, anual: 800, setup: 1000, dest: false,
     desc: 'Para empresas que querem automação total e resultado máximo.',
-    inclui: ['Tudo do Negócio', 'Email Marketing', 'Chat ao Vivo no Site', 'Gestão de Reputação Google',
+    inclui: ['Tudo do Negócio', 'Gestão de Reputação Google',
              'Suporte 7 dias por semana', 'Reunião mensal de resultados', 'Integrações personalizadas'],
-    fora: [] }
+    emBreve: ['Email Marketing', 'Chat ao Vivo no Site'], fora: [] }
 ];
 
 function Planos() {
@@ -973,6 +973,10 @@ function Planos() {
                       <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-violeta/20 text-violeta">
                         <${Ico} d=${ICONES.check} className="h-3 w-3" />
                       </span>${it}
+                    </li>`)}
+                  ${(p.emBreve||[]).map((it) => html`
+                    <li key=${it} className="flex items-start gap-2.5 text-sm text-amber-300/90">
+                      <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-amber-400/15 text-amber-300 text-[10px] font-bold">⏳</span>${it} <span className="text-[10px] uppercase tracking-wide text-amber-400/80">(em breve)</span>
                     </li>`)}
                   ${p.fora.map((it) => html`
                     <li key=${it} className="flex items-start gap-2.5 text-sm text-txt3/70">

@@ -316,6 +316,8 @@ details[open] summary { margin-bottom: 4px; }
 .plan-mini-feat li .pf-icon { flex-shrink: 0; margin-top: 1px; }
 .plan-mini-feat li.on .pf-icon { color: var(--green); }
 .plan-mini-feat li:not(.on) .pf-icon { color: var(--faint); }
+.plan-mini-feat li.soon .pf-icon { color: var(--yellow); }
+.plan-mini-feat li.soon em { color: var(--yellow); font-style: normal; font-size: 0.68rem; }
 
 /* ── FORM (config wizard) ── */
 .form-group { margin-bottom: 14px; }
@@ -749,12 +751,12 @@ let PLANS = [
   ]},
   { name:'Pro', desc:'Para empresas que querem automação total e resultado máximo.', price:'R$1.000', setup:'+ R$1.000 de configuração (único)', features:[
     { on:true, text:'Tudo do Negócio' },
-    { on:true, text:'Email Marketing' },
-    { on:true, text:'Chat ao Vivo no Site' },
     { on:true, text:'Gestão de Reputação Google' },
     { on:true, text:'Suporte 7 dias por semana' },
     { on:true, text:'Reunião mensal de resultados' },
     { on:true, text:'Integrações personalizadas' },
+    { on:false, soon:true, text:'Email Marketing' },
+    { on:false, soon:true, text:'Chat ao Vivo no Site' },
   ]},
 ];
 
@@ -768,7 +770,9 @@ function renderPlans() {
       '<div class="plan-mini-setup">'+p.setup+'</div>' +
       '<ul class="plan-mini-feat">' +
         p.features.map(function(f){
-          return '<li class="'+(f.on?'on':'')+'"><span class="pf-icon">'+(f.on?'✓':'✕')+'</span><span>'+f.text+'</span></li>';
+          let cls = f.on ? 'on' : (f.soon ? 'soon' : '');
+          let icon = f.on ? '✓' : (f.soon ? '⏳' : '✕');
+          return '<li class="'+cls+'"><span class="pf-icon">'+icon+'</span><span>'+f.text+(f.soon ? ' <em>(em breve)</em>' : '')+'</span></li>';
         }).join('') +
       '</ul>' +
     '</div>';
