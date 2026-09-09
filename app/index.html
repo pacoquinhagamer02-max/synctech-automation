@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#0A0714">
+<meta name="theme-color" content="#08050F">
 <meta name="description" content="SyncTech Automation — hub completo de automação: Pipeline, CRM, WhatsApp e Instagram automáticos, agendamento e onboarding de clientes.">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icons/favicon-64.png">
@@ -52,6 +52,8 @@ body {
 }
 h1, h2, h3, .logo { font-family: var(--font-head), sans-serif; }
 :focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; border-radius: 4px; }
+.skip-link { position: absolute; left: 12px; top: -48px; z-index: 1100; background: var(--s2); color: var(--text); border: 1px solid var(--border-s); border-radius: 8px; padding: 10px 16px; font-size: 0.82rem; font-weight: 600; text-decoration: none; transition: top 0.15s ease; }
+.skip-link:focus { top: 12px; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
 }
@@ -353,6 +355,7 @@ details[open] summary { margin-bottom: 4px; }
 </head>
 <body>
 
+<a class="skip-link" href="#main-content">Pular para o conteúdo</a>
 <div class="aurora"></div>
 <div class="grid-overlay"></div>
 
@@ -381,12 +384,12 @@ details[open] summary { margin-bottom: 4px; }
     </div>
   </div>
 
-  <div class="content">
+  <main class="content" id="main-content">
 
     <!-- ── INÍCIO ── -->
     <div class="page active" id="page-inicio">
       <div class="hero">
-        <div class="hero-greet">Olá, <span class="accent">Rafael</span> 👋</div>
+        <h1 class="hero-greet">Olá, <span class="accent">Rafael</span> 👋</h1>
         <div class="hero-sub">Aqui está o resumo do seu hub de automação hoje.</div>
       </div>
       <div class="kpi-grid" id="home-kpis"></div>
@@ -398,12 +401,12 @@ details[open] summary { margin-bottom: 4px; }
         <button class="qa-btn" onclick="goPage('config')">➕ Novo cliente</button>
       </div>
       <div class="card">
-        <div class="card-title">Serviços avulsos deste mês</div>
+        <h2 class="card-title">Serviços avulsos deste mês</h2>
         <div class="card-sub">Cobrança única, fora dos planos fixos</div>
         <div id="home-avulsos"></div>
       </div>
       <div class="card">
-        <div class="card-title">Próximos passos</div>
+        <h2 class="card-title">Próximos passos</h2>
         <div class="card-sub">O que ainda precisa da sua atenção</div>
         <div id="home-todos"></div>
       </div>
@@ -412,7 +415,7 @@ details[open] summary { margin-bottom: 4px; }
     <!-- ── PIPELINE ── -->
     <div class="page" id="page-pipeline">
       <div class="hero">
-        <div class="hero-greet" style="font-size:1.25rem">Pipeline de Leads</div>
+        <h1 class="hero-greet" style="font-size:1.25rem">Pipeline de Leads</h1>
         <div class="hero-sub" id="pipeline-summary"></div>
       </div>
       <div class="card">
@@ -422,22 +425,22 @@ details[open] summary { margin-bottom: 4px; }
       </div>
 
       <div class="card">
-        <div class="card-title">+ Adicionar lead ao funil</div>
+        <h2 class="card-title">+ Adicionar lead ao funil</h2>
         <div class="card-sub">Cadastre aqui todo prospect que encontrar em Mariana/Ouro Preto — entra direto em "Novo Lead"</div>
         <div class="form-row2">
           <div class="form-group">
             <label class="form-label" for="pl-name">Nome do contato *</label>
-            <input class="form-input" id="pl-name" placeholder="Ex: João Silva">
+            <input class="form-input" id="pl-name" name="lead-nome" autocomplete="off" placeholder="Ex: João Silva">
           </div>
           <div class="form-group">
             <label class="form-label" for="pl-biz">Negócio *</label>
-            <input class="form-input" id="pl-biz" placeholder="Ex: Salão Beleza Pura">
+            <input class="form-input" id="pl-biz" name="lead-negocio" autocomplete="off" placeholder="Ex: Salão Beleza Pura">
           </div>
         </div>
         <div class="form-row2">
           <div class="form-group">
             <label class="form-label" for="pl-wpp">WhatsApp *</label>
-            <input class="form-input" id="pl-wpp" placeholder="(31) 99999-9999">
+            <input class="form-input" id="pl-wpp" name="lead-whatsapp" type="tel" inputmode="tel" autocomplete="off" placeholder="(31) 99999-9999">
           </div>
           <div class="form-group">
             <label class="form-label" for="pl-city">Cidade</label>
@@ -472,7 +475,7 @@ details[open] summary { margin-bottom: 4px; }
       </div>
 
       <div class="card" id="guide-sync">
-        <div class="card-title">🔄 Sincronizar entre celular e PC</div>
+        <h2 class="card-title">🔄 Sincronizar entre celular e PC</h2>
         <div class="card-sub" id="sync-status-text">Sem isso, os leads que você cadastra ficam só no aparelho usado. Com 5 min de setup (planilha Google), tudo aparece em qualquer aparelho.</div>
         <details id="sync-details">
         <summary class="qa-btn" style="display:inline-flex;width:fit-content;margin-bottom:14px">Ver passo a passo →</summary>
@@ -517,7 +520,7 @@ function doGet(e) {
         </details>
         <div class="form-group">
           <label class="form-label" for="pl-sync-url">URL do App da Web (deixe vazio pra ficar só local)</label>
-          <input class="form-input" id="pl-sync-url" placeholder="https://script.google.com/macros/s/..." value="">
+          <input class="form-input" id="pl-sync-url" name="sync-url" type="url" inputmode="url" autocomplete="off" placeholder="https://script.google.com/macros/s/...">
         </div>
         <button class="btn btn-primary" onclick="salvarSyncUrl()">Salvar e sincronizar</button>
       </div>
@@ -528,13 +531,13 @@ function doGet(e) {
     <!-- ── SERVIÇOS ── -->
     <div class="page" id="page-servicos">
       <div class="hero">
-        <div class="hero-greet" style="font-size:1.25rem">Os 11 serviços do hub</div>
+        <h1 class="hero-greet" style="font-size:1.25rem">Os 11 serviços do hub</h1>
         <div class="hero-sub">Status real de cada módulo — o que já funciona e o que precisa de configuração</div>
       </div>
       <div class="svc-grid2" id="services-grid"></div>
 
       <div id="guide-whatsapp" class="card" style="margin-top:18px">
-        <div class="card-title">📱 Ativar WhatsApp Bot 24/7 (Z-API)</div>
+        <h2 class="card-title">📱 Ativar WhatsApp Bot 24/7 (Z-API)</h2>
         <div class="card-sub">3 passos — sem custo de plataforma extra além da Z-API</div>
         <div class="guide-steps">
           <div class="guide-step"><div class="guide-num">1</div><div><div class="guide-step-title">Crie conta gratuita na Z-API</div><div class="guide-step-desc">Acesse z-api.io → Cadastre-se → Crie uma instância → Escaneie o QR Code com o WhatsApp do negócio.</div></div></div>
@@ -548,7 +551,7 @@ function doGet(e) {
       </div>
 
       <div id="guide-instagram" class="card">
-        <div class="card-title">📸 Ativar Instagram Automático (Make.com nativo)</div>
+        <h2 class="card-title">📸 Ativar Instagram Automático (Make.com nativo)</h2>
         <div class="card-sub">Usa o Make.com que você já tem — sem pagar ManyChat</div>
         <div class="guide-steps">
           <div class="guide-step"><div class="guide-num">1</div><div><div class="guide-step-title">Conta Business vinculada a uma Página do Facebook</div><div class="guide-step-desc">O Instagram do cliente precisa ser Profissional/Business e vinculado a uma Página no business.facebook.com.</div></div></div>
@@ -565,7 +568,7 @@ function doGet(e) {
     <!-- ── CLIENTES FIXOS ── -->
     <div class="page" id="page-clientes">
       <div class="hero">
-        <div class="hero-greet" style="font-size:1.25rem">Clientes fixos</div>
+        <h1 class="hero-greet" style="font-size:1.25rem">Clientes fixos</h1>
         <div class="hero-sub">Contratos com mensalidade recorrente — acesso rápido às ferramentas de cada um</div>
       </div>
       <div id="clients-list"></div>
@@ -574,7 +577,7 @@ function doGet(e) {
     <!-- ── SERVIÇOS AVULSOS ── -->
     <div class="page" id="page-avulsos">
       <div class="hero">
-        <div class="hero-greet" style="font-size:1.25rem">Serviços avulsos</div>
+        <h1 class="hero-greet" style="font-size:1.25rem">Serviços avulsos</h1>
         <div class="hero-sub">Cobrança única, sem plano fixo — soma tudo o que os clientes te devem</div>
       </div>
       <div class="kpi-grid" id="avulsos-total" style="margin-bottom:14px"></div>
@@ -584,7 +587,7 @@ function doGet(e) {
     <!-- ── RELATÓRIO ── -->
     <div class="page" id="page-relatorio">
       <div class="hero">
-        <div class="hero-greet" style="font-size:1.25rem">Relatório mensal</div>
+        <h1 class="hero-greet" style="font-size:1.25rem">Relatório mensal</h1>
         <div class="hero-sub" id="report-sub"></div>
       </div>
       <div id="report-body"></div>
@@ -593,28 +596,28 @@ function doGet(e) {
     <!-- ── CONFIG (novo cliente) ── -->
     <div class="page" id="page-config">
       <div class="hero">
-        <div class="hero-greet" style="font-size:1.25rem">Nossos planos</div>
+        <h1 class="hero-greet" style="font-size:1.25rem">Nossos planos</h1>
         <div class="hero-sub">O que cada plano oferece — mesmo conteúdo da landing page pública</div>
       </div>
       <div class="plan-mini-grid" id="plans-grid"></div>
 
       <div class="hero" style="margin-top:22px">
-        <div class="hero-greet" style="font-size:1.25rem">Onboarding de novo cliente</div>
+        <h1 class="hero-greet" style="font-size:1.25rem">Onboarding de novo cliente</h1>
         <div class="hero-sub">Gera os links de agendamento + bio prontos para enviar</div>
       </div>
       <div class="card">
         <div class="form-group">
           <label class="form-label" for="nc-name">Nome do negócio *</label>
-          <input class="form-input" id="nc-name" placeholder="Ex: Barbearia do João">
+          <input class="form-input" id="nc-name" name="cliente-nome" autocomplete="off" placeholder="Ex: Barbearia do João">
         </div>
         <div class="form-row2">
           <div class="form-group">
             <label class="form-label" for="nc-wpp">WhatsApp do dono *</label>
-            <input class="form-input" id="nc-wpp" placeholder="(11) 99999-9999">
+            <input class="form-input" id="nc-wpp" name="cliente-whatsapp" type="tel" inputmode="tel" autocomplete="off" placeholder="(11) 99999-9999">
           </div>
           <div class="form-group">
             <label class="form-label" for="nc-ig">Instagram</label>
-            <input class="form-input" id="nc-ig" placeholder="@seunegocio">
+            <input class="form-input" id="nc-ig" name="cliente-instagram" autocomplete="off" spellcheck="false" placeholder="@seunegocio">
           </div>
         </div>
         <div class="form-group">
@@ -628,7 +631,7 @@ function doGet(e) {
         <button class="btn btn-primary" onclick="gerarCliente()">Gerar links do cliente →</button>
       </div>
       <div class="card" id="nc-result" style="display:none">
-        <div class="card-title">✓ Cliente pronto</div>
+        <h2 class="card-title">✓ Cliente pronto</h2>
         <div class="card-sub">Envie os dois links abaixo — o cliente já pode receber agendamentos</div>
         <div class="form-label">Link de agendamento</div>
         <div class="result-link" id="nc-link-agend"></div>
@@ -638,7 +641,7 @@ function doGet(e) {
       </div>
     </div>
 
-  </div>
+  </main>
 </div>
 
 <!-- BOTTOM NAV (mobile) -->
@@ -744,7 +747,7 @@ function renderPlans() {
   document.getElementById('plans-grid').innerHTML = PLANS.map(function(p) {
     return '<div class="plan-mini-card'+(p.featured?' featured':'')+'">' +
       (p.badge ? '<div class="plan-mini-badge">'+p.badge+'</div>' : '') +
-      '<div class="plan-mini-name">'+p.name+'</div>' +
+      '<h3 class="plan-mini-name">'+p.name+'</h3>' +
       '<div class="plan-mini-desc">'+p.desc+'</div>' +
       '<div class="plan-mini-price">'+p.price+'<span>/mês</span></div>' +
       '<div class="plan-mini-setup">'+p.setup+'</div>' +
@@ -814,7 +817,7 @@ function renderHome() {
     { done:false, text:'Montar o cenário de resposta automática no Make.com (token do Instagram já gerado)' },
   ];
   document.getElementById('home-todos').innerHTML = todos.map(function(t){
-    return '<div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px solid let(--border)"><span style="color:let(--yellow)">⚠️</span><span style="font-size:0.8rem;color:let(--muted)">'+t.text+'</span></div>';
+    return '<div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--border)"><span style="color:var(--yellow)">⚠️</span><span style="font-size:0.8rem;color:var(--muted)">'+t.text+'</span></div>';
   }).join('');
 }
 
@@ -945,13 +948,13 @@ function renderPipeline() {
         '<div class="lc-row"><span class="lc-val">R$'+l.val+'/mês</span><span class="lc-source '+srcCls+'">'+srcLabel+'</span></div>' +
         '<div class="lc-time">'+l.time+'</div>' +
         '<a href="https://wa.me/'+wppNum+'?text='+wppMsg+'" target="_blank" style="display:block;text-align:center;margin-top:10px;background:rgba(37,211,102,0.12);border:1px solid rgba(37,211,102,0.25);color:#25D366;border-radius:7px;padding:7px;font-size:0.7rem;font-weight:700;text-decoration:none">💬 WhatsApp</a>' +
-        (nextStage ? '<button onclick="avancarLead(\''+l.id+'\')" style="width:100%;margin-top:7px;background:let(--s3);border:1px solid let(--border-s);color:let(--pl);border-radius:7px;padding:7px;font-size:0.68rem;font-weight:700;cursor:pointer;font-family:let(--font-head),sans-serif;text-transform:uppercase;letter-spacing:0.03em">→ '+nextStage+'</button>' : '') +
+        (nextStage ? '<button onclick="avancarLead(\''+l.id+'\')" style="width:100%;margin-top:7px;background:var(--s3);border:1px solid var(--border-s);color:var(--pl);border-radius:7px;padding:7px;font-size:0.68rem;font-weight:700;cursor:pointer;font-family:var(--font-head),sans-serif;text-transform:uppercase;letter-spacing:0.03em">→ '+nextStage+'</button>' : '') +
       '</div>';
     }).join('');
     let total = colLeads.reduce(function(s,l){ return s+l.val; }, 0);
     return '<div class="pipeline-col">' +
       '<div class="pipeline-col-header"><span class="pipeline-col-title">'+col.stage+'</span><span class="pipeline-count">'+colLeads.length+'</span></div>' +
-      (total ? '<div style="font-size:0.65rem;color:let(--muted);margin-bottom:8px">R$'+total.toLocaleString('pt-BR')+'/mês</div>' : '') +
+      (total ? '<div style="font-size:0.65rem;color:var(--muted);margin-bottom:8px">R$'+total.toLocaleString('pt-BR')+'/mês</div>' : '') +
       '<div class="pipeline-cards">'+cards+'</div>' +
     '</div>';
   }).join('');
@@ -989,7 +992,7 @@ function renderPipeline() {
 function renderServicesGrid() {
   document.getElementById('services-grid').innerHTML = SERVICES.map(function(s) {
     return '<div class="svc-tile">' +
-      '<div class="svc-tile-head"><div class="svc-tile-icon">'+s.icon+'</div><div class="svc-tile-name">'+s.name+'</div></div>' +
+      '<div class="svc-tile-head"><div class="svc-tile-icon">'+s.icon+'</div><h3 class="svc-tile-name">'+s.name+'</h3></div>' +
       '<div class="svc-tile-desc">'+s.desc+'</div>' +
       '<span class="status-pill '+s.status+'"><span class="status-dot"></span>'+statusLabel(s.status)+'</span>' +
     '</div>';
@@ -1136,10 +1139,10 @@ function buildFollowerHistorySvg(hist) {
   let dots = pts.map(function(p, i){
     let isEnd = i === 0 || i === n - 1;
     return '<circle cx="' + p.x.toFixed(1) + '" cy="' + p.y.toFixed(1) + '" r="' + (isEnd ? 3 : 2) +
-      '" fill="' + (isEnd ? '#fff' : '#8B5CF6') + '"' + (isEnd ? ' stroke="#8B5CF6" stroke-width="2"' : '') + ' />';
+      '" fill="' + (isEnd ? '#fff' : '#A855F7') + '"' + (isEnd ? ' stroke="#A855F7" stroke-width="2"' : '') + ' />';
   }).join('');
   return '<svg viewBox="0 0 ' + W + ' ' + H + '" class="client-history-svg" preserveAspectRatio="none" role="img" aria-label="Seguidores ao longo dos últimos dias">' +
-    '<polyline points="' + poly + '" fill="none" stroke="#8B5CF6" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>' +
+    '<polyline points="' + poly + '" fill="none" stroke="#A855F7" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>' +
     dots +
   '</svg>';
 }
@@ -1265,7 +1268,7 @@ function renderClients() {
   }));
   document.getElementById('clients-list').innerHTML = all.map(function(c) {
     return '<div class="client-card">' +
-      '<div class="client-head"><div class="client-av">'+c.name.charAt(0)+'</div><div><div class="client-name">'+c.name+'</div><div class="client-meta">'+c.plan+'</div></div></div>' +
+      '<div class="client-head"><div class="client-av">'+c.name.charAt(0)+'</div><div><h3 class="client-name">'+c.name+'</h3><div class="client-meta">'+c.plan+'</div></div></div>' +
       buildStatsHtml(c) +
       '<div class="client-links">'+c.links.map(function(l){ return '<a class="client-link" href="'+l.url+'" target="_blank">'+l.label+' →</a>'; }).join('')+'</div>' +
     '</div>';
@@ -1295,7 +1298,7 @@ function renderAvulsos() {
 
   document.getElementById('avulsos-list').innerHTML = AVULSOS.map(function(a) {
     return '<div class="client-card">' +
-      '<div class="client-head"><div class="client-av">'+a.client.charAt(0)+'</div><div><div class="client-name">'+a.client+'</div><div class="client-meta">'+a.service+'</div></div></div>' +
+      '<div class="client-head"><div class="client-av">'+a.client.charAt(0)+'</div><div><h3 class="client-name">'+a.client+'</h3><div class="client-meta">'+a.service+'</div></div></div>' +
       '<div class="client-meta" style="margin-bottom:10px">'+a.desc+' · Fechado em '+a.date+'</div>' +
       '<div class="report-badge" style="font-size:0.8rem;padding:6px 12px">R$'+a.value.toLocaleString('pt-BR')+'</div>' +
     '</div>';
@@ -1335,7 +1338,7 @@ function renderReport() {
 
     return '<div class="card report-card">' +
       '<div class="report-card-head">' +
-        '<div class="report-card-title">'+c.name+'</div>' +
+        '<h3 class="report-card-title">'+c.name+'</h3>' +
         '<div class="report-badge">Coletado em '+s.collectedAt+'</div>' +
       '</div>' +
       '<div class="report-summary">'+resumo+'</div>' +
