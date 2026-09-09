@@ -556,13 +556,23 @@ function doGet(e) {
       </div>
     </div>
 
-    <!-- ── CLIENTES ── -->
+    <!-- ── CLIENTES FIXOS ── -->
     <div class="page" id="page-clientes">
       <div class="hero">
-        <div class="hero-greet" style="font-size:1.25rem">Clientes ativos</div>
-        <div class="hero-sub">Contratos fechados — acesso rápido às ferramentas de cada um</div>
+        <div class="hero-greet" style="font-size:1.25rem">Clientes fixos</div>
+        <div class="hero-sub">Contratos com mensalidade recorrente — acesso rápido às ferramentas de cada um</div>
       </div>
       <div id="clients-list"></div>
+    </div>
+
+    <!-- ── SERVIÇOS AVULSOS ── -->
+    <div class="page" id="page-avulsos">
+      <div class="hero">
+        <div class="hero-greet" style="font-size:1.25rem">Serviços avulsos</div>
+        <div class="hero-sub">Cobrança única, sem plano fixo — soma tudo o que os clientes te devem</div>
+      </div>
+      <div class="kpi-grid" id="avulsos-total" style="margin-bottom:14px"></div>
+      <div id="avulsos-list"></div>
     </div>
 
     <!-- ── RELATÓRIO ── -->
@@ -636,7 +646,8 @@ let PAGES = [
   { id:'inicio',   label:'Início',    icon:'<path d="M2 8L9 2L16 8M4 7V15H14V7"/>' },
   { id:'pipeline', label:'Pipeline',  icon:'<rect x="1" y="4" width="4" height="12"/><rect x="7" y="7" width="4" height="9"/><rect x="13" y="10" width="4" height="6"/>' },
   { id:'servicos', label:'Serviços',  icon:'<rect x="2" y="2" width="6" height="6" rx="1"/><rect x="10" y="2" width="6" height="6" rx="1"/><rect x="2" y="10" width="6" height="6" rx="1"/><rect x="10" y="10" width="6" height="6" rx="1"/>' },
-  { id:'clientes', label:'Clientes',  icon:'<circle cx="9" cy="6" r="3"/><path d="M3 16c0-3.3 2.7-6 6-6s6 2.7 6 6"/>' },
+  { id:'clientes', label:'Fixos',     icon:'<circle cx="9" cy="6" r="3"/><path d="M3 16c0-3.3 2.7-6 6-6s6 2.7 6 6"/>' },
+  { id:'avulsos', label:'Avulsos',    icon:'<circle cx="9" cy="9" r="7"/><path d="M9 5v8M11.3 7.2c0-1.1-1-2-2.3-2s-2.3.7-2.3 1.7c0 2.3 4.6.9 4.6 3.2 0 1-1 1.7-2.3 1.7s-2.3-.9-2.3-2"/>' },
   { id:'relatorio', label:'Relatório', icon:'<path d="M4 2h7l3 3v11H4V2Z"/><path d="M11 2v3h3"/><path d="M6.5 10.5v3M9 8.5v5M11.5 11.5v2"/>' },
   { id:'config',   label:'Config',    icon:'<circle cx="9" cy="9" r="2.5"/><path d="M9 1v2.4M9 14.6V17M17 9h-2.4M3.4 9H1M14.7 3.3l-1.7 1.7M4.9 12.9L3.3 14.7M14.7 14.7l-1.7-1.7M4.9 5.1L3.3 3.3"/>' },
 ];
@@ -747,8 +758,8 @@ function renderFooterStatus() {
   let dot = document.getElementById('status-dot');
   let txt = document.getElementById('status-text');
   txt.textContent = ativos + ' de ' + SERVICES.length + ' módulos ativos';
-  dot.style.background = ativos === SERVICES.length ? 'let(--green)' : 'let(--yellow)';
-  dot.style.boxShadow = '0 0 6px ' + (ativos === SERVICES.length ? 'let(--green)' : 'let(--yellow)');
+  dot.style.background = ativos === SERVICES.length ? 'var(--green)' : 'var(--yellow)';
+  dot.style.boxShadow = '0 0 6px ' + (ativos === SERVICES.length ? 'var(--green)' : 'var(--yellow)');
 }
 
 // ═══════════════ RENDER: INÍCIO ═══════════════
@@ -760,8 +771,10 @@ function renderHome() {
   let martinsStats = CLIENTS_FIXED[0] && CLIENTS_FIXED[0].stats ? CLIENTS_FIXED[0].stats : null;
   let martinsGoal = martinsStats ? martinsStats.goal : null;
 
+  let avulsosMes = avulsosMesTotal();
   let kpis = [
     { label:'Clientes fechados', val: fechados.length, delta: 'MRR ~R$'+mrr.toLocaleString('pt-BR'), cls:'up' },
+    { label:'A receber este mês', val: 'R$'+(mrr+avulsosMes).toLocaleString('pt-BR'), delta: 'R$'+mrr.toLocaleString('pt-BR')+' fixo + R$'+avulsosMes.toLocaleString('pt-BR')+' avulso', cls:'up' },
     { label:'Leads em aberto',   val: abertos, delta: 'no funil agora', cls:'up' },
     { label:'Serviços ativos',   val: ativos+'/11', delta: (11-ativos)+' pendentes de config', cls: (11-ativos)>0 ? 'warn':'up' },
   ];
@@ -1082,6 +1095,12 @@ let CLIENTS_FIXED = [
 // Nota: CRM/Avaliação/Dashboard financeiro dela ainda são arquivos locais (barbearia-martins-ferramentas/),
 // sem site publicado — não linkar aqui até estarem hospedados, senão quebra no celular.
 
+// ═══════════════ DADOS: SERVIÇOS AVULSOS (cobrança única, sem plano fixo mensal) ═══════════════
+// month no formato MM/AAAA — usado pra somar "quanto entrou esse mês" na aba Avulsos e no KPI do Início.
+let AVULSOS = [
+  { client:'PL Car', service:'Tráfego Pago (Meta Ads) — serviço avulso', value:800, month:'09/2026', date:'09/09/2026', desc:'Gestão de tráfego pago fechada avulsa, sem plano fixo mensal.' },
+];
+
 // ═══════════════ HELPER: gráficos/stats reais de um cliente (usado em Clientes e Relatório) ═══════════════
 // Gráfico de seguidores dia a dia. Escala pro min/max da própria janela
 // (não de 0) de propósito — um número que só muda 1-5 por dia num total
@@ -1237,6 +1256,36 @@ function renderClients() {
   }).join('');
 }
 
+// ═══════════════ RENDER: SERVIÇOS AVULSOS ═══════════════
+function currentMonthKey() {
+  let d = new Date();
+  return String(d.getMonth()+1).padStart(2,'0') + '/' + d.getFullYear();
+}
+function avulsosMesTotal() {
+  let mesAtual = currentMonthKey();
+  return AVULSOS.filter(function(a){ return a.month === mesAtual; }).reduce(function(s,a){ return s+a.value; }, 0);
+}
+function fixosMensalTotal() {
+  let fechados = pipelineData.filter(function(c){ return c.stage==='Fechado'; })[0].leads;
+  return fechados.reduce(function(s,l){ return s+l.val; }, 0);
+}
+function renderAvulsos() {
+  let totalMes = avulsosMesTotal();
+  let totalGeral = AVULSOS.reduce(function(s,a){ return s+a.value; }, 0);
+  document.getElementById('avulsos-total').innerHTML =
+    '<div class="kpi-card"><div class="kpi-label">Avulsos este mês</div><div class="kpi-val">R$'+totalMes.toLocaleString('pt-BR')+'</div><div class="kpi-delta up">'+AVULSOS.filter(function(a){return a.month===currentMonthKey();}).length+' serviço(s) fechado(s)</div></div>' +
+    '<div class="kpi-card"><div class="kpi-label">Total avulsos (histórico)</div><div class="kpi-val">R$'+totalGeral.toLocaleString('pt-BR')+'</div><div class="kpi-delta up">'+AVULSOS.length+' no total</div></div>' +
+    '<div class="kpi-card"><div class="kpi-label">Fixos + avulsos este mês</div><div class="kpi-val">R$'+(fixosMensalTotal()+totalMes).toLocaleString('pt-BR')+'</div><div class="kpi-delta up">soma de tudo que os clientes te devem</div></div>';
+
+  document.getElementById('avulsos-list').innerHTML = AVULSOS.map(function(a) {
+    return '<div class="client-card">' +
+      '<div class="client-head"><div class="client-av">'+a.client.charAt(0)+'</div><div><div class="client-name">'+a.client+'</div><div class="client-meta">'+a.service+'</div></div></div>' +
+      '<div class="client-meta" style="margin-bottom:10px">'+a.desc+' · Fechado em '+a.date+'</div>' +
+      '<div class="report-badge" style="font-size:0.8rem;padding:6px 12px">R$'+a.value.toLocaleString('pt-BR')+'</div>' +
+    '</div>';
+  }).join('');
+}
+
 // ═══════════════ RENDER: RELATÓRIO MENSAL ═══════════════
 function renderReport() {
   let withData = CLIENTS_FIXED.filter(function(c){ return c.stats; });
@@ -1350,6 +1399,7 @@ renderPipeline();
 if (PIPELINE_SYNC_URL) { syncPipelineFromCloud(renderPipeline); }
 renderServicesGrid();
 renderClients();
+renderAvulsos();
 renderReport();
 renderPlans();
 renderFooterStatus();
