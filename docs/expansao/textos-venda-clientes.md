@@ -28,16 +28,16 @@ de cada ferramenta.
 Vamos automatizar o atendimento do seu negócio — WhatsApp, agendamento e
 Instagram funcionando sozinhos, 24h.
 
-📊 Uma barbearia aqui em Mariana cresceu *18% em agendamentos em 30 dias*
+📊 Uma barbearia aqui em Mariana cresceu *18% em agendamentos em 23 dias*
 com isso, sem gastar mais com anúncio.
 
-*🔹 Starter — R$197/mês*
+*🔹 Starter — R$250/mês*
 WhatsApp Bot + Agendamento Online + Link na Bio
 
-*🔸 Negócio — R$397/mês* ⭐ mais popular
+*🔸 Negócio — R$500/mês* ⭐ mais popular
 Tudo do Starter + IA no WhatsApp + Instagram Automático + CRM
 
-*🔺 Pro — R$797/mês*
+*🔺 Pro — R$1.000/mês*
 Tudo do Negócio + Reputação Google + Email Marketing + suporte todo dia
 
 Não precisa de plano fechado — dá pra contratar *só o que falta* no seu
@@ -64,21 +64,21 @@ conseguir marcar horário por ligação, em vez de deixar a pessoa agendar
 sozinha? Isso é dinheiro escapando todo mês, mesmo sem perceber.
 
 📊 *Case real:* uma barbearia aqui em Mariana cresceu *18% em seguidores e
-agendamentos em 30 dias*, sem gastar mais com anúncio — só automação bem
+agendamentos em 23 dias*, sem gastar mais com anúncio — só automação bem
 feita.
 
 ━━━━━━━━━━━━━━━
 *OS 3 PLANOS — O QUE CADA UM MUDA NO SEU NEGÓCIO*
 ━━━━━━━━━━━━━━━
 
-*🔹 STARTER — R$197/mês + R$299 setup*
+*🔹 STARTER — R$250/mês + R$300 setup*
 _O primeiro passo pra parar de perder cliente por demora_
 WhatsApp responde o básico sozinho, cliente marca horário online sem
 precisar ligar, e você ganha uma página profissional pra colocar na bio do
 Instagram. Resolve o atendimento mais urgente sem virar uma reforma grande
 no seu dia a dia.
 
-*🔸 NEGÓCIO — R$397/mês + R$499 setup* ⭐ mais popular
+*🔸 NEGÓCIO — R$500/mês + R$600 setup* ⭐ mais popular
 _Atendimento e venda automáticos, não só organização_
 Além de tudo do Starter: IA de verdade no WhatsApp (não são só respostas
 prontas), Instagram vira canal de venda (comentário e DM respondem
@@ -86,12 +86,14 @@ sozinhos), e um painel mostra cada cliente em potencial até fechar negócio.
 É pra quem quer crescer o número de clientes, não só organizar os que já
 tem.
 
-*🔺 PRO — R$797/mês + R$799 setup*
+*🔺 PRO — R$1.000/mês + R$1.000 setup*
 _Automação ponta a ponta, sem nada passando batido_
 Tudo do Negócio, mais: sua reputação no Google protegida (só entra
-avaliação boa, insatisfeito fala com você antes), email pra ex-cliente
-voltar a comprar, chat ao vivo no site, e reunião comigo todo mês revisando
-o resultado. Pra quem já cresceu e quer parar de deixar coisa na mão.
+avaliação boa, insatisfeito fala com você antes), suporte 7 dias por
+semana, integrações personalizadas e reunião comigo todo mês revisando
+o resultado. Email marketing e chat ao vivo no site entram em breve, sem
+custo extra quando ficarem prontos. Pra quem já cresceu e quer parar de
+deixar coisa na mão.
 
 ━━━━━━━━━━━━━━━
 *NÃO PRECISA DE PLANO FECHADO — OS 5 SERVIÇOS AVULSOS MAIS PROCURADOS*
@@ -113,7 +115,7 @@ WhatsApp. Curtida virando conversa de venda sozinha.
 Cliente satisfeito é direcionado pra avaliar no Google; insatisfeito manda
 feedback só pra você, antes de virar reclamação pública. Protege sua nota.
 
-📈 *Tráfego Pago (Meta Ads) — R$297 setup + R$397/mês*
+📈 *Tráfego Pago (Meta Ads) — R$297 setup + R$800/mês (com vídeo do anúncio incluso)*
 Coloca seu negócio na frente de gente na sua região que ainda não te
 conhece — campanha criada e otimizada por profissional, você só paga a
 verba direto pra Meta, separada da gestão.
@@ -141,7 +143,7 @@ desistindo de agendar porque só dava pra marcar por ligação? Isso é dinheiro
 escapando todo mês, mesmo sem você perceber.
 
 📊 *Case real:* uma barbearia aqui em Mariana cresceu *18% em seguidores e
-agendamentos em menos de 30 dias*, sem gastar nada a mais em anúncio — só
+agendamentos em 23 dias*, sem gastar nada a mais em anúncio — só
 automação bem feita.
 
 Quer ver funcionando no seu negócio? *Me chama agora, 5 minutos e sem
@@ -197,15 +199,15 @@ pra ir somando conforme o negócio cresce.
 *COMO CONTRATAR — 3 PLANOS PRONTOS*
 ━━━━━━━━━━━━━━━
 
-*🔹 STARTER — R$197/mês*
+*🔹 STARTER — R$250/mês*
 _Pra quem quer começar com o essencial_
 ✅ WhatsApp Bot básico
 ✅ Agendamento Online
 ✅ Link Bio Profissional
 ✅ Suporte via WhatsApp
-+ R$299 de configuração (única vez)
++ R$300 de configuração (única vez)
 
-*🔸 NEGÓCIO — R$397/mês* ⭐ mais popular
+*🔸 NEGÓCIO — R$500/mês* ⭐ mais popular
 _O pacote completo pra crescer de verdade_
 ✅ WhatsApp Bot completo com IA
 ✅ Instagram Automático (DM + comentários)
@@ -214,18 +216,18 @@ _O pacote completo pra crescer de verdade_
 ✅ Catálogo Digital
 ✅ Dashboard de Métricas
 ✅ Suporte prioritário
-+ R$499 de configuração (única vez)
++ R$600 de configuração (única vez)
 
-*🔺 PRO — R$797/mês*
+*🔺 PRO — R$1.000/mês*
 _Automação total, resultado máximo_
 ✅ Tudo do plano Negócio
-✅ Email Marketing
-✅ Chat ao Vivo no Site
 ✅ Gestão de Reputação Google
 ✅ Suporte 7 dias por semana
 ✅ Reunião mensal de resultados
 ✅ Integrações personalizadas
-+ R$799 de configuração (única vez)
+⏳ Email Marketing (em breve)
+⏳ Chat ao Vivo no Site (em breve)
++ R$1.000 de configuração (única vez)
 
 ━━━━━━━━━━━━━━━
 *🧩 NÃO USA TUDO ISSO? CONTRATE SÓ O QUE PRECISA*
@@ -241,7 +243,7 @@ _Serviços avulsos, sem entrar num plano fechado_
 • Link na Bio — R$47/mês
 • Chat ao Vivo no Site — R$67/mês
 • Email Marketing — R$67/mês
-• Tráfego Pago (Meta Ads) — R$297 setup + R$397/mês de gestão
+• Tráfego Pago (Meta Ads) — R$297 setup + R$800/mês de gestão (com vídeo do anúncio incluso)
 _(+ configuração inicial de cada serviço, valor conforme a complexidade)_
 
 ━━━━━━━━━━━━━━━
