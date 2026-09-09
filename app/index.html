@@ -12,7 +12,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="SyncTech">
 <title>SyncTech Automation — App</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Rajdhani:wght@600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 html { font-size: 16px; }
@@ -47,7 +49,7 @@ html { font-size: 16px; }
 }
 
 body {
-  font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text);
+  font-family: 'Manrope', sans-serif; background: var(--bg); color: var(--text);
   min-height: 100vh; overflow-x: hidden; position: relative;
 }
 h1, h2, h3, .logo { font-family: var(--font-head), sans-serif; }
@@ -100,7 +102,7 @@ h1, h2, h3, .logo { font-family: var(--font-head), sans-serif; }
   display: flex; align-items: center; gap: 10px; padding: 10px 12px; margin-bottom: 3px;
   cursor: pointer; font-size: 0.84rem; color: var(--muted); border-radius: 10px;
   transition: all 0.15s; user-select: none; position: relative;
-  width: 100%; border: none; background: none; font-family: 'Inter', sans-serif; text-align: left;
+  width: 100%; border: none; background: none; font-family: 'Manrope', sans-serif; text-align: left;
 }
 .nav-item span { font-family: var(--font-head), sans-serif; font-weight: 600; letter-spacing: 0.03em; text-transform: uppercase; font-size: 0.88rem; }
 .nav-item:hover { color: var(--text); background: rgba(255,255,255,0.03); transform: translateX(2px); }
@@ -114,7 +116,7 @@ h1, h2, h3, .logo { font-family: var(--font-head), sans-serif; }
 .install-btn {
   width: 100%; padding: 10px; border-radius: 10px; border: 1px solid rgba(168,85,247,0.35);
   background: linear-gradient(135deg, rgba(168,85,247,0.18), rgba(34,211,238,0.08));
-  color: var(--pl); font-size: 0.78rem; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif;
+  color: var(--pl); font-size: 0.78rem; font-weight: 700; cursor: pointer; font-family: 'Manrope', sans-serif;
   display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 10px; transition: all 0.15s;
 }
 .install-btn:hover { border-color: var(--primary); box-shadow: 0 0 16px rgba(168,85,247,0.35); }
@@ -195,7 +197,8 @@ h1, h2, h3, .logo { font-family: var(--font-head), sans-serif; }
 .svc-tile { background: var(--s1); border: 1px solid var(--border); border-radius: var(--r); padding: 16px; transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease; }
 .svc-tile:hover { border-color: var(--border-s); transform: translateY(-3px); box-shadow: var(--glow-hover); }
 .svc-tile-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-.svc-tile-icon { width: 36px; height: 36px; border-radius: 9px; background: rgba(168,85,247,0.1); display: grid; place-items: center; font-size: 1.05rem; flex-shrink: 0; }
+.svc-tile-icon { width: 36px; height: 36px; border-radius: 9px; background: rgba(168,85,247,0.1); display: grid; place-items: center; color: var(--pl); flex-shrink: 0; }
+.svc-tile-icon svg { width: 19px; height: 19px; }
 .svc-tile-name { font-family: var(--font-head), sans-serif; font-size: 0.94rem; font-weight: 700; letter-spacing: 0.01em; flex: 1; }
 .svc-tile-desc { font-size: 0.74rem; color: var(--muted); line-height: 1.5; margin-bottom: 12px; }
 .status-pill { display: inline-flex; align-items: center; gap: 5px; font-size: 0.66rem; font-weight: 700; padding: 3px 9px; border-radius: 20px; }
@@ -311,7 +314,7 @@ details[open] summary { margin-bottom: 4px; }
 /* ── FORM (config wizard) ── */
 .form-group { margin-bottom: 14px; }
 .form-label { font-size: 0.72rem; font-weight: 600; color: var(--muted); display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.06em; }
-.form-input, select.form-input { width: 100%; background: var(--s2); border: 1.5px solid var(--border-s); border-radius: 10px; padding: 10px 13px; color: var(--text); font-size: 0.86rem; outline: none; font-family: 'Inter', sans-serif; transition: border-color 0.15s; }
+.form-input, select.form-input { width: 100%; background: var(--s2); border: 1.5px solid var(--border-s); border-radius: 10px; padding: 10px 13px; color: var(--text); font-size: 0.86rem; outline: none; font-family: 'Manrope', sans-serif; transition: border-color 0.15s; }
 .form-input:focus { border-color: var(--primary); }
 .form-input::placeholder { color: var(--faint); }
 .form-row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -321,7 +324,7 @@ details[open] summary { margin-bottom: 4px; }
 .btn-primary:active { transform: translateY(0) scale(0.98); }
 
 .result-link { background: var(--s2); border: 1px solid var(--border-s); border-radius: 10px; padding: 10px 13px; font-size: 0.72rem; font-family: var(--font-mono); color: var(--pl); word-break: break-all; margin-bottom: 8px; }
-.copy-btn { padding: 6px 12px; border-radius: 7px; border: 1px solid var(--border-s); background: var(--s3); color: var(--muted); font-size: 0.7rem; cursor: pointer; font-family: 'Inter',sans-serif; }
+.copy-btn { padding: 6px 12px; border-radius: 7px; border: 1px solid var(--border-s); background: var(--s3); color: var(--muted); font-size: 0.7rem; cursor: pointer; font-family: 'Manrope',sans-serif; }
 .copy-btn:hover { color: var(--text); border-color: var(--primary); }
 
 .toast { position: fixed; bottom: calc(var(--bottomnav) + 16px); left: 50%; transform: translateX(-50%) translateY(80px); background: var(--s2); border: 1px solid var(--border-s); border-radius: 10px; padding: 12px 20px; font-size: 0.82rem; font-weight: 600; transition: transform 0.3s; z-index: 1000; white-space: nowrap; box-shadow: var(--glow); }
@@ -341,7 +344,7 @@ details[open] summary { margin-bottom: 4px; }
     background: rgba(13,9,23,0.88); backdrop-filter: blur(20px); border-top: 1px solid var(--border);
     padding-bottom: env(safe-area-inset-bottom);
   }
-  .bn-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: var(--faint); cursor: pointer; transition: color 0.15s; border: none; background: none; font-family: 'Inter', sans-serif; height: 100%; }
+  .bn-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: var(--faint); cursor: pointer; transition: color 0.15s; border: none; background: none; font-family: 'Manrope', sans-serif; height: 100%; }
   .bn-item.active { color: var(--pl); }
   .bn-item svg { width: 20px; height: 20px; }
   .bn-item span { font-family: var(--font-head), sans-serif; font-size: 0.62rem; font-weight: 600; letter-spacing: 0.03em; text-transform: uppercase; }
@@ -699,18 +702,19 @@ let pipelineData = [
   ]},
 ];
 
+function svcIc(paths) { return '<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+paths+'</svg>'; }
 let SERVICES = [
-  { icon:'💬', name:'WhatsApp Bot 24/7',       status:'warn', desc:'Atende, agenda e responde clientes automaticamente. Requer Z-API conectado por cliente.' },
-  { icon:'📸', name:'Instagram Automático',     status:'warn', desc:'Comentário→DM, seguiu→boas-vindas. Requer conta Business + Make.com conectados.' },
-  { icon:'📅', name:'Agendamento Online',       status:'ok',   desc:'App completo: serviços, calendário, lista de espera e confirmação. Funcionando 100%.' },
-  { icon:'📋', name:'CRM com Pipeline',         status:'ok',   desc:'Kanban de leads com WhatsApp direto e histórico por cliente. Funcionando 100%.' },
-  { icon:'🔗', name:'Link na Bio',              status:'ok',   desc:'Página mobile com serviços, preços e agendamento — pronta para o Instagram do cliente.' },
-  { icon:'⭐', name:'Gestão de Reputação',       status:'ok',   desc:'Roteamento inteligente: 1-3★ vira feedback privado, 4-5★ vai direto pro Google.' },
-  { icon:'📊', name:'Dashboard de Métricas',    status:'warn', desc:'Mostra dados de demonstração até a planilha Google ser compartilhada publicamente.' },
-  { icon:'🛍️', name:'Catálogo Digital',         status:'ok',   desc:'Reaproveita a mesma tela de serviços do agendamento/bio.' },
-  { icon:'💭', name:'Chat ao Vivo no Site',     status:'off',  desc:'Ainda não implementado. Recomendado: Tawk.to (grátis, sem limite).' },
-  { icon:'✉️', name:'Email Marketing',          status:'off',  desc:'Ainda não implementado. Recomendado: Brevo (grátis até 9 mil emails/mês).' },
-  { icon:'📈', name:'Tráfego Pago (Meta Ads)',  status:'ok',   desc:'Prestado manualmente por você — setup R$297 + gestão R$397/mês. Vale como add-on de plano ou avulso, mesmo preço.' },
+  { icon:svcIc('<path d="M2 8c0-3.3 3-6 7-6s7 2.7 7 6-3 6-7 6c-1 0-2-.15-2.9-.4L3 15l.7-3.3C2.6 10.7 2 9.4 2 8z"/><path d="M9.8 4.8l-2 4h2l-1 4.4 3.4-5.4h-2l1-3z" fill="currentColor" stroke="none"/>'), name:'WhatsApp Bot 24/7',       status:'warn', desc:'Atende, agenda e responde clientes automaticamente. Requer Z-API conectado por cliente.' },
+  { icon:svcIc('<rect x="2" y="2" width="14" height="14" rx="4"/><circle cx="9" cy="9" r="3.5"/><circle cx="13" cy="5" r="0.9" fill="currentColor" stroke="none"/>'), name:'Instagram Automático',     status:'warn', desc:'Comentário→DM, seguiu→boas-vindas. Requer conta Business + Make.com conectados.' },
+  { icon:svcIc('<rect x="2" y="3" width="14" height="13" rx="2"/><path d="M2 7h14M6 1.5v3M12 1.5v3"/><path d="M6.3 11l1.5 1.5L11.7 9"/>'), name:'Agendamento Online',       status:'ok',   desc:'App completo: serviços, calendário, lista de espera e confirmação. Funcionando 100%.' },
+  { icon:svcIc('<rect x="2" y="3" width="4" height="12" rx="1"/><rect x="7" y="6.5" width="4" height="8.5" rx="1"/><rect x="12" y="9.5" width="4" height="5.5" rx="1"/>'), name:'CRM com Pipeline',         status:'ok',   desc:'Kanban de leads com WhatsApp direto e histórico por cliente. Funcionando 100%.' },
+  { icon:svcIc('<path d="M7.2 10.8l3.6-3.6"/><path d="M6 8.3L4.4 9.9a2.5 2.5 0 003.5 3.5l1.6-1.6"/><path d="M12 9.7l1.6-1.6a2.5 2.5 0 00-3.5-3.5L8.5 6.2"/>'), name:'Link na Bio',              status:'ok',   desc:'Página mobile com serviços, preços e agendamento — pronta para o Instagram do cliente.' },
+  { icon:svcIc('<path d="M9 1.5l2.1 4.3 4.7.7-3.4 3.3.8 4.7L9 12.3l-4.2 2.2.8-4.7L2.2 6.5l4.7-.7z"/>'), name:'Gestão de Reputação',       status:'ok',   desc:'Roteamento inteligente: 1-3★ vira feedback privado, 4-5★ vai direto pro Google.' },
+  { icon:svcIc('<path d="M3 15V9M9 15V4M15 15V8"/><path d="M2 15.5h14"/>'), name:'Dashboard de Métricas',    status:'warn', desc:'Mostra dados de demonstração até a planilha Google ser compartilhada publicamente.' },
+  { icon:svcIc('<path d="M4 6h10l-.8 8.2a2 2 0 01-2 1.8H6.8a2 2 0 01-2-1.8z"/><path d="M6.5 6V4.5a2.5 2.5 0 015 0V6"/>'), name:'Catálogo Digital',         status:'ok',   desc:'Reaproveita a mesma tela de serviços do agendamento/bio.' },
+  { icon:svcIc('<path d="M2 8.5c0-3.6 3.1-6.5 7-6.5s7 2.9 7 6.5-3.1 6.5-7 6.5c-.9 0-1.8-.15-2.6-.43L3 16l.5-3.2C2.5 11.7 2 10.2 2 8.5z"/><circle cx="6.3" cy="8.5" r="0.9" fill="currentColor" stroke="none"/><circle cx="9" cy="8.5" r="0.9" fill="currentColor" stroke="none"/><circle cx="11.7" cy="8.5" r="0.9" fill="currentColor" stroke="none"/>'), name:'Chat ao Vivo no Site',     status:'off',  desc:'Ainda não implementado. Recomendado: Tawk.to (grátis, sem limite).' },
+  { icon:svcIc('<rect x="2" y="4" width="14" height="10" rx="1.5"/><path d="M2.5 5l6.5 5 6.5-5"/>'), name:'Email Marketing',          status:'off',  desc:'Ainda não implementado. Recomendado: Brevo (grátis até 9 mil emails/mês).' },
+  { icon:svcIc('<path d="M2 13l4.5-5 3 3L16 4"/><path d="M12 4h4v4"/>'), name:'Tráfego Pago (Meta Ads)',  status:'ok',   desc:'Prestado manualmente por você — setup R$297 + gestão R$397/mês. Vale como add-on de plano ou avulso, mesmo preço.' },
 ];
 
 // Mesmo conteúdo real da landing page pública (index.html raiz, seção #planos) — não duplicar com números diferentes.
@@ -1138,8 +1142,10 @@ function buildFollowerHistorySvg(hist) {
   let poly = pts.map(function(p){ return p.x.toFixed(1) + ',' + p.y.toFixed(1); }).join(' ');
   let dots = pts.map(function(p, i){
     let isEnd = i === 0 || i === n - 1;
-    return '<circle cx="' + p.x.toFixed(1) + '" cy="' + p.y.toFixed(1) + '" r="' + (isEnd ? 3 : 2) +
-      '" fill="' + (isEnd ? '#fff' : '#A855F7') + '"' + (isEnd ? ' stroke="#A855F7" stroke-width="2"' : '') + ' />';
+    let tip = '<title>' + hist[i].date + ' — ' + hist[i].followers + ' seguidores</title>';
+    return '<circle cx="' + p.x.toFixed(1) + '" cy="' + p.y.toFixed(1) + '" r="7" fill="transparent">' + tip + '</circle>' +
+      '<circle cx="' + p.x.toFixed(1) + '" cy="' + p.y.toFixed(1) + '" r="' + (isEnd ? 3 : 2) +
+      '" fill="' + (isEnd ? '#fff' : '#A855F7') + '"' + (isEnd ? ' stroke="#A855F7" stroke-width="2"' : '') + ' style="pointer-events:none">' + tip + '</circle>';
   }).join('');
   return '<svg viewBox="0 0 ' + W + ' ' + H + '" class="client-history-svg" preserveAspectRatio="none" role="img" aria-label="Seguidores ao longo dos últimos dias">' +
     '<polyline points="' + poly + '" fill="none" stroke="#A855F7" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>' +
