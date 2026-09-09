@@ -393,8 +393,14 @@ details[open] summary { margin-bottom: 4px; }
       <div class="quick-actions">
         <button class="qa-btn primary" onclick="goPage('pipeline')">📋 Ver Pipeline</button>
         <button class="qa-btn" onclick="goPage('servicos')">🧩 Ver Serviços</button>
-        <button class="qa-btn" onclick="goPage('clientes')">👥 Clientes ativos</button>
+        <button class="qa-btn" onclick="goPage('clientes')">👥 Clientes fixos</button>
+        <button class="qa-btn" onclick="goPage('avulsos')">💵 Ver Avulsos</button>
         <button class="qa-btn" onclick="goPage('config')">➕ Novo cliente</button>
+      </div>
+      <div class="card">
+        <div class="card-title">Serviços avulsos deste mês</div>
+        <div class="card-sub">Cobrança única, fora dos planos fixos</div>
+        <div id="home-avulsos"></div>
       </div>
       <div class="card">
         <div class="card-title">Próximos passos</div>
@@ -791,6 +797,16 @@ function renderHome() {
   document.getElementById('home-kpis').innerHTML = kpis.map(function(k){
     return '<div class="kpi-card"><div class="kpi-label">'+k.label+'</div><div class="kpi-val">'+k.val+'</div><div class="kpi-delta '+k.cls+'">'+k.delta+'</div></div>';
   }).join('');
+
+  let avulsosDoMes = AVULSOS.filter(function(a){ return a.month === currentMonthKey(); });
+  document.getElementById('home-avulsos').innerHTML = avulsosDoMes.length
+    ? avulsosDoMes.map(function(a){
+        return '<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--border)">' +
+          '<div><div style="font-size:0.86rem;font-weight:600">'+a.client+'</div><div style="font-size:0.74rem;color:var(--muted)">'+a.service+'</div></div>' +
+          '<div class="report-badge" style="flex-shrink:0">R$'+a.value.toLocaleString('pt-BR')+'</div>' +
+        '</div>';
+      }).join('')
+    : '<div style="font-size:0.8rem;color:var(--muted);padding:8px 0">Nenhum serviço avulso fechado esse mês ainda.</div>';
 
   let todos = [
     { done:false, text:'Compartilhar a planilha Google publicamente (Dashboard mostra dados reais)' },
