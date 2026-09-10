@@ -209,22 +209,20 @@ a { color: inherit; }
 .ios-hint button { background: none; border: none; cursor: pointer; margin-left: auto; font-size: 1rem; line-height: 1; }
 
 /* ═══════════════ HERO ═══════════════ */
-.hero { padding: 44px 0 20px; }
-.hero-grid { display: grid; gap: 30px; align-items: center; }
-@media (min-width: 900px) { .hero-grid { grid-template-columns: 1fr 1fr; gap: 46px; } .hero { padding: 64px 0 32px; } .hero-img img { aspect-ratio: 4/3; } }
+.hero { padding: 44px 0 28px; }
+.hero-grid { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 18px; max-width: 46rem; margin-inline: auto; }
+@media (min-width: 900px) { .hero { padding: 76px 0 52px; } }
 .pill-live { background: hsl(var(--whatsapp) / .14); color: hsl(142 60% 26%); }
 .pill-live .dot { width: 7px; height: 7px; border-radius: 999px; background: hsl(var(--whatsapp)); }
 .pill-live.fechado { background: hsl(var(--destructive) / .12); color: hsl(var(--destructive)); }
 .pill-live.fechado .dot { background: hsl(var(--destructive)); }
-.hero h1 { font-size: clamp(2.1rem, 7vw, 3.5rem); margin-top: 18px; }
-.hero-sub { margin-top: 18px; color: hsl(var(--muted-foreground)); font-size: 1.05rem; max-width: 34rem; }
-.hero-acts { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
-.hero-facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 30px; }
-.fact { padding: 14px; text-align: left; }
-.fact b { display: block; font-family: 'Fraunces', Georgia, serif; font-size: 1.05rem; }
-.fact span { display: block; font-size: .74rem; color: hsl(var(--muted-foreground)); margin-top: 2px; line-height: 1.35; }
-.hero-img { border-radius: calc(var(--radius) * 1.5); overflow: hidden; box-shadow: 0 24px 60px -30px hsl(25 30% 14% / .5); }
-.hero-img img { width: 100%; height: 100%; object-fit: cover; aspect-ratio: 4/5; }
+.hero h1 { font-size: clamp(2.4rem, 6.4vw, 3.85rem); }
+.hero-sub { color: hsl(var(--muted-foreground)); font-size: 1.15rem; max-width: 38rem; }
+.hero-acts { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+.hero-facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; width: 100%; max-width: 34rem; }
+.fact { padding: 14px; text-align: center; }
+.fact b { display: block; font-family: 'Fraunces', Georgia, serif; font-size: 1.15rem; }
+.fact span { display: block; font-size: .8rem; color: hsl(var(--muted-foreground)); margin-top: 3px; line-height: 1.4; }
 
 /* ═══════════════ CARDÁPIO ═══════════════ */
 .sec { padding: 56px 0; }
@@ -558,37 +556,32 @@ a { color: inherit; }
 <!-- ═══════════ HERO ═══════════ -->
 <section class="hero shop-section" id="top">
   <div class="hero-grid">
-    <div>
-      <span class="shop-pill pill-live" id="pill-status"><span class="dot" aria-hidden="true"></span>Aberto agora</span>
-      <h1>Pão quentinho, do forno pra sua mesa</h1>
-      <p class="hero-sub">
-        Padaria de bairro na Rua do Catete, em Mariana. Forno aceso desde as 5h30 — salgados,
-        pães e bolos feitos na casa. Retirada e entrega todo dia de funcionamento.
-      </p>
-      <div class="hero-acts">
-        <a class="btn btn-primary" href="#cardapio">
-          Ver cardápio e pedir
-          <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-        </a>
-        <a class="btn btn-outline" href="#visita">Como chegar</a>
-      </div>
-      <div class="hero-facts">
-        <div class="shop-card fact">
-          <b>4,5</b>
-          <span>74 avaliações no Google</span>
-        </div>
-        <div class="shop-card fact">
-          <b>5h30</b>
-          <span>Retirada todo dia</span>
-        </div>
-        <div class="shop-card fact">
-          <b>Seg–Sáb</b>
-          <span>Entrega todo dia de funcionamento</span>
-        </div>
-      </div>
+    <span class="shop-pill pill-live" id="pill-status"><span class="dot" aria-hidden="true"></span>Aberto agora</span>
+    <h1>Pão quentinho, do forno pra sua mesa</h1>
+    <p class="hero-sub">
+      Padaria de bairro na Rua do Catete, em Mariana. Forno aceso desde as 5h30 — salgados,
+      pães e bolos feitos na casa. Retirada e entrega todo dia de funcionamento.
+    </p>
+    <div class="hero-acts">
+      <a class="btn btn-primary" href="#cardapio">
+        Ver cardápio e pedir
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+      <a class="btn btn-outline" href="#visita">Como chegar</a>
     </div>
-    <div class="hero-img">
-      <img src="assets/hero.jpg" alt="Pães fresquinhos saídos do forno da padaria" width="900" height="675" fetchpriority="high">
+    <div class="hero-facts">
+      <div class="shop-card fact">
+        <b>4,5</b>
+        <span>74 avaliações no Google</span>
+      </div>
+      <div class="shop-card fact">
+        <b>5h30</b>
+        <span>Retirada todo dia</span>
+      </div>
+      <div class="shop-card fact">
+        <b>Seg–Sáb</b>
+        <span>Entrega todo dia de funcionamento</span>
+      </div>
     </div>
   </div>
 </section>
