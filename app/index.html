@@ -499,19 +499,33 @@ details[open] summary { margin-bottom: 4px; }
           <div class="guide-step"><div class="guide-num">2</div><div><div class="guide-step-title">Cole o script em Extensões → Apps Script</div><div class="guide-step-desc">Apague o conteúdo padrão e cole o código abaixo. Depois clique em <strong>Implantar → Nova implantação → tipo "App da Web"</strong>, com acesso "Qualquer pessoa" — copie a URL gerada.</div></div></div>
           <div class="guide-step"><div class="guide-num">3</div><div><div class="guide-step-title">Cole a URL aqui embaixo em todo aparelho</div><div class="guide-step-desc">Repita esse último passo (só colar a URL, o script é o mesmo) em cada celular/PC onde for usar o Pipeline.</div></div></div>
         </div>
-        <div class="result-link" style="white-space:pre-wrap;word-break:break-word;font-size:0.62rem;line-height:1.6;max-height:220px;overflow-y:auto" id="sync-script-code">function doPost(e) {
+        <div class="result-link" style="white-space:pre-wrap;word-break:break-word;font-size:0.62rem;line-height:1.6;max-height:220px;overflow-y:auto" id="sync-script-code">// Troque a linha abaixo pela mesma chave que você colar no campo "Chave de segurança" do app.
+// Sem isso, qualquer pessoa que descobrir a URL do App da Web conseguiria ler/escrever seus leads.
+var SECRET = 'COLE_AQUI_A_MESMA_CHAVE_DO_APP';
+
+// Evita "injeção de fórmula": se alguém mandar um valor começando com = + - @, o Sheets/Excel
+// pode executar isso como fórmula ao abrir a planilha. Prefixa com aspas simples pra neutralizar.
+function sanitizeCell(v) {
+  var s = (v === undefined || v === null) ? '' : String(v);
+  return /^[=+\-@]/.test(s) ? "'" + s : s;
+}
+
+function doPost(e) {
+  var data = JSON.parse(e.postData.contents);
+  if (data.secret !== SECRET) {
+    return ContentService.createTextOutput(JSON.stringify({ok:false, error:'unauthorized'})).setMimeType(ContentService.MimeType.JSON);
+  }
   var sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Pipeline') || SpreadsheetApp.getActiveSpreadsheet().insertSheet('Pipeline');
   if (sh.getLastRow() === 0) sh.appendRow(['id','name','biz','phone','city','src','val','stage','time']);
-  var data = JSON.parse(e.postData.contents);
   if (data.action === 'add') {
     var l = data.lead;
-    sh.appendRow([l.id, l.name, l.biz, l.phone, l.city, l.src, l.val, l.stage, l.time]);
+    sh.appendRow([l.id, l.name, l.biz, l.phone, l.city, l.src, l.val, l.stage, l.time].map(sanitizeCell));
   } else if (data.action === 'update') {
     var rows = sh.getDataRange().getValues();
     for (var i = 1; i < rows.length; i++) {
       if (rows[i][0] === data.id) {
-        sh.getRange(i+1, 8).setValue(data.stage);
-        sh.getRange(i+1, 9).setValue(data.time || '');
+        sh.getRange(i+1, 8).setValue(sanitizeCell(data.stage));
+        sh.getRange(i+1, 9).setValue(sanitizeCell(data.time || ''));
         break;
       }
     }
@@ -520,6 +534,9 @@ details[open] summary { margin-bottom: 4px; }
 }
 
 function doGet(e) {
+  if (e.parameter.secret !== SECRET) {
+    return ContentService.createTextOutput(JSON.stringify({error:'unauthorized'})).setMimeType(ContentService.MimeType.JSON);
+  }
   var sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Pipeline');
   if (!sh || sh.getLastRow() < 2) return ContentService.createTextOutput('[]').setMimeType(ContentService.MimeType.JSON);
   var rows = sh.getDataRange().getValues();
@@ -536,6 +553,10 @@ function doGet(e) {
         <div class="form-group">
           <label class="form-label" for="pl-sync-url">URL do App da Web (deixe vazio pra ficar só local)</label>
           <input class="form-input" id="pl-sync-url" name="sync-url" type="url" inputmode="url" autocomplete="off" placeholder="https://script.google.com/macros/s/...">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="pl-sync-secret">Chave de segurança (cole a mesma do topo do script — gerada sozinha se deixar em branco)</label>
+          <input class="form-input" id="pl-sync-secret" name="sync-secret" type="text" autocomplete="off" placeholder="Gerada automaticamente ao salvar">
         </div>
         <button class="btn btn-primary" onclick="salvarSyncUrl()">Salvar e sincronizar</button>
       </div>
@@ -844,8 +865,18 @@ function renderHome() {
 }
 
 // ═══════════════ PIPELINE: leads cadastrados manualmente (localStorage + sincronização em nuvem) ═══════════════
+// Escapa qualquer valor antes de ir pro innerHTML/atributo — leads sincronizados vêm de um
+// endpoint (PIPELINE_SYNC_URL) sem autenticação, então tratamos como dado não confiável.
+function escapeHtml(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
 let STAGE_ORDER = ['Novo Lead', 'Contato feito', 'Demo enviado', 'Proposta', 'Fechado'];
 let PIPELINE_SYNC_URL = localStorage.getItem('synctech_pipeline_sync_url') || '';
+// Segredo compartilhado com o Apps Script (ver template em copiarScriptSync()) — sem isso,
+// qualquer pessoa que descobrisse a URL do App da Web conseguiria escrever/ler leads à vontade.
+let PIPELINE_SYNC_SECRET = localStorage.getItem('synctech_pipeline_sync_secret') || '';
 
 function getStoredLeads() {
   try {
@@ -870,8 +901,17 @@ function saveStoredLeads(leads) {
 // Enquanto PIPELINE_SYNC_URL estiver vazia, tudo continua 100% local, sem quebrar nada.
 function salvarSyncUrl() {
   let url = document.getElementById('pl-sync-url').value.trim();
+  let secretInput = document.getElementById('pl-sync-secret');
+  let secret = secretInput.value.trim();
+  // Gera uma chave sozinho na primeira ativação, pra não depender do Rafael inventar uma.
+  if (url && !secret) {
+    secret = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(36).slice(2)).replace(/-/g, '');
+    secretInput.value = secret;
+  }
   localStorage.setItem('synctech_pipeline_sync_url', url);
+  localStorage.setItem('synctech_pipeline_sync_secret', secret);
   PIPELINE_SYNC_URL = url;
+  PIPELINE_SYNC_SECRET = secret;
   showToast(url ? 'Sincronização ativada!' : 'Sincronização desativada — voltou a ser só local', 'success');
   if (url) syncPipelineFromCloud(renderPipeline);
   updateSyncStatusUI();
@@ -894,13 +934,13 @@ function pushLeadToCloud(action, payload) {
   fetch(PIPELINE_SYNC_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain' }, // evita preflight CORS no Apps Script
-    body: JSON.stringify(Object.assign({ action: action }, payload)),
+    body: JSON.stringify(Object.assign({ action: action, secret: PIPELINE_SYNC_SECRET }, payload)),
   }).catch(function(err){ console.error('Falha ao sincronizar lead com a planilha:', err); });
 }
 
 function syncPipelineFromCloud(callback) {
   if (!PIPELINE_SYNC_URL) { if (callback) callback(); return; }
-  fetch(PIPELINE_SYNC_URL)
+  fetch(PIPELINE_SYNC_URL + (PIPELINE_SYNC_URL.indexOf('?') === -1 ? '?' : '&') + 'secret=' + encodeURIComponent(PIPELINE_SYNC_SECRET))
     .then(function(r){ return r.json(); })
     .then(function(cloudLeads){
       let normalized = (cloudLeads||[]).map(function(l){ return {
@@ -959,18 +999,19 @@ function renderPipeline() {
     let cards = colLeads.map(function(l, li) {
       let srcCls = l.src==='wa' ? 'lc-wa' : l.src==='ig' ? 'lc-ig' : 'lc-google';
       let srcLabel = l.src==='wa' ? 'WhatsApp' : l.src==='ig' ? 'Instagram' : 'Google';
-      let cidadeTxt = l.city ? ' aqui em '+l.city : '';
-      let wppMsg = encodeURIComponent('Oi! Vi o '+l.name+cidadeTxt+'. Ajudei uma barbearia em Mariana a crescer 18% em agendamentos sem gastar mais com anúncio — usando automação de WhatsApp e Instagram. Posso te mostrar como funcionaria pro seu negócio? Leva 5 minutos.');
-      let wppNum = l.phone ? '55'+l.phone.replace(/\D/g,'') : '55';
+      let cidadeTxt = l.city ? ' aqui em '+String(l.city).replace(/[<>&"']/g, '') : '';
+      let wppMsg = encodeURIComponent('Oi! Vi o '+String(l.name||'')+cidadeTxt+'. Ajudei uma barbearia em Mariana a crescer 18% em agendamentos sem gastar mais com anúncio — usando automação de WhatsApp e Instagram. Posso te mostrar como funcionaria pro seu negócio? Leva 5 minutos.');
+      let wppNum = l.phone ? '55'+String(l.phone).replace(/\D/g,'') : '55';
       let isStored = !!l.id;
       let nextStage = isStored ? STAGE_ORDER[STAGE_ORDER.indexOf(l.stage)+1] : null;
+      let valNum = Number(l.val) || 0;
       return '<div class="lead-card">' +
-        '<div class="lc-name">'+l.name+'</div>' +
-        '<div class="lc-biz">'+l.biz+'</div>' +
-        '<div class="lc-row"><span class="lc-val">R$'+l.val+'/mês</span><span class="lc-source '+srcCls+'">'+srcLabel+'</span></div>' +
-        '<div class="lc-time">'+l.time+'</div>' +
-        '<a href="https://wa.me/'+wppNum+'?text='+wppMsg+'" target="_blank" style="display:block;text-align:center;margin-top:10px;background:rgba(37,211,102,0.12);border:1px solid rgba(37,211,102,0.25);color:#25D366;border-radius:7px;padding:7px;font-size:0.7rem;font-weight:700;text-decoration:none">💬 WhatsApp</a>' +
-        (nextStage ? '<button onclick="avancarLead(\''+l.id+'\')" style="width:100%;margin-top:7px;background:var(--s3);border:1px solid var(--border-s);color:var(--pl);border-radius:7px;padding:7px;font-size:0.68rem;font-weight:700;cursor:pointer;font-family:var(--font-head),sans-serif;text-transform:uppercase;letter-spacing:0.03em">→ '+nextStage+'</button>' : '') +
+        '<div class="lc-name">'+escapeHtml(l.name)+'</div>' +
+        '<div class="lc-biz">'+escapeHtml(l.biz)+'</div>' +
+        '<div class="lc-row"><span class="lc-val">R$'+valNum+'/mês</span><span class="lc-source '+srcCls+'">'+srcLabel+'</span></div>' +
+        '<div class="lc-time">'+escapeHtml(l.time)+'</div>' +
+        '<a href="https://wa.me/'+encodeURIComponent(wppNum)+'?text='+wppMsg+'" target="_blank" style="display:block;text-align:center;margin-top:10px;background:rgba(37,211,102,0.12);border:1px solid rgba(37,211,102,0.25);color:#25D366;border-radius:7px;padding:7px;font-size:0.7rem;font-weight:700;text-decoration:none">💬 WhatsApp</a>' +
+        (nextStage ? '<button onclick="avancarLead(\''+escapeHtml(l.id)+'\')" style="width:100%;margin-top:7px;background:var(--s3);border:1px solid var(--border-s);color:var(--pl);border-radius:7px;padding:7px;font-size:0.68rem;font-weight:700;cursor:pointer;font-family:var(--font-head),sans-serif;text-transform:uppercase;letter-spacing:0.03em">→ '+escapeHtml(nextStage)+'</button>' : '') +
       '</div>';
     }).join('');
     let total = colLeads.reduce(function(s,l){ return s+l.val; }, 0);
@@ -1439,6 +1480,7 @@ if ('serviceWorker' in navigator) {
 renderNav();
 renderHome();
 document.getElementById('pl-sync-url').value = PIPELINE_SYNC_URL;
+document.getElementById('pl-sync-secret').value = PIPELINE_SYNC_SECRET;
 updateSyncStatusUI();
 renderPipeline();
 if (PIPELINE_SYNC_URL) { syncPipelineFromCloud(renderPipeline); }

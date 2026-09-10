@@ -1106,8 +1106,10 @@ function FAQ() {
 function Contato() {
   const [nome, setNome] = useState('');
   const [tel, setTel] = useState('');
+  const [site, setSite] = useState(''); // honeypot: campo invisível pra gente, isca pra bot de spam
   const [erros, setErros] = useState({});
   const [enviado, setEnviado] = useState(false);
+  const montadoEm = useRef(Date.now());
 
   const soDigitos = (s) => s.replace(/\D/g, '');
   const mascarar = (v) => {
@@ -1120,6 +1122,12 @@ function Contato() {
 
   const enviar = (e) => {
     e.preventDefault();
+    /* Honeypot + envio rápido demais = bot de spam. Finge que deu certo, mas não manda
+       nada pro webhook — não vale alertar o script de que foi barrado. */
+    if (site.trim() || Date.now() - montadoEm.current < 1500) {
+      setEnviado(true);
+      return;
+    }
     const novos = {};
     if (nome.trim().length < 2) novos.nome = 'Escreve seu nome pra gente saber com quem fala.';
     const d = soDigitos(tel);
@@ -1200,6 +1208,11 @@ function Contato() {
             </div>
 
             <form onSubmit=${enviar} noValidate className="grid content-start gap-5">
+              <div aria-hidden="true" style=${{ position: 'absolute', left: '-9999px', width: '1px', height: '1px', overflow: 'hidden' }}>
+                <label htmlFor="site">Deixe este campo em branco</label>
+                <input id="site" name="site" type="text" tabIndex="-1" autoComplete="off"
+                       value=${site} onInput=${(e) => setSite(e.target.value)} />
+              </div>
               ${campo('nome', 'Seu nome', nome, setNome, 'text', 'Ex: Maria Silva', 'name', erros.nome)}
               ${campo('tel', 'Seu WhatsApp', mascarar(tel), setTel, 'tel', '(31) 98655-1626', 'tel', erros.tel)}
               <button type="submit"
