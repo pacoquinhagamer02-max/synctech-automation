@@ -211,7 +211,7 @@ a { color: inherit; }
 /* ═══════════════ HERO ═══════════════ */
 .hero { padding: 44px 0 20px; }
 .hero-grid { display: grid; gap: 30px; align-items: center; }
-@media (min-width: 900px) { .hero-grid { grid-template-columns: 1fr 1fr; gap: 46px; } .hero { padding: 64px 0 32px; } }
+@media (min-width: 900px) { .hero-grid { grid-template-columns: 1fr 1fr; gap: 46px; } .hero { padding: 64px 0 32px; } .hero-img img { aspect-ratio: 4/3; } }
 .pill-live { background: hsl(var(--whatsapp) / .14); color: hsl(142 60% 26%); }
 .pill-live .dot { width: 7px; height: 7px; border-radius: 999px; background: hsl(var(--whatsapp)); }
 .pill-live.fechado { background: hsl(var(--destructive) / .12); color: hsl(var(--destructive)); }
@@ -224,7 +224,7 @@ a { color: inherit; }
 .fact b { display: block; font-family: 'Fraunces', Georgia, serif; font-size: 1.05rem; }
 .fact span { display: block; font-size: .74rem; color: hsl(var(--muted-foreground)); margin-top: 2px; line-height: 1.35; }
 .hero-img { border-radius: calc(var(--radius) * 1.5); overflow: hidden; box-shadow: 0 24px 60px -30px hsl(25 30% 14% / .5); }
-.hero-img img { width: 100%; height: 100%; object-fit: cover; aspect-ratio: 4/3; }
+.hero-img img { width: 100%; height: 100%; object-fit: cover; aspect-ratio: 4/5; }
 
 /* ═══════════════ CARDÁPIO ═══════════════ */
 .sec { padding: 56px 0; }
