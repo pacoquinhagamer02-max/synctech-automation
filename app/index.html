@@ -338,6 +338,9 @@ details[open] summary { margin-bottom: 4px; }
 .toast { position: fixed; bottom: calc(var(--bottomnav) + 16px); left: 50%; transform: translateX(-50%) translateY(80px); background: var(--s2); border: 1px solid var(--border-s); border-radius: 10px; padding: 12px 20px; font-size: 0.82rem; font-weight: 600; transition: transform 0.3s; z-index: 1000; white-space: nowrap; box-shadow: var(--glow); }
 .toast.show { transform: translateX(-50%) translateY(0); }
 .toast.success { border-color: rgba(34,197,94,0.4); color: var(--green); }
+/* Aviso de falha: precisa quebrar linha, senão a frase longa vaza da tela no celular. */
+.toast.error { border-color: rgba(245,158,11,0.45); color: var(--yellow); white-space: normal; max-width: min(88vw, 420px); text-align: center; line-height: 1.45; }
+.sync-pendentes { margin-top: 12px; padding: 10px 14px; border-radius: 9px; background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.3); color: var(--yellow); font-size: 0.76rem; line-height: 1.5; }
 
 /* ── BOTTOM NAV (mobile) ── */
 .bottom-nav { display: none; }
@@ -559,6 +562,7 @@ function doGet(e) {
           <input class="form-input" id="pl-sync-secret" name="sync-secret" type="text" autocomplete="off" placeholder="Gerada automaticamente ao salvar">
         </div>
         <button class="btn btn-primary" onclick="salvarSyncUrl()">Salvar e sincronizar</button>
+        <p class="sync-pendentes" id="sync-pendentes" hidden></p>
       </div>
 
       <div class="pipeline-board" id="pipeline-board"></div>
@@ -929,13 +933,80 @@ function updateSyncStatusUI() {
   }
 }
 
-function pushLeadToCloud(action, payload) {
+/* Fila de reenvio: antes, uma falha de rede caía num catch que só logava no console —
+   o lead sumia da planilha e ninguém ficava sabendo. Agora o que falha fica guardado
+   e tenta de novo sozinho na próxima abertura do app. */
+const K_SYNC_FILA = 'synctech_pipeline_fila';
+
+function lerFilaSync() {
+  try { return JSON.parse(localStorage.getItem(K_SYNC_FILA) || '[]'); }
+  catch (err) { console.error('Fila de sync corrompida, reiniciando:', err); return []; }
+}
+function gravarFilaSync(fila) {
+  try { localStorage.setItem(K_SYNC_FILA, JSON.stringify(fila.slice(-50))); }
+  catch (err) { console.error('Falha ao gravar fila de sync:', err); }
+}
+function enfileirarSync(corpo) {
+  let fila = lerFilaSync();
+  fila.push({ corpo: corpo, quando: new Date().toISOString() });
+  gravarFilaSync(fila);
+  atualizarAvisoFila();
+}
+
+function atualizarAvisoFila() {
+  let pendentes = lerFilaSync().length;
+  let el = document.getElementById('sync-pendentes');
+  if (!el) return;
+  el.hidden = pendentes === 0;
+  if (pendentes) {
+    el.textContent = '⚠️ ' + pendentes + (pendentes === 1 ? ' lead ainda não foi' : ' leads ainda não foram') +
+      ' pra planilha (a rede falhou). Está salvo aqui e vai tentar de novo sozinho.';
+  }
+}
+
+/* Reenvia o que ficou pra trás. Só remove da fila o que realmente deu certo. */
+function reenviarFilaSync() {
   if (!PIPELINE_SYNC_URL) return;
-  fetch(PIPELINE_SYNC_URL, {
+  let fila = lerFilaSync();
+  if (!fila.length) return;
+  gravarFilaSync([]);
+  let falhas = [];
+  let restantes = fila.length;
+  fila.forEach(function (item) {
+    enviarParaPlanilha(item.corpo)
+      .catch(function () { falhas.push(item); })
+      .then(function () {
+        restantes--;
+        if (restantes === 0) {
+          if (falhas.length) gravarFilaSync(lerFilaSync().concat(falhas));
+          atualizarAvisoFila();
+          if (falhas.length === 0) showToast('Leads pendentes sincronizados!', 'success');
+        }
+      });
+  });
+}
+
+/* Uma requisição só, com o erro de verdade propagado (inclusive HTTP 4xx/5xx,
+   que o fetch não trata como erro sozinho). */
+function enviarParaPlanilha(corpo) {
+  return fetch(PIPELINE_SYNC_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain' }, // evita preflight CORS no Apps Script
-    body: JSON.stringify(Object.assign({ action: action, secret: PIPELINE_SYNC_SECRET }, payload)),
-  }).catch(function(err){ console.error('Falha ao sincronizar lead com a planilha:', err); });
+    body: JSON.stringify(corpo),
+  }).then(function (r) {
+    if (!r.ok) throw new Error('A planilha respondeu HTTP ' + r.status);
+    return r;
+  });
+}
+
+function pushLeadToCloud(action, payload) {
+  if (!PIPELINE_SYNC_URL) return;
+  let corpo = Object.assign({ action: action, secret: PIPELINE_SYNC_SECRET }, payload);
+  enviarParaPlanilha(corpo).catch(function(err){
+    console.error('Falha ao sincronizar lead com a planilha:', err);
+    enfileirarSync(corpo);
+    showToast('Sem conexão com a planilha — o lead ficou salvo aqui e vai sincronizar depois.', 'error');
+  });
 }
 
 function syncPipelineFromCloud(callback) {
@@ -1482,6 +1553,8 @@ renderHome();
 document.getElementById('pl-sync-url').value = PIPELINE_SYNC_URL;
 document.getElementById('pl-sync-secret').value = PIPELINE_SYNC_SECRET;
 updateSyncStatusUI();
+atualizarAvisoFila();
+reenviarFilaSync();
 renderPipeline();
 if (PIPELINE_SYNC_URL) { syncPipelineFromCloud(renderPipeline); }
 renderServicesGrid();
