@@ -494,23 +494,34 @@ details[open] summary { margin-bottom: 4px; }
 
       <div class="card" id="guide-sync">
         <h2 class="card-title">🔄 Sincronizar entre celular e PC</h2>
-        <div class="card-sub" id="sync-status-text">Sem isso, os leads que você cadastra ficam só no aparelho usado. Com 5 min de setup (planilha Google), tudo aparece em qualquer aparelho.</div>
+        <div class="card-sub" id="sync-status-text">Sem isso, leads, clientes e avulsos que você cadastra ficam só no aparelho usado. Com 5 min de setup (planilha Google), tudo aparece em qualquer aparelho.</div>
         <details id="sync-details">
         <summary class="qa-btn" style="display:inline-flex;width:fit-content;margin-bottom:14px">Ver passo a passo →</summary>
         <div class="guide-steps">
-          <div class="guide-step"><div class="guide-num">1</div><div><div class="guide-step-title">Crie uma planilha Google nova</div><div class="guide-step-desc">sheets.google.com → planilha em branco. Pode deixar sem nenhuma aba especial, o script cria sozinho.</div></div></div>
+          <div class="guide-step"><div class="guide-num">1</div><div><div class="guide-step-title">Crie uma planilha Google nova</div><div class="guide-step-desc">sheets.google.com → planilha em branco. Pode deixar sem nenhuma aba especial, o script cria sozinho (Pipeline, Clientes e Avulsos).</div></div></div>
           <div class="guide-step"><div class="guide-num">2</div><div><div class="guide-step-title">Cole o script em Extensões → Apps Script</div><div class="guide-step-desc">Apague o conteúdo padrão e cole o código abaixo. Depois clique em <strong>Implantar → Nova implantação → tipo "App da Web"</strong>, com acesso "Qualquer pessoa" — copie a URL gerada.</div></div></div>
-          <div class="guide-step"><div class="guide-num">3</div><div><div class="guide-step-title">Cole a URL aqui embaixo em todo aparelho</div><div class="guide-step-desc">Repita esse último passo (só colar a URL, o script é o mesmo) em cada celular/PC onde for usar o Pipeline.</div></div></div>
+          <div class="guide-step"><div class="guide-num">3</div><div><div class="guide-step-title">Cole a URL aqui embaixo em todo aparelho</div><div class="guide-step-desc">Repita esse último passo (só colar a URL, o script é o mesmo) em cada celular/PC onde for usar o Pipeline, Clientes ou Avulsos.</div></div></div>
         </div>
         <div class="result-link" style="white-space:pre-wrap;word-break:break-word;font-size:0.62rem;line-height:1.6;max-height:220px;overflow-y:auto" id="sync-script-code">// Troque a linha abaixo pela mesma chave que você colar no campo "Chave de segurança" do app.
-// Sem isso, qualquer pessoa que descobrir a URL do App da Web conseguiria ler/escrever seus leads.
+// Sem isso, qualquer pessoa que descobrir a URL do App da Web conseguiria ler/escrever seus dados.
 var SECRET = 'COLE_AQUI_A_MESMA_CHAVE_DO_APP';
 
 // Evita "injeção de fórmula": se alguém mandar um valor começando com = + - @, o Sheets/Excel
 // pode executar isso como fórmula ao abrir a planilha. Prefixa com aspas simples pra neutralizar.
+// Só mexe em texto — número e data continuam do jeito que a planilha espera.
 function sanitizeCell(v) {
-  var s = (v === undefined || v === null) ? '' : String(v);
-  return /^[=+\-@]/.test(s) ? "'" + s : s;
+  if (typeof v !== 'string') return v;
+  return /^[=+\-@]/.test(v) ? "'" + v : v;
+}
+
+function pegarOuCriarAba(nome, cabecalho) {
+  var planilha = SpreadsheetApp.getActiveSpreadsheet();
+  var aba = planilha.getSheetByName(nome);
+  if (!aba) {
+    aba = planilha.insertSheet(nome);
+    aba.appendRow(cabecalho);
+  }
+  return aba;
 }
 
 function doPost(e) {
@@ -518,21 +529,32 @@ function doPost(e) {
   if (data.secret !== SECRET) {
     return ContentService.createTextOutput(JSON.stringify({ok:false, error:'unauthorized'})).setMimeType(ContentService.MimeType.JSON);
   }
-  var sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Pipeline') || SpreadsheetApp.getActiveSpreadsheet().insertSheet('Pipeline');
-  if (sh.getLastRow() === 0) sh.appendRow(['id','name','biz','phone','city','src','val','stage','time']);
-  if (data.action === 'add') {
-    var l = data.lead;
-    sh.appendRow([l.id, l.name, l.biz, l.phone, l.city, l.src, l.val, l.stage, l.time].map(sanitizeCell));
-  } else if (data.action === 'update') {
-    var rows = sh.getDataRange().getValues();
-    for (var i = 1; i < rows.length; i++) {
-      if (rows[i][0] === data.id) {
-        sh.getRange(i+1, 8).setValue(sanitizeCell(data.stage));
-        sh.getRange(i+1, 9).setValue(sanitizeCell(data.time || ''));
-        break;
+
+  if (data.action === 'add' || data.action === 'update') {
+    var sh = pegarOuCriarAba('Pipeline', ['id','name','biz','phone','city','src','val','stage','time']);
+    if (data.action === 'add') {
+      var l = data.lead;
+      sh.appendRow([l.id, l.name, l.biz, l.phone, l.city, l.src, l.val, l.stage, l.time].map(sanitizeCell));
+    } else {
+      var rows = sh.getDataRange().getValues();
+      for (var i = 1; i < rows.length; i++) {
+        if (rows[i][0] === data.id) {
+          sh.getRange(i+1, 8).setValue(sanitizeCell(data.stage));
+          sh.getRange(i+1, 9).setValue(sanitizeCell(data.time || ''));
+          break;
+        }
       }
     }
+  } else if (data.action === 'add-cliente') {
+    var shC = pegarOuCriarAba('Clientes', ['id','bizName','plan','tipoNegocio','observacoes','agendLink','bioLink','createdAt']);
+    shC.appendRow([data.id, data.bizName, data.plan, data.tipoNegocio, data.observacoes, data.agendLink, data.bioLink, data.createdAt].map(sanitizeCell));
+  } else if (data.action === 'add-avulso') {
+    var shA = pegarOuCriarAba('Avulsos', ['id','client','service','value','desc','date','month','createdAt']);
+    shA.appendRow([data.id, data.client, data.service, data.value, data.desc, data.date, data.month, data.createdAt].map(sanitizeCell));
+  } else {
+    return ContentService.createTextOutput(JSON.stringify({ok:false, error:'ação desconhecida: ' + data.action})).setMimeType(ContentService.MimeType.JSON);
   }
+
   return ContentService.createTextOutput(JSON.stringify({ok:true})).setMimeType(ContentService.MimeType.JSON);
 }
 
@@ -540,16 +562,18 @@ function doGet(e) {
   if (e.parameter.secret !== SECRET) {
     return ContentService.createTextOutput(JSON.stringify({error:'unauthorized'})).setMimeType(ContentService.MimeType.JSON);
   }
-  var sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Pipeline');
+  var abas = { leads:'Pipeline', clientes:'Clientes', avulsos:'Avulsos' };
+  var nomeAba = abas[e.parameter.tipo] || 'Pipeline';
+  var sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(nomeAba);
   if (!sh || sh.getLastRow() < 2) return ContentService.createTextOutput('[]').setMimeType(ContentService.MimeType.JSON);
   var rows = sh.getDataRange().getValues();
   var headers = rows[0];
-  var leads = rows.slice(1).map(function(row) {
+  var itens = rows.slice(1).map(function(row) {
     var obj = {};
     headers.forEach(function(h, i) { obj[h] = row[i]; });
     return obj;
   });
-  return ContentService.createTextOutput(JSON.stringify(leads)).setMimeType(ContentService.MimeType.JSON);
+  return ContentService.createTextOutput(JSON.stringify(itens)).setMimeType(ContentService.MimeType.JSON);
 }</div>
         <button class="copy-btn" style="margin:8px 0 14px" onclick="copiarScriptSync()">Copiar código do script</button>
         </details>
@@ -621,6 +645,42 @@ function doGet(e) {
         <div class="hero-sub">Cobrança única, sem plano fixo — soma tudo o que os clientes te devem</div>
       </div>
       <div class="kpi-grid" id="avulsos-total" style="margin-bottom:14px"></div>
+
+      <div class="card" style="margin-bottom:16px">
+        <h2 class="card-title">+ Registrar avulso</h2>
+        <div class="card-sub">Fechou um serviço avulso? Registra aqui — entra na soma na hora</div>
+        <div class="form-row2">
+          <div class="form-group">
+            <label class="form-label" for="av-cliente">Cliente *</label>
+            <input class="form-input" id="av-cliente" autocomplete="off" placeholder="Ex: PL Car">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="av-valor">Valor (R$) *</label>
+            <input class="form-input" id="av-valor" type="number" inputmode="decimal" min="0" step="1" placeholder="800">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="av-servico">Serviço *</label>
+          <select class="form-input" id="av-servico">
+            <option value="WhatsApp Bot 24/7">WhatsApp Bot 24/7</option>
+            <option value="Instagram Automático">Instagram Automático</option>
+            <option value="Agendamento Online">Agendamento Online</option>
+            <option value="CRM com Pipeline">CRM com Pipeline</option>
+            <option value="Link na Bio">Link na Bio</option>
+            <option value="Gestão de Reputação">Gestão de Reputação</option>
+            <option value="Dashboard de Métricas">Dashboard de Métricas</option>
+            <option value="Catálogo Digital">Catálogo Digital</option>
+            <option value="Tráfego Pago (Meta Ads)" selected>Tráfego Pago (Meta Ads)</option>
+            <option value="Outro">Outro</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="av-desc">Descrição (opcional)</label>
+          <input class="form-input" id="av-desc" autocomplete="off" placeholder="Ex: Gestão de tráfego pago fechada avulsa, sem plano fixo.">
+        </div>
+        <button class="btn btn-primary" onclick="registrarAvulso()">Registrar avulso →</button>
+      </div>
+
       <div id="avulsos-list"></div>
     </div>
 
@@ -660,13 +720,27 @@ function doGet(e) {
             <input class="form-input" id="nc-ig" name="cliente-instagram" autocomplete="off" spellcheck="false" placeholder="@seunegocio">
           </div>
         </div>
+        <div class="form-row2">
+          <div class="form-group">
+            <label class="form-label" for="nc-plan">Plano</label>
+            <select class="form-input" id="nc-plan">
+              <option value="Starter">Starter — R$250/mês</option>
+              <option value="Negócio" selected>Negócio — R$500/mês</option>
+              <option value="Pro">Pro — R$1.000/mês</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="nc-tipo">Tipo de negócio</label>
+            <select class="form-input" id="nc-tipo">
+              <option value="Padaria">Padaria</option>
+              <option value="Barbearia">Barbearia</option>
+              <option value="Outro" selected>Outro</option>
+            </select>
+          </div>
+        </div>
         <div class="form-group">
-          <label class="form-label" for="nc-plan">Plano</label>
-          <select class="form-input" id="nc-plan">
-            <option value="Starter">Starter — R$250/mês</option>
-            <option value="Negócio" selected>Negócio — R$500/mês</option>
-            <option value="Pro">Pro — R$1.000/mês</option>
-          </select>
+          <label class="form-label" for="nc-obs">Observações (opcional)</label>
+          <textarea class="form-input" id="nc-obs" rows="2" placeholder="Ex: fechou dia 10/09, prótese é o carro-chefe..."></textarea>
         </div>
         <button class="btn btn-primary" onclick="gerarCliente()">Gerar links do cliente →</button>
       </div>
@@ -999,13 +1073,53 @@ function enviarParaPlanilha(corpo) {
   });
 }
 
+/* Reaproveitada por lead/cliente/avulso — mesma fila, mesmo aviso, um só lugar pra manter. */
+function enviarRegistroComFila(corpo, mensagemFalha) {
+  if (!PIPELINE_SYNC_URL) return;
+  enviarParaPlanilha(corpo).catch(function(err){
+    console.error('Falha ao sincronizar com a planilha:', err);
+    enfileirarSync(corpo);
+    showToast(mensagemFalha, 'error');
+  });
+}
+
+function buscarDaPlanilha(tipo, callback) {
+  if (!PIPELINE_SYNC_URL) { if (callback) callback([]); return; }
+  fetch(PIPELINE_SYNC_URL + '?secret=' + encodeURIComponent(PIPELINE_SYNC_SECRET) + '&tipo=' + encodeURIComponent(tipo))
+    .then(function(r){ if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    .then(function(dados){ if (callback) callback(dados || []); })
+    .catch(function(err){ console.error('Falha ao buscar ' + tipo + ' da planilha:', err); if (callback) callback([]); });
+}
+
 function pushLeadToCloud(action, payload) {
   if (!PIPELINE_SYNC_URL) return;
   let corpo = Object.assign({ action: action, secret: PIPELINE_SYNC_SECRET }, payload);
-  enviarParaPlanilha(corpo).catch(function(err){
-    console.error('Falha ao sincronizar lead com a planilha:', err);
-    enfileirarSync(corpo);
-    showToast('Sem conexão com a planilha — o lead ficou salvo aqui e vai sincronizar depois.', 'error');
+  enviarRegistroComFila(corpo, 'Sem conexão com a planilha — o lead ficou salvo aqui e vai sincronizar depois.');
+}
+
+/* Mesma ideia do Pipeline: puxa o que outro aparelho cadastrou, sem sobrescrever
+   o que já existe local — só evita que o dono do Hub veja o cliente/avulso
+   só no celular onde foi cadastrado. */
+function syncClientsFromCloud() {
+  buscarDaPlanilha('clientes', function (nuvem) {
+    if (!nuvem.length) return;
+    let local = getStoredClients();
+    let idsLocais = local.map(function (c) { return c.id; });
+    let novos = nuvem.filter(function (c) { return c.id && idsLocais.indexOf(c.id) === -1; });
+    if (!novos.length) return;
+    localStorage.setItem('synctech_new_clients', JSON.stringify(local.concat(novos)));
+    renderClients();
+  });
+}
+function syncAvulsosFromCloud() {
+  buscarDaPlanilha('avulsos', function (nuvem) {
+    if (!nuvem.length) return;
+    let local = getStoredAvulsos();
+    let idsLocais = local.map(function (a) { return a.id; });
+    let novos = nuvem.filter(function (a) { return a.id && idsLocais.indexOf(a.id) === -1; });
+    if (!novos.length) return;
+    localStorage.setItem('synctech_new_avulsos', JSON.stringify(local.concat(novos)));
+    renderAvulsos();
   });
 }
 
@@ -1399,16 +1513,17 @@ function renderClients() {
   let stored = getStoredClients();
   let fixed = CLIENTS_FIXED;
   let all = fixed.concat(stored.map(function(c){
-    return { name:c.bizName, plan:c.plan, links:[
+    return { name:c.bizName, plan:c.plan, tipoNegocio:c.tipoNegocio, observacoes:c.observacoes, links:[
       { label:'Agendamento', url:c.agendLink },
       { label:'Bio', url:c.bioLink },
     ]};
   }));
   document.getElementById('clients-list').innerHTML = all.map(function(c) {
     return '<div class="client-card">' +
-      '<div class="client-head"><div class="client-av">'+c.name.charAt(0)+'</div><div><h3 class="client-name">'+c.name+'</h3><div class="client-meta">'+c.plan+'</div></div></div>' +
+      '<div class="client-head"><div class="client-av">'+escapeHtml(c.name.charAt(0))+'</div><div><h3 class="client-name">'+escapeHtml(c.name)+'</h3><div class="client-meta">'+escapeHtml(c.plan)+(c.tipoNegocio ? ' · '+escapeHtml(c.tipoNegocio) : '')+'</div></div></div>' +
       buildStatsHtml(c) +
-      '<div class="client-links">'+c.links.map(function(l){ return '<a class="client-link" href="'+l.url+'" target="_blank">'+l.label+' →</a>'; }).join('')+'</div>' +
+      (c.observacoes ? '<div class="client-meta" style="margin-bottom:8px">📝 '+escapeHtml(c.observacoes)+'</div>' : '') +
+      '<div class="client-links">'+c.links.filter(function(l){ return l.url; }).map(function(l){ return '<a class="client-link" href="'+escapeHtml(l.url)+'" target="_blank">'+escapeHtml(l.label)+' →</a>'; }).join('')+'</div>' +
     '</div>';
   }).join('');
 }
@@ -1418,9 +1533,12 @@ function currentMonthKey() {
   let d = new Date();
   return String(d.getMonth()+1).padStart(2,'0') + '/' + d.getFullYear();
 }
+function todosAvulsos() {
+  return AVULSOS.concat(getStoredAvulsos());
+}
 function avulsosMesTotal() {
   let mesAtual = currentMonthKey();
-  return AVULSOS.filter(function(a){ return a.month === mesAtual; }).reduce(function(s,a){ return s+a.value; }, 0);
+  return todosAvulsos().filter(function(a){ return a.month === mesAtual; }).reduce(function(s,a){ return s+a.value; }, 0);
 }
 function fixosMensalTotal() {
   let fechados = pipelineData.filter(function(c){ return c.stage==='Fechado'; })[0].leads;
@@ -1428,16 +1546,17 @@ function fixosMensalTotal() {
 }
 function renderAvulsos() {
   let totalMes = avulsosMesTotal();
-  let totalGeral = AVULSOS.reduce(function(s,a){ return s+a.value; }, 0);
+  let all = todosAvulsos();
+  let totalGeral = all.reduce(function(s,a){ return s+a.value; }, 0);
   document.getElementById('avulsos-total').innerHTML =
-    '<div class="kpi-card"><div class="kpi-label">Avulsos este mês</div><div class="kpi-val">R$'+totalMes.toLocaleString('pt-BR')+'</div><div class="kpi-delta up">'+AVULSOS.filter(function(a){return a.month===currentMonthKey();}).length+' serviço(s) fechado(s)</div></div>' +
-    '<div class="kpi-card"><div class="kpi-label">Total avulsos (histórico)</div><div class="kpi-val">R$'+totalGeral.toLocaleString('pt-BR')+'</div><div class="kpi-delta up">'+AVULSOS.length+' no total</div></div>' +
+    '<div class="kpi-card"><div class="kpi-label">Avulsos este mês</div><div class="kpi-val">R$'+totalMes.toLocaleString('pt-BR')+'</div><div class="kpi-delta up">'+all.filter(function(a){return a.month===currentMonthKey();}).length+' serviço(s) fechado(s)</div></div>' +
+    '<div class="kpi-card"><div class="kpi-label">Total avulsos (histórico)</div><div class="kpi-val">R$'+totalGeral.toLocaleString('pt-BR')+'</div><div class="kpi-delta up">'+all.length+' no total</div></div>' +
     '<div class="kpi-card"><div class="kpi-label">Fixos + avulsos este mês</div><div class="kpi-val">R$'+(fixosMensalTotal()+totalMes).toLocaleString('pt-BR')+'</div><div class="kpi-delta up">soma de tudo que os clientes te devem</div></div>';
 
-  document.getElementById('avulsos-list').innerHTML = AVULSOS.map(function(a) {
+  document.getElementById('avulsos-list').innerHTML = all.map(function(a) {
     return '<div class="client-card">' +
-      '<div class="client-head"><div class="client-av">'+a.client.charAt(0)+'</div><div><h3 class="client-name">'+a.client+'</h3><div class="client-meta">'+a.service+'</div></div></div>' +
-      '<div class="client-meta" style="margin-bottom:10px">'+a.desc+' · Fechado em '+a.date+'</div>' +
+      '<div class="client-head"><div class="client-av">'+escapeHtml(a.client.charAt(0))+'</div><div><h3 class="client-name">'+escapeHtml(a.client)+'</h3><div class="client-meta">'+escapeHtml(a.service)+'</div></div></div>' +
+      '<div class="client-meta" style="margin-bottom:10px">'+escapeHtml(a.desc)+' · Fechado em '+escapeHtml(a.date)+'</div>' +
       '<div class="report-badge" style="font-size:0.8rem;padding:6px 12px">R$'+a.value.toLocaleString('pt-BR')+'</div>' +
     '</div>';
   }).join('');
@@ -1492,6 +1611,8 @@ function gerarCliente() {
   let wpp  = document.getElementById('nc-wpp').value.trim();
   let ig   = document.getElementById('nc-ig').value.trim();
   let plan = document.getElementById('nc-plan').value;
+  let tipoNegocio = document.getElementById('nc-tipo').value;
+  let obs = document.getElementById('nc-obs').value.trim();
   if (!name || !wpp) { showToast('Preencha nome e WhatsApp', 'error'); return; }
 
   let cfg = { bizName:name, bizWpp:wpp, instagram:ig, services:[], professionals:[{id:0,name:'Qualquer',emoji:'⭐',color:'#A855F7',rating:null,reviews:null}] };
@@ -1507,11 +1628,63 @@ function gerarCliente() {
   document.getElementById('nc-link-bio').textContent = bioLink;
   document.getElementById('nc-result').style.display = 'block';
 
+  let novoCliente = {
+    id: (crypto.randomUUID ? crypto.randomUUID() : 'c' + Date.now()),
+    bizName: name, plan: plan, tipoNegocio: tipoNegocio, observacoes: obs,
+    agendLink: agendLink, bioLink: bioLink, createdAt: new Date().toISOString(),
+  };
   let stored = getStoredClients();
-  stored.push({ bizName:name, plan:plan, agendLink:agendLink, bioLink:bioLink, createdAt:new Date().toISOString() });
+  stored.push(novoCliente);
   localStorage.setItem('synctech_new_clients', JSON.stringify(stored));
   renderClients();
+
+  enviarRegistroComFila(
+    Object.assign({ action: 'add-cliente', secret: PIPELINE_SYNC_SECRET }, novoCliente),
+    'Cliente salvo aqui — sem conexão com a planilha agora, vai sincronizar depois.'
+  );
   showToast('Cliente criado! Links prontos para enviar.', 'success');
+}
+
+// ═══════════════ CONFIG: NOVO AVULSO ═══════════════
+function getStoredAvulsos() {
+  try {
+    return JSON.parse(localStorage.getItem('synctech_new_avulsos') || '[]');
+  } catch (err) {
+    console.error('Dado corrompido em synctech_new_avulsos, reiniciando lista:', err);
+    return [];
+  }
+}
+
+function registrarAvulso() {
+  let cliente = document.getElementById('av-cliente').value.trim();
+  let servico = document.getElementById('av-servico').value;
+  let valor = Number(document.getElementById('av-valor').value);
+  let desc = document.getElementById('av-desc').value.trim();
+  if (!cliente || !servico || !valor || valor <= 0) { showToast('Preenche cliente, serviço e um valor válido', 'error'); return; }
+
+  let hoje = new Date();
+  let novoAvulso = {
+    id: (crypto.randomUUID ? crypto.randomUUID() : 'a' + Date.now()),
+    client: cliente, service: servico, value: valor,
+    desc: desc || 'Serviço avulso fechado, sem plano fixo mensal.',
+    date: hoje.toLocaleDateString('pt-BR'),
+    month: String(hoje.getMonth() + 1).padStart(2, '0') + '/' + hoje.getFullYear(),
+    createdAt: hoje.toISOString(),
+  };
+  let stored = getStoredAvulsos();
+  stored.push(novoAvulso);
+  localStorage.setItem('synctech_new_avulsos', JSON.stringify(stored));
+  renderAvulsos();
+
+  document.getElementById('av-cliente').value = '';
+  document.getElementById('av-valor').value = '';
+  document.getElementById('av-desc').value = '';
+
+  enviarRegistroComFila(
+    Object.assign({ action: 'add-avulso', secret: PIPELINE_SYNC_SECRET }, novoAvulso),
+    'Avulso salvo aqui — sem conexão com a planilha agora, vai sincronizar depois.'
+  );
+  showToast('Avulso registrado!', 'success');
 }
 
 function copiarLinksCliente() {
@@ -1556,7 +1729,7 @@ updateSyncStatusUI();
 atualizarAvisoFila();
 reenviarFilaSync();
 renderPipeline();
-if (PIPELINE_SYNC_URL) { syncPipelineFromCloud(renderPipeline); }
+if (PIPELINE_SYNC_URL) { syncPipelineFromCloud(renderPipeline); syncClientsFromCloud(); syncAvulsosFromCloud(); }
 renderServicesGrid();
 renderClients();
 renderAvulsos();
