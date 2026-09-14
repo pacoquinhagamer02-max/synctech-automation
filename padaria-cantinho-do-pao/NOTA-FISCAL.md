@@ -41,33 +41,51 @@ faturamento — é questão tributária de verdade, não uma escolha de
 ferramenta, e eu não vou arriscar te dar uma resposta errada sobre
 obrigação legal. O contador dela sabe exatamente o enquadramento dela.
 
-## Checklist pra levar pra ela (08/09/2026: ela já tem CNPJ; o resto ainda não foi confirmado)
+## Checklist pra levar pra ela — ATUALIZADO 11/09/2026
 
-Três perguntas separadas — CNPJ sozinho não responde nenhuma delas:
+**Itens 1 e 2 abaixo já estão confirmados**, não precisa mais perguntar:
 
-1. **"Você tem certificado digital A1 (às vezes chamado e-CNPJ)?"**
-   É um arquivo (`.pfx` ou `.p12`) com senha, não um cartão físico. Se ela
-   já emite qualquer nota fiscal eletrônica hoje — mesmo NF-e avulsa pra
-   outra empresa, não precisa ser NFC-e — ela já tem isso, e é só
-   perguntar pro contador onde está guardado.
+1. ~~Certificado digital A1~~ — **confirmado**: ela já emite nota fiscal
+   nas vendas do balcão, então isso existe.
+2. ~~Credenciada pra NFC-e na Sefaz-MG~~ — **confirmado visualmente**: no
+   SIARE (`Serviços > Credenciamento de Contribuintes > Credenciar Emissor
+   em Homologação`), as linhas **NF-e e NFC-e já aparecem "Habilitado"**
+   pro CNPJ dela (38.385.182/0001-39).
 
-2. **"A empresa está credenciada pra emitir NFC-e na Sefaz-MG?"**
-   Essa é melhor perguntar direto pro contador — ele consulta isso rápido
-   num portal do governo. Ter CNPJ ou até ter certificado digital **não
-   confirma** isso; é um cadastro à parte, específico pra NFC-e.
-   Pergunta de sondagem: "hoje, quando você vende, sai algum cupom fiscal
-   de verdade (não recibo de caderno)?" — se sim, ela provavelmente já é
-   credenciada.
+**O que ainda falta — e agora é bem mais específico** do que "ela tem
+certificado?". A pergunta certa mudou: **qual sistema já está cadastrado
+ali, e ele é acessível pela internet ou é um equipamento físico preso ao
+caixa?** Isso decide se dá pra integrar no que ela já tem ou se precisa
+contratar um emissor à parte só pras vendas do site.
 
-3. **"Prefere qual emissor?"** — ainda em aberto, sem escolha ainda.
-   Entre os citados acima, pra um app pequeno e independente como este,
-   **Focus NFe e eNotas tendem a encaixar melhor** que Bling/Tiny: são
-   focados só em emissão (API simples de plugar), enquanto Bling/Tiny são
-   ERPs completos (estoque, financeiro, etc.) que duplicariam coisa que o
-   Hub da SyncTech já cobre. Isso é uma sugestão de encaixe técnico, não
-   recomendação de preço — comparem os planos atuais direto com cada um.
+### Perguntas pra levar direto pro contador (ele resolve isso rápido)
 
-Assim que tiver as 3 respostas, é só voltar aqui que eu sigo.
+1. **No SIARE, em "Consulta" (não em "Credenciar"), quem está cadastrado
+   hoje nas linhas NF-e e NFC-e?** — pede o nome do aplicativo e o nome
+   da software house que aparecem lá. É literalmente a resposta que
+   faltava desde o início: qual sistema ela usa pra emitir a nota local.
+2. **Esse sistema é em nuvem (acessa pela internet — Focus NFe, eNotas,
+   Bling, Tiny, ou nota integrada à própria maquininha) ou é um SAT/
+   impressora fiscal física ligada ao computador do caixa?** Se for
+   físico, ele **não tem como conversar com o site** — precisaria de um
+   segundo emissor só pra vendas online, mesmo ela já tendo tudo credenciado
+   pro balcão.
+3. **Se for em nuvem: existe uma chave de API / token de acesso** já
+   liberado, ou precisaria pedir um novo pro provedor pra usar no app?
+4. **Regime tributário** (MEI, Simples Nacional, Lucro Presumido) — muda
+   o cálculo do imposto que entra em cada nota.
+5. **Numeração/série de NFC-e em uso hoje** — pra não gerar conflito se
+   for preciso abrir um segundo canal de emissão (numeração duplicada
+   invalida nota).
+
+### Separado disso — pergunta pra ela, não pro contador
+**Qual a marca da maquininha de cartão** (Mercado Pago, PagBank, Stone,
+Cielo, GetNet)? O contador não necessariamente sabe isso, mas muda o
+caminho técnico: Mercado Pago Point tem nota fiscal integrada de verdade;
+PagBank tem nota separada que **não** conversa com venda feita por
+API/site; Stone/Cielo/GetNet não têm nota embutida nenhuma.
+
+Assim que tiver essas respostas, é só voltar aqui que eu sigo.
 
 ## Quando ela tiver isso resolvido
 

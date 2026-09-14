@@ -1,0 +1,251 @@
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nota Fiscal no App do Cantinho</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --bg:#FBF8F4; --paper:#FFFFFF; --ink:#2B1D14; --ink-2:#5A4A3F; --muted:#8A7A6E;
+    --crust:#84411F; --crust-2:#A65A2E; --butter:#E9C46A; --butter-soft:#F6E7B8;
+    --line:#E7DCCB; --ok:#2F6B45; --ok-bg:#E5F0E8; --wait:#8A5A12; --wait-bg:#FBF0D3;
+    --shadow:0 10px 30px rgba(43,29,20,.08);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#1B1410; --paper:#241B16; --ink:#F3EBE1; --ink-2:#CDBFB2; --muted:#9A8A7D;
+      --crust:#E0A170; --crust-2:#C98756; --butter:#D9B25A; --butter-soft:#3A2E1C;
+      --line:#3A2E26; --ok:#8FD1A3; --ok-bg:#1E2F25; --wait:#E6B95C; --wait-bg:#33281A;
+      --shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#1B1410; --paper:#241B16; --ink:#F3EBE1; --ink-2:#CDBFB2; --muted:#9A8A7D;
+    --crust:#E0A170; --crust-2:#C98756; --butter:#D9B25A; --butter-soft:#3A2E1C;
+    --line:#3A2E26; --ok:#8FD1A3; --ok-bg:#1E2F25; --wait:#E6B95C; --wait-bg:#33281A;
+    --shadow:0 10px 30px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  html{scroll-snap-type:y proximity;scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  h1,h2,h3{font-family:Fraunces,Georgia,"Times New Roman",serif;font-weight:600;line-height:1.12;margin:0;text-wrap:balance;letter-spacing:-.01em}
+  h1{font-size:clamp(2.2rem,6vw,3.6rem);font-weight:700}
+  h2{font-size:clamp(1.7rem,4.2vw,2.5rem)}
+  h3{font-size:1.2rem}
+  p{margin:0}
+  .slide{min-height:100svh;scroll-snap-align:start;display:flex;flex-direction:column;justify-content:center;padding:clamp(28px,6vw,72px) clamp(20px,6vw,80px);position:relative;border-bottom:1px solid var(--line)}
+  .slide > .in{max-width:880px;width:100%;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+  .eyebrow{font-size:.78rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--crust);display:flex;align-items:center;gap:12px}
+  .eyebrow::before{content:"";width:28px;height:2px;background:var(--butter)}
+  .lead{font-size:1.15rem;color:var(--ink-2);max-width:62ch}
+  .num{position:absolute;top:22px;right:clamp(20px,6vw,80px);font-family:Fraunces,serif;font-size:.95rem;color:var(--muted);font-variant-numeric:tabular-nums}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:20px 22px;box-shadow:var(--shadow)}
+  .grid{display:grid;gap:14px}
+  .g2{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+  .pill{display:inline-flex;align-items:center;gap:8px;padding:5px 12px;border-radius:999px;font-size:.82rem;font-weight:600}
+  .pill.ok{background:var(--ok-bg);color:var(--ok)}
+  .pill.wait{background:var(--wait-bg);color:var(--wait)}
+  .pill.you{background:var(--butter-soft);color:var(--ink)}
+  .check{display:grid;gap:12px}
+  .check .row{display:grid;grid-template-columns:34px 1fr;gap:12px;align-items:start;padding:14px 16px;background:var(--paper);border:1px solid var(--line);border-radius:12px}
+  .check .mark{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:.9rem}
+  .mark.ok{background:var(--ok-bg);color:var(--ok)}
+  .mark.wait{background:var(--wait-bg);color:var(--wait)}
+  .row b{display:block;font-weight:600}
+  .row small{color:var(--ink-2);font-size:.92rem}
+  .flow{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;counter-reset:s}
+  .flow .step{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:16px 14px 14px;position:relative;counter-increment:s}
+  .flow .step::before{content:counter(s);font-family:Fraunces,serif;font-size:1.4rem;color:var(--crust);display:block;margin-bottom:6px}
+  .flow .step b{display:block;font-weight:600;margin-bottom:4px}
+  .flow .step span{font-size:.9rem;color:var(--ink-2)}
+  .price{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .price .big{font-family:Fraunces,serif;font-size:clamp(2.4rem,7vw,3.6rem);font-weight:700;color:var(--crust);font-variant-numeric:tabular-nums}
+  .price .per{color:var(--ink-2)}
+  table{width:100%;border-collapse:collapse;font-size:.95rem}
+  th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-weight:600;color:var(--ink-2);font-size:.82rem;text-transform:uppercase;letter-spacing:.06em}
+  td.v{font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:600}
+  .callout{border-left:4px solid var(--butter);background:var(--butter-soft);padding:14px 18px;border-radius:0 12px 12px 0;color:var(--ink)}
+  .faq{display:grid;gap:10px}
+  details{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:0}
+  summary{cursor:pointer;padding:14px 18px;font-weight:600;list-style:none;display:flex;justify-content:space-between;gap:12px}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"+";color:var(--crust);font-family:Fraunces,serif;font-size:1.3rem;line-height:1}
+  details[open] summary::after{content:"–"}
+  details p{padding:0 18px 16px;color:var(--ink-2)}
+  .hero{background:linear-gradient(180deg,var(--bg) 0%,var(--butter-soft) 100%)}
+  .hero .logo{width:72px;height:72px;border-radius:50%;background:var(--ink);color:var(--butter);display:grid;place-items:center;font-family:Fraunces,serif;font-weight:700;font-size:1.5rem}
+  .foot{font-size:.85rem;color:var(--muted)}
+  .nav{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);display:flex;gap:6px;background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:8px 12px;box-shadow:var(--shadow);z-index:5}
+  .nav a{width:9px;height:9px;border-radius:50%;background:var(--line);display:block}
+  .nav a:focus-visible{outline:2px solid var(--crust);outline-offset:2px}
+  .nav a.on{background:var(--crust)}
+  a{color:var(--crust)}
+  :focus-visible{outline:2px solid var(--crust);outline-offset:3px}
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+  @media print{
+    html{scroll-snap-type:none}
+    body{background:#fff;color:#111}
+    .slide{min-height:auto;page-break-after:always;border:0;padding:24px 8px}
+    .nav,.num{display:none}
+    .card,.row,.step,details{box-shadow:none;border-color:#ccc}
+    details{display:block}details summary::after{display:none}
+  }
+</style>
+
+<section class="slide hero" id="s1">
+  <div class="in">
+    <div class="logo">C</div>
+    <p class="eyebrow">Padaria Cantinho do Pão · Mariana/MG</p>
+    <h1>Nota fiscal nos pedidos do app</h1>
+    <p class="lead">Onde a padaria já está, o que falta pra cada pedido feito pelo aplicativo sair com nota, quanto custa e o que precisamos da contadora.</p>
+    <p class="foot">Preparado por Rafael Santos · SyncTech Automation · setembro de 2026</p>
+  </div>
+</section>
+
+<section class="slide" id="s2">
+  <span class="num">2 / 8</span>
+  <div class="in">
+    <p class="eyebrow">Ponto de partida</p>
+    <h2>A parte difícil a padaria já tem</h2>
+    <p class="lead">Emitir nota fiscal exige três coisas junto à Receita e à Sefaz de Minas. As três já estão resolvidas, porque a padaria já emite nota no balcão todo dia.</p>
+    <div class="check">
+      <div class="row"><span class="mark ok">✓</span><div><b>Certificado digital A1</b><small>É a "assinatura" eletrônica da empresa. Já existe e está válido.</small></div></div>
+      <div class="row"><span class="mark ok">✓</span><div><b>Credenciamento na Sefaz-MG para NF-e e NFC-e</b><small>Confirmado na tela do SIARE: as duas linhas aparecem como "Habilitado".</small></div></div>
+      <div class="row"><span class="mark ok">✓</span><div><b>Sistema do balcão (Linear) funcionando</b><small>Continua igual. Nada do que vem a seguir mexe no caixa da loja.</small></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="s3">
+  <span class="num">3 / 8</span>
+  <div class="in">
+    <p class="eyebrow">O que falta</p>
+    <h2>O pedido do app não passa pelo caixa</h2>
+    <p class="lead">Quando alguém pede pelo aplicativo, o pedido chega no WhatsApp, não no sistema Linear. Por isso hoje esses pedidos ficam sem nota, a não ser que alguém digite tudo de novo no balcão.</p>
+    <div class="grid g2">
+      <div class="card">
+        <h3>Balcão</h3>
+        <p style="color:var(--ink-2);margin-top:8px">Cliente na loja → caixa (Linear) → nota impressa na hora. <span class="pill ok" style="margin-top:10px">Funciona</span></p>
+      </div>
+      <div class="card">
+        <h3>App</h3>
+        <p style="color:var(--ink-2);margin-top:8px">Cliente no celular → pedido no WhatsApp → <b>sem nota</b>. <span class="pill wait" style="margin-top:10px">É o que vamos resolver</span></p>
+      </div>
+    </div>
+    <div class="callout">A Linear não oferece uma porta de entrada aberta pra receber pedidos de fora. A solução é um segundo caminho de emissão, só pras vendas do app, usando o mesmo certificado e o mesmo credenciamento que já existem.</div>
+  </div>
+</section>
+
+<section class="slide" id="s4">
+  <span class="num">4 / 8</span>
+  <div class="in">
+    <p class="eyebrow">A solução</p>
+    <h2>Um emissor na nuvem, ligado ao app</h2>
+    <p class="lead">Escolhemos a <b>Focus NFe</b>: uma das plataformas mais usadas do Brasil pra sistemas e aplicativos emitirem nota, com centenas de milhões de notas emitidas e milhares de empresas atendidas.</p>
+    <div class="flow">
+      <div class="step"><b>Cliente pede no app</b><span>Como já acontece hoje.</span></div>
+      <div class="step"><b>Padaria confirma</b><span>Um toque num painel simples, quando o pedido está certo e pago.</span></div>
+      <div class="step"><b>Nota sai sozinha</b><span>O sistema fala com a Sefaz e autoriza a NFC-e em segundos.</span></div>
+      <div class="step"><b>Cliente recebe</b><span>Link e QR Code da nota, direto no pedido.</span></div>
+    </div>
+    <div class="callout">A nota é emitida <b>quando a padaria confirma</b>, não quando o cliente aperta o botão. Assim pedido cancelado ou não pago nunca vira nota, e ninguém precisa cancelar nota na Sefaz.</div>
+  </div>
+</section>
+
+<section class="slide" id="s5">
+  <span class="num">5 / 8</span>
+  <div class="in">
+    <p class="eyebrow">Custo</p>
+    <h2>Quanto isso custa pra padaria</h2>
+    <div class="price"><span class="big">R$ 59,90</span><span class="per">por mês · primeiro mês grátis · sem fidelidade</span></div>
+    <div class="card">
+      <table>
+        <tr><th>Item</th><th>Valor</th><th>Observação</th></tr>
+        <tr><td>Plataforma Focus NFe (plano Retail)</td><td class="v">R$ 59,90/mês</td><td>Até 500 notas por mês. Cancela quando quiser.</td></tr>
+        <tr><td>Certificado digital</td><td class="v">R$ 0</td><td>Já existe.</td></tr>
+        <tr><td>Integração no app + painel de confirmação</td><td class="v">R$ 0</td><td>Incluso no plano da SyncTech.</td></tr>
+        <tr><td>Manutenção e suporte</td><td class="v">R$ 0</td><td>Incluso no plano da SyncTech.</td></tr>
+      </table>
+    </div>
+    <p class="foot">Valor consultado na página oficial de preços em setembro de 2026. A conta é aberta no CNPJ da padaria, então o valor deve ser confirmado na hora do cadastro.</p>
+  </div>
+</section>
+
+<section class="slide" id="s6">
+  <span class="num">6 / 8</span>
+  <div class="in">
+    <p class="eyebrow">Precisamos da contadora</p>
+    <h2>Cinco entregas, nessa ordem</h2>
+    <p class="lead">Tudo aqui é da parte fiscal, por isso quem faz é a contadora. Ela já tem quase tudo em mãos, porque usa esses mesmos dados pra Linear.</p>
+    <div class="check">
+      <div class="row"><span class="mark wait">1</span><div><b>Abrir a conta na Focus NFe no CNPJ e e-mail da padaria</b><small>A conta é da padaria, não da SyncTech. Se um dia o contrato acabar, a nota continua com vocês.</small></div></div>
+      <div class="row"><span class="mark wait">2</span><div><b>Enviar o certificado digital A1 pra plataforma</b><small>Upload do arquivo + senha. Cinco minutos.</small></div></div>
+      <div class="row"><span class="mark wait">3</span><div><b>Criar uma série nova de NFC-e</b><small>Pra numeração do app não se misturar com a do balcão.</small></div></div>
+      <div class="row"><span class="mark wait">4</span><div><b>Passar os códigos fiscais dos itens do cardápio</b><small>NCM, CFOP e CST/CSOSN de cada produto. Sem isso a Sefaz recusa a nota. Ela já tem isso cadastrado na Linear.</small></div></div>
+      <div class="row"><span class="mark wait">5</span><div><b>Gerar a chave de integração e entregar de forma segura</b><small>Nunca por mensagem solta. É como uma senha da empresa.</small></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="s7">
+  <span class="num">7 / 8</span>
+  <div class="in">
+    <p class="eyebrow">Prazo</p>
+    <h2>Cinco dias úteis depois que a contadora entregar</h2>
+    <div class="grid g2">
+      <div class="card">
+        <h3>O que a SyncTech faz nesses dias</h3>
+        <p style="color:var(--ink-2);margin-top:8px">Liga o app à plataforma, monta o painel de confirmação da padaria, testa tudo em <b>ambiente de teste</b> da Sefaz (sem nota de verdade) e só depois vira pra produção.</p>
+      </div>
+      <div class="card">
+        <h3>O que costuma atrasar</h3>
+        <p style="color:var(--ink-2);margin-top:8px">Não é a parte técnica. É a espera por resposta: conta ativada, código fiscal faltando, chave não enviada. Com tudo em mãos numa terça, a nota sai na segunda seguinte.</p>
+      </div>
+    </div>
+    <div class="card">
+      <table>
+        <tr><th>Cenário</th><th>Prazo</th></tr>
+        <tr><td>Contadora entrega os 5 itens em até 2 dias</td><td class="v">1 semana</td></tr>
+        <tr><td>Algum dado fiscal vem incompleto e precisa de ajuste</td><td class="v">2 semanas</td></tr>
+        <tr><td>Contadora só consegue na semana que vem</td><td class="v">A contar da entrega</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="s8">
+  <span class="num">8 / 8</span>
+  <div class="in">
+    <p class="eyebrow">Perguntas que costumam aparecer</p>
+    <h2>Dúvidas rápidas</h2>
+    <div class="faq">
+      <details><summary>Vai mudar alguma coisa no caixa da loja?</summary><p>Não. A Linear continua exatamente igual. O emissor novo cuida só dos pedidos que chegam pelo app, com uma série de numeração própria.</p></details>
+      <details><summary>Quem é o dono da conta na Focus NFe?</summary><p>A padaria. A conta fica no CNPJ e no e-mail de vocês, com o cartão de vocês. A SyncTech só recebe a chave de integração pra ligar o app.</p></details>
+      <details><summary>E se o cliente cancelar o pedido?</summary><p>Nenhuma nota é gerada, porque a nota só sai quando a padaria confirma o pedido no painel. Pedido cancelado antes disso não existe pra Sefaz.</p></details>
+      <details><summary>O cliente recebe a nota como?</summary><p>Assim que a nota é autorizada, o app mostra o link e o QR Code da NFC-e, os mesmos que sairiam num cupom impresso. Dá pra mandar pelo WhatsApp junto com a confirmação.</p></details>
+      <details><summary>Precisa contratar por 12 meses?</summary><p>Não. O plano é mensal, sem fidelidade e sem taxa de adesão. O primeiro mês é gratuito.</p></details>
+      <details><summary>E se um dia a padaria parar de trabalhar com a SyncTech?</summary><p>A conta e as notas continuam com a padaria. A parte que a SyncTech construiu (a ligação com o app) pode ser mantida por outro profissional, porque usa uma plataforma aberta e documentada.</p></details>
+    </div>
+    <div class="callout"><b>Próximo passo:</b> a padaria autoriza, a contadora recebe a lista da tela 6, e a contagem dos cinco dias úteis começa no dia em que o último item chegar.</div>
+    <p class="foot">Rafael Santos · SyncTech Automation · Mariana/MG</p>
+  </div>
+</section>
+
+<nav class="nav" aria-label="Telas">
+  <a href="#s1" aria-label="Tela 1"></a><a href="#s2" aria-label="Tela 2"></a><a href="#s3" aria-label="Tela 3"></a><a href="#s4" aria-label="Tela 4"></a><a href="#s5" aria-label="Tela 5"></a><a href="#s6" aria-label="Tela 6"></a><a href="#s7" aria-label="Tela 7"></a><a href="#s8" aria-label="Tela 8"></a>
+</nav>
+<script>
+  (function(){
+    var dots = document.querySelectorAll('.nav a');
+    var slides = document.querySelectorAll('.slide');
+    if (!('IntersectionObserver' in window)) return;
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if (e.isIntersecting) {
+          var i = Array.prototype.indexOf.call(slides, e.target);
+          dots.forEach(function(d, j){ d.classList.toggle('on', j === i); });
+        }
+      });
+    }, { threshold: 0.5 });
+    slides.forEach(function(s){ io.observe(s); });
+  })();
+</script>
