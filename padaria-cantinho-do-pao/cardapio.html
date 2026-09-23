@@ -364,6 +364,18 @@ a { color: inherit; }
   box-shadow: 0 1px 0 hsl(var(--azulejo) / .14);
 }
 .cat-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 2px; }
+/* CRO (achado real): 9 categorias não cabem na tela do celular e a
+   barra rola sem nenhum sinal disso — sem indicação de "tem mais",
+   quem não percebe por acaso nunca vê Guloseimas/Biscoitos/Mercearia.
+   Um degradê fixo na borda direita avisa que dá pra arrastar, sem JS. */
+@media (max-width: 899px) {
+  .menu-bar { position: relative; }
+  .menu-bar::after {
+    content: ''; position: absolute; top: 14px; bottom: 2px; right: 0; width: 34px;
+    background: linear-gradient(to right, transparent, hsl(var(--glass-bg)));
+    pointer-events: none;
+  }
+}
 .cat-row::-webkit-scrollbar { display: none; }
 .cat-btn {
   border: 1px solid hsl(var(--border)); background: hsl(var(--card));
@@ -376,6 +388,11 @@ a { color: inherit; }
 .cat-btn.active { background: hsl(var(--azulejo)); color: hsl(var(--primary-foreground)); border-color: hsl(var(--azulejo)); }
 
 .cat-block { margin-top: 40px; }
+.mercadinho-divisor {
+  margin-top: 52px; padding-top: 28px; border-top: 1px solid hsl(var(--border));
+  display: grid; gap: 8px; justify-items: start;
+}
+.mercadinho-divisor p { color: hsl(var(--muted-foreground)); font-size: .88rem; }
 .cat-title { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
 .cat-title h3 { font-size: 1.4rem; }
 .cat-title span { font-size: .84rem; color: hsl(var(--muted-foreground)); }
@@ -1575,14 +1592,34 @@ function montarFiltros(){
   });
 }
 
+/* CRO (achado real, não genérico): na visão "Tudo", os 11 itens feitos
+   na casa (salgados/pães/bolos) eram seguidos DIRETO por 58 bebidas
+   quase-duplicadas (Coca em 5 tamanhos, Fanta em 4...) sem nenhum
+   sinal de que a partir dali é o mercadinho, não a padaria. Esse
+   divisor separa as duas identidades na rolagem — só aparece 1x, antes
+   da 1ª categoria de mercadinho. */
+const MERCADINHO_DESDE = 'bebidas';
 function montarMenu(){
   elMenu.innerHTML = categories.map(function(cat){
     const itens = products.filter(function(p){ return p.category === cat.id; });
-    return '<div class="cat-block" data-cat="' + cat.id + '">' +
+    const divisor = cat.id === MERCADINHO_DESDE
+      ? '<div class="mercadinho-divisor"><span class="shop-pill">Também vendemos</span><p>Bebidas, guloseimas e itens de mercearia — pra completar seu pedido.</p></div>'
+      : '';
+    return divisor + '<div class="cat-block" data-cat="' + cat.id + '">' +
       '<div class="cat-title"><h3>' + cat.label + '</h3><span>' + cat.note + '</span></div>' +
       '<div class="item-grid">' + itens.map(cardHTML).join('') + '</div>' +
     '</div>';
   }).join('');
+
+  /* CRO: o CTA de bolo por encomenda (ticket mais alto do cardápio)
+     ficava preso no fim do DOM, depois dos 211 itens — quem rolava a
+     página (maioria do tráfego, vindo de link do WhatsApp/Instagram)
+     dificilmente chegava lá. Move pra logo depois da categoria
+     "Bolos & doces", onde a pessoa já está pensando em bolo. O atalho
+     "Bolos" do menu continua funcionando igual (mesmo id="bolos"). */
+  const blocoDoces = elMenu.querySelector('.cat-block[data-cat="doces"]');
+  const encomenda = document.getElementById('bolos');
+  if (blocoDoces && encomenda) blocoDoces.insertAdjacentElement('afterend', encomenda);
 
   elMenu.querySelectorAll('.item').forEach(function(el){
     const id = el.dataset.id;
