@@ -16,7 +16,7 @@
 <meta name="twitter:card" content="summary_large_image">
 
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#FBF8F4">
+<meta name="theme-color" content="#FAFAFA">
 <link rel="apple-touch-icon" href="assets/logo.jpg">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -28,46 +28,44 @@
    TOKENS — HSL, mesmos nomes do padrão shadcn
    ═══════════════════════════════════════════════════════════ */
 :root {
-  /* "Bakery Glass": creme + caramelo de pao assado (quente) + azulejo
-     colonial mineiro (estrutural/interacao) + vidro translucido. O azul
-     nao e capricho — Mariana/MG e cidade colonial de azulejo real, o
-     mesmo raciocinio ja usado antes neste projeto (ver memoria da 5a
-     passada). Aqui ele volta como o acento FRIO que evita o cliche
-     "creme + terracota" sozinho: caramelo esquenta, azulejo estrutura. */
-  --background: 36 46% 96%;
-  --foreground: 22 34% 15%;
-  --card: 38 40% 99%;
-  --card-foreground: 22 34% 15%;
-  --primary: 27 62% 38%;
-  --primary-foreground: 38 60% 97%;
-  --secondary: 34 44% 91%;
-  --secondary-foreground: 22 40% 22%;
-  --muted: 34 32% 93%;
-  --muted-foreground: 25 14% 40%;
-  --accent: 206 56% 32%;
-  --accent-foreground: 38 60% 97%;
+  /* Tema preto e branco (pedido do Rafael 23/09/2026) — troca da
+     paleta "Bakery Glass" (creme/caramelo/azulejo) pra monocromatico.
+     Só 2 cores ficaram de fora de proposito, por serem FUNCIONAIS, não
+     decorativas: --whatsapp (reconhecimento do botão que abre o
+     WhatsApp de verdade) e --destructive (vermelho de erro/fechado,
+     convenção de status). Fotos reais continuam coloridas — nunca
+     aplicar filtro de cinza em foto de comida, tira o apetite. */
+  --background: 0 0% 98%;
+  --foreground: 0 0% 9%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 9%;
+  --primary: 0 0% 8%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 0 0% 93%;
+  --secondary-foreground: 0 0% 15%;
+  --muted: 0 0% 95%;
+  --muted-foreground: 0 0% 38%;
+  --accent: 0 0% 8%;
+  --accent-foreground: 0 0% 100%;
   --destructive: 4 74% 48%;
   --destructive-foreground: 0 0% 100%;
-  --border: 32 26% 86%;
-  --input: 32 26% 86%;
-  --ring: 206 56% 32%;
+  --border: 0 0% 85%;
+  --input: 0 0% 85%;
+  --ring: 0 0% 8%;
   --radius: 1rem;
 
-  --crust: 25 60% 28%;
-  --butter: 42 88% 85%;
+  --crust: 0 0% 0%;
+  --butter: 0 0% 90%;
   --whatsapp: 142 60% 38%;
 
-  /* Azulejo: acento estrutural (nav ativa, foco, selo azul) — so em
-     linhas, bordas e detalhes, como ladrilho real. */
-  --azulejo: 206 56% 32%;
-  --azulejo-dim: 205 44% 91%;
+  /* Acento estrutural (nav ativa, foco, selo) — cinza bem escuro em vez
+     de preto puro, só pra diferenciar levemente do --primary. */
+  --azulejo: 0 0% 18%;
+  --azulejo-dim: 0 0% 91%;
 
-  /* Faixa: preto quente (não cinza puro, pra combinar com o resto da
-     paleta) pras 2 areas GRANDES de cor solida — ticker e o bloco "A
-     padaria". Pedido do Rafael: o azul nessas duas ficava forte demais
-     numa faixa grande; separado do --azulejo pra nao mexer nos detalhes
-     pequenos (categoria ativa, sublinhado do menu) que continuam azuis. */
-  --faixa: 22 28% 10%;
+  /* Faixa: preto solido pras 2 areas GRANDES de cor — ticker e o bloco
+     "A padaria". */
+  --faixa: 0 0% 6%;
 
   /* Vidro: superficie translucida com blur, usada so no cabecalho fixo
      e na barra de categoria (as duas barras sticky, onde faz sentido
@@ -75,7 +73,7 @@
      no botao flutuante de carrinho (esse precisa ficar solido e opaco
      pra nao perder contraste sobre fotos/fundos variados ao rolar). */
   --glass-bg: 38 44% 99% / .72;
-  --glass-border: 22 34% 15% / .07;
+  --glass-border: 0 0% 9% / .07;
 
   /* Pagina e clara de proposito: sem isto o navegador em modo escuro
      inverte controles nativos (select, date) e eles somem no fundo creme. */
@@ -130,7 +128,7 @@ a { color: inherit; }
   border: 1px solid hsl(var(--border));
   background: hsl(var(--card));
   overflow: hidden;
-  box-shadow: 0 1px 2px hsl(25 30% 14% / 0.04), 0 8px 24px -16px hsl(25 30% 14% / 0.18);
+  box-shadow: 0 1px 2px hsl(0 0% 8% / 0.04), 0 8px 24px -16px hsl(0 0% 8% / 0.18);
 }
 .shop-pill {
   display: inline-flex; align-items: center; gap: 6px;
@@ -319,7 +317,7 @@ a { color: inherit; }
 .hero-photo-frame {
   border-radius: calc(var(--radius) * 1.6); overflow: hidden;
   aspect-ratio: 4/5; max-width: 26rem; margin-inline: auto;
-  box-shadow: 0 30px 60px -30px hsl(22 34% 15% / .45), 0 1px 0 hsl(var(--glass-border));
+  box-shadow: 0 30px 60px -30px hsl(0 0% 9% / .45), 0 1px 0 hsl(var(--glass-border));
   border: 1px solid hsl(var(--border));
 }
 .hero-photo-frame img { width: 100%; height: 100%; object-fit: cover; }
@@ -438,7 +436,7 @@ a { color: inherit; }
 .ticker { background: hsl(var(--faixa)); overflow: hidden; padding: 11px 0; }
 .ticker-track {
   display: flex; width: max-content; gap: 16px; white-space: nowrap;
-  font-size: .8rem; font-weight: 600; letter-spacing: .02em; color: hsl(38 60% 97%);
+  font-size: .8rem; font-weight: 600; letter-spacing: .02em; color: hsl(0 0% 100%);
   animation: ticker-scroll 26s linear infinite;
 }
 .ticker-track .tk-dot { opacity: .55; }
@@ -455,9 +453,9 @@ a { color: inherit; }
    azulejo (creme->azulejo->creme->caramelo no resto da pagina) — o
    mesmo ritmo de "sections coloridas alternadas" que apareceu na
    referencia que o Rafael trouxe (Main Stays), com nossa paleta. */
-#historia { position: relative; background: hsl(var(--faixa)); color: hsl(38 60% 97% / .9); padding-top: 68px; padding-bottom: 72px; overflow: hidden; }
-#historia .shop-pill { background: hsl(38 60% 97% / .16); color: hsl(38 60% 97%); }
-#historia h2 { color: hsl(38 60% 97%); }
+#historia { position: relative; background: hsl(var(--faixa)); color: hsl(0 0% 100% / .9); padding-top: 68px; padding-bottom: 72px; overflow: hidden; }
+#historia .shop-pill { background: hsl(0 0% 100% / .16); color: hsl(0 0% 100%); }
+#historia h2 { color: hsl(0 0% 100%); }
 .hist-grid { display: grid; gap: 32px; align-items: center; }
 @media (min-width: 900px) { .hist-grid { grid-template-columns: .9fr 1.1fr; gap: 48px; } }
 /* equipe.jpg e um flyer promocional ("Dia do Cliente") com uma faixa
@@ -469,35 +467,35 @@ a { color: inherit; }
 .hist-img {
   border-radius: calc(var(--radius) * 1.2); overflow: hidden; aspect-ratio: 28/9;
   transform: rotate(-1.4deg);
-  border: 6px solid hsl(38 60% 97%);
-  box-shadow: 0 26px 50px -22px hsl(206 60% 10% / .55);
+  border: 6px solid hsl(0 0% 100%);
+  box-shadow: 0 26px 50px -22px hsl(0 0% 0% / .55);
 }
 .hist-img img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
 .pilares { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 28px; }
-.pilar { padding: 16px; background: hsl(38 60% 97% / .96); border: 1px solid hsl(38 60% 97% / .3); border-radius: var(--radius); }
+.pilar { padding: 16px; background: hsl(0 0% 100% / .96); border: 1px solid hsl(0 0% 100% / .3); border-radius: var(--radius); }
 .pilar .ico { color: hsl(var(--primary)); margin-bottom: 8px; }
 .pilar b { display: block; font-size: .92rem; color: hsl(var(--foreground)); }
 .pilar span { display: block; font-size: .78rem; color: hsl(var(--muted-foreground)); margin-top: 3px; line-height: 1.4; }
-#historia .btn-caps { margin-top: 24px; background: transparent; border-color: hsl(38 60% 97% / .5); color: hsl(38 60% 97%); }
-#historia .btn-caps:hover { background: hsl(38 60% 97% / .14); border-color: hsl(38 60% 97%); }
+#historia .btn-caps { margin-top: 24px; background: transparent; border-color: hsl(0 0% 100% / .5); color: hsl(0 0% 100%); }
+#historia .btn-caps:hover { background: hsl(0 0% 100% / .14); border-color: hsl(0 0% 100%); }
 
 .avaliacoes { margin-top: 44px; }
-.aval-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding-bottom: 18px; border-bottom: 1px solid hsl(38 60% 97% / .22); }
-.nota { font-family: 'Fraunces', Georgia, serif; font-weight: 700; font-size: 2.1rem; line-height: 1; color: hsl(38 60% 97%); }
+.aval-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding-bottom: 18px; border-bottom: 1px solid hsl(0 0% 100% / .22); }
+.nota { font-family: 'Fraunces', Georgia, serif; font-weight: 700; font-size: 2.1rem; line-height: 1; color: hsl(0 0% 100%); }
 .estrelas { position: relative; display: inline-block; font-size: 1.05rem; letter-spacing: 2px; line-height: 1; }
-.estrelas .bg { color: hsl(38 60% 97% / .3); }
-.estrelas .fg { position: absolute; inset: 0; overflow: hidden; color: hsl(42 88% 60%); white-space: nowrap; }
-.aval-head span { font-size: .85rem; color: hsl(38 60% 97% / .78); }
+.estrelas .bg { color: hsl(0 0% 100% / .3); }
+.estrelas .fg { position: absolute; inset: 0; overflow: hidden; color: hsl(0 0% 12%); white-space: nowrap; }
+.aval-head span { font-size: .85rem; color: hsl(0 0% 100% / .78); }
 .reviews { display: grid; gap: 16px; margin-top: 20px; }
 @media (min-width: 760px) { .reviews { grid-template-columns: repeat(3, 1fr); } }
 /* Cards de avaliacao em cor solida (alternando 3 tons), como na
    referencia — em vez do card branco neutro que tinha antes. */
-.review { padding: 20px; border-radius: calc(var(--radius) * 1.1); color: hsl(38 60% 97%); }
+.review { padding: 20px; border-radius: calc(var(--radius) * 1.1); color: hsl(0 0% 100%); }
 .review:nth-child(3n+1) { background: hsl(var(--primary)); }
 .review:nth-child(3n+2) { background: hsl(var(--crust)); }
-.review:nth-child(3n+3) { background: hsl(38 60% 97% / .14); }
+.review:nth-child(3n+3) { background: hsl(0 0% 100% / .14); }
 .review p { font-size: .92rem; line-height: 1.55; }
-.review cite { display: block; margin-top: 10px; font-size: .78rem; font-style: normal; color: hsl(38 60% 97% / .94); }
+.review cite { display: block; margin-top: 10px; font-size: .78rem; font-style: normal; color: hsl(0 0% 100% / .94); }
 
 /* ═══════════════ DÚVIDAS ═══════════════ */
 .faq-grid { display: grid; gap: 32px; align-items: start; }
@@ -541,7 +539,7 @@ a { color: inherit; }
   display: none; align-items: center; justify-content: space-between; gap: 14px;
   background: hsl(var(--primary)); color: hsl(var(--primary-foreground));
   border: none; border-radius: 999px; padding: 15px 22px; cursor: pointer;
-  box-shadow: 0 18px 40px -14px hsl(25 30% 14% / .6);
+  box-shadow: 0 18px 40px -14px hsl(0 0% 8% / .6);
   font-weight: 600;
 }
 .cart-float.show { display: flex; }
@@ -551,7 +549,7 @@ a { color: inherit; }
 /* ═══════════════ DRAWER DO PEDIDO ═══════════════ */
 .overlay {
   position: fixed; inset: 0; z-index: 50;
-  background: hsl(25 30% 10% / .55); backdrop-filter: blur(2px);
+  background: hsl(0 0% 6% / .55); backdrop-filter: blur(2px);
   opacity: 0; pointer-events: none; transition: opacity .25s ease;
 }
 .overlay.show { opacity: 1; pointer-events: auto; }
@@ -562,7 +560,7 @@ a { color: inherit; }
   background: hsl(var(--background));
   display: flex; flex-direction: column;
   transform: translateX(100%); transition: transform .3s cubic-bezier(.3,.8,.3,1);
-  box-shadow: -20px 0 60px -20px hsl(25 30% 14% / .45);
+  box-shadow: -20px 0 60px -20px hsl(0 0% 8% / .45);
 }
 .drawer.show { transform: translateX(0); }
 .drawer-head {
