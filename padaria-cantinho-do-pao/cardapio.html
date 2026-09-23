@@ -480,6 +480,10 @@ a { color: inherit; }
 }
 .ticker-track .tk-dot { opacity: .55; }
 @keyframes ticker-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+/* Guidelines de interface: movimento em loop rodando sozinho por mais
+   de 5s precisa de como parar — hover/foco pausa (dá pra ler uma frase
+   parada), sem precisar de um botão extra só pra isso. */
+.ticker:hover .ticker-track, .ticker:focus-within .ticker-track { animation-play-state: paused; }
 @media (prefers-reduced-motion: reduce) {
   .ticker-track { animation: none; overflow-x: auto; }
 }
@@ -1369,7 +1373,7 @@ const PERGUNTAS = [
   ['Vocês entregam todo dia?', 'Entregamos de segunda a sábado, no mesmo horário de funcionamento da padaria. Só não tem entrega nem retirada no domingo, que a gente fecha.'],
   ['Como faço o pedido?', 'Monte no cardápio, escolha retirada ou entrega e confirme. Ele chega formatado no nosso WhatsApp, com os itens e o total.'],
   ['Como é o pagamento?', 'Combinamos direto com você no WhatsApp, na hora de confirmar o pedido.'],
-  ['Dá pra encomendar bolo inteiro ou festa?', 'Sim. Conte o sabor, o tamanho e o dia que você precisa — a gente confirma o valor e o prazo. Tem um formulário no fim do cardápio pra isso.']
+  ['Dá pra encomendar bolo inteiro ou festa?', 'Sim. Conte o sabor, o tamanho e o dia que você precisa — a gente confirma o valor e o prazo. Tem um formulário logo depois da seção de bolos no cardápio pra isso.']
 ];
 
 const formatBRL = (v) => Number(v).toLocaleString('pt-BR', { style:'currency', currency:'BRL' });
@@ -1571,7 +1575,16 @@ const elMenu = document.getElementById('menu');
 const elCats = document.getElementById('cat-row');
 const elBusca = document.getElementById('busca');
 const elBuscaVazia = document.getElementById('busca-vazia');
-let catAtiva = 'tudo';
+/* Guidelines de interface: estado de filtro deveria refletir na URL —
+   sem isso, atualizar a página ou compartilhar o link sempre volta pra
+   "Tudo", mesmo que a pessoa tenha mandado especificamente o link de
+   "Bebidas" pra alguém no grupo da família. */
+function categoriaDaURL(){
+  const idsValidos = categories.map(function(c){ return c.id; }).concat('tudo');
+  const cat = new URLSearchParams(location.search).get('cat');
+  return idsValidos.indexOf(cat) !== -1 ? cat : 'tudo';
+}
+let catAtiva = categoriaDaURL();
 
 function normalizar(s){
   return s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
@@ -1588,6 +1601,9 @@ function montarFiltros(){
       catAtiva = b.dataset.cat;
       montarFiltros();
       aplicarFiltro();
+      const url = new URL(location.href);
+      if (catAtiva === 'tudo') url.searchParams.delete('cat'); else url.searchParams.set('cat', catAtiva);
+      history.replaceState(null, '', url);
     });
   });
 }
@@ -1698,10 +1714,16 @@ const overlay = document.getElementById('overlay');
 function confirmarAdicao(btn, id){
   if (btn.classList.contains('confirmando')) return;
   const original = btn.innerHTML;
+  const rotuloOriginal = btn.getAttribute('aria-label');
   btn.classList.add('confirmando');
   btn.innerHTML = '<svg class="ico ico-sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg>Adicionado';
+  /* Acessibilidade: o nome acessível precisa bater com o texto visível
+     (WCAG 2.5.3) — sem isso, quem usa leitor de tela nunca ouve a
+     confirmação, só quem enxerga o botão mudar. */
+  btn.setAttribute('aria-label', 'Adicionado');
   setTimeout(function(){
     btn.classList.remove('confirmando');
+    btn.setAttribute('aria-label', rotuloOriginal);
     btn.innerHTML = original;
     add(id);
   }, 430);
@@ -2267,6 +2289,9 @@ aplicarFiltro();
 montarRepeticao();
 pintarTudo();
 iniciarRevelacao();
+/* Link com ?cat= é um deep-link de verdade: quem abre já cai direto no
+   cardápio filtrado, sem precisar rolar a página passando pelo hero. */
+if (catAtiva !== 'tudo') document.getElementById('cardapio').scrollIntoView();
 })();
 </script>
 </body>
