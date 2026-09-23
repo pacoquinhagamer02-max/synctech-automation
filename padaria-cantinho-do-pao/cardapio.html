@@ -57,10 +57,17 @@
   --butter: 42 88% 85%;
   --whatsapp: 142 60% 38%;
 
-  /* Azulejo: acento estrutural (nav ativa, foco, selo azul) — nunca usado
-     em area grande, so em linhas, bordas e detalhes, como ladrilho real. */
+  /* Azulejo: acento estrutural (nav ativa, foco, selo azul) — so em
+     linhas, bordas e detalhes, como ladrilho real. */
   --azulejo: 206 56% 32%;
   --azulejo-dim: 205 44% 91%;
+
+  /* Faixa: preto quente (não cinza puro, pra combinar com o resto da
+     paleta) pras 2 areas GRANDES de cor solida — ticker e o bloco "A
+     padaria". Pedido do Rafael: o azul nessas duas ficava forte demais
+     numa faixa grande; separado do --azulejo pra nao mexer nos detalhes
+     pequenos (categoria ativa, sublinhado do menu) que continuam azuis. */
+  --faixa: 22 28% 10%;
 
   /* Vidro: superficie translucida com blur, usada so no cabecalho fixo
      e na barra de categoria (as duas barras sticky, onde faz sentido
@@ -428,7 +435,7 @@ a { color: inherit; }
 /* ═══════════════ TICKER ═══════════════ */
 /* Faixa de fatos reais (os mesmos das hero-tags), so que em movimento —
    toque de energia sem custar performance (so transform, sem JS). */
-.ticker { background: hsl(var(--azulejo)); overflow: hidden; padding: 11px 0; }
+.ticker { background: hsl(var(--faixa)); overflow: hidden; padding: 11px 0; }
 .ticker-track {
   display: flex; width: max-content; gap: 16px; white-space: nowrap;
   font-size: .8rem; font-weight: 600; letter-spacing: .02em; color: hsl(38 60% 97%);
@@ -448,7 +455,7 @@ a { color: inherit; }
    azulejo (creme->azulejo->creme->caramelo no resto da pagina) — o
    mesmo ritmo de "sections coloridas alternadas" que apareceu na
    referencia que o Rafael trouxe (Main Stays), com nossa paleta. */
-#historia { position: relative; background: hsl(var(--azulejo)); color: hsl(38 60% 97% / .9); padding-top: 68px; padding-bottom: 72px; overflow: hidden; }
+#historia { position: relative; background: hsl(var(--faixa)); color: hsl(38 60% 97% / .9); padding-top: 68px; padding-bottom: 72px; overflow: hidden; }
 #historia .shop-pill { background: hsl(38 60% 97% / .16); color: hsl(38 60% 97%); }
 #historia h2 { color: hsl(38 60% 97%); }
 .hist-grid { display: grid; gap: 32px; align-items: center; }
