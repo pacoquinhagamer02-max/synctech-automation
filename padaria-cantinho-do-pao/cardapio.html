@@ -415,34 +415,82 @@ a { color: inherit; }
 .encomenda-txt h3 { font-size: 1.35rem; }
 .encomenda-txt p { color: hsl(var(--muted-foreground)); font-size: .92rem; }
 
-/* ═══════════════ HISTÓRIA ═══════════════ */
-#historia { background: hsl(var(--secondary) / .6); }
+/* ═══════════════ DIVISOR ONDULADO ═══════════════ */
+/* Reaproveitado em qualquer transicao creme->bloco de cor->creme.
+   Sempre pintado com --background (creme): "morde" a borda do bloco
+   colorido por cima, em vez de uma linha reta entre secoes. */
+.wave-top, .wave-bottom { position: absolute; left: 0; right: 0; line-height: 0; pointer-events: none; }
+.wave-top { top: -1px; }
+.wave-bottom { bottom: -1px; transform: scaleY(-1); }
+.wave-top svg, .wave-bottom svg { width: 100%; height: 44px; display: block; }
+.wave-top path, .wave-bottom path { fill: hsl(var(--background)); }
+
+/* ═══════════════ TICKER ═══════════════ */
+/* Faixa de fatos reais (os mesmos das hero-tags), so que em movimento —
+   toque de energia sem custar performance (so transform, sem JS). */
+.ticker { background: hsl(var(--azulejo)); overflow: hidden; padding: 11px 0; }
+.ticker-track {
+  display: flex; width: max-content; gap: 16px; white-space: nowrap;
+  font-size: .8rem; font-weight: 600; letter-spacing: .02em; color: hsl(38 60% 97%);
+  animation: ticker-scroll 26s linear infinite;
+}
+.ticker-track .tk-dot { opacity: .55; }
+@keyframes ticker-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track { animation: none; overflow-x: auto; }
+}
+
+/* ═══════════════ BOTÃO — variante caixa alta ═══════════════ */
+.btn-caps { text-transform: uppercase; letter-spacing: .06em; font-size: .76rem; font-weight: 700; border-radius: 999px; padding: 13px 26px; }
+
+/* ═══════════════ HISTÓRIA — bloco de cor solido ═══════════════ */
+/* Em vez de tudo no mesmo creme, esta secao vira um bloco solido de
+   azulejo (creme->azulejo->creme->caramelo no resto da pagina) — o
+   mesmo ritmo de "sections coloridas alternadas" que apareceu na
+   referencia que o Rafael trouxe (Main Stays), com nossa paleta. */
+#historia { position: relative; background: hsl(var(--azulejo)); color: hsl(38 60% 97% / .9); padding-top: 68px; padding-bottom: 72px; overflow: hidden; }
+#historia .shop-pill { background: hsl(38 60% 97% / .16); color: hsl(38 60% 97%); }
+#historia h2 { color: hsl(38 60% 97%); }
 .hist-grid { display: grid; gap: 32px; align-items: center; }
 @media (min-width: 900px) { .hist-grid { grid-template-columns: .9fr 1.1fr; gap: 48px; } }
 /* equipe.jpg e um flyer promocional ("Dia do Cliente") com uma faixa
    limpa (atendente entregando um doce no balcão) só no topo — o resto
-   é texto de campanha datada. 21/9 + object-position:top mostra só essa
+   é texto de campanha datada. 28/9 + object-position:top mostra só essa
    faixa limpa, sem cair no texto (conta feita a partir da proporção real
-   da foto — ver web-design-pro sobre "cover math"). */
-.hist-img { border-radius: calc(var(--radius) * 1.5); overflow: hidden; aspect-ratio: 28/9; }
+   da foto — ver web-design-pro sobre "cover math"). A rotação leve +
+   moldura creme trata a tira larga como "cartao preso", nao como bug. */
+.hist-img {
+  border-radius: calc(var(--radius) * 1.2); overflow: hidden; aspect-ratio: 28/9;
+  transform: rotate(-1.4deg);
+  border: 6px solid hsl(38 60% 97%);
+  box-shadow: 0 26px 50px -22px hsl(206 60% 10% / .55);
+}
 .hist-img img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
 .pilares { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 28px; }
-.pilar { padding: 16px; background: hsl(var(--card)); border: 1px solid hsl(var(--border)); border-radius: var(--radius); }
+.pilar { padding: 16px; background: hsl(38 60% 97% / .96); border: 1px solid hsl(38 60% 97% / .3); border-radius: var(--radius); }
 .pilar .ico { color: hsl(var(--primary)); margin-bottom: 8px; }
-.pilar b { display: block; font-size: .92rem; }
+.pilar b { display: block; font-size: .92rem; color: hsl(var(--foreground)); }
 .pilar span { display: block; font-size: .78rem; color: hsl(var(--muted-foreground)); margin-top: 3px; line-height: 1.4; }
+#historia .btn-caps { margin-top: 24px; background: transparent; border-color: hsl(38 60% 97% / .5); color: hsl(38 60% 97%); }
+#historia .btn-caps:hover { background: hsl(38 60% 97% / .14); border-color: hsl(38 60% 97%); }
 
-.avaliacoes { margin-top: 40px; padding: 26px; }
-.aval-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding-bottom: 18px; border-bottom: 1px solid hsl(var(--border)); }
-.nota { font-family: 'Fraunces', Georgia, serif; font-weight: 700; font-size: 2.1rem; line-height: 1; color: hsl(var(--primary)); }
+.avaliacoes { margin-top: 44px; }
+.aval-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding-bottom: 18px; border-bottom: 1px solid hsl(38 60% 97% / .22); }
+.nota { font-family: 'Fraunces', Georgia, serif; font-weight: 700; font-size: 2.1rem; line-height: 1; color: hsl(38 60% 97%); }
 .estrelas { position: relative; display: inline-block; font-size: 1.05rem; letter-spacing: 2px; line-height: 1; }
-.estrelas .bg { color: hsl(var(--border)); }
-.estrelas .fg { position: absolute; inset: 0; overflow: hidden; color: hsl(42 88% 48%); white-space: nowrap; }
-.aval-head span { font-size: .85rem; color: hsl(var(--muted-foreground)); }
+.estrelas .bg { color: hsl(38 60% 97% / .3); }
+.estrelas .fg { position: absolute; inset: 0; overflow: hidden; color: hsl(42 88% 60%); white-space: nowrap; }
+.aval-head span { font-size: .85rem; color: hsl(38 60% 97% / .78); }
 .reviews { display: grid; gap: 16px; margin-top: 20px; }
 @media (min-width: 760px) { .reviews { grid-template-columns: repeat(3, 1fr); } }
-.review p { font-size: .9rem; line-height: 1.5; }
-.review cite { display: block; margin-top: 8px; font-size: .78rem; font-style: normal; color: hsl(var(--muted-foreground)); }
+/* Cards de avaliacao em cor solida (alternando 3 tons), como na
+   referencia — em vez do card branco neutro que tinha antes. */
+.review { padding: 20px; border-radius: calc(var(--radius) * 1.1); color: hsl(38 60% 97%); }
+.review:nth-child(3n+1) { background: hsl(var(--primary)); }
+.review:nth-child(3n+2) { background: hsl(var(--crust)); }
+.review:nth-child(3n+3) { background: hsl(38 60% 97% / .14); }
+.review p { font-size: .92rem; line-height: 1.55; }
+.review cite { display: block; margin-top: 10px; font-size: .78rem; font-style: normal; color: hsl(38 60% 97% / .94); }
 
 /* ═══════════════ DÚVIDAS ═══════════════ */
 .faq-grid { display: grid; gap: 32px; align-items: start; }
@@ -459,7 +507,7 @@ a { color: inherit; }
 .faq-a { padding: 0 20px 20px; font-size: .9rem; color: hsl(var(--muted-foreground)); }
 
 /* ═══════════════ VISITA / RODAPÉ ═══════════════ */
-#visita { background: hsl(var(--primary)); color: hsl(var(--primary-foreground)); }
+#visita { position: relative; background: hsl(var(--primary)); color: hsl(var(--primary-foreground)); overflow: hidden; }
 #visita h2 { font-size: clamp(1.7rem, 4.4vw, 2.4rem); }
 .visita-grid { display: grid; gap: 34px; }
 @media (min-width: 860px) { .visita-grid { grid-template-columns: 1fr 1fr; gap: 56px; } }
@@ -710,6 +758,22 @@ a { color: inherit; }
   </div>
 </section>
 
+<!-- ═══════════ TICKER ═══════════ -->
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track">
+    <span>Feito na casa</span><span class="tk-dot">✦</span>
+    <span>Forno aceso 5h30</span><span class="tk-dot">✦</span>
+    <span>Entrega segunda a sábado</span><span class="tk-dot">✦</span>
+    <span>Sem taxa de aplicativo</span><span class="tk-dot">✦</span>
+    <span>Retirada todo dia</span><span class="tk-dot">✦</span>
+    <span>Feito na casa</span><span class="tk-dot">✦</span>
+    <span>Forno aceso 5h30</span><span class="tk-dot">✦</span>
+    <span>Entrega segunda a sábado</span><span class="tk-dot">✦</span>
+    <span>Sem taxa de aplicativo</span><span class="tk-dot">✦</span>
+    <span>Retirada todo dia</span><span class="tk-dot">✦</span>
+  </div>
+</div>
+
 <!-- ═══════════ CARDÁPIO ═══════════ -->
 <section class="sec shop-section" id="cardapio">
   <div class="sec-head">
@@ -746,6 +810,7 @@ a { color: inherit; }
 
 <!-- ═══════════ A PADARIA ═══════════ -->
 <section class="sec" id="historia">
+  <div class="wave-top" aria-hidden="true"><svg viewBox="0 0 1440 48" preserveAspectRatio="none"><path d="M0,24 C120,48 360,0 600,24 C840,48 1080,0 1320,24 C1380,30 1410,26 1440,24 L1440,48 L0,48 Z"/></svg></div>
   <div class="shop-section">
     <div class="hist-grid">
       <div class="hist-img">
@@ -754,14 +819,15 @@ a { color: inherit; }
       <div>
         <span class="shop-pill">A padaria</span>
         <h2 style="font-size:clamp(1.7rem,4.4vw,2.4rem);margin-top:14px">Fornada nova antes de Mariana acordar</h2>
-        <p style="margin-top:14px;color:hsl(var(--muted-foreground))">
+        <p style="margin-top:14px">
           Abrimos às 5h30, todo santo dia, pra fornada sair quentinha antes da cidade acordar.
           Quem chega cedo pega o pão ainda esquentando a sacola.
         </p>
-        <p style="margin-top:12px;color:hsl(var(--muted-foreground))">
+        <p style="margin-top:12px">
           Salgados feitos na casa, sem intermediário — é o item que mais aparece elogiado
           nas avaliações de quem já veio.
         </p>
+        <a class="btn btn-outline btn-caps" href="#cardapio">Ver cardápio</a>
         <div class="pilares">
           <div class="pilar">
             <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22c4 0 6.5-2.6 6.5-6 0-4-3-5.5-3-9.5C13 8 12.5 10 11 11c-.5-1.5-.5-3-2-4.5C7.5 9 5.5 11 5.5 16c0 3.4 2.5 6 6.5 6z"/></svg>
@@ -783,7 +849,7 @@ a { color: inherit; }
       </div>
     </div>
 
-    <div class="shop-card avaliacoes">
+    <div class="avaliacoes">
       <div class="aval-head">
         <span class="nota">4,5</span>
         <span class="estrelas" role="img" aria-label="4,5 de 5 estrelas">
@@ -808,6 +874,7 @@ a { color: inherit; }
       </div>
     </div>
   </div>
+  <div class="wave-bottom" aria-hidden="true"><svg viewBox="0 0 1440 48" preserveAspectRatio="none"><path d="M0,24 C120,48 360,0 600,24 C840,48 1080,0 1320,24 C1380,30 1410,26 1440,24 L1440,48 L0,48 Z"/></svg></div>
 </section>
 
 <!-- ═══════════ DÚVIDAS ═══════════ -->
@@ -832,13 +899,14 @@ a { color: inherit; }
 
 <!-- ═══════════ VISITA / RODAPÉ ═══════════ -->
 <footer class="sec" id="visita">
+  <div class="wave-top" aria-hidden="true"><svg viewBox="0 0 1440 48" preserveAspectRatio="none"><path d="M0,24 C120,48 360,0 600,24 C840,48 1080,0 1320,24 C1380,30 1410,26 1440,24 L1440,48 L0,48 Z"/></svg></div>
   <div class="shop-section">
     <div class="visita-grid">
       <div>
         <h2>Passa na padaria</h2>
         <p class="visita-end">R. do Catete, 500 — Mariana/MG</p>
         <div class="visita-acts">
-          <a class="btn btn-outline" href="https://www.google.com/maps/search/?api=1&query=R.+do+Catete,+500,+Mariana,+MG" target="_blank" rel="noopener">
+          <a class="btn btn-outline btn-caps" href="https://www.google.com/maps/search/?api=1&query=R.+do+Catete,+500,+Mariana,+MG" target="_blank" rel="noopener">
             <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6.5 7-12a7 7 0 10-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.3"/></svg>
             Ver no mapa
           </a>
