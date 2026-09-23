@@ -406,6 +406,17 @@ a { color: inherit; }
   font-size: .84rem; font-weight: 600; cursor: pointer;
 }
 .step-add:hover { background: hsl(var(--crust)); }
+/* Confirmação de "adicionado": o botão pulsa e o texto vira "Adicionado"
+   por ~500ms antes de virar o stepper — sem isso a troca é instantânea
+   demais pra registrar que o toque funcionou. Ideia adaptada de um
+   padrão de botão com troca de rótulo (visto num componente do
+   Uiverse), escrita do zero aqui — sem depender de site externo. */
+.step-add.confirmando { animation: step-add-pop .5s cubic-bezier(.2,.9,.3,1.3); pointer-events: none; }
+@keyframes step-add-pop {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.08); background: hsl(var(--crust)); }
+  100% { transform: scale(1); }
+}
 .step-btn {
   width: 34px; height: 34px; border-radius: 999px; cursor: pointer;
   border: 1px solid hsl(var(--border)); background: hsl(var(--card));
@@ -413,6 +424,12 @@ a { color: inherit; }
 }
 .step-btn:hover { border-color: hsl(var(--primary)); color: hsl(var(--primary)); }
 .step-qty { min-width: 20px; text-align: center; font-weight: 700; font-variant-numeric: tabular-nums; }
+/* Estepper "nasce" com um pop leve na 1a unidade, e o número pisca um
+   pulso curto a cada + / − — confirma visualmente sem precisar de texto. */
+.stepper.pop-in { animation: stepper-pop-in .32s cubic-bezier(.2,.9,.3,1.3); }
+@keyframes stepper-pop-in { from { transform: scale(.86); opacity: .4; } to { transform: scale(1); opacity: 1; } }
+.step-qty.bump { animation: qty-bump .28s ease; }
+@keyframes qty-bump { 0%{transform:scale(1)} 45%{transform:scale(1.32)} 100%{transform:scale(1)} }
 
 .busca-vazia { display: none; padding: 40px 0; text-align: center; color: hsl(var(--muted-foreground)); }
 .busca-vazia.show { display: block; }
@@ -1569,7 +1586,7 @@ function montarMenu(){
 
   elMenu.querySelectorAll('.item').forEach(function(el){
     const id = el.dataset.id;
-    el.querySelector('.js-add').addEventListener('click', function(){ add(id); });
+    el.querySelector('.js-add').addEventListener('click', function(e){ confirmarAdicao(e.currentTarget, id); });
     el.querySelector('.js-mais').addEventListener('click', function(){ add(id); });
     el.querySelector('.js-menos').addEventListener('click', function(){ remove(id); });
   });
@@ -1636,16 +1653,55 @@ const elEnviar = document.getElementById('enviar');
 const drawer = document.getElementById('drawer');
 const overlay = document.getElementById('overlay');
 
+/* Confirmação ao tocar "Adicionar": o botão pulsa e mostra "Adicionado"
+   por um instante antes do carrinho ser atualizado de verdade — sem
+   isso a troca pro stepper é rápida demais pra registrar que o toque
+   funcionou. Só afeta o 1º toque de cada item (+ e − do stepper, que
+   já ficam visíveis, continuam instantâneos). */
+function confirmarAdicao(btn, id){
+  if (btn.classList.contains('confirmando')) return;
+  const original = btn.innerHTML;
+  btn.classList.add('confirmando');
+  btn.innerHTML = '<svg class="ico ico-sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg>Adicionado';
+  setTimeout(function(){
+    btn.classList.remove('confirmando');
+    btn.innerHTML = original;
+    add(id);
+  }, 430);
+}
+
+/* Guarda a última quantidade pintada por item, só pra saber quando
+   tocar a animação de entrada do stepper (0→1) e o "bump" do número —
+   nunca reanimar um card que nem mudou (ex: outro item foi alterado e
+   pintarTudo() rodou de novo). primeiraPintura evita animar a
+   restauração do carrinho salvo ao abrir o app — isso não é uma ação
+   do usuário agora, é estado antigo, não deve piscar nada. */
+const ultimaQtd = {};
+let primeiraPintura = true;
 function pintarSteppers(){
   elMenu.querySelectorAll('.item').forEach(function(el){
-    const q = cart[el.dataset.id] || 0;
+    const id = el.dataset.id;
+    const q = cart[id] || 0;
+    const antes = ultimaQtd[id] || 0;
     el.querySelector('.js-add').hidden = q > 0;
     el.querySelector('.js-menos').hidden = q === 0;
     el.querySelector('.js-mais').hidden = q === 0;
     const elQ = el.querySelector('.js-qty');
     elQ.hidden = q === 0;
     elQ.textContent = q;
+    if (q !== antes) {
+      if (!primeiraPintura) {
+        const stepper = el.querySelector('.stepper');
+        if (antes === 0 && q > 0) {
+          stepper.classList.remove('pop-in'); void stepper.offsetWidth; stepper.classList.add('pop-in');
+        } else if (q > 0) {
+          elQ.classList.remove('bump'); void elQ.offsetWidth; elQ.classList.add('bump');
+        }
+      }
+      ultimaQtd[id] = q;
+    }
   });
+  primeiraPintura = false;
 }
 
 function pintarBotoes(){
