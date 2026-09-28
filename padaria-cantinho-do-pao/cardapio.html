@@ -1628,6 +1628,19 @@ function montarFiltros(){
       const url = new URL(location.href);
       if (catAtiva === 'tudo') url.searchParams.delete('cat'); else url.searchParams.set('cat', catAtiva);
       history.replaceState(null, '', url);
+
+      /* Achado real (28/09/2026): o filtro escondia/mostrava os blocos
+         certos, mas a página ficava exatamente na mesma posição de
+         rolagem. Como os blocos acima encolhem (ou crescem, voltando
+         pra "Tudo"), a pessoa "sobrava" numa categoria diferente da que
+         clicou — parecia que o botão não levava a lugar nenhum. */
+      const alvo = catAtiva === 'tudo' ? elMenu : elMenu.querySelector('.cat-block[data-cat="' + catAtiva + '"]');
+      if (alvo && !alvo.hidden) {
+        const barra = document.querySelector('.menu-bar');
+        const folga = (barra ? barra.getBoundingClientRect().bottom : 0) + 14;
+        const y = alvo.getBoundingClientRect().top + window.scrollY - folga;
+        window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+      }
     });
   });
 }
