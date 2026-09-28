@@ -1,7 +1,11 @@
 #!/bin/bash
-# Sincroniza padaria-cantinho-do-pao/ pros 2 repos publicados:
-# - cantinhodopao-site (dominio /cantinhodopao/, link antigo, continua valido)
-# - pacoquinhagamer02-max.github.io (raiz da conta, link curto oficial desde 28/09/2026)
+# Sincroniza padaria-cantinho-do-pao/ pros lugares publicados:
+# - cantinhodopao-site (github.io/cantinhodopao/, link antigo, continua valido)
+# - pacoquinhagamer02-max.github.io (raiz da conta github, link curto)
+# - cantinhodopao-netlify (Netlify, cantinhodopaomariana.netlify.app — sem
+#   usuario no dominio, o link "oficial" pedido pelo Rafael 28/09/2026. So
+#   copia os arquivos; publicar de verdade e' `netlify deploy --prod` na
+#   pasta cantinhodopao-netlify (nao tem git, nao precisa commit).
 # Roda a partir da raiz do synctech-automation.
 set -e
 SRC="padaria-cantinho-do-pao"
@@ -23,5 +27,7 @@ sync_para() {
 
 sync_para "../cantinhodopao-site" "https://pacoquinhagamer02-max.github.io/cantinhodopao/"
 sync_para "../pacoquinhagamer02-max.github.io" "https://pacoquinhagamer02-max.github.io/"
+sync_para "../cantinhodopao-netlify" "https://cantinhodopaomariana.netlify.app/"
 
-echo "Sincronizado nos 2 repos publicados. Falta só: cd em cada pasta e git commit+push."
+echo "Sincronizado nos 3 lugares. Falta: git commit+push nos 2 repos GitHub, e"
+echo "'netlify deploy --prod --dir=.' dentro de cantinhodopao-netlify/ pro Netlify."
