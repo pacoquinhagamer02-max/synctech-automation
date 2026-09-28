@@ -15,6 +15,16 @@
 <meta property="og:image" content="https://pacoquinhagamer02-max.github.io/cantinhodopao/assets/hero.jpg">
 <meta name="twitter:card" content="summary_large_image">
 
+<!-- GitHub Pages não deixa mandar header HTTP customizado, então o CSP tem que
+     vir por aqui mesmo. 'unsafe-inline' em script/style é necessário porque o
+     app inteiro é 1 arquivo só (sem build, sem nonce/hash pra liberar o script
+     interno) — mas isso já barra a categoria de ataque mais comum num app assim:
+     carregar um script externo malicioso via URL de terceiro (dependência
+     comprometida, script injetado apontando pra fora). connect-src libera o
+     domínio do Apps Script pra não quebrar
+     o registro de pedidos na planilha (MEDICAO-DE-PEDIDOS.md) quando ativado. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://script.google.com https://script.googleusercontent.com; form-action 'self'; base-uri 'self'; object-src 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#FAFAFA">
 <link rel="apple-touch-icon" href="assets/logo.jpg">
@@ -1564,7 +1574,9 @@ function copiarTextoAntigo(texto){
 }
 
 function abrirWhatsApp(url){
-  const janela = window.open(url, '_blank');
+  /* noopener: sem isso a aba nova (wa.me) ganha window.opener e podia redirecionar
+     esta aba pra outro lugar sem o cliente perceber (reverse tabnabbing). */
+  const janela = window.open(url, '_blank', 'noopener');
   if (!janela) window.location.href = url;   // popup bloqueado
 }
 
