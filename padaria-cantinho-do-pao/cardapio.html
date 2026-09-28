@@ -866,16 +866,6 @@ a { color: inherit; }
 
   <div id="menu"></div>
   <p class="busca-vazia" id="busca-vazia">Nenhum item encontrado. Tenta outro termo.</p>
-
-  <div class="shop-card encomenda" id="bolos">
-    <div class="encomenda-img"><img src="assets/bolo-chocolate.jpg" alt="Bolo de chocolate da vitrine" width="900" height="675" loading="lazy" decoding="async"></div>
-    <div class="encomenda-txt">
-      <span class="shop-pill">Por encomenda</span>
-      <h3>Bolo inteiro pra sua data</h3>
-      <p>Aniversário, café da tarde, festa da firma. Conta o sabor, o tamanho e o dia que você precisa — a gente confirma o valor e o prazo no WhatsApp.</p>
-      <button type="button" class="btn btn-primary" id="encomenda-open">Pedir orçamento</button>
-    </div>
-  </div>
 </section>
 
 <!-- ═══════════ A PADARIA ═══════════ -->
@@ -945,6 +935,25 @@ a { color: inherit; }
     </div>
   </div>
   <div class="wave-bottom" aria-hidden="true"><svg viewBox="0 0 1440 48" preserveAspectRatio="none"><path d="M0,24 C120,48 360,0 600,24 C840,48 1080,0 1320,24 C1380,30 1410,26 1440,24 L1440,48 L0,48 Z"/></svg></div>
+</section>
+
+<!-- ═══════════ BOLO POR ENCOMENDA ═══════════ -->
+<!-- Fica fora do #cardapio de propósito: com o card dentro do menu, o
+     filtro de categoria escondia os produtos errados mas deixava esse
+     card visível (não é um .cat-block, então aplicarFiltro() não
+     mexia nele) — clicar numa categoria "sobrava" mostrando este
+     card em vez de só os produtos dela. Pedido do Rafael 28/09/2026:
+     deixar separado, mais abaixo, pra categoria mostrar só produto. -->
+<section class="sec shop-section" id="bolos">
+  <div class="shop-card encomenda">
+    <div class="encomenda-img"><img src="assets/bolo-chocolate.jpg" alt="Bolo de chocolate da vitrine" width="900" height="675" loading="lazy" decoding="async"></div>
+    <div class="encomenda-txt">
+      <span class="shop-pill">Por encomenda</span>
+      <h3>Bolo inteiro pra sua data</h3>
+      <p>Aniversário, café da tarde, festa da firma. Conta o sabor, o tamanho e o dia que você precisa — a gente confirma o valor e o prazo no WhatsApp.</p>
+      <button type="button" class="btn btn-primary" id="encomenda-open">Pedir orçamento</button>
+    </div>
+  </div>
 </section>
 
 <!-- ═══════════ DÚVIDAS ═══════════ -->
@@ -1395,7 +1404,7 @@ const PERGUNTAS = [
   ['Vocês entregam todo dia?', 'Entregamos de segunda a sábado, no mesmo horário de funcionamento da padaria. Só não tem entrega nem retirada no domingo, que a gente fecha.'],
   ['Como faço o pedido?', 'Monte no cardápio, escolha retirada ou entrega e confirme. Ele chega formatado no nosso WhatsApp, com os itens e o total.'],
   ['Como é o pagamento?', 'Combinamos direto com você no WhatsApp, na hora de confirmar o pedido.'],
-  ['Dá pra encomendar bolo inteiro ou festa?', 'Sim. Conte o sabor, o tamanho e o dia que você precisa — a gente confirma o valor e o prazo. Tem um formulário logo depois da seção de bolos no cardápio pra isso.']
+  ['Dá pra encomendar bolo inteiro ou festa?', 'Sim. Conte o sabor, o tamanho e o dia que você precisa — a gente confirma o valor e o prazo. Tem um formulário mais abaixo na página, na seção "Bolo inteiro pra sua data", pra isso.']
 ];
 
 const formatBRL = (v) => Number(v).toLocaleString('pt-BR', { style:'currency', currency:'BRL' });
@@ -1663,16 +1672,6 @@ function montarMenu(){
       '<div class="item-grid">' + itens.map(cardHTML).join('') + '</div>' +
     '</div>';
   }).join('');
-
-  /* CRO: o CTA de bolo por encomenda (ticket mais alto do cardápio)
-     ficava preso no fim do DOM, depois dos 211 itens — quem rolava a
-     página (maioria do tráfego, vindo de link do WhatsApp/Instagram)
-     dificilmente chegava lá. Move pra logo depois da categoria
-     "Bolos & doces", onde a pessoa já está pensando em bolo. O atalho
-     "Bolos" do menu continua funcionando igual (mesmo id="bolos"). */
-  const blocoDoces = elMenu.querySelector('.cat-block[data-cat="doces"]');
-  const encomenda = document.getElementById('bolos');
-  if (blocoDoces && encomenda) blocoDoces.insertAdjacentElement('afterend', encomenda);
 
   elMenu.querySelectorAll('.item').forEach(function(el){
     const id = el.dataset.id;
