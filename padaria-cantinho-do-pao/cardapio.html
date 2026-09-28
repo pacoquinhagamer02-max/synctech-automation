@@ -1623,6 +1623,26 @@ function normalizar(s){
   return s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
 }
 
+/* Achado real (28/09/2026): o filtro escondia/mostrava os blocos certos,
+   mas a página ficava exatamente na mesma posição de rolagem. Como os
+   blocos acima encolhem (ou crescem, voltando pra "Tudo"), a pessoa
+   "sobrava" numa categoria diferente da que clicou — parecia que o
+   botão não levava a lugar nenhum. Reusada tanto no clique quanto no
+   link direto (?cat=), que antes só rolava até o topo do cardápio
+   inteiro (heading + "peça de novo"), não até os produtos de verdade. */
+function rolarParaCategoria(comportamento){
+  const alvo = catAtiva === 'tudo' ? elMenu : elMenu.querySelector('.cat-block[data-cat="' + catAtiva + '"]');
+  if (!alvo || alvo.hidden) return;
+  /* offsetHeight (não getBoundingClientRect) porque a barra é sticky:
+     antes de "grudar" no topo, sua posição na tela não reflete a folga
+     real quando ela estiver grudada — usar a altura própria + o "top"
+     fixo do CSS (68px) funciona igual não importa se ela já grudou. */
+  const barra = document.querySelector('.menu-bar');
+  const folga = 68 + (barra ? barra.offsetHeight : 0) + 14;
+  const y = alvo.getBoundingClientRect().top + window.scrollY - folga;
+  window.scrollTo({ top: Math.max(0, y), behavior: comportamento });
+}
+
 function montarFiltros(){
   const tudo = [{ id:'tudo', label:'Tudo' }].concat(categories);
   elCats.innerHTML = tudo.map(function(c){
@@ -1637,19 +1657,7 @@ function montarFiltros(){
       const url = new URL(location.href);
       if (catAtiva === 'tudo') url.searchParams.delete('cat'); else url.searchParams.set('cat', catAtiva);
       history.replaceState(null, '', url);
-
-      /* Achado real (28/09/2026): o filtro escondia/mostrava os blocos
-         certos, mas a página ficava exatamente na mesma posição de
-         rolagem. Como os blocos acima encolhem (ou crescem, voltando
-         pra "Tudo"), a pessoa "sobrava" numa categoria diferente da que
-         clicou — parecia que o botão não levava a lugar nenhum. */
-      const alvo = catAtiva === 'tudo' ? elMenu : elMenu.querySelector('.cat-block[data-cat="' + catAtiva + '"]');
-      if (alvo && !alvo.hidden) {
-        const barra = document.querySelector('.menu-bar');
-        const folga = (barra ? barra.getBoundingClientRect().bottom : 0) + 14;
-        const y = alvo.getBoundingClientRect().top + window.scrollY - folga;
-        window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
-      }
+      rolarParaCategoria('smooth');
     });
   });
 }
@@ -2326,9 +2334,10 @@ aplicarFiltro();
 montarRepeticao();
 pintarTudo();
 iniciarRevelacao();
-/* Link com ?cat= é um deep-link de verdade: quem abre já cai direto no
-   cardápio filtrado, sem precisar rolar a página passando pelo hero. */
-if (catAtiva !== 'tudo') document.getElementById('cardapio').scrollIntoView();
+/* Link com ?cat= é um deep-link de verdade: quem abre já cai direto nos
+   produtos da categoria filtrada, sem precisar rolar a página passando
+   pelo hero nem pelo cabeçalho do cardápio. */
+if (catAtiva !== 'tudo') rolarParaCategoria('smooth');
 })();
 </script>
 </body>
