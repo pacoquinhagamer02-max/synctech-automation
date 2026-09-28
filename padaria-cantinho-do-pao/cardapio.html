@@ -168,6 +168,19 @@ a { color: inherit; }
 .btn-whats:hover { background: hsl(var(--crust)); }
 .btn:disabled { opacity: .5; cursor: not-allowed; }
 
+/* Toque físico consistente: só os .btn (hero) tinham transição suave e
+   reação ao toque. O filtro de categoria, o stepper de quantidade, o
+   botão do carrinho, "pedir de novo" e retirada/entrega mudavam de cor
+   seco, sem transição, e não reagiam ao toque/clique — pareciam
+   "mortos" no celular, que é onde a maioria pede. */
+:where(.cat-btn, .step-add, .cart-btn, .install-btn, .modo-btn, .repeat-card button) {
+  transition: background-color .18s ease, border-color .18s ease, color .18s ease, transform .12s ease;
+}
+:where(.cat-btn, .step-add, .cart-btn, .install-btn, .modo-btn, .repeat-card button):active { transform: translateY(1px); }
+:where(.step-btn, .icon-btn) { transition: background-color .18s ease, border-color .18s ease, color .18s ease, transform .12s ease; }
+:where(.step-btn, .icon-btn):active { transform: scale(.92); }
+.modo-btn:hover { border-color: hsl(var(--primary) / .5); }
+
 .ico { width: 18px; height: 18px; flex: 0 0 auto; stroke: currentColor; fill: none; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
 .ico-sm { width: 15px; height: 15px; }
 
