@@ -896,16 +896,16 @@ function Segmentos() {
 
 /* ═══════════════ Planos ═══════════════ */
 const PLANOS = [
-  { chave: 'starter', nome: 'Starter', mensal: 250, anual: 200, setup: 300, dest: false,
+  { chave: 'starter', nome: 'Starter', mensal: 250, anual: 200, dest: false,
     desc: 'Para quem quer começar a automatizar com o essencial.',
     inclui: ['WhatsApp Bot básico', 'Agendamento Online', 'Link Bio Profissional', 'Suporte via WhatsApp'],
     emBreve: [], fora: ['Instagram Automático', 'CRM e Métricas'] },
-  { chave: 'negocio', nome: 'Negócio', mensal: 500, anual: 400, setup: 600, dest: true,
+  { chave: 'negocio', nome: 'Negócio', mensal: 500, anual: 400, dest: true,
     desc: 'O pacote completo para quem quer crescer de verdade.',
     inclui: ['WhatsApp Bot completo com IA', 'Instagram Auto (DM + comentários)', 'Agendamento Online completo',
              'CRM com pipeline de vendas', 'Catálogo Digital', 'Dashboard de Métricas', 'Suporte prioritário'],
     emBreve: [], fora: [] },
-  { chave: 'pro', nome: 'Pro', mensal: 1000, anual: 800, setup: 1000, dest: false,
+  { chave: 'pro', nome: 'Pro', mensal: 1000, anual: 800, dest: false,
     desc: 'Para empresas que querem automação total e resultado máximo.',
     inclui: ['Tudo do Negócio', 'Gestão de Reputação Google',
              'Suporte 7 dias por semana', 'Reunião mensal de resultados', 'Integrações personalizadas'],
@@ -936,7 +936,7 @@ function Planos() {
                 </button>`)}
             </div>
             <span className="rounded-full border border-violeta/50 bg-violeta/15 px-3.5 py-1.5 text-xs font-extrabold text-lilas">
-              Anual economiza 20% + setup incluso
+              Anual economiza 20%
             </span>
           </div>
         <//>
@@ -961,8 +961,8 @@ function Planos() {
                 </p>
                 <p className="mt-2 text-xs text-txt3">
                   ${anual
-                    ? 'Configuração inclusa no plano anual · economia de ' + brl((p.mensal - p.anual) * 12 + p.setup) + ' no ano'
-                    : '+ ' + brl(p.setup) + ' de configuração (único)'}
+                    ? 'Preço final · economia de ' + brl((p.mensal - p.anual) * 12) + ' no ano'
+                    : 'Preço final · configuração inclusa, sem taxa de adesão'}
                 </p>
 
                 <div className="my-7 h-px bg-linha"></div>
@@ -1001,15 +1001,14 @@ function Planos() {
               <p className="text-xs font-extrabold uppercase tracking-wider text-lilas">Também vendido avulso — sem precisar de plano</p>
               <h3 className="mt-1.5 font-disp text-lg font-bold">Gestão de Tráfego Pago (Meta Ads)</h3>
               <p className="mt-2 text-sm leading-relaxed text-txt2">
-                Setup da campanha + otimização mensal. A verba de anúncio é paga direto pra Meta,
-                separada da nossa taxa de gestão. Mesmo preço como add-on de um plano ou contratado sozinho.
+                Montagem da campanha, criativo e otimização mensal, tudo incluso no valor. A verba de anúncio é paga
+                direto pra Meta, separada da nossa taxa de gestão. Mesmo preço como add-on de um plano ou contratado sozinho.
               </p>
             </div>
             <div className="text-right">
-              <p className="text-xs text-txt3">Setup único</p>
-              <p className="font-disp text-xl font-bold">${brl(297)}</p>
-              <p className="mt-2 text-xs text-txt3">Gestão mensal</p>
-              <p className="font-disp text-xl font-bold">${brl(397)}<span className="text-xs font-medium text-txt3">/mês</span></p>
+              <p className="text-xs text-txt3">Preço final</p>
+              <p className="font-disp text-3xl font-bold">${brl(397)}<span className="text-sm font-medium text-txt3">/mês</span></p>
+              <p className="mt-1 text-xs text-txt3">configuração inclusa</p>
             </div>
           </div>
         <//>
@@ -1064,7 +1063,7 @@ const PERGUNTAS = [
   ['Preciso ter conhecimento técnico para usar?', 'Não. Cuidamos de toda a configuração, do A ao Z. Você só precisa nos passar as informações do seu negócio (serviços, horários, preços). Em 7 dias está tudo funcionando sem você precisar saber nada de tecnologia.'],
   ['Como funciona o WhatsApp Bot? Preciso de API paga?', 'Configuramos com o WhatsApp Business do seu número atual, sem precisar de API paga. O bot responde automaticamente as mensagens que chegam, agenda horários e encaminha leads. Para volumes maiores (plano Pro), usamos a API oficial sem custo adicional para você.'],
   ['Quanto tempo leva para ter resultado?', 'O bot e a agenda começam a funcionar assim que ativados, na primeira semana. No nosso caso real (Barbearia Martins), o crescimento em seguidores e agendamentos apareceu em 23 dias.'],
-  ['Posso cancelar quando quiser?', 'Sim. Não temos fidelidade nem contrato de longo prazo. A taxa de configuração (única) não é reembolsável, mas a mensalidade pode ser cancelada a qualquer momento, sem multa.'],
+  ['Posso cancelar quando quiser?', 'Sim. Não temos fidelidade nem contrato de longo prazo, e não cobramos taxa de configuração nem de adesão. A mensalidade pode ser cancelada a qualquer momento, sem multa.'],
   ['O sistema funciona para qualquer tipo de negócio?', 'Sim. O sistema foi desenhado pra negócios locais que atendem por WhatsApp e agenda — barbearia, clínica, salão, padaria, pet shop, academia, entre outros. É personalizado pro seu negócio específico durante a configuração.'],
   ['O que acontece se o bot errar ou não souber responder?', 'O bot identifica quando não consegue resolver e encaminha a conversa para você com um aviso. Você nunca fica sem resposta e o cliente sempre recebe alguma atenção. Com o tempo, o bot aprende e as transferências ficam cada vez mais raras.']
 ];

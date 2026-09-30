@@ -1,0 +1,399 @@
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Serviços e Preços SyncTech</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Manrope:wght@400;500;600;700&display=swap">
+<style>
+  :root{
+    color-scheme: light;
+    --paper:#FFFFFF; --ground:#F7F4FD; --ink:#18102E; --ink2:#4A4166; --muted:#6B6285;
+    --violet:#6E3BD1; --violet-deep:#4C2494; --lilac:#F2EBFF; --lilac-line:#DED0FA;
+    --line:#E6E0F2; --ok:#1F6B45; --ok-bg:#E4F2EA; --warn:#8A5A12; --warn-bg:#FBF0D3;
+    --soon:#5A5470; --soon-bg:#EFEDF4;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:Manrope,ui-sans-serif,system-ui,sans-serif;font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  h1,h2,h3{font-family:Sora,ui-sans-serif,system-ui,sans-serif;margin:0;line-height:1.14;text-wrap:balance;letter-spacing:-.015em}
+  h1{font-size:2.45rem;font-weight:800}
+  h2{font-size:1.5rem;font-weight:700}
+  h3{font-size:1.06rem;font-weight:700}
+  p{margin:0}
+  main{max-width:860px;margin:0 auto;padding:0 22px 64px}
+
+  .sheet{padding-top:38px}
+  .mark{display:flex;align-items:center;gap:11px;margin-bottom:26px}
+  .mark .dot{width:34px;height:34px;border-radius:10px;background:var(--violet);display:grid;place-items:center;color:#fff;font-family:Sora;font-weight:800;font-size:1rem}
+  .mark b{font-family:Sora;font-weight:700;font-size:1.02rem;letter-spacing:-.01em}
+  .mark span{color:var(--muted);font-size:.86rem}
+
+  .hero{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:34px 32px;display:flex;flex-direction:column;gap:16px}
+  .kicker{font-size:.74rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--violet)}
+  .lead{color:var(--ink2);max-width:60ch;font-size:1.03rem}
+
+  .how{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:12px;margin-top:6px}
+  .how div{background:var(--lilac);border:1px solid var(--lilac-line);border-radius:12px;padding:14px 16px}
+  .how b{display:block;font-family:Sora;font-size:.92rem;margin-bottom:3px}
+  .how span{font-size:.88rem;color:var(--ink2)}
+
+  .band{margin:34px 0 14px;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+  .band h2{flex:0 0 auto}
+  .band p{color:var(--muted);font-size:.9rem}
+
+  .svc{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:20px 22px;margin-bottom:12px;display:grid;grid-template-columns:1fr 190px;gap:22px;break-inside:avoid;page-break-inside:avoid}
+  .svc .body{min-width:0}
+  .svc h3{margin-bottom:8px}
+  .svc .what{color:var(--ink2);font-size:.95rem;margin-bottom:10px}
+  .svc ul{margin:0;padding-left:17px;color:var(--ink2);font-size:.93rem}
+  .svc li{margin:3px 0}
+  .need{margin-top:11px;padding:9px 12px;border-radius:9px;font-size:.87rem;background:var(--warn-bg);color:var(--warn)}
+  .need.plain{background:var(--lilac);color:var(--violet-deep)}
+  .mkt{margin-top:9px;font-size:.85rem;color:var(--muted)}
+  .mkt b{color:var(--violet-deep);font-weight:700}
+  .need b{font-weight:700}
+
+  .cost{border-left:1px solid var(--line);padding-left:20px;display:flex;flex-direction:column;justify-content:center;gap:4px}
+  .cost .lbl{font-size:.72rem;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-weight:700}
+  .cost .big{font-family:Sora;font-weight:800;font-size:1.6rem;color:var(--violet-deep);font-variant-numeric:tabular-nums;line-height:1.1}
+  .cost .big span{font-size:.82rem;font-weight:600;color:var(--muted)}
+  .cost .sub{font-size:.85rem;color:var(--ink2);font-variant-numeric:tabular-nums}
+  .cost .once{font-family:Sora;font-weight:700;font-size:1.1rem;color:var(--ink)}
+
+  .tag{display:inline-block;padding:2px 9px;border-radius:999px;font-size:.7rem;font-weight:700;letter-spacing:.03em;vertical-align:middle;margin-left:7px}
+  .tag.ok{background:var(--ok-bg);color:var(--ok)}
+  .tag.soon{background:var(--soon-bg);color:var(--soon)}
+
+  .soonbox{background:var(--paper);border:1px dashed var(--lilac-line);border-radius:14px;padding:16px 20px;color:var(--ink2);font-size:.93rem}
+  .soonbox b{font-family:Sora;color:var(--ink)}
+
+  table{width:100%;border-collapse:collapse;background:var(--paper);border:1px solid var(--line);border-radius:14px;overflow:hidden;font-size:.93rem}
+  th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:var(--lilac);font-family:Sora;font-size:.76rem;text-transform:uppercase;letter-spacing:.07em;color:var(--violet-deep);font-weight:700}
+  tr:last-child td{border-bottom:0}
+  td.v{font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:700;font-family:Sora}
+  .save{color:var(--ok);font-weight:700}
+
+  .note{border-left:4px solid var(--violet);background:var(--lilac);padding:14px 18px;border-radius:0 12px 12px 0;font-size:.93rem;color:var(--ink2);margin-top:14px}
+  .note b{color:var(--ink)}
+
+  .cond{display:grid;gap:9px;margin-top:12px}
+  .cond div{background:var(--paper);border:1px solid var(--line);border-radius:11px;padding:12px 16px;font-size:.92rem;color:var(--ink2)}
+  .cond b{font-family:Sora;color:var(--ink);display:block;margin-bottom:2px;font-size:.95rem}
+
+  footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:.85rem;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
+
+  @media (max-width:640px){
+    h1{font-size:1.95rem}
+    .svc{grid-template-columns:1fr;gap:14px}
+    .cost{border-left:0;border-top:1px solid var(--line);padding-left:0;padding-top:14px}
+  }
+  @media print{
+    body{background:#fff;font-size:11.5pt}
+    main{max-width:none;padding:0}
+    .sheet{padding-top:0}
+    .hero,.svc,.soonbox,table,.cond div,.note{box-shadow:none}
+    .page{page-break-before:always}
+    .band{margin-top:22px}
+    footer{page-break-inside:avoid}
+  }
+</style>
+<main>
+  <div class="sheet">
+    <div class="mark">
+      <div class="dot">S</div>
+      <div><b>SyncTech Automation</b><br><span>Automação para negócios locais · Mariana/MG</span></div>
+    </div>
+
+    <section class="hero">
+      <p class="kicker">Tabela de serviços e preços</p>
+      <h1>Escolha só o que você precisa</h1>
+      <p class="lead">Cada serviço abaixo funciona sozinho: você contrata um, dois ou quantos quiser, sem pacote obrigatório. O preço de cada um já é o valor final por mês, com configuração, acompanhamento e suporte inclusos. Não há taxa de instalação. Quem contrata três ou mais normalmente sai mais barato no plano fechado — a comparação está no fim.</p>
+      <div class="how">
+        <div><b>Preço final</b><span>O valor que aparece é o que você paga por mês. Não há taxa de configuração, adesão nem cobrança de instalação.</span></div>
+        <div><b>O que está dentro</b><span>Montagem, ajustes, manutenção e suporte no WhatsApp, enquanto o serviço estiver no ar.</span></div>
+        <div><b>Sem fidelidade</b><span>Nenhum serviço avulso tem prazo mínimo nem multa. Avise com 15 dias e encerramos.</span></div>
+      </div>
+      <div class="note" style="margin-top:4px">Os valores abaixo ficam <b>abaixo da média de mercado</b> porque a SyncTech é nova e está formando carteira. Em cada serviço você encontra o que o mercado cobra hoje, para comparar.</div>
+    </section>
+
+    <div class="band">
+      <h2>Prontos para ligar</h2>
+      <p>Já estão funcionando e entram no ar em poucos dias.</p>
+    </div>
+
+    <article class="svc">
+      <div class="body">
+        <h3>Agendamento Online <span class="tag ok">no ar</span></h3>
+        <p class="what">Uma agenda que trabalha sozinha, 24 horas. O cliente marca pelo celular sem precisar falar com ninguém.</p>
+        <ul>
+          <li>Ele escolhe o serviço, o dia e o horário por um link</li>
+          <li>Recebe a confirmação na hora e um lembrete antes</li>
+          <li>Entra numa lista de espera automática quando o dia lota</li>
+          <li>Você vê tudo num painel, e o horário some da agenda sozinho</li>
+        </ul>
+        <div class="need plain">Não depende de nada além do WhatsApp do seu negócio.</div>
+        <p class="mkt">Sistemas prontos de agenda custam <b>R$ 59 a R$ 150/mês</b> e vêm iguais para todo mundo. Aqui o sistema é montado para o seu fluxo e conversa com os outros serviços.</p>
+      </div>
+      <div class="cost">
+        <p class="lbl">Preço final</p><p class="big">R$ 127<span>/mês</span></p>
+        <p class="sub">configuração inclusa</p>
+      </div>
+    </article>
+
+    <article class="svc">
+      <div class="body">
+        <h3>CRM com Pipeline <span class="tag ok">no ar</span></h3>
+        <p class="what">O lugar onde nenhum cliente se perde. Cada pessoa que chega vira um cartão que você arrasta até fechar.</p>
+        <ul>
+          <li>Quadro em colunas: Novo → Contatado → Fechado</li>
+          <li>Histórico por cliente: quantas vezes veio, quanto gastou, qual foi o último serviço</li>
+          <li>Botão que abre o WhatsApp já na conversa daquela pessoa</li>
+          <li>Disparo de mensagem para todos de uma coluna de uma vez</li>
+        </ul>
+        <div class="need plain">Não depende de nada. Funciona no celular e no computador.</div>
+        <p class="mkt">CRMs de mercado cobram <b>por usuário</b>, de R$ 59 a R$ 131 cada. Aqui é preço único, com quantas pessoas você quiser.</p>
+      </div>
+      <div class="cost">
+        <p class="lbl">Preço final</p><p class="big">R$ 127<span>/mês</span></p>
+        <p class="sub">configuração inclusa</p>
+      </div>
+    </article>
+
+    <article class="svc">
+      <div class="body">
+        <h3>Link na Bio <span class="tag ok">no ar</span></h3>
+        <p class="what">Uma página só sua para colocar no Instagram, no lugar daquele link genérico. Feita para abrir rápido no celular.</p>
+        <ul>
+          <li>Seus serviços com preço, um embaixo do outro</li>
+          <li>Botão de agendar e botão de WhatsApp sempre à vista</li>
+          <li>Link direto para o cliente avaliar você no Google</li>
+          <li>Você pede alteração de preço ou serviço quando quiser</li>
+        </ul>
+        <div class="need plain">Hospedagem inclusa. <b>Sem mensalidade</b> — paga uma vez e a página é sua.</div>
+        <p class="mkt">Serviços de link na bio cobram <b>R$ 18 a R$ 50 por mês, para sempre</b>. Em pouco mais de um ano você já teria pago mais do que isso.</p>
+      </div>
+      <div class="cost">
+        <p class="lbl">Preço final</p><p class="big">R$ 297</p>
+        <p class="sub">pagamento único, sem mensalidade</p>
+      </div>
+    </article>
+
+    <article class="svc">
+      <div class="body">
+        <h3>Catálogo Digital <span class="tag ok">no ar</span></h3>
+        <p class="what">Seu cardápio ou catálogo online, com foto e preço. O cliente monta o pedido e ele chega pronto no seu WhatsApp.</p>
+        <ul>
+          <li>O cliente vê a foto, escolhe a quantidade e fecha o pedido</li>
+          <li>A mensagem chega organizada: itens, total, nome e endereço</li>
+          <li>Sem aplicativo para baixar e sem taxa por pedido</li>
+          <li>Preço e item atualizados sempre que você pedir</li>
+        </ul>
+        <div class="need">Precisa das <b>fotos dos produtos</b>. Se você não tiver, dá para começar com os itens sem foto e ir completando.</div>
+        <p class="mkt">Plataformas de cardápio digital custam <b>R$ 60 a R$ 300/mês</b> e várias ainda cobram por pedido acima da cota. Aqui não há taxa por pedido.</p>
+      </div>
+      <div class="cost">
+        <p class="lbl">Preço final</p><p class="big">R$ 77<span>/mês</span></p>
+        <p class="sub">configuração inclusa</p>
+      </div>
+    </article>
+
+    <article class="svc">
+      <div class="body">
+        <h3>Gestão de Reputação no Google <span class="tag ok">no ar</span></h3>
+        <p class="what">Transforma cliente satisfeito em avaliação pública, e cliente insatisfeito em conversa privada antes de virar nota baixa.</p>
+        <ul>
+          <li>Depois do atendimento, a pessoa recebe o pedido de avaliação</li>
+          <li>Nota 4 ou 5 vai direto para a sua página no Google</li>
+          <li>Nota 1 a 3 chega como mensagem privada para você resolver</li>
+          <li>Você acompanha quantas avaliações entraram no mês</li>
+        </ul>
+        <div class="need">Precisa do seu <b>perfil no Google Meu Negócio</b> ativo. Se não tiver, a gente cria junto, sem custo extra.</div>
+        <p class="mkt">Agências cobram <b>R$ 500 a R$ 1.500/mês</b> para cuidar de reputação no Google.</p>
+      </div>
+      <div class="cost">
+        <p class="lbl">Preço final</p><p class="big">R$ 127<span>/mês</span></p>
+        <p class="sub">configuração inclusa</p>
+      </div>
+    </article>
+
+    <article class="svc">
+      <div class="body">
+        <h3>Dashboard de Métricas <span class="tag ok">no ar</span></h3>
+        <p class="what">Um painel que responde, sem você abrir planilha: quanto entrou, quantos clientes novos, o que mais vendeu.</p>
+        <ul>
+          <li>Agendamentos e pedidos do período</li>
+          <li>Receita e ticket médio</li>
+          <li>Clientes novos contra clientes que voltaram</li>
+          <li>Atualiza sozinho, você só abre o link</li>
+        </ul>
+        <div class="need">Precisa que os dados do negócio estejam numa <b>planilha conectada</b>. Enquanto não estiver, o painel mostra dados de exemplo — a montagem dessa planilha já está inclusa.</div>
+        <p class="mkt">A ferramenta em si é gratuita. O que se paga aqui é a montagem e a manutenção do painel, por isso a mensalidade é baixa.</p>
+      </div>
+      <div class="cost">
+        <p class="lbl">Preço final</p><p class="big">R$ 77<span>/mês</span></p>
+        <p class="sub">configuração inclusa</p>
+      </div>
+    </article>
+
+    <div class="page"></div>
+
+    <article class="svc">
+      <div class="body">
+        <h3>Aplicativo Personalizado <span class="tag ok">no ar</span></h3>
+        <p class="what">O seu negócio virando um aplicativo de verdade na tela do celular do cliente, sem passar por loja de aplicativo.</p>
+        <ul>
+          <li>O cliente instala pelo link e o ícone fica na tela dele</li>
+          <li>Pedido, carrinho e checkout com o fluxo do seu negócio</li>
+          <li>Histórico com "pedir de novo" em um toque</li>
+          <li>Funciona mesmo com internet ruim e abre rápido</li>
+          <li>Formulários sob medida: encomenda, orçamento, reserva</li>
+        </ul>
+        <div class="need plain">É o mesmo aplicativo que a Padaria Cantinho do Pão usa hoje. Posso mostrar funcionando antes de você decidir.</div>
+        <p class="mkt">Um aplicativo próprio no mercado brasileiro começa em <b>R$ 8.000 de entrada mais R$ 500 a R$ 2.000 por mês</b>. É o serviço com a maior diferença de preço desta tabela.</p>
+      </div>
+      <div class="cost">
+        <p class="lbl">Preço final</p><p class="big">R$ 247<span>/mês</span></p>
+        <p class="sub">configuração inclusa</p>
+      </div>
+    </article>
+
+    <article class="svc">
+      <div class="body">
+        <h3>Gestão de Tráfego Pago (Meta Ads) <span class="tag ok">no ar</span></h3>
+        <p class="what">Anúncio no Instagram e no Facebook para trazer cliente novo toda semana, com alguém cuidando e ajustando.</p>
+        <ul>
+          <li>Campanha montada do zero, com público por região e perfil</li>
+          <li>Produção do criativo do anúncio (vídeo ou imagem) inclusa</li>
+          <li>Acompanhamento e ajuste semanal, não é "liga e esquece"</li>
+          <li>Relatório mensal: quanto foi gasto e quantos contatos entraram</li>
+          <li>Teto de custo por cliente combinado antes de começar</li>
+        </ul>
+        <div class="need">A <b>verba do anúncio é separada</b> e paga por você direto para a Meta, no seu cartão. Ela não passa pelo nosso caixa e não cobramos percentual sobre ela.</div>
+        <p class="mkt">Gestores iniciantes cobram <b>R$ 800 a R$ 1.500/mês</b>; agências fecham entre R$ 2.000 e R$ 6.000. Este é o piso da faixa.</p>
+      </div>
+      <div class="cost">
+        <p class="lbl">Preço final</p><p class="big">R$ 800<span>/mês</span></p>
+        <p class="sub">configuração inclusa</p>
+        <p class="sub">+ verba, paga por você</p>
+      </div>
+    </article>
+
+    <div class="band">
+      <h2>Precisam de uma conta externa</h2>
+      <p>Funcionam igual aos de cima, mas dependem de um serviço de terceiro contratado no seu nome.</p>
+    </div>
+
+    <article class="svc">
+      <div class="body">
+        <h3>WhatsApp Bot 24/7</h3>
+        <p class="what">Um atendente que responde em segundos, a qualquer hora, inclusive domingo e madrugada — e só te chama quando precisa de gente.</p>
+        <ul>
+          <li>Responde na hora as perguntas que mais se repetem</li>
+          <li>Agenda, confirma e remarca sozinho</li>
+          <li>Pergunta o que a pessoa precisa antes de chegar em você</li>
+          <li>Passa a conversa para uma pessoa quando o caso é complexo</li>
+          <li>Nunca deixa mensagem sem resposta fora do horário</li>
+        </ul>
+        <div class="need">Precisa de uma <b>conta Z-API</b> conectada ao seu número. É um serviço externo pago, contratado no seu nome e cobrado por eles, à parte desta tabela. Consulto o valor atual antes de fechar.</div>
+        <p class="mkt">Atendimento automático com IA no WhatsApp é vendido por <b>R$ 500 a R$ 1.400/mês</b> no mercado.</p>
+      </div>
+      <div class="cost">
+        <p class="lbl">Preço final</p><p class="big">R$ 297<span>/mês</span></p>
+        <p class="sub">configuração inclusa</p>
+        <p class="sub">+ conta Z-API</p>
+      </div>
+    </article>
+
+    <article class="svc">
+      <div class="body">
+        <h3>Instagram Automático</h3>
+        <p class="what">O Instagram respondendo sozinho quem interage com você, em vez de deixar a pessoa esperando.</p>
+        <ul>
+          <li>Comentou no post, recebe mensagem no direct</li>
+          <li>Começou a seguir, recebe boas-vindas</li>
+          <li>Mencionou nos Stories, tem resposta automática</li>
+          <li>Dá para agendar pelo próprio direct, sem sair do app</li>
+        </ul>
+        <div class="need">Precisa de <b>conta Instagram Business</b> (gratuita, é só converter) e de uma conta <b>Make.com</b> conectada — o plano gratuito do Make atende o começo.</div>
+        <p class="mkt">Só a ferramenta de automação já custa <b>R$ 40 a R$ 200/mês</b>, e a maioria cobra mais conforme sua base cresce. Aqui o valor é fixo.</p>
+      </div>
+      <div class="cost">
+        <p class="lbl">Preço final</p><p class="big">R$ 197<span>/mês</span></p>
+        <p class="sub">configuração inclusa</p>
+      </div>
+    </article>
+
+    <article class="svc">
+      <div class="body">
+        <h3>Nota Fiscal no pedido (NFC-e) <span class="tag soon">em implantação</span></h3>
+        <p class="what">Cada venda feita pelo aplicativo sai com nota fiscal autorizada, sem ninguém digitar nada de novo no caixa.</p>
+        <ul>
+          <li>A nota é emitida quando você confirma o pedido, não antes</li>
+          <li>Pedido cancelado nunca vira nota, então não há cancelamento na Sefaz</li>
+          <li>O cliente recebe o QR Code e o link da nota no próprio pedido</li>
+          <li>Série de numeração separada, sem mexer no sistema do balcão</li>
+        </ul>
+        <div class="need">Exige <b>CNPJ credenciado na Sefaz, certificado digital A1</b> e uma plataforma emissora (usamos a Focus NFe, cerca de R$ 60/mês, contratada no CNPJ da sua empresa). Sem esses três, o serviço não roda.</div>
+      </div>
+      <div class="cost">
+        <p class="lbl">Preço final</p><p class="big">R$ 147<span>/mês</span></p>
+        <p class="sub">configuração inclusa</p>
+        <p class="sub">+ emissor (~R$ 60/mês)</p>
+      </div>
+    </article>
+
+    <div class="band">
+      <h2>Ainda em desenvolvimento</h2>
+      <p>Estão na fila. Não entram em contrato até ficarem prontos.</p>
+    </div>
+    <div class="soonbox">
+      <b>Chat ao Vivo no Site</b> — janela de conversa no seu site que captura o visitante e encaminha para o WhatsApp.<br>
+      <b>E-mail Marketing</b> — sequências automáticas para clientes e leads, com métricas de abertura.<br>
+      <span style="color:var(--muted)">Quem já é cliente entra primeiro quando lançarem, sem custo adicional.</span>
+    </div>
+
+    <div class="page"></div>
+
+    <div class="band">
+      <h2>Contratando três ou mais, o plano sai mais barato</h2>
+      <p>Mesma entrega, mensalidade única.</p>
+    </div>
+
+    <table>
+      <tr><th>Plano</th><th>O que inclui</th><th>Avulso daria</th><th>No plano</th></tr>
+      <tr>
+        <td class="v">Starter</td>
+        <td>WhatsApp Bot básico, Agendamento Online e Link na Bio, com suporte no WhatsApp.</td>
+        <td class="v">R$ 424/mês</td>
+        <td class="v">R$ 250/mês<br><span class="save">economia de R$ 174</span></td>
+      </tr>
+      <tr>
+        <td class="v">Negócio</td>
+        <td>Tudo do Starter com o bot completo, mais Instagram Automático, CRM com Pipeline, Catálogo Digital e Dashboard de Métricas. Suporte prioritário.</td>
+        <td class="v">R$ 902/mês</td>
+        <td class="v">R$ 500/mês<br><span class="save">economia de R$ 402</span></td>
+      </tr>
+      <tr>
+        <td class="v">Pro</td>
+        <td>Tudo do Negócio, mais Gestão de Tráfego Pago, Gestão de Reputação no Google, suporte sete dias por semana, reunião mensal de resultados e integrações sob medida.</td>
+        <td class="v">R$ 1.829/mês</td>
+        <td class="v">R$ 1.000/mês<br><span class="save">economia de R$ 829</span></td>
+      </tr>
+    </table>
+    <div class="note">A coluna <b>"avulso daria"</b> é a soma das mensalidades desta tabela para os mesmos serviços. A verba do anúncio do plano Pro continua paga por você, separada. Aplicativo Personalizado e Nota Fiscal não entram nos planos: são contratados à parte, com o mesmo preço da tabela, tanto sozinhos quanto somados a um plano.</div>
+
+    <div class="band">
+      <h2>Como funciona na prática</h2>
+    </div>
+    <div class="cond">
+      <div><b>Pagamento</b>Uma mensalidade só, todo dia 10, por Pix ou transferência. Sem taxa de adesão e sem cobrança de configuração. A primeira cobrança só acontece depois que o serviço estiver no ar.</div>
+      <div><b>Prazo de entrega</b>De 3 a 7 dias úteis por serviço, contados de quando você entregar o material (fotos, lista de preços, acessos). Tráfego Pago e Nota Fiscal podem levar mais, por dependerem de aprovação de terceiros.</div>
+      <div><b>Acessos</b>Nunca pedimos sua senha de Instagram ou de banco. Somos adicionados como usuário ou administrador nas suas contas, e você pode remover o acesso a qualquer momento.</div>
+      <div><b>Cancelamento</b>Sem fidelidade e sem multa nos serviços avulsos. Avise com 15 dias e encerramos; você paga só o que já foi prestado.</div>
+      <div><b>O que fica com você</b>As contas (Google, Meta, emissor de nota, Z-API) são abertas no nome da sua empresa. Se um dia a parceria acabar, elas continuam funcionando com você.</div>
+    </div>
+
+    <footer>
+      <span>SyncTech Automation · Rafael Santos · Mariana/MG</span>
+      <span>Valores válidos para setembro de 2026</span>
+    </footer>
+  </div>
+</main>
