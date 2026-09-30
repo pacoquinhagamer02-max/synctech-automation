@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Controle de estoque</title>
+<meta name="description" content="Controle de estoque simples: conta, avisa o que está acabando e manda a lista de compras.">
+<meta name="theme-color" content="#FBF8F4">
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+  [hidden]{display:none!important}
+
+  :root{
+    color-scheme: light;
+    --primary:#84411F; --primary-esc:#5E2E15; --primary-claro:rgba(132,65,31,.12);
+    --bg:#FBF8F4; --card:#FFFFFF; --ink:#241A14; --ink2:#5B4A40; --muted:#8A7A6E;
+    --linha:#E9DFD4; --whats:#1F9D55; --whats-esc:#177A41;
+    --alerta:#B3261E; --alerta-bg:#FBE9E7; --atencao:#8A5A12; --atencao-bg:#FBF0D3;
+    --ok:#1F6B45; --ok-bg:#E4F2EA; --raio:14px;
+  }
+  *{box-sizing:border-box}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+  h1,h2,h3{font-family:Fraunces,Georgia,serif;font-weight:600;margin:0;line-height:1.15;text-wrap:balance}
+  p{margin:0}
+  button,input,select{font:inherit;color:inherit}
+  button{touch-action:manipulation;cursor:pointer}
+  a{color:var(--primary)}
+  :focus-visible{outline:3px solid var(--primary);outline-offset:2px;border-radius:6px}
+  .wrap{max-width:760px;margin:0 auto;padding:0 16px}
+  .pular{position:absolute;left:-9999px}.pular:focus{left:12px;top:12px;background:var(--card);padding:10px 16px;border-radius:8px;z-index:100}
+
+  header{position:sticky;top:0;z-index:30;background:var(--bg);border-bottom:1px solid var(--linha)}
+  .topo{display:flex;align-items:center;gap:12px;padding:12px 0;min-height:66px}
+  .logo{width:42px;height:42px;border-radius:12px;background:var(--primary);color:#fff;display:grid;place-items:center;font-family:Fraunces,serif;font-weight:700;flex:none}
+  .marca{font-family:Fraunces,serif;font-weight:700;font-size:1.02rem;line-height:1.2}
+  .marca small{display:block;font-family:Inter,sans-serif;font-weight:400;font-size:.76rem;color:var(--muted)}
+
+  .resumo{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:16px 0}
+  .box{background:var(--card);border:1px solid var(--linha);border-radius:var(--raio);padding:12px;text-align:center}
+  .box b{display:block;font-family:Fraunces,serif;font-size:1.5rem;font-variant-numeric:tabular-nums;line-height:1.1}
+  .box small{font-size:.72rem;color:var(--muted);display:block;margin-top:3px}
+  .box.alerta b{color:var(--alerta)} .box.atencao b{color:var(--atencao)} .box.ok b{color:var(--ok)}
+
+  .barra-acoes{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  .btn{border:1px solid var(--linha);background:var(--card);border-radius:11px;padding:11px 16px;font-weight:600;font-size:.9rem;min-height:46px}
+  .btn.principal{background:var(--whats);color:#fff;border-color:var(--whats)}
+  .btn.principal:disabled{opacity:.45}
+  .btn[aria-pressed="true"]{border-color:var(--primary);background:var(--primary-claro);color:var(--primary-esc)}
+
+  .busca{position:relative;margin-bottom:12px}
+  .busca input{width:100%;padding:12px 14px 12px 40px;border:1px solid var(--linha);border-radius:var(--raio);background:var(--card);min-height:46px}
+  .busca svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);opacity:.45}
+
+  .grupo{margin-top:18px}
+  .grupo h2{font-size:1.02rem;margin-bottom:8px}
+  .lista{display:grid;gap:8px}
+
+  .item{background:var(--card);border:1px solid var(--linha);border-radius:var(--raio);padding:12px 14px;display:flex;align-items:center;gap:12px}
+  .item.baixo{border-color:rgba(179,38,30,.45);background:var(--alerta-bg)}
+  .item.perto{border-color:rgba(138,90,18,.4);background:var(--atencao-bg)}
+  .item-txt{flex:1;min-width:0}
+  .item-txt b{display:block;font-weight:600;font-size:.96rem}
+  .item-txt small{color:var(--ink2);font-size:.8rem;display:block;margin-top:2px}
+  .selo{display:inline-block;font-size:.66rem;font-weight:700;padding:2px 7px;border-radius:999px;margin-top:4px}
+  .selo.baixo{background:var(--alerta);color:#fff}
+  .selo.perto{background:var(--atencao);color:#fff}
+
+  .contador{display:flex;align-items:center;gap:6px;flex:none}
+  .cbtn{width:40px;height:40px;border-radius:10px;border:1px solid var(--linha);background:var(--bg);font-size:1.2rem;display:grid;place-items:center;font-weight:600}
+  .cbtn:active{background:var(--primary-claro)}
+  .qtd{min-width:52px;text-align:center;font-family:Fraunces,serif;font-weight:700;font-size:1.15rem;font-variant-numeric:tabular-nums}
+  .qtd small{display:block;font-family:Inter,sans-serif;font-weight:400;font-size:.66rem;color:var(--muted);margin-top:-2px}
+
+  .vazio{text-align:center;color:var(--muted);padding:36px 16px}
+
+  .rodape-fixo{position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--card);border-top:1px solid var(--linha);padding:11px 16px calc(11px + env(safe-area-inset-bottom))}
+  .rodape-in{max-width:760px;margin:0 auto;display:flex;gap:10px;align-items:center}
+  .rodape-in .txt{flex:1;min-width:0;font-size:.82rem;color:var(--ink2)}
+
+  footer{padding:24px 0 130px;text-align:center;color:var(--muted);font-size:.83rem}
+  footer a{color:var(--muted)}
+  .aria-so-leitor{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+  .aviso-salvo{background:var(--primary-claro);border-radius:10px;padding:10px 14px;font-size:.84rem;color:var(--primary-esc);margin-bottom:12px}
+</style>
+</head>
+<body>
+<a class="pular" href="#lista">Pular para a lista</a>
+
+<header>
+  <div class="wrap topo">
+    <div class="logo" id="logo">N</div>
+    <div class="marca"><span id="biz-nome">Negócio</span><small>Controle de estoque</small></div>
+  </div>
+</header>
+
+<main class="wrap" id="lista">
+  <div class="resumo">
+    <div class="box alerta"><b id="n-acabou">0</b><small>acabou</small></div>
+    <div class="box atencao"><b id="n-pouco">0</b><small>está acabando</small></div>
+    <div class="box ok"><b id="n-ok">0</b><small>tem bastante</small></div>
+  </div>
+
+  <div class="aviso-salvo" id="aviso-salvo" hidden></div>
+
+  <div class="busca">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+    <input type="search" id="busca" placeholder="Buscar item" aria-label="Buscar item no estoque">
+  </div>
+
+  <div class="barra-acoes">
+    <button type="button" class="btn" id="f-tudo" aria-pressed="true">Tudo</button>
+    <button type="button" class="btn" id="f-falta">Só o que falta</button>
+    <button type="button" class="btn" id="zerar">Recomeçar contagem</button>
+  </div>
+
+  <div id="grupos"></div>
+  <p class="vazio" id="vazio" hidden>Nenhum item encontrado.</p>
+
+  <footer>
+    <span id="rodape-nome"></span><br>
+    Controle de estoque por <a href="https://pacoquinhagamer02-max.github.io/synctech-automation/" target="_blank" rel="noopener">SyncTech Automation</a>
+  </footer>
+</main>
+
+<p class="aria-so-leitor" id="aria-msg" aria-live="polite"></p>
+
+<div class="rodape-fixo">
+  <div class="rodape-in">
+    <div class="txt" id="rodape-txt">Toque em + ou − para ajustar</div>
+    <button type="button" class="btn principal" id="mandar" disabled>Mandar lista de compras</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  /* CONFIG entregue pelo Hub em #config=BASE64 — mesmo mecanismo de
+     /agendamento/, /bio/, /catalogo/ e /site/. Campo vazio = desligado. */
+  var CONFIG = {
+    bizName: 'Negócio Exemplo',
+    bizWpp: '',
+    corPrimaria: '#84411F',
+    /* item: { nome, unidade, minimo, categoria } — a quantidade atual NÃO
+       vem da config: ela é do dia a dia e vive no aparelho de quem conta. */
+    itens: [
+      { nome: 'Item de exemplo', unidade: 'un', minimo: 5, categoria: 'Geral' }
+    ]
+  };
+
+  (function(){
+    try {
+      var hash = window.location.hash;
+      if (hash.indexOf('#config=') !== 0) return;
+      var dec = JSON.parse(decodeURIComponent(escape(atob(hash.slice(8)))));
+      ['bizName','bizWpp','corPrimaria'].forEach(function(k){
+        if (dec[k] !== undefined && dec[k] !== null && dec[k] !== '') CONFIG[k] = dec[k];
+      });
+      if (Array.isArray(dec.itens) && dec.itens.length) CONFIG.itens = dec.itens;
+    } catch (err) {
+      console.error('Config inválida na URL, usando os valores padrão:', err);
+    }
+  })();
+
+  CONFIG.bizWpp = String(CONFIG.bizWpp).replace(/\D/g, '');
+
+  var NS = 'est_' + (CONFIG.bizWpp || CONFIG.bizName.replace(/\W/g, '') || 'demo') + '_';
+  var K_QTD = NS + 'quantidades';
+  var K_DATA = NS + 'contagem';
+
+  var el = function(id){ return document.getElementById(id); };
+  var qtds = {};
+  var filtroFalta = false;
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c];
+    });
+  }
+  function normalizar(s){
+    return String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  }
+  function chave(item){ return normalizar(item.nome).replace(/\s+/g, '-'); }
+
+  function aplicarTema(){
+    var c = CONFIG.corPrimaria;
+    if (!/^#[0-9a-fA-F]{6}$/.test(c)) return;
+    var r = parseInt(c.slice(1,3),16), g = parseInt(c.slice(3,5),16), b = parseInt(c.slice(5,7),16);
+    document.documentElement.style.setProperty('--primary', c);
+    document.documentElement.style.setProperty('--primary-esc',
+      '#' + [r,g,b].map(function(x){ return Math.round(x*0.7).toString(16).padStart(2,'0'); }).join(''));
+    document.documentElement.style.setProperty('--primary-claro', 'rgba(' + r + ',' + g + ',' + b + ',.12)');
+  }
+
+  /* Defensivo: quantidade salva de item que saiu da lista é descartada, e
+     valor estragado no storage não pode derrubar a tela inteira. */
+  function carregar(){
+    var bruto;
+    try { bruto = JSON.parse(localStorage.getItem(K_QTD) || '{}'); } catch (e) { bruto = {}; }
+    if (!bruto || typeof bruto !== 'object') bruto = {};
+    CONFIG.itens.forEach(function(item){
+      var k = chave(item);
+      var v = Number(bruto[k]);
+      qtds[k] = (isFinite(v) && v >= 0) ? Math.floor(v) : 0;
+    });
+    var quando = '';
+    try { quando = localStorage.getItem(K_DATA) || ''; } catch (e) {}
+    if (quando) {
+      el('aviso-salvo').textContent = 'Última contagem salva neste aparelho em ' + quando + '.';
+      el('aviso-salvo').hidden = false;
+    }
+  }
+  function salvar(){
+    try {
+      localStorage.setItem(K_QTD, JSON.stringify(qtds));
+      localStorage.setItem(K_DATA, new Date().toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' }));
+    } catch (e) { /* modo privado: segue funcionando na sessão */ }
+  }
+
+  function estado(item){
+    var q = qtds[chave(item)] || 0;
+    var min = Number(item.minimo) || 0;
+    if (q <= 0) return 'baixo';
+    if (min > 0 && q <= min) return 'perto';
+    return 'ok';
+  }
+
+  function categorias(){
+    var vistas = [];
+    CONFIG.itens.forEach(function(i){
+      var c = i.categoria || 'Geral';
+      if (vistas.indexOf(c) === -1) vistas.push(c);
+    });
+    return vistas;
+  }
+
+  function montar(){
+    el('grupos').innerHTML = categorias().map(function(cat){
+      var itens = CONFIG.itens.filter(function(i){ return (i.categoria || 'Geral') === cat; });
+      return '<section class="grupo" data-cat="' + escapeHtml(cat) + '">' +
+        '<h2>' + escapeHtml(cat) + '</h2>' +
+        '<div class="lista">' + itens.map(function(item){
+          var k = chave(item);
+          return '<article class="item" data-k="' + k + '" data-nome="' + escapeHtml(item.nome) + '">' +
+            '<div class="item-txt">' +
+              '<b>' + escapeHtml(item.nome) + '</b>' +
+              '<small>mínimo ' + (Number(item.minimo) || 0) + ' ' + escapeHtml(item.unidade || 'un') + '</small>' +
+              '<span class="selo" data-selo="' + k + '" hidden></span>' +
+            '</div>' +
+            '<div class="contador">' +
+              '<button type="button" class="cbtn" data-menos="' + k + '" aria-label="Tirar um de ' + escapeHtml(item.nome) + '">−</button>' +
+              '<span class="qtd" data-qtd="' + k + '">0<small>' + escapeHtml(item.unidade || 'un') + '</small></span>' +
+              '<button type="button" class="cbtn" data-mais="' + k + '" aria-label="Somar um de ' + escapeHtml(item.nome) + '">+</button>' +
+            '</div>' +
+          '</article>';
+        }).join('') + '</div>' +
+      '</section>';
+    }).join('');
+  }
+
+  function faltando(){
+    return CONFIG.itens.filter(function(i){ return estado(i) !== 'ok'; });
+  }
+
+  function pintar(){
+    var termo = normalizar(el('busca').value.trim());
+    var contas = { baixo:0, perto:0, ok:0 };
+    var algumVisivel = false;
+
+    CONFIG.itens.forEach(function(item){
+      var k = chave(item);
+      var st = estado(item);
+      contas[st]++;
+      var elItem = document.querySelector('.item[data-k="' + k + '"]');
+      if (!elItem) return;
+
+      elItem.classList.toggle('baixo', st === 'baixo');
+      elItem.classList.toggle('perto', st === 'perto');
+
+      var selo = document.querySelector('[data-selo="' + k + '"]');
+      if (st === 'baixo') { selo.textContent = 'Acabou'; selo.className = 'selo baixo'; selo.hidden = false; }
+      else if (st === 'perto') { selo.textContent = 'Está acabando'; selo.className = 'selo perto'; selo.hidden = false; }
+      else { selo.hidden = true; }
+
+      var span = document.querySelector('[data-qtd="' + k + '"]');
+      span.firstChild.nodeValue = String(qtds[k] || 0);
+
+      var casaBusca = !termo || normalizar(item.nome).indexOf(termo) !== -1;
+      var casaFiltro = !filtroFalta || st !== 'ok';
+      var mostra = casaBusca && casaFiltro;
+      elItem.hidden = !mostra;
+      if (mostra) algumVisivel = true;
+    });
+
+    document.querySelectorAll('.grupo').forEach(function(g){
+      var visiveis = Array.prototype.filter.call(g.querySelectorAll('.item'), function(i){ return !i.hidden; }).length;
+      g.hidden = visiveis === 0;
+    });
+
+    el('vazio').hidden = algumVisivel;
+    el('n-acabou').textContent = contas.baixo;
+    el('n-pouco').textContent = contas.perto;
+    el('n-ok').textContent = contas.ok;
+
+    var falta = faltando().length;
+    el('mandar').disabled = falta === 0 || !CONFIG.bizWpp;
+    el('rodape-txt').textContent = falta === 0
+      ? 'Nada faltando por enquanto.'
+      : falta + (falta === 1 ? ' item precisa repor' : ' itens precisam repor');
+    if (!CONFIG.bizWpp && falta > 0) el('rodape-txt').textContent += ' · sem WhatsApp configurado';
+    el('aria-msg').textContent = contas.baixo + ' acabaram, ' + contas.perto + ' acabando, ' + contas.ok + ' com estoque.';
+  }
+
+  function ajustar(k, delta){
+    qtds[k] = Math.max(0, Math.min((qtds[k] || 0) + delta, 9999));
+    salvar();
+    pintar();
+  }
+
+  function mensagemCompras(){
+    var L = [];
+    L.push('*Lista de compras — ' + CONFIG.bizName + '*');
+    L.push('Contagem de ' + new Date().toLocaleDateString('pt-BR'));
+    L.push('');
+    var acabou = CONFIG.itens.filter(function(i){ return estado(i) === 'baixo'; });
+    var perto = CONFIG.itens.filter(function(i){ return estado(i) === 'perto'; });
+    if (acabou.length) {
+      L.push('*Acabou:*');
+      acabou.forEach(function(i){ L.push('- ' + i.nome + ' (mínimo ' + (i.minimo || 0) + ' ' + (i.unidade || 'un') + ')'); });
+      L.push('');
+    }
+    if (perto.length) {
+      L.push('*Está acabando:*');
+      perto.forEach(function(i){
+        L.push('- ' + i.nome + ': tem ' + (qtds[chave(i)] || 0) + ', mínimo ' + (i.minimo || 0) + ' ' + (i.unidade || 'un'));
+      });
+    }
+    return L.join('\n');
+  }
+
+  function ligarEventos(){
+    document.addEventListener('click', function(ev){
+      var t = ev.target.closest('[data-mais],[data-menos]');
+      if (!t) return;
+      if (t.dataset.mais !== undefined) ajustar(t.dataset.mais, 1);
+      else ajustar(t.dataset.menos, -1);
+    });
+
+    el('busca').addEventListener('input', pintar);
+
+    el('f-tudo').addEventListener('click', function(){
+      filtroFalta = false;
+      el('f-tudo').setAttribute('aria-pressed', 'true');
+      el('f-falta').setAttribute('aria-pressed', 'false');
+      pintar();
+    });
+    el('f-falta').addEventListener('click', function(){
+      filtroFalta = true;
+      el('f-falta').setAttribute('aria-pressed', 'true');
+      el('f-tudo').setAttribute('aria-pressed', 'false');
+      pintar();
+    });
+
+    /* zerar é destrutivo: dois toques, mesmo padrão já usado no carrinho
+       do cardápio depois de um toque acidental apagar um pedido inteiro */
+    var armado = false, timer = null;
+    el('zerar').addEventListener('click', function(){
+      var b = el('zerar');
+      if (!armado) {
+        armado = true;
+        b.textContent = 'Tocar de novo para zerar';
+        timer = setTimeout(function(){ armado = false; b.textContent = 'Recomeçar contagem'; }, 4000);
+        return;
+      }
+      clearTimeout(timer);
+      armado = false;
+      b.textContent = 'Recomeçar contagem';
+      Object.keys(qtds).forEach(function(k){ qtds[k] = 0; });
+      salvar();
+      pintar();
+    });
+
+    el('mandar').addEventListener('click', function(){
+      var url = 'https://wa.me/' + CONFIG.bizWpp + '?text=' + encodeURIComponent(mensagemCompras());
+      var janela = window.open(url, '_blank', 'noopener');
+      if (!janela) location.href = url;
+    });
+  }
+
+  document.title = CONFIG.bizName + ' — Estoque';
+  el('logo').textContent = (CONFIG.bizName || 'N').trim().charAt(0).toUpperCase();
+  el('biz-nome').textContent = CONFIG.bizName;
+  el('rodape-nome').textContent = CONFIG.bizName;
+  aplicarTema();
+  montar();
+  carregar();
+  ligarEventos();
+  pintar();
+})();
+</script>
+</body>
+</html>

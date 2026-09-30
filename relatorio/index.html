@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Relatório do mês</title>
+<meta name="description" content="O que foi feito no mês e os números que saíram disso.">
+<meta name="theme-color" content="#FBF8F4">
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+  [hidden]{display:none!important}
+
+  :root{
+    color-scheme: light;
+    --primary:#84411F; --primary-esc:#5E2E15; --primary-claro:rgba(132,65,31,.12);
+    --bg:#FBF8F4; --card:#FFFFFF; --ink:#241A14; --ink2:#5B4A40; --muted:#8A7A6E;
+    --linha:#E9DFD4; --sobe:#1F6B45; --sobe-bg:#E4F2EA; --desce:#B3261E; --desce-bg:#FBE9E7;
+    --grade:#EDE4D9; --raio:16px; --sombra:0 8px 26px rgba(36,26,20,.07);
+  }
+  *{box-sizing:border-box}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  h1,h2,h3{font-family:Fraunces,Georgia,serif;font-weight:600;margin:0;line-height:1.14;text-wrap:balance}
+  p{margin:0}
+  a{color:var(--primary)}
+  :focus-visible{outline:3px solid var(--primary);outline-offset:3px;border-radius:6px}
+  .wrap{max-width:820px;margin:0 auto;padding:0 20px}
+
+  .capa{padding:40px 0 26px}
+  .marca{display:flex;align-items:center;gap:11px;margin-bottom:22px}
+  .logo{width:40px;height:40px;border-radius:11px;background:var(--primary);color:#fff;display:grid;place-items:center;font-family:Fraunces,serif;font-weight:700;flex:none}
+  .marca b{font-family:Fraunces,serif;font-size:1rem}
+  .marca small{display:block;color:var(--muted);font-size:.78rem;font-weight:400}
+  .kicker{font-size:.74rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--primary)}
+  .capa h1{font-size:clamp(1.9rem,6vw,2.9rem);font-weight:700;margin-top:10px}
+  .capa .lead{color:var(--ink2);margin-top:12px;max-width:56ch}
+
+  section{padding:26px 0}
+  .tit{margin-bottom:16px}
+  .tit h2{font-size:clamp(1.3rem,3.6vw,1.75rem)}
+  .tit p{color:var(--muted);font-size:.9rem;margin-top:5px}
+
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
+  .kpi{background:var(--card);border:1px solid var(--linha);border-radius:var(--raio);padding:18px;box-shadow:var(--sombra)}
+  .kpi .n{font-family:Fraunces,serif;font-weight:700;font-size:1.9rem;font-variant-numeric:tabular-nums;line-height:1.1}
+  .kpi .r{font-size:.82rem;color:var(--ink2);margin-top:5px}
+  .kpi .d{display:inline-flex;align-items:center;gap:4px;font-size:.76rem;font-weight:700;padding:2px 9px;border-radius:999px;margin-top:9px}
+  .kpi .d.sobe{background:var(--sobe-bg);color:var(--sobe)}
+  .kpi .d.desce{background:var(--desce-bg);color:var(--desce)}
+  .kpi .d.igual{background:var(--primary-claro);color:var(--primary-esc)}
+
+  .grafico{background:var(--card);border:1px solid var(--linha);border-radius:var(--raio);padding:20px;box-shadow:var(--sombra)}
+  .grafico h3{font-size:1rem;font-family:Inter,sans-serif;font-weight:700}
+  .grafico .sub{font-size:.82rem;color:var(--muted);margin-top:3px;margin-bottom:14px}
+  svg{display:block;width:100%;height:auto}
+  .eixo{font-family:Inter,sans-serif;font-size:11px;fill:var(--muted)}
+  .rotulo{font-family:Fraunces,serif;font-size:13px;font-weight:700;fill:var(--primary-esc)}
+
+  .feito{display:grid;gap:9px}
+  .feito div{background:var(--card);border:1px solid var(--linha);border-radius:12px;padding:13px 16px;display:grid;grid-template-columns:24px 1fr;gap:11px;align-items:start;font-size:.93rem}
+  .feito .marca-ok{width:22px;height:22px;border-radius:50%;background:var(--sobe-bg);color:var(--sobe);display:grid;place-items:center;font-size:.78rem;font-weight:700}
+
+  .nota{border-left:4px solid var(--primary);background:var(--primary-claro);padding:14px 18px;border-radius:0 12px 12px 0;font-size:.92rem;color:var(--ink2)}
+  .nota b{color:var(--ink)}
+
+  .proximos{display:grid;gap:9px;counter-reset:n}
+  .proximos div{background:var(--card);border:1px solid var(--linha);border-radius:12px;padding:13px 16px 13px 46px;position:relative;counter-increment:n;font-size:.93rem}
+  .proximos div::before{content:counter(n);position:absolute;left:14px;top:12px;width:22px;height:22px;border-radius:50%;background:var(--primary);color:#fff;display:grid;place-items:center;font-size:.74rem;font-weight:700}
+
+  footer{padding:26px 0 44px;border-top:1px solid var(--linha);margin-top:26px;color:var(--muted);font-size:.84rem;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  footer a{color:var(--muted)}
+
+  @media print{
+    body{background:#fff}
+    .capa{padding-top:0}
+    section{padding:16px 0}
+    .kpi,.grafico,.feito div,.proximos div{box-shadow:none}
+  }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header class="capa">
+    <div class="marca">
+      <div class="logo" id="logo">S</div>
+      <div><b>SyncTech Automation</b><small>Automação para negócios locais · Mariana/MG</small></div>
+    </div>
+    <p class="kicker" id="periodo">Relatório</p>
+    <h1 id="titulo">Relatório do mês</h1>
+    <p class="lead" id="lead"></p>
+  </header>
+
+  <section id="sec-kpis" hidden>
+    <div class="tit"><h2>Os números</h2><p id="kpi-sub"></p></div>
+    <div class="kpis" id="kpis"></div>
+  </section>
+
+  <section id="sec-grafico" hidden>
+    <div class="grafico">
+      <h3>Seguidores no Instagram</h3>
+      <p class="sub" id="graf-sub"></p>
+      <div id="graf"></div>
+    </div>
+  </section>
+
+  <section id="sec-feito" hidden>
+    <div class="tit"><h2>O que foi feito</h2><p>Entregas concluídas no período.</p></div>
+    <div class="feito" id="feito"></div>
+  </section>
+
+  <section id="sec-nota" hidden>
+    <div class="nota" id="nota"></div>
+  </section>
+
+  <section id="sec-proximos" hidden>
+    <div class="tit"><h2>Próximos passos</h2><p>O que entra no mês que vem.</p></div>
+    <div class="proximos" id="proximos"></div>
+  </section>
+
+  <footer>
+    <span id="rodape">SyncTech Automation · Rafael Santos</span>
+    <span id="coleta"></span>
+  </footer>
+</main>
+
+<script>
+(function(){
+  'use strict';
+
+  /* CONFIG entregue pelo Hub em #config=BASE64.
+     IMPORTANTE: nenhum número aqui é coletado sozinho. O relatório mostra
+     exatamente o que foi medido e informado — métrica não preenchida
+     simplesmente não aparece, em vez de virar zero ou estimativa. */
+  var CONFIG = {
+    cliente: 'Cliente',
+    periodo: '',
+    corPrimaria: '#84411F',
+    resumo: '',
+    coletadoEm: '',
+    /* kpi: { rotulo, valor, antes, sufixo, prefixo, melhorQuandoSobe } */
+    kpis: [],
+    /* serie de seguidores: [{ date:'DD/MM', followers:Number }] */
+    seguidores: [],
+    feito: [],
+    proximos: [],
+    nota: ''
+  };
+
+  (function(){
+    try {
+      var hash = window.location.hash;
+      if (hash.indexOf('#config=') !== 0) return;
+      var dec = JSON.parse(decodeURIComponent(escape(atob(hash.slice(8)))));
+      ['cliente','periodo','corPrimaria','resumo','coletadoEm','nota'].forEach(function(k){
+        if (dec[k] !== undefined && dec[k] !== null && dec[k] !== '') CONFIG[k] = dec[k];
+      });
+      ['kpis','seguidores','feito','proximos'].forEach(function(k){
+        if (Array.isArray(dec[k]) && dec[k].length) CONFIG[k] = dec[k];
+      });
+    } catch (err) {
+      console.error('Config inválida na URL, usando os valores padrão:', err);
+    }
+  })();
+
+  var el = function(id){ return document.getElementById(id); };
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c];
+    });
+  }
+  function numBR(v){
+    return Number(v).toLocaleString('pt-BR', { maximumFractionDigits: 2 });
+  }
+
+  function aplicarTema(){
+    var c = CONFIG.corPrimaria;
+    if (!/^#[0-9a-fA-F]{6}$/.test(c)) return;
+    var r = parseInt(c.slice(1,3),16), g = parseInt(c.slice(3,5),16), b = parseInt(c.slice(5,7),16);
+    document.documentElement.style.setProperty('--primary', c);
+    document.documentElement.style.setProperty('--primary-esc',
+      '#' + [r,g,b].map(function(x){ return Math.round(x*0.7).toString(16).padStart(2,'0'); }).join(''));
+    document.documentElement.style.setProperty('--primary-claro', 'rgba(' + r + ',' + g + ',' + b + ',.12)');
+  }
+
+  function montarKpis(){
+    if (!CONFIG.kpis.length) return;
+    el('sec-kpis').hidden = false;
+    el('kpi-sub').textContent = CONFIG.coletadoEm
+      ? 'Coletados em ' + CONFIG.coletadoEm + '.'
+      : 'Medidos no período.';
+    el('kpis').innerHTML = CONFIG.kpis.map(function(k){
+      var html = '<div class="kpi">';
+      /* o formulario do Hub corta espaco das bordas de cada campo, entao
+         um sufixo como " de 10" chegaria grudado no numero ("4de 10") */
+      var sufixo = String(k.sufixo || '');
+      if (sufixo && !/^[\s.,%\/]/.test(sufixo)) sufixo = ' ' + sufixo;
+      html += '<div class="n">' + escapeHtml(k.prefixo || '') + numBR(k.valor) + escapeHtml(sufixo) + '</div>';
+      html += '<div class="r">' + escapeHtml(k.rotulo) + '</div>';
+      /* variação só aparece quando existe um "antes" de verdade: sem base
+         de comparação, um percentual seria invenção */
+      if (k.antes !== undefined && k.antes !== null && k.antes !== '' && Number(k.antes) !== 0) {
+        var antes = Number(k.antes), agora = Number(k.valor);
+        var dif = agora - antes;
+        var pct = Math.round((dif / Math.abs(antes)) * 100);
+        var sobeEhBom = k.melhorQuandoSobe !== false;
+        var classe = dif === 0 ? 'igual' : ((dif > 0) === sobeEhBom ? 'sobe' : 'desce');
+        var seta = dif === 0 ? '=' : (dif > 0 ? '▲' : '▼');
+        html += '<div class="d ' + classe + '">' + seta + ' ' +
+          (dif === 0 ? 'sem mudança' : (pct > 0 ? '+' : '') + pct + '% · era ' + numBR(antes)) + '</div>';
+      }
+      html += '</div>';
+      return html;
+    }).join('');
+  }
+
+  /* Gráfico de uma série só: sem legenda (o título já nomeia), grade
+     discreta, ponto final destacado e rótulo direto no primeiro e no
+     último valor em vez de número em cima de cada ponto. */
+  function montarGrafico(){
+    var s = CONFIG.seguidores;
+    if (s.length < 2) return;
+    el('sec-grafico').hidden = false;
+    el('graf-sub').textContent = s[0].date + ' a ' + s[s.length - 1].date +
+      ' · de ' + numBR(s[0].followers) + ' para ' + numBR(s[s.length - 1].followers);
+
+    var L = 46, R = 16, T = 16, B = 30, W = 700, H = 240;
+    var vals = s.map(function(p){ return Number(p.followers); });
+    var min = Math.min.apply(null, vals), max = Math.max.apply(null, vals);
+    /* folga de 8% pra linha não encostar na borda; se todos os valores
+       forem iguais, abre uma faixa artificial pra não dividir por zero */
+    var faixa = (max - min) || Math.max(1, Math.round(max * 0.05));
+    var lo = min - faixa * 0.25, hi = max + faixa * 0.25;
+    var x = function(i){ return L + (i / (s.length - 1)) * (W - L - R); };
+    var y = function(v){ return T + (1 - (v - lo) / (hi - lo)) * (H - T - B); };
+
+    var linha = s.map(function(p, i){ return (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(vals[i]).toFixed(1); }).join(' ');
+    var area = linha + ' L' + x(s.length - 1).toFixed(1) + ' ' + (H - B) + ' L' + x(0).toFixed(1) + ' ' + (H - B) + ' Z';
+
+    var grades = [lo + (hi - lo) * 0.15, lo + (hi - lo) * 0.5, lo + (hi - lo) * 0.85];
+    var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Evolução de seguidores de ' +
+      numBR(vals[0]) + ' em ' + s[0].date + ' para ' + numBR(vals[vals.length-1]) + ' em ' + s[s.length-1].date + '">';
+
+    grades.forEach(function(g){
+      svg += '<line x1="' + L + '" y1="' + y(g).toFixed(1) + '" x2="' + (W - R) + '" y2="' + y(g).toFixed(1) +
+        '" stroke="var(--grade)" stroke-width="1"/>';
+      svg += '<text class="eixo" x="' + (L - 8) + '" y="' + (y(g) + 4).toFixed(1) + '" text-anchor="end">' + Math.round(g) + '</text>';
+    });
+
+    svg += '<path d="' + area + '" fill="var(--primary)" opacity="0.10"/>';
+    svg += '<path d="' + linha + '" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>';
+
+    s.forEach(function(p, i){
+      var ultimo = i === s.length - 1;
+      svg += '<circle cx="' + x(i).toFixed(1) + '" cy="' + y(vals[i]).toFixed(1) + '" r="' + (ultimo ? 5.5 : 3.5) +
+        '" fill="' + (ultimo ? 'var(--primary)' : 'var(--card)') + '" stroke="var(--primary)" stroke-width="2"/>';
+    });
+
+    svg += '<text class="rotulo" x="' + x(0).toFixed(1) + '" y="' + (y(vals[0]) - 12).toFixed(1) + '" text-anchor="start">' + numBR(vals[0]) + '</text>';
+    svg += '<text class="rotulo" x="' + (W - R).toFixed(1) + '" y="' + (y(vals[vals.length-1]) - 14).toFixed(1) + '" text-anchor="end">' + numBR(vals[vals.length-1]) + '</text>';
+    svg += '<text class="eixo" x="' + x(0).toFixed(1) + '" y="' + (H - 8) + '" text-anchor="start">' + escapeHtml(s[0].date) + '</text>';
+    svg += '<text class="eixo" x="' + (W - R).toFixed(1) + '" y="' + (H - 8) + '" text-anchor="end">' + escapeHtml(s[s.length-1].date) + '</text>';
+    svg += '</svg>';
+    el('graf').innerHTML = svg;
+  }
+
+  function montarListas(){
+    if (CONFIG.feito.length) {
+      el('sec-feito').hidden = false;
+      el('feito').innerHTML = CONFIG.feito.map(function(t){
+        return '<div><span class="marca-ok">✓</span><span>' + escapeHtml(t) + '</span></div>';
+      }).join('');
+    }
+    if (CONFIG.proximos.length) {
+      el('sec-proximos').hidden = false;
+      el('proximos').innerHTML = CONFIG.proximos.map(function(t){
+        return '<div>' + escapeHtml(t) + '</div>';
+      }).join('');
+    }
+    if (CONFIG.nota) {
+      el('sec-nota').hidden = false;
+      el('nota').innerHTML = escapeHtml(CONFIG.nota);
+    }
+  }
+
+  document.title = 'Relatório — ' + CONFIG.cliente;
+  el('logo').textContent = 'S';
+  el('periodo').textContent = CONFIG.periodo ? 'Relatório · ' + CONFIG.periodo : 'Relatório';
+  el('titulo').textContent = CONFIG.cliente;
+  el('lead').textContent = CONFIG.resumo || 'O que foi feito no período e os números que saíram disso.';
+  el('rodape').textContent = 'SyncTech Automation · Rafael Santos';
+  el('coleta').textContent = CONFIG.coletadoEm ? 'Dados coletados em ' + CONFIG.coletadoEm : '';
+
+  aplicarTema();
+  montarKpis();
+  montarGrafico();
+  montarListas();
+})();
+</script>
+</body>
+</html>

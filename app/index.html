@@ -788,6 +788,14 @@ function doGet(e) {
       </div>
 
       <div class="card">
+        <div class="form-group" id="ob-grp-existente" style="margin-bottom:18px" hidden>
+          <label class="form-label" for="ob-existente">Puxar dados de um cliente que j&aacute; existe</label>
+          <select class="form-input" id="ob-existente">
+            <option value="">Come&ccedil;ar do zero</option>
+          </select>
+          <div class="ob-hint" style="margin-top:6px">Preenche o que j&aacute; est&aacute; registrado no Hub. Voc&ecirc; ajusta o resto.</div>
+        </div>
+
         <div class="ob-step" data-n="1">
           <h3>O neg&oacute;cio</h3>
           <div class="ob-hint">S&oacute; nome e WhatsApp s&atilde;o obrigat&oacute;rios. O resto melhora o que for gerado.</div>
@@ -927,7 +935,49 @@ function doGet(e) {
           </div>
         </div>
 
-        <div class="ob-step" data-n="6">
+        <div class="ob-step ob-cond" data-n="6" id="ob-cond-estoque" hidden>
+          <h3>Itens do estoque</h3>
+          <div class="ob-hint">Um por linha: <b>item | unidade | m&iacute;nimo | categoria</b>. A quantidade do dia fica no aparelho de quem conta, n&atilde;o aqui.</div>
+          <div class="form-group">
+            <label class="form-label" for="ob-estoque">Lista de itens</label>
+            <textarea class="form-input" id="ob-estoque" rows="5" placeholder="Farinha de trigo | kg | 20 | Secos&#10;Leite | L | 12 | Geladeira&#10;Sacola de p&atilde;o | un | 200 | Embalagens"></textarea>
+          </div>
+        </div>
+
+        <div class="ob-step ob-cond" data-n="7" id="ob-cond-relatorio" hidden>
+          <h3>N&uacute;meros do relat&oacute;rio</h3>
+          <div class="ob-hint">Nada aqui &eacute; buscado sozinho. S&oacute; aparece no relat&oacute;rio o que voc&ecirc; medir e preencher.</div>
+          <div class="form-row2">
+            <div class="form-group">
+              <label class="form-label" for="ob-rel-periodo">Per&iacute;odo</label>
+              <input class="form-input" id="ob-rel-periodo" autocomplete="off" placeholder="Setembro de 2026">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="ob-rel-resumo">Resumo em uma frase</label>
+              <input class="form-input" id="ob-rel-resumo" autocomplete="off" placeholder="Terceiro m&ecirc;s de trabalho...">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="ob-rel-kpis">Indicadores</label>
+            <div class="ob-hint" style="margin-bottom:6px">Um por linha: <b>o que &eacute; | valor agora | valor antes | sufixo</b>. Sem o "antes", o relat&oacute;rio n&atilde;o mostra percentual, em vez de inventar um.</div>
+            <textarea class="form-input" id="ob-rel-kpis" rows="4" placeholder="Seguidores no Instagram | 566 | 424&#10;Pr&oacute;teses fechadas | 4 | 0 |  de 10"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="ob-rel-seguidores">Seguidores ao longo do tempo</label>
+            <div class="ob-hint" style="margin-bottom:6px">Um por linha: <b>data | n&uacute;mero</b>. Precisa de pelo menos dois pontos para virar gr&aacute;fico.</div>
+            <textarea class="form-input" id="ob-rel-seguidores" rows="4" placeholder="10/08 | 424&#10;03/09 | 502&#10;23/09 | 566"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="ob-rel-feito">O que foi feito</label>
+            <textarea class="form-input" id="ob-rel-feito" rows="4" placeholder="Site publicado&#10;Tr&aacute;fego pago ligado&#10;Roteiro de WhatsApp entregue"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="ob-rel-proximos">Pr&oacute;ximos passos</label>
+            <textarea class="form-input" id="ob-rel-proximos" rows="3" placeholder="Produzir 4 Reels&#10;Revisar o custo por conversa"></textarea>
+          </div>
+        </div>
+
+        <div class="ob-step" data-n="8">
           <h3>Hor&aacute;rio de funcionamento</h3>
           <div class="ob-hint">Uma linha por dia: <b>dia | hor&aacute;rio</b>. Escreva "fechado" quando n&atilde;o abrir.</div>
           <div class="form-group">
@@ -972,6 +1022,7 @@ let PAGES = [
 function obInit() {
   if (!document.getElementById('ob-svcs')) return;
   obRenderServicos();
+  obMontarSeletorExistente();
   document.getElementById('ob-modo').addEventListener('change', obAplicarPlano);
   document.getElementById('ob-plano').addEventListener('change', obAplicarPlano);
   obAplicarPlano();
@@ -1830,6 +1881,8 @@ let OB_SERVICOS = [
   { id:'reputacao',   nome:'Gestão de Reputação',      hint:'Avaliação no Google' },
   { id:'crm',         nome:'CRM com Pipeline',         hint:'Ferramenta interna sua' },
   { id:'dashboard',   nome:'Dashboard de Métricas',    hint:'Depende de planilha' },
+  { id:'estoque',     nome:'Controle de Estoque',      hint:'Conta e avisa o que falta' },
+  { id:'relatorio',   nome:'Relatório de Resultados',   hint:'Métricas do que foi feito' },
   { id:'notafiscal',  nome:'Nota Fiscal (NFC-e)',      hint:'Depende da contadora' },
 ];
 
@@ -1839,7 +1892,7 @@ let OB_SERVICOS = [
 let OB_PLANOS = {
   'Starter':  ['whatsbot','agendamento','bio'],
   'Negócio':  ['whatsbot','instagram','agendamento','crm','catalogo','dashboard','bio'],
-  'Pro':      ['whatsbot','instagram','agendamento','crm','catalogo','dashboard','bio','reputacao'],
+  'Pro':      ['whatsbot','instagram','agendamento','crm','catalogo','dashboard','bio','reputacao','relatorio'],
 };
 
 function obEl(id){ return document.getElementById(id); }
@@ -1907,6 +1960,131 @@ function obAtualizarCondicionais() {
   obEl('ob-cond-servicos').hidden = !(obLigado('agendamento') || obLigado('bio') || obLigado('site'));
   obEl('ob-cond-catalogo').hidden = !obLigado('catalogo');
   obEl('ob-cond-trafego').hidden  = !obLigado('trafego');
+  obEl('ob-cond-estoque').hidden  = !obLigado('estoque');
+  obEl('ob-cond-relatorio').hidden = !obLigado('relatorio');
+}
+
+/* "Puxar dados de um cliente que ja existe": le CLIENTS_FIXED (os dois
+   clientes reais, com metricas coletadas a mao) e os cadastrados no
+   localStorage. So preenche campo que esta vazio, pra nao apagar o que o
+   Rafael ja digitou. */
+function obFontesDeCliente() {
+  let fontes = [];
+  if (typeof CLIENTS_FIXED !== 'undefined') {
+    CLIENTS_FIXED.forEach(function(c, i){ fontes.push({ chave: 'fix:' + i, nome: c.name }); });
+  }
+  getStoredClients().forEach(function(c, i){
+    if (c.bizName) fontes.push({ chave: 'loc:' + i, nome: c.bizName + ' (cadastrado aqui)' });
+  });
+  return fontes;
+}
+
+function obMontarSeletorExistente() {
+  let sel = obEl('ob-existente');
+  if (!sel) return;
+  let fontes = obFontesDeCliente();
+  if (!fontes.length) return;
+  obEl('ob-grp-existente').hidden = false;
+  sel.innerHTML = '<option value="">Come\u00e7ar do zero</option>' + fontes.map(function(f){
+    return '<option value="' + f.chave + '">' + escapeHtml(f.nome) + '</option>';
+  }).join('');
+  sel.addEventListener('change', obPuxarCliente);
+}
+
+function obSeVazio(id, valor) {
+  let e = obEl(id);
+  if (e && !e.value.trim() && valor) e.value = valor;
+}
+
+function obPuxarCliente() {
+  let v = obVal('ob-existente');
+  if (!v) return;
+  let partes = v.split(':');
+  let indice = Number(partes[1]);
+
+  if (partes[0] === 'loc') {
+    let c = getStoredClients()[indice];
+    if (!c) return;
+    obSeVazio('ob-nome', c.bizName);
+    obSeVazio('ob-wpp', c.wpp || '');
+    obSeVazio('ob-tipo', c.tipoNegocio || '');
+    showToast('Dados de ' + c.bizName + ' carregados', 'success');
+    return;
+  }
+
+  let c = CLIENTS_FIXED[indice];
+  if (!c) return;
+  obSeVazio('ob-nome', c.name);
+
+  /* telefone e instagram sao extraidos dos links do cartao do cliente:
+     e o unico lugar onde esses dados existem estruturados hoje */
+  (c.links || []).forEach(function(l){
+    let m = /wa\.me\/(\d+)/.exec(l.url || '');
+    if (m) obSeVazio('ob-wpp', m[1]);
+    if (/instagram\.com\//.test(l.url || '')) {
+      let ig = l.url.split('instagram.com/')[1];
+      if (ig) obSeVazio('ob-ig', '@' + ig.replace(/\/$/, ''));
+    }
+  });
+
+  let st = c.stats;
+  if (st) {
+    obSeVazio('ob-rel-periodo', new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }));
+
+    let kpis = [];
+    /* o cartao guarda duas coletas diferentes: a mensal (st.followers) e a
+       diaria (st.history). A mensal costuma ser mais VELHA, entao usar ela
+       no indicador deixava o numero do topo em desacordo com o fim do
+       grafico (502 no cartao, 566 na linha). Vale sempre a mais recente. */
+    let seguidoresAgora = st.followers;
+    if (st.history && st.history.length) {
+      let ultimo = st.history[st.history.length - 1];
+      if (ultimo && ultimo.followers) seguidoresAgora = ultimo.followers;
+    }
+    if (seguidoresAgora) kpis.push('Seguidores no Instagram | ' + seguidoresAgora + (st.followersPrev ? ' | ' + st.followersPrev : ''));
+    if (st.likesTotal) kpis.push('Curtidas no per\u00edodo | ' + st.likesTotal);
+    if (st.commentsTotal) kpis.push('Coment\u00e1rios | ' + st.commentsTotal);
+    if (st.posts60d) kpis.push('Posts em 60 dias | ' + st.posts60d);
+    if (st.googleRating) kpis.push('Nota no Google | ' + st.googleRating);
+    if (st.googleReviews) kpis.push('Avalia\u00e7\u00f5es no Google | ' + st.googleReviews);
+    if (st.goal && st.goal.closed !== undefined) {
+      kpis.push((st.goal.label || 'Meta') + ' | ' + st.goal.closed + ' | 0 | de ' + (st.goal.target || ''));
+    }
+    obSeVazio('ob-rel-kpis', kpis.join('\n'));
+
+    let serie = [];
+    if (st.followersPrev && st.followersPrevDate) serie.push(st.followersPrevDate.slice(0,5) + ' | ' + st.followersPrev);
+    if (st.collectedAt && st.followers) serie.push(st.collectedAt.slice(0,5) + ' | ' + st.followers);
+    (st.history || []).forEach(function(h){ serie.push(h.date.slice(0,5) + ' | ' + h.followers); });
+    /* ordena e tira data repetida: a serie vem de duas coletas diferentes
+       (a mensal e a diaria) e elas podem se sobrepor */
+    let vistas = {};
+    serie = serie.filter(function(l){
+      let d = l.split('|')[0].trim();
+      if (vistas[d]) return false;
+      vistas[d] = 1;
+      return true;
+    });
+    obSeVazio('ob-rel-seguidores', serie.join('\n'));
+
+    if (st.servicesUsed && st.servicesUsed.active) {
+      obSeVazio('ob-rel-feito', st.servicesUsed.active.map(function(t){ return t.split('\u2014')[0].trim(); }).join('\n'));
+    }
+    if (st.actionPlan) {
+      let pendentes = st.actionPlan.filter(function(a){ return !a.done; }).slice(0, 5)
+        .map(function(a){ return a.text.length > 90 ? a.text.slice(0, 90) + '...' : a.text; });
+      obSeVazio('ob-rel-proximos', pendentes.join('\n'));
+    }
+  }
+
+  /* liga o relatorio, ja que os numeros acabaram de ser preenchidos */
+  let chk = obEl('ob-svc-relatorio');
+  if (chk && !chk.checked) {
+    chk.checked = true;
+    chk.closest('.ob-chk').classList.add('on');
+    obAtualizarCondicionais();
+  }
+  showToast('Dados de ' + c.name + ' carregados', 'success');
 }
 
 function obPreencherHorarioPadrao() {
@@ -1986,6 +2164,19 @@ function obMontarConfig() {
     verba: obNum('ob-verba'),
     diferencial: obVal('ob-diferencial'),
     objecao: obVal('ob-objecao'),
+    estoque: obLinhas(obVal('ob-estoque')).map(function(c){
+      return { nome: c[0], unidade: c[1] || 'un', minimo: obPreco(c[2]) || 0, categoria: c[3] || 'Geral' };
+    }).filter(function(x){ return x.nome; }),
+    relPeriodo: obVal('ob-rel-periodo'),
+    relResumo: obVal('ob-rel-resumo'),
+    relKpis: obLinhas(obVal('ob-rel-kpis')).map(function(c){
+      return { rotulo: c[0], valor: obPreco(c[1]), antes: c[2] ? obPreco(c[2]) : '', sufixo: c[3] || '' };
+    }).filter(function(x){ return x.rotulo; }),
+    relSeguidores: obLinhas(obVal('ob-rel-seguidores')).map(function(c){
+      return { date: c[0], followers: obPreco(c[1]) };
+    }).filter(function(x){ return x.date && x.followers; }),
+    relFeito: obVal('ob-rel-feito').split('\n').map(function(l){ return l.trim(); }).filter(Boolean),
+    relProximos: obVal('ob-rel-proximos').split('\n').map(function(l){ return l.trim(); }).filter(Boolean),
   };
 }
 
@@ -2025,6 +2216,22 @@ function obLinks(o) {
       pixChave: o.pix, pixNome: o.nome, pixCidade: (o.cidade || '').split('/')[0],
       entrega: o.entrega, sobre: o.sobre, endereco: o.endereco,
       categories: o.categorias, products: o.produtos, hours: o.horarios,
+    });
+  }
+  if (o.ligados.indexOf('estoque') !== -1 && o.estoque.length) {
+    out.estoque = OB_BASE + '/estoque/#config=' + obCodificar({
+      bizName: o.nome, bizWpp: nomeWpp, corPrimaria: o.cor, itens: o.estoque,
+    });
+  }
+  if (o.ligados.indexOf('relatorio') !== -1 && (o.relKpis.length || o.relSeguidores.length)) {
+    out.relatorio = OB_BASE + '/relatorio/#config=' + obCodificar({
+      cliente: o.nome, periodo: o.relPeriodo, corPrimaria: o.cor,
+      resumo: o.relResumo, coletadoEm: new Date().toLocaleDateString('pt-BR'),
+      kpis: o.relKpis, seguidores: o.relSeguidores,
+      feito: o.relFeito, proximos: o.relProximos,
+      /* nota fixa: o relatorio nunca busca numero sozinho, e o cliente
+         precisa saber disso pra nao achar que e leitura ao vivo */
+      nota: 'Os n\u00fameros deste relat\u00f3rio foram coletados manualmente nas datas indicadas. N\u00e3o \u00e9 leitura autom\u00e1tica das redes sociais: cada valor \u00e9 uma foto do momento em que foi medido.',
     });
   }
   if (o.ligados.indexOf('site') !== -1) {
@@ -2219,6 +2426,12 @@ function obPendencias(o) {
   if (o.ligados.indexOf('trafego') !== -1 && (!o.ticket || !o.margem)) {
     itens.push('<b>Ticket médio e margem reais</b>. Sem eles não existe teto de custo por cliente e a campanha vira aposta.');
   }
+  if (o.ligados.indexOf('estoque') !== -1 && !o.estoque.length) {
+    itens.push('<b>Lista de itens do estoque</b> com unidade e quantidade m\u00ednima. Sem ela o aplicativo abre vazio.');
+  }
+  if (o.ligados.indexOf('relatorio') !== -1 && !o.relKpis.length && !o.relSeguidores.length) {
+    itens.push('<b>N\u00fameros do per\u00edodo</b> para o relat\u00f3rio. Nada aqui \u00e9 coletado sozinho: os valores precisam ser medidos e informados.');
+  }
   if (!o.horarios.length) {
     itens.push('<b>Horário de funcionamento</b>, para aparecer no site e no catálogo.');
   }
@@ -2291,7 +2504,7 @@ function obGerar() {
   OB_GERADO = {};
   let cards = [];
 
-  let rotulos = { agendamento:'Agendamento Online', bio:'Link na Bio', catalogo:'Catálogo / Aplicativo', site:'Site do cliente' };
+  let rotulos = { agendamento:'Agendamento Online', bio:'Link na Bio', catalogo:'Catálogo / Aplicativo', site:'Site do cliente', estoque:'Controle de Estoque', relatorio:'Relatório de Resultados' };
   Object.keys(links).forEach(function(k){
     OB_GERADO[k] = links[k];
     cards.push('<div class="ob-card"><h4>' + rotulos[k] + '</h4>' +
@@ -2351,6 +2564,8 @@ function obSalvar(o, links) {
     bioLink: links.bio || '',
     catalogoLink: links.catalogo || '',
     siteLink: links.site || '',
+    estoqueLink: links.estoque || '',
+    relatorioLink: links.relatorio || '',
     wpp: o.wpp,
     createdAt: new Date().toISOString(),
   };
