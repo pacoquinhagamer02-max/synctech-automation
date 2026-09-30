@@ -381,7 +381,7 @@ details[open] summary { margin-bottom: 4px; }
   .bn-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: var(--faint); cursor: pointer; transition: color 0.15s; border: none; background: none; font-family: 'Manrope', sans-serif; height: 100%; }
   .bn-item.active { color: var(--pl); }
   .bn-item svg { width: 20px; height: 20px; }
-  .bn-item span { font-family: var(--font-head), sans-serif; font-size: 0.62rem; font-weight: 600; letter-spacing: 0.03em; text-transform: uppercase; }
+  .bn-item span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font-head), sans-serif; font-size: 0.62rem; font-weight: 600; letter-spacing: 0.03em; text-transform: uppercase; }
   .bn-item.active svg { filter: drop-shadow(0 0 6px rgba(168,85,247,0.8)); }
   .kpi-grid { grid-template-columns: 1fr 1fr; }
   .svc-grid2 { grid-template-columns: 1fr; }
@@ -965,7 +965,7 @@ let PAGES = [
   { id:'clientes', label:'Fixos',     icon:'<circle cx="9" cy="6" r="3"/><path d="M3 16c0-3.3 2.7-6 6-6s6 2.7 6 6"/>' },
   { id:'avulsos', label:'Avulsos',    icon:'<circle cx="9" cy="9" r="7"/><path d="M9 5v8M11.3 7.2c0-1.1-1-2-2.3-2s-2.3.7-2.3 1.7c0 2.3 4.6.9 4.6 3.2 0 1-1 1.7-2.3 1.7s-2.3-.9-2.3-2"/>' },
   { id:'relatorio', label:'Relatório', icon:'<path d="M4 2h7l3 3v11H4V2Z"/><path d="M11 2v3h3"/><path d="M6.5 10.5v3M9 8.5v5M11.5 11.5v2"/>' },
-  { id:'onboarding', label:'Cadastrar', icon:'<circle cx="9" cy="9" r="7.5"/><path d="M9 5.5v7M5.5 9h7"/>' },
+  { id:'onboarding', label:'Cadastrar', short:'Novo', icon:'<circle cx="9" cy="9" r="7.5"/><path d="M9 5.5v7M5.5 9h7"/>' },
   { id:'config',   label:'Config',    icon:'<circle cx="9" cy="9" r="2.5"/><path d="M9 1v2.4M9 14.6V17M17 9h-2.4M3.4 9H1M14.7 3.3l-1.7 1.7M4.9 12.9L3.3 14.7M14.7 14.7l-1.7-1.7M4.9 5.1L3.3 3.3"/>' },
 ];
 
@@ -986,7 +986,7 @@ function renderNav() {
   document.getElementById('bottom-nav').innerHTML = PAGES.map(function(p, i) {
     return '<button type="button" class="bn-item'+(i===0?' active':'')+'" data-page="'+p.id+'" aria-current="'+(i===0?'page':'false')+'" onclick="goPage(\''+p.id+'\')">' +
       '<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+p.icon+'</svg>' +
-      '<span>'+p.label+'</span></button>';
+      '<span>'+(p.short||p.label)+'</span></button>';
   }).join('');
 }
 
