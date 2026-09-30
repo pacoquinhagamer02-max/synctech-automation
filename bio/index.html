@@ -321,7 +321,7 @@ function render() {
       '</div>' +
       '<div class="svc-right">' +
         '<div class="svc-price">R$' + (s.price||0) + '</div>' +
-        '<div class="svc-dur">⏱ ' + (s.durationStr||s.duration+' min') + '</div>' +
+        (s.durationStr || s.duration ? '<div class="svc-dur">⏱ ' + (s.durationStr || (s.duration + ' min')) + '</div>' : '') +
       '</div>' +
     '</a>';
   }).join('');

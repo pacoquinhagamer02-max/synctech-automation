@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Site</title>
+<meta name="description" content="Conheça o negócio, veja os serviços e fale direto no WhatsApp.">
+<meta name="theme-color" content="#FBF8F4">
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+  [hidden]{display:none!important}
+
+  :root{
+    color-scheme: light;
+    --primary:#84411F; --primary-esc:#5E2E15; --primary-claro:rgba(132,65,31,.12);
+    --bg:#FBF8F4; --card:#FFFFFF; --ink:#241A14; --ink2:#5B4A40; --muted:#8A7A6E;
+    --linha:#E9DFD4; --whats:#1F9D55; --raio:16px;
+    --sombra:0 10px 30px rgba(36,26,20,.08);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+  h1,h2,h3{font-family:Fraunces,Georgia,serif;font-weight:600;margin:0;line-height:1.14;text-wrap:balance}
+  p{margin:0}
+  a{color:var(--primary)}
+  button{font:inherit;touch-action:manipulation}
+  :focus-visible{outline:3px solid var(--primary);outline-offset:3px;border-radius:6px}
+  .wrap{max-width:900px;margin:0 auto;padding:0 20px}
+  .pular{position:absolute;left:-9999px}.pular:focus{left:12px;top:12px;background:var(--card);padding:10px 16px;border-radius:8px;z-index:100}
+
+  header{position:sticky;top:0;z-index:30;background:var(--bg);border-bottom:1px solid var(--linha)}
+  .topo{display:flex;align-items:center;gap:12px;padding:13px 0;min-height:66px}
+  .logo{width:42px;height:42px;border-radius:12px;background:var(--primary);color:#fff;display:grid;place-items:center;font-family:Fraunces,serif;font-weight:700;flex:none}
+  .marca{font-family:Fraunces,serif;font-weight:700;font-size:1.04rem;line-height:1.2}
+  .marca small{display:block;font-family:Inter,sans-serif;font-weight:400;font-size:.78rem;color:var(--muted)}
+  .topo .cta{margin-left:auto}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--whats);color:#fff;border:0;border-radius:11px;padding:12px 20px;font-weight:700;text-decoration:none;min-height:46px;cursor:pointer}
+  .btn.ghost{background:transparent;color:var(--primary);border:1.5px solid var(--primary)}
+  .btn.sm{padding:9px 15px;min-height:40px;font-size:.9rem}
+
+  .hero{padding:52px 0 36px;text-align:center}
+  .hero h1{font-size:clamp(2rem,6.5vw,3.3rem);font-weight:700}
+  .hero .tag{display:inline-block;font-size:.76rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--primary);margin-bottom:12px}
+  .hero p{color:var(--ink2);font-size:1.08rem;max-width:56ch;margin:14px auto 0}
+  .hero .acoes{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:26px}
+  .estrelas{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:18px;font-size:.9rem;color:var(--ink2)}
+  .estrelas b{font-family:Fraunces,serif}
+
+  section{padding:36px 0}
+  .titulo{text-align:center;margin-bottom:26px}
+  .titulo h2{font-size:clamp(1.5rem,4.2vw,2.1rem)}
+  .titulo p{color:var(--muted);margin-top:8px}
+
+  .grade{display:grid;gap:14px}
+  @media(min-width:640px){.grade{grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}}
+  .card{background:var(--card);border:1px solid var(--linha);border-radius:var(--raio);padding:20px;box-shadow:var(--sombra)}
+  .card h3{font-size:1.05rem;font-family:Inter,sans-serif;font-weight:700}
+  .card p{color:var(--ink2);font-size:.93rem;margin-top:6px}
+  .card .valor{font-family:Fraunces,serif;font-weight:700;font-size:1.2rem;margin-top:10px;color:var(--primary);font-variant-numeric:tabular-nums}
+
+  .sobre{background:var(--card);border:1px solid var(--linha);border-radius:var(--raio);padding:28px;box-shadow:var(--sombra)}
+  .sobre p{color:var(--ink2);margin-top:10px;max-width:62ch}
+
+  .info{display:grid;gap:14px}
+  @media(min-width:640px){.info{grid-template-columns:1fr 1fr}}
+  .horarios div{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--linha);font-size:.93rem}
+  .horarios div:last-child{border-bottom:0}
+  .horarios .hoje{font-weight:700;color:var(--primary)}
+
+  .final{text-align:center;background:var(--primary-claro);border-radius:var(--raio);padding:36px 24px;margin-top:20px}
+  .final h2{font-size:clamp(1.4rem,4vw,2rem)}
+  .final p{color:var(--ink2);margin-top:10px;max-width:46ch;margin-inline:auto}
+
+  footer{padding:30px 0 40px;text-align:center;color:var(--muted);font-size:.86rem;border-top:1px solid var(--linha);margin-top:36px}
+  footer a{color:var(--muted)}
+
+  .flutua{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:40;box-shadow:0 8px 24px rgba(31,157,85,.4)}
+
+  .rev{opacity:0;transform:translateY(14px);transition:opacity .5s ease,transform .5s ease}
+  .rev.on{opacity:1;transform:none}
+  @media (prefers-reduced-motion:reduce){.rev{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<a class="pular" href="#conteudo">Pular para o conteúdo</a>
+
+<header>
+  <div class="wrap topo">
+    <div class="logo" id="logo">N</div>
+    <div class="marca"><span id="marca-nome">Negócio</span><small id="marca-sub"></small></div>
+    <a class="btn sm cta" id="cta-topo" href="#" target="_blank" rel="noopener">WhatsApp</a>
+  </div>
+</header>
+
+<main id="conteudo">
+  <section class="hero wrap">
+    <span class="tag" id="hero-tag" hidden></span>
+    <h1 id="hero-titulo">Negócio</h1>
+    <p id="hero-sub"></p>
+    <div class="estrelas" id="estrelas" hidden><span id="estrelas-txt"></span></div>
+    <div class="acoes">
+      <a class="btn" id="cta-hero" href="#" target="_blank" rel="noopener">Falar no WhatsApp</a>
+      <a class="btn ghost" id="cta-extra" href="#" target="_blank" rel="noopener" hidden>Ver cardápio</a>
+    </div>
+  </section>
+
+  <section class="wrap rev" id="sec-servicos" hidden>
+    <div class="titulo"><h2>O que oferecemos</h2></div>
+    <div class="grade" id="servicos"></div>
+  </section>
+
+  <section class="wrap rev" id="sec-sobre" hidden>
+    <div class="sobre">
+      <h2 id="sobre-titulo">Sobre</h2>
+      <p id="sobre-texto"></p>
+    </div>
+  </section>
+
+  <section class="wrap rev" id="sec-info" hidden>
+    <div class="titulo"><h2>Onde e quando</h2></div>
+    <div class="info">
+      <div class="card" id="card-horarios" hidden>
+        <h3>Horário de funcionamento</h3>
+        <div class="horarios" id="horarios" style="margin-top:10px"></div>
+      </div>
+      <div class="card" id="card-endereco" hidden>
+        <h3>Endereço</h3>
+        <p id="endereco-txt"></p>
+        <p style="margin-top:12px"><a id="maps-link" href="#" target="_blank" rel="noopener" hidden>Ver no mapa</a></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap rev">
+    <div class="final">
+      <h2 id="final-titulo">Fale com a gente agora</h2>
+      <p id="final-sub">Manda uma mensagem no WhatsApp e a gente responde.</p>
+      <div class="acoes" style="margin-top:22px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+        <a class="btn" id="cta-final" href="#" target="_blank" rel="noopener">Falar no WhatsApp</a>
+        <a class="btn ghost" id="cta-google" href="#" target="_blank" rel="noopener" hidden>Avaliar no Google</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="wrap">
+    <span id="rodape-nome"></span><br>
+    Site por <a href="https://pacoquinhagamer02-max.github.io/synctech-automation/" target="_blank" rel="noopener">SyncTech Automation</a>
+  </footer>
+</main>
+
+<a class="btn flutua" id="flutua" href="#" target="_blank" rel="noopener" aria-label="Falar no WhatsApp">WhatsApp</a>
+
+<script>
+(function(){
+  'use strict';
+
+  /* CONFIG — montado pelo Hub da SyncTech e entregue em #config=BASE64.
+     Mesmo mecanismo de /bio/, /agendamento/ e /catalogo/.
+     Campo vazio = seção escondida. */
+  var CONFIG = {
+    bizName: 'Negócio Exemplo',
+    bizTipo: '',
+    bizWpp: '5511999990000',
+    tagline: '',
+    heroSub: '',
+    mensagemWpp: '',
+    corPrimaria: '#84411F',
+    sobre: '',
+    endereco: '',
+    mapsUrl: '',
+    googleReviewUrl: '',
+    rating: null,
+    reviewCount: null,
+    catalogoUrl: '',
+    servicos: [],
+    hours: []
+  };
+
+  (function(){
+    try {
+      var hash = window.location.hash;
+      if (hash.indexOf('#config=') !== 0) return;
+      var dec = JSON.parse(decodeURIComponent(escape(atob(hash.slice(8)))));
+      ['bizName','bizTipo','bizWpp','tagline','heroSub','mensagemWpp','corPrimaria',
+       'sobre','endereco','mapsUrl','googleReviewUrl','rating','reviewCount','catalogoUrl'].forEach(function(k){
+        if (dec[k] !== undefined && dec[k] !== null && dec[k] !== '') CONFIG[k] = dec[k];
+      });
+      ['servicos','hours'].forEach(function(k){
+        if (Array.isArray(dec[k]) && dec[k].length) CONFIG[k] = dec[k];
+      });
+    } catch (err) {
+      console.error('Config inválida na URL, usando os valores padrão:', err);
+    }
+  })();
+
+  CONFIG.bizWpp = String(CONFIG.bizWpp).replace(/\D/g, '');
+
+  var el = function(id){ return document.getElementById(id); };
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c];
+    });
+  }
+  function brl(v){ return 'R$ ' + Number(v).toFixed(2).replace('.', ','); }
+
+  function aplicarTema(){
+    var c = CONFIG.corPrimaria;
+    if (!/^#[0-9a-fA-F]{6}$/.test(c)) return;
+    var r = parseInt(c.slice(1,3),16), g = parseInt(c.slice(3,5),16), b = parseInt(c.slice(5,7),16);
+    var esc = '#' + [r,g,b].map(function(x){ return Math.round(x*0.7).toString(16).padStart(2,'0'); }).join('');
+    document.documentElement.style.setProperty('--primary', c);
+    document.documentElement.style.setProperty('--primary-esc', esc);
+    document.documentElement.style.setProperty('--primary-claro', 'rgba(' + r + ',' + g + ',' + b + ',.12)');
+  }
+
+  function linkWhats(){
+    var msg = CONFIG.mensagemWpp || ('Olá! Vim pelo site da ' + CONFIG.bizName + ' e queria mais informações.');
+    return 'https://wa.me/' + CONFIG.bizWpp + '?text=' + encodeURIComponent(msg);
+  }
+
+  function montar(){
+    document.title = CONFIG.bizName + (CONFIG.bizTipo ? ' — ' + CONFIG.bizTipo : '');
+    el('logo').textContent = (CONFIG.bizName || 'N').trim().charAt(0).toUpperCase();
+    el('marca-nome').textContent = CONFIG.bizName;
+    el('marca-sub').textContent = CONFIG.bizTipo || '';
+    el('hero-titulo').textContent = CONFIG.tagline || CONFIG.bizName;
+    el('rodape-nome').textContent = CONFIG.bizName;
+
+    if (CONFIG.bizTipo) { el('hero-tag').textContent = CONFIG.bizTipo; el('hero-tag').hidden = false; }
+    el('hero-sub').textContent = CONFIG.heroSub || ('Fale com a ' + CONFIG.bizName + ' pelo WhatsApp e seja atendido rápido.');
+
+    var url = linkWhats();
+    ['cta-topo','cta-hero','cta-final','flutua'].forEach(function(id){ el(id).href = url; });
+
+    if (CONFIG.catalogoUrl) {
+      el('cta-extra').href = CONFIG.catalogoUrl;
+      el('cta-extra').hidden = false;
+    }
+    if (CONFIG.googleReviewUrl) {
+      el('cta-google').href = CONFIG.googleReviewUrl;
+      el('cta-google').hidden = false;
+    }
+
+    if (CONFIG.rating) {
+      /* mostra o número, não uma fileira de estrelas arredondada: 4,7 virando
+         cinco estrelas cheias infla a nota real do cliente */
+      var n = Number(CONFIG.rating);
+      el('estrelas-txt').innerHTML = '★ <b>' + String(n).replace('.', ',') + '</b>' +
+        (CONFIG.reviewCount ? ' · ' + CONFIG.reviewCount + ' avaliações no Google' : ' no Google');
+      el('estrelas').hidden = false;
+    }
+
+    if (CONFIG.servicos.length) {
+      el('sec-servicos').hidden = false;
+      el('servicos').innerHTML = CONFIG.servicos.map(function(s){
+        return '<article class="card">' +
+          '<h3>' + escapeHtml(s.name || s.nome || '') + '</h3>' +
+          ((s.desc || s.description) ? '<p>' + escapeHtml(s.desc || s.description) + '</p>' : '') +
+          (s.price || s.preco ? '<div class="valor">' + brl(s.price || s.preco) + '</div>' : '') +
+        '</article>';
+      }).join('');
+    }
+
+    if (CONFIG.sobre) {
+      el('sec-sobre').hidden = false;
+      el('sobre-titulo').textContent = 'Sobre a ' + CONFIG.bizName;
+      el('sobre-texto').textContent = CONFIG.sobre;
+    }
+
+    var temInfo = false;
+    if (CONFIG.hours.length) {
+      temInfo = true;
+      el('card-horarios').hidden = false;
+      var hoje = new Date().getDay();
+      el('horarios').innerHTML = CONFIG.hours.map(function(h){
+        return '<div class="' + (h.dia === hoje ? 'hoje' : '') + '"><span>' + escapeHtml(h.day) + '</span><span>' +
+          escapeHtml(h.fechado ? 'Fechado' : h.value) + '</span></div>';
+      }).join('');
+    }
+    if (CONFIG.endereco) {
+      temInfo = true;
+      el('card-endereco').hidden = false;
+      el('endereco-txt').textContent = CONFIG.endereco;
+      if (CONFIG.mapsUrl) { el('maps-link').href = CONFIG.mapsUrl; el('maps-link').hidden = false; }
+    }
+    el('sec-info').hidden = !temInfo;
+
+    el('final-titulo').textContent = 'Fale com a ' + CONFIG.bizName;
+  }
+
+  /* revelação no scroll, com fallback pra quem não tem IntersectionObserver */
+  function revelar(){
+    var alvos = document.querySelectorAll('.rev');
+    if (!('IntersectionObserver' in window)) {
+      Array.prototype.forEach.call(alvos, function(e){ e.classList.add('on'); });
+      return;
+    }
+    var io = new IntersectionObserver(function(entradas){
+      entradas.forEach(function(e){ if (e.isIntersecting) { e.target.classList.add('on'); io.unobserve(e.target); } });
+    }, { threshold: 0.12 });
+    Array.prototype.forEach.call(alvos, function(e){ io.observe(e); });
+    setTimeout(function(){ Array.prototype.forEach.call(alvos, function(e){ e.classList.add('on'); }); }, 2200);
+  }
+
+  aplicarTema();
+  montar();
+  revelar();
+})();
+</script>
+</body>
+</html>

@@ -334,6 +334,29 @@ details[open] summary { margin-bottom: 4px; }
 .result-link { background: var(--s2); border: 1px solid var(--border-s); border-radius: 10px; padding: 10px 13px; font-size: 0.72rem; font-family: var(--font-mono); color: var(--pl); word-break: break-all; margin-bottom: 8px; }
 .copy-btn { padding: 6px 12px; border-radius: 7px; border: 1px solid var(--border-s); background: var(--s3); color: var(--muted); font-size: 0.7rem; cursor: pointer; font-family: 'Manrope',sans-serif; }
 .copy-btn:hover { color: var(--text); border-color: var(--primary); }
+/* --- Onboarding --- */
+.ob-step { border-left: 2px solid var(--border-s); padding-left: 16px; margin-bottom: 20px; position: relative; }
+.ob-step::before { content: attr(data-n); position: absolute; left: -13px; top: 0; width: 24px; height: 24px; border-radius: 50%; background: var(--primary); color: #fff; display: grid; place-items: center; font-size: 0.72rem; font-weight: 700; }
+.ob-step h3 { font-family: var(--font-head), sans-serif; font-size: 0.98rem; margin: 0 0 3px; }
+.ob-step .ob-hint { font-size: 0.76rem; color: var(--muted); margin-bottom: 12px; }
+.ob-svcs { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px,1fr)); gap: 8px; }
+.ob-chk { display: flex; align-items: flex-start; gap: 9px; padding: 10px 12px; border: 1px solid var(--border-s); border-radius: 10px; background: var(--s2); cursor: pointer; font-size: 0.8rem; min-height: 44px; }
+.ob-chk input { margin-top: 2px; width: 16px; height: 16px; flex: none; accent-color: var(--primary); }
+.ob-chk.on { border-color: var(--primary); background: rgba(168,85,247,0.1); }
+.ob-chk small { display: block; color: var(--muted); font-size: 0.7rem; margin-top: 2px; }
+.ob-cond[hidden] { display: none !important; }
+.ob-out { display: grid; gap: 12px; }
+.ob-card { border: 1px solid var(--border-s); border-radius: 12px; padding: 14px; background: var(--s2); }
+.ob-card h4 { font-family: var(--font-head), sans-serif; font-size: 0.88rem; margin: 0 0 3px; }
+.ob-card .ob-desc { font-size: 0.74rem; color: var(--muted); margin-bottom: 9px; }
+.ob-pend { border-color: rgba(245,158,11,0.4); background: rgba(245,158,11,0.07); }
+.ob-pend h4 { color: #F59E0B; }
+.ob-pend ul { margin: 6px 0 0; padding-left: 18px; font-size: 0.78rem; color: var(--muted); }
+.ob-pend li { margin: 4px 0; }
+.ob-txt { width: 100%; background: var(--s3); border: 1px solid var(--border-s); border-radius: 9px; padding: 10px; font-family: var(--font-mono); font-size: 0.68rem; color: var(--text); white-space: pre-wrap; max-height: 190px; overflow-y: auto; }
+.ob-aviso { border-radius: 10px; padding: 10px 13px; font-size: 0.78rem; margin-top: 10px; }
+.ob-aviso.warn { background: rgba(245,158,11,0.12); color: #F59E0B; }
+.ob-aviso.err { background: rgba(239,68,68,0.12); color: #F87171; }
 
 .toast { position: fixed; bottom: calc(var(--bottomnav) + 16px); left: 50%; transform: translateX(-50%) translateY(80px); background: var(--s2); border: 1px solid var(--border-s); border-radius: 10px; padding: 12px 20px; font-size: 0.82rem; font-weight: 600; transition: transform 0.3s; z-index: 1000; white-space: nowrap; box-shadow: var(--glow); }
 .toast.show { transform: translateX(-50%) translateY(0); }
@@ -548,6 +571,9 @@ function doPost(e) {
   } else if (data.action === 'add-cliente') {
     var shC = pegarOuCriarAba('Clientes', ['id','bizName','plan','tipoNegocio','observacoes','agendLink','bioLink','createdAt']);
     shC.appendRow([data.id, data.bizName, data.plan, data.tipoNegocio, data.observacoes, data.agendLink, data.bioLink, data.createdAt].map(sanitizeCell));
+  } else if (data.action === 'add-onboarding') {
+    var shO = pegarOuCriarAba('Onboarding', ['id','bizName','plan','tipoNegocio','observacoes','wpp','agendLink','bioLink','catalogoLink','siteLink','createdAt']);
+    shO.appendRow([data.id, data.bizName, data.plan, data.tipoNegocio, data.observacoes, data.wpp, data.agendLink, data.bioLink, data.catalogoLink, data.siteLink, data.createdAt].map(sanitizeCell));
   } else if (data.action === 'add-avulso') {
     var shA = pegarOuCriarAba('Avulsos', ['id','client','service','value','desc','date','month','createdAt']);
     shA.appendRow([data.id, data.client, data.service, data.value, data.desc, data.date, data.month, data.createdAt].map(sanitizeCell));
@@ -562,7 +588,7 @@ function doGet(e) {
   if (e.parameter.secret !== SECRET) {
     return ContentService.createTextOutput(JSON.stringify({error:'unauthorized'})).setMimeType(ContentService.MimeType.JSON);
   }
-  var abas = { leads:'Pipeline', clientes:'Clientes', avulsos:'Avulsos' };
+  var abas = { leads:'Pipeline', clientes:'Clientes', avulsos:'Avulsos', onboarding:'Onboarding' };
   var nomeAba = abas[e.parameter.tipo] || 'Pipeline';
   var sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(nomeAba);
   if (!sh || sh.getLastRow() < 2) return ContentService.createTextOutput('[]').setMimeType(ContentService.MimeType.JSON);
@@ -755,6 +781,173 @@ function doGet(e) {
       </div>
     </div>
 
+    <div class="page" id="page-onboarding">
+      <div class="hero">
+        <h1 class="hero-greet" style="font-size:1.25rem">Cadastrar cliente novo</h1>
+        <div class="hero-sub">Preenche uma vez e sai tudo: links dos produtos, briefing do an&uacute;ncio, contrato e a lista do que ainda falta de acesso</div>
+      </div>
+
+      <div class="card">
+        <div class="ob-step" data-n="1">
+          <h3>O neg&oacute;cio</h3>
+          <div class="ob-hint">S&oacute; nome e WhatsApp s&atilde;o obrigat&oacute;rios. O resto melhora o que for gerado.</div>
+          <div class="form-group">
+            <label class="form-label" for="ob-nome">Nome do neg&oacute;cio *</label>
+            <input class="form-input" id="ob-nome" autocomplete="off" placeholder="Ex: Pizzaria do Z&eacute;">
+          </div>
+          <div class="form-row2">
+            <div class="form-group">
+              <label class="form-label" for="ob-wpp">WhatsApp *</label>
+              <input class="form-input" id="ob-wpp" type="tel" inputmode="tel" autocomplete="off" placeholder="(31) 99999-9999">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="ob-tipo">Tipo de neg&oacute;cio</label>
+              <input class="form-input" id="ob-tipo" autocomplete="off" placeholder="Padaria, barbearia, pizzaria...">
+            </div>
+          </div>
+          <div class="form-row2">
+            <div class="form-group">
+              <label class="form-label" for="ob-cidade">Cidade</label>
+              <input class="form-input" id="ob-cidade" autocomplete="off" placeholder="Mariana/MG">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="ob-ig">Instagram</label>
+              <input class="form-input" id="ob-ig" autocomplete="off" spellcheck="false" placeholder="@negocio">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="ob-endereco">Endere&ccedil;o</label>
+            <input class="form-input" id="ob-endereco" autocomplete="off" placeholder="Rua das Flores, 120">
+          </div>
+          <div class="form-row2">
+            <div class="form-group">
+              <label class="form-label" for="ob-cor">Cor da marca</label>
+              <input class="form-input" id="ob-cor" type="color" value="#84411F" style="height:44px;padding:4px">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="ob-google">Link de avalia&ccedil;&atilde;o no Google</label>
+              <input class="form-input" id="ob-google" autocomplete="off" spellcheck="false" placeholder="https://g.page/...">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="ob-sobre">Sobre o neg&oacute;cio (2 ou 3 linhas)</label>
+            <textarea class="form-input" id="ob-sobre" rows="2" placeholder="Abriu em 2019, forno a lenha, massa de fermenta&ccedil;&atilde;o natural..."></textarea>
+          </div>
+        </div>
+
+        <div class="ob-step" data-n="2">
+          <h3>O que foi contratado</h3>
+          <div class="ob-hint">Escolher um plano marca os servi&ccedil;os dele automaticamente. D&aacute; pra ajustar depois.</div>
+          <div class="form-row2">
+            <div class="form-group">
+              <label class="form-label" for="ob-modo">Forma</label>
+              <select class="form-input" id="ob-modo">
+                <option value="plano" selected>Plano mensal</option>
+                <option value="avulso">Servi&ccedil;os avulsos</option>
+              </select>
+            </div>
+            <div class="form-group" id="ob-grp-plano">
+              <label class="form-label" for="ob-plano">Plano</label>
+              <select class="form-input" id="ob-plano">
+                <option value="Starter">Starter &mdash; R$250/m&ecirc;s</option>
+                <option value="Neg&oacute;cio" selected>Neg&oacute;cio &mdash; R$500/m&ecirc;s</option>
+                <option value="Pro">Pro &mdash; R$1.000/m&ecirc;s</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-label" style="margin-bottom:8px">Servi&ccedil;os ligados</div>
+          <div class="ob-svcs" id="ob-svcs"></div>
+        </div>
+
+        <div class="ob-step ob-cond" data-n="3" id="ob-cond-servicos" hidden>
+          <h3>Servi&ccedil;os que o cliente vende</h3>
+          <div class="ob-hint">Um por linha: <b>nome | pre&ccedil;o | descri&ccedil;&atilde;o</b>. Alimenta agendamento, bio e site.</div>
+          <div class="form-group">
+            <label class="form-label" for="ob-lista-servicos">Lista de servi&ccedil;os</label>
+            <textarea class="form-input" id="ob-lista-servicos" rows="4" placeholder="Corte masculino | 45 | Tesoura ou m&aacute;quina&#10;Barba | 35 | Navalha e toalha quente"></textarea>
+          </div>
+        </div>
+
+        <div class="ob-step ob-cond" data-n="4" id="ob-cond-catalogo" hidden>
+          <h3>Cat&aacute;logo do aplicativo</h3>
+          <div class="ob-hint">Categorias uma por linha. Produtos: <b>nome | pre&ccedil;o | categoria | descri&ccedil;&atilde;o</b>.</div>
+          <div class="form-group">
+            <label class="form-label" for="ob-categorias">Categorias</label>
+            <textarea class="form-input" id="ob-categorias" rows="3" placeholder="Pizzas salgadas&#10;Pizzas doces&#10;Bebidas"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="ob-produtos">Produtos</label>
+            <textarea class="form-input" id="ob-produtos" rows="6" placeholder="Margherita | 45 | Pizzas salgadas | Molho e mu&ccedil;arela&#10;Refrigerante 2L | 12 | Bebidas"></textarea>
+          </div>
+          <div class="form-row2">
+            <div class="form-group">
+              <label class="form-label" for="ob-pix">Chave Pix (opcional)</label>
+              <input class="form-input" id="ob-pix" autocomplete="off" spellcheck="false" placeholder="CNPJ, e-mail ou telefone">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="ob-entrega">Faz entrega?</label>
+              <select class="form-input" id="ob-entrega">
+                <option value="nao" selected>N&atilde;o, s&oacute; retirada</option>
+                <option value="sim">Sim</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="ob-step ob-cond" data-n="5" id="ob-cond-trafego" hidden>
+          <h3>Dados para o an&uacute;ncio</h3>
+          <div class="ob-hint">Ticket e margem definem o teto de custo por cliente. Sem eles o briefing sai sem a conta.</div>
+          <div class="form-row2">
+            <div class="form-group">
+              <label class="form-label" for="ob-ticket">Ticket m&eacute;dio (R$)</label>
+              <input class="form-input" id="ob-ticket" type="number" inputmode="decimal" min="0" step="1" placeholder="30">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="ob-margem">Margem de lucro (%)</label>
+              <input class="form-input" id="ob-margem" type="number" inputmode="numeric" min="1" max="100" step="1" placeholder="50">
+            </div>
+          </div>
+          <div class="form-row2">
+            <div class="form-group">
+              <label class="form-label" for="ob-raio">Raio do an&uacute;ncio (km)</label>
+              <input class="form-input" id="ob-raio" type="number" inputmode="numeric" min="1" max="80" step="1" placeholder="8">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="ob-verba">Verba por dia (R$)</label>
+              <input class="form-input" id="ob-verba" type="number" inputmode="decimal" min="0" step="5" placeholder="20">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="ob-diferencial">O que o cliente tem de diferente</label>
+            <input class="form-input" id="ob-diferencial" autocomplete="off" placeholder="Forno a lenha, entrega em 30 min, atende domingo...">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="ob-objecao">Maior obje&ccedil;&atilde;o de quem n&atilde;o compra</label>
+            <input class="form-input" id="ob-objecao" autocomplete="off" placeholder="Acha caro, n&atilde;o sabe que tem entrega...">
+          </div>
+        </div>
+
+        <div class="ob-step" data-n="6">
+          <h3>Hor&aacute;rio de funcionamento</h3>
+          <div class="ob-hint">Uma linha por dia: <b>dia | hor&aacute;rio</b>. Escreva "fechado" quando n&atilde;o abrir.</div>
+          <div class="form-group">
+            <label class="form-label" for="ob-horarios">Hor&aacute;rios por dia</label>
+            <textarea class="form-input" id="ob-horarios" rows="4" placeholder="Segunda | 8h-18h&#10;Domingo | fechado"></textarea>
+          </div>
+          <button class="copy-btn" type="button" onclick="obPreencherHorarioPadrao()">Preencher seg-s&aacute;b 8h-18h</button>
+        </div>
+
+        <button class="btn btn-primary" style="margin-top:6px" onclick="obGerar()">Gerar tudo para este cliente &rarr;</button>
+        <div id="ob-alerta"></div>
+      </div>
+
+      <div class="card" id="ob-result" style="display:none">
+        <h2 class="card-title">Pronto</h2>
+        <div class="card-sub" id="ob-result-sub"></div>
+        <div class="ob-out" id="ob-out"></div>
+      </div>
+    </div>
+
   </main>
 </div>
 
@@ -772,8 +965,17 @@ let PAGES = [
   { id:'clientes', label:'Fixos',     icon:'<circle cx="9" cy="6" r="3"/><path d="M3 16c0-3.3 2.7-6 6-6s6 2.7 6 6"/>' },
   { id:'avulsos', label:'Avulsos',    icon:'<circle cx="9" cy="9" r="7"/><path d="M9 5v8M11.3 7.2c0-1.1-1-2-2.3-2s-2.3.7-2.3 1.7c0 2.3 4.6.9 4.6 3.2 0 1-1 1.7-2.3 1.7s-2.3-.9-2.3-2"/>' },
   { id:'relatorio', label:'Relatório', icon:'<path d="M4 2h7l3 3v11H4V2Z"/><path d="M11 2v3h3"/><path d="M6.5 10.5v3M9 8.5v5M11.5 11.5v2"/>' },
+  { id:'onboarding', label:'Cadastrar', icon:'<circle cx="9" cy="9" r="7.5"/><path d="M9 5.5v7M5.5 9h7"/>' },
   { id:'config',   label:'Config',    icon:'<circle cx="9" cy="9" r="2.5"/><path d="M9 1v2.4M9 14.6V17M17 9h-2.4M3.4 9H1M14.7 3.3l-1.7 1.7M4.9 12.9L3.3 14.7M14.7 14.7l-1.7-1.7M4.9 5.1L3.3 3.3"/>' },
 ];
+
+function obInit() {
+  if (!document.getElementById('ob-svcs')) return;
+  obRenderServicos();
+  document.getElementById('ob-modo').addEventListener('change', obAplicarPlano);
+  document.getElementById('ob-plano').addEventListener('change', obAplicarPlano);
+  obAplicarPlano();
+}
 
 function renderNav() {
   document.getElementById('sidebar-nav').innerHTML = PAGES.map(function(p, i) {
@@ -1608,6 +1810,561 @@ function renderReport() {
   }).join('');
 }
 
+// ═══════════════ ONBOARDING: cadastra uma vez, gera tudo ═══════════════
+/* O que este bloco NÃO faz, de propósito: criar campanha no Meta, conectar
+   Z-API, Make.com ou emissor de nota. Tudo isso exige credencial de terceiro
+   e um backend pra guardar o token — num HTML estático a chave ficaria
+   visível no código-fonte. Onde não dá pra executar, o sistema gera a
+   instrução pronta e registra a pendência. */
+
+let OB_BASE = 'https://pacoquinhagamer02-max.github.io/synctech-automation';
+
+let OB_SERVICOS = [
+  { id:'agendamento', nome:'Agendamento Online',       hint:'Agenda 24h por link' },
+  { id:'bio',         nome:'Link na Bio',              hint:'Página pro Instagram' },
+  { id:'catalogo',    nome:'Catálogo / Aplicativo',    hint:'Pedido direto no WhatsApp' },
+  { id:'site',        nome:'Site do cliente',          hint:'Página institucional' },
+  { id:'trafego',     nome:'Tráfego Pago (Meta Ads)',  hint:'Briefing pronto pro Meta' },
+  { id:'whatsbot',    nome:'WhatsApp Bot 24/7',        hint:'Depende de conta Z-API' },
+  { id:'instagram',   nome:'Instagram Automático',     hint:'Depende de Make.com' },
+  { id:'reputacao',   nome:'Gestão de Reputação',      hint:'Avaliação no Google' },
+  { id:'crm',         nome:'CRM com Pipeline',         hint:'Ferramenta interna sua' },
+  { id:'dashboard',   nome:'Dashboard de Métricas',    hint:'Depende de planilha' },
+  { id:'notafiscal',  nome:'Nota Fiscal (NFC-e)',      hint:'Depende da contadora' },
+];
+
+/* Espelha o conteúdo de PLANS, que por sua vez espelha a landing pública.
+   Tráfego Pago fica FORA do Pro aqui porque a landing e o Hub ainda não o
+   listam nesse plano — se essa decisão mudar, é só acrescentar 'trafego'. */
+let OB_PLANOS = {
+  'Starter':  ['whatsbot','agendamento','bio'],
+  'Negócio':  ['whatsbot','instagram','agendamento','crm','catalogo','dashboard','bio'],
+  'Pro':      ['whatsbot','instagram','agendamento','crm','catalogo','dashboard','bio','reputacao'],
+};
+
+function obEl(id){ return document.getElementById(id); }
+function obVal(id){ let e = obEl(id); return e ? e.value.trim() : ''; }
+function obNum(id){ let v = Number(obVal(id)); return isFinite(v) && v > 0 ? v : 0; }
+function obLigado(id){ let c = obEl('ob-svc-' + id); return !!(c && c.checked); }
+
+/* wa.me exige o telefone com codigo do pais. Digitar "(31) 99999-8888"
+   e so tirar o que nao e digito produz um link que abre em branco, sem
+   erro visivel. 10 ou 11 digitos = numero brasileiro sem o 55. */
+function obTelefone(bruto) {
+  let d = String(bruto).replace(/\D/g, '');
+  if (d.length === 10 || d.length === 11) return '55' + d;
+  if (d.length === 12 || d.length === 13) return d;
+  return d;
+}
+
+/* A bio mostra um emoji ao lado do nome. Sem isso ela usa a tesoura do
+   exemplo, e uma pizzaria aparecia como barbearia. */
+let OB_EMOJI = [
+  ['padaria','🥖'], ['confeitaria','🍰'], ['barbearia','💈'], ['barbeiro','💈'],
+  ['pizza','🍕'], ['lanchonete','🍔'], ['hamburgue','🍔'], ['restaurante','🍽'],
+  ['bar','🍻'], ['cafe','☕'], ['salao','💇'], ['beleza','💅'], ['estetica','✨'],
+  ['pet','🐾'], ['academia','🏋'], ['farmacia','💊'], ['mercado','🛒'],
+  ['loja','🛍'], ['oficina','🔧'], ['auto','🚗'], ['clinica','🩺'],
+  ['dent','🦷'], ['escola','📚'], ['doce','🍬'], ['sorvete','🍦'],
+];
+function obEmoji(tipo) {
+  let t = obSlug(tipo);
+  for (let i = 0; i < OB_EMOJI.length; i++) {
+    if (t.indexOf(OB_EMOJI[i][0]) !== -1) return OB_EMOJI[i][1];
+  }
+  return '🏪';
+}
+
+function obRenderServicos() {
+  obEl('ob-svcs').innerHTML = OB_SERVICOS.map(function(sv){
+    return '<label class="ob-chk" for="ob-svc-'+sv.id+'">' +
+      '<input type="checkbox" id="ob-svc-'+sv.id+'" data-svc="'+sv.id+'">' +
+      '<span>'+escapeHtml(sv.nome)+'<small>'+escapeHtml(sv.hint)+'</small></span>' +
+    '</label>';
+  }).join('');
+  obEl('ob-svcs').addEventListener('change', function(ev){
+    if (!ev.target.dataset.svc) return;
+    ev.target.closest('.ob-chk').classList.toggle('on', ev.target.checked);
+    obAtualizarCondicionais();
+  });
+}
+
+function obAplicarPlano() {
+  let modo = obVal('ob-modo');
+  obEl('ob-grp-plano').style.display = modo === 'plano' ? '' : 'none';
+  if (modo !== 'plano') return;
+  let ligados = OB_PLANOS[obVal('ob-plano')] || [];
+  OB_SERVICOS.forEach(function(sv){
+    let c = obEl('ob-svc-' + sv.id);
+    if (!c) return;
+    c.checked = ligados.indexOf(sv.id) !== -1;
+    c.closest('.ob-chk').classList.toggle('on', c.checked);
+  });
+  obAtualizarCondicionais();
+}
+
+function obAtualizarCondicionais() {
+  obEl('ob-cond-servicos').hidden = !(obLigado('agendamento') || obLigado('bio') || obLigado('site'));
+  obEl('ob-cond-catalogo').hidden = !obLigado('catalogo');
+  obEl('ob-cond-trafego').hidden  = !obLigado('trafego');
+}
+
+function obPreencherHorarioPadrao() {
+  obEl('ob-horarios').value =
+    'Segunda | 8h-18h\nTerça | 8h-18h\nQuarta | 8h-18h\nQuinta | 8h-18h\n' +
+    'Sexta | 8h-18h\nSábado | 8h-13h\nDomingo | fechado';
+}
+
+/* Parser de "campo | campo | campo" por linha. Linha vazia é ignorada,
+   campo faltando vira string vazia — colar de planilha continua funcionando. */
+function obLinhas(texto) {
+  return String(texto).split('\n').map(function(l){ return l.trim(); }).filter(Boolean)
+    .map(function(l){ return l.split('|').map(function(c){ return c.trim(); }); });
+}
+function obSlug(s) {
+  return String(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'geral';
+}
+function obPreco(v) {
+  let n = Number(String(v).replace(/[^\d,.-]/g, '').replace(',', '.'));
+  return isFinite(n) && n > 0 ? n : 0;
+}
+
+let OB_DIAS = [
+  ['domingo', 0], ['segunda', 1], ['terca', 2], ['quarta', 3],
+  ['quinta', 4], ['sexta', 5], ['sabado', 6]
+];
+function obHorarios() {
+  return obLinhas(obVal('ob-horarios')).map(function(c){
+    let nome = obSlug(c[0]);
+    let dia = -1;
+    OB_DIAS.forEach(function(d){ if (nome.indexOf(d[0]) === 0) dia = d[1]; });
+    let valor = c[1] || '';
+    let fechado = /fechad|nao abre|não abre/i.test(valor) || !valor;
+    return { dia: dia, day: c[0], value: valor, fechado: fechado };
+  }).filter(function(h){ return h.dia >= 0; });
+}
+
+function obMontarConfig() {
+  let servicos = obLinhas(obVal('ob-lista-servicos')).map(function(c, i){
+    return { id: i + 1, name: c[0], price: obPreco(c[1]), desc: c[2] || '', durationStr: '' };
+  }).filter(function(x){ return x.name; });
+
+  let cats = obLinhas(obVal('ob-categorias')).map(function(c){
+    return { id: obSlug(c[0]), label: c[0], note: c[1] || '' };
+  });
+  let produtos = obLinhas(obVal('ob-produtos')).map(function(c, i){
+    return { id: i + 1, name: c[0], price: obPreco(c[1]), category: obSlug(c[2] || (cats[0] && cats[0].label) || 'geral'), description: c[3] || '' };
+  }).filter(function(x){ return x.name; });
+  /* produto apontando pra categoria que não existe sumiria da tela sem aviso */
+  let idsCat = cats.map(function(c){ return c.id; });
+  let orfaos = produtos.filter(function(pr){ return idsCat.indexOf(pr.category) === -1; });
+
+  return {
+    nome: obVal('ob-nome'),
+    tipo: obVal('ob-tipo'),
+    wpp: obTelefone(obVal('ob-wpp')),
+    ig: obVal('ob-ig'),
+    cidade: obVal('ob-cidade'),
+    endereco: obVal('ob-endereco'),
+    cor: obVal('ob-cor') || '#84411F',
+    google: obVal('ob-google'),
+    sobre: obVal('ob-sobre'),
+    modo: obVal('ob-modo'),
+    plano: obVal('ob-modo') === 'plano' ? obVal('ob-plano') : 'Avulso',
+    ligados: OB_SERVICOS.filter(function(sv){ return obLigado(sv.id); }).map(function(sv){ return sv.id; }),
+    servicos: servicos,
+    categorias: cats,
+    produtos: produtos,
+    orfaos: orfaos,
+    pix: obVal('ob-pix'),
+    entrega: obVal('ob-entrega') === 'sim',
+    horarios: obHorarios(),
+    ticket: obNum('ob-ticket'),
+    margem: obNum('ob-margem'),
+    raio: obNum('ob-raio') || 8,
+    verba: obNum('ob-verba'),
+    diferencial: obVal('ob-diferencial'),
+    objecao: obVal('ob-objecao'),
+  };
+}
+
+/* Encapsula o btoa(unescape(encodeURIComponent(...))) usado pelos 4 produtos.
+   Sem o unescape/encodeURIComponent, acento quebra o btoa. */
+function obCodificar(cfg) {
+  return btoa(unescape(encodeURIComponent(JSON.stringify(cfg))));
+}
+
+function obLinks(o) {
+  let out = {};
+  let nomeWpp = o.wpp;
+
+  if (o.ligados.indexOf('agendamento') !== -1) {
+    out.agendamento = OB_BASE + '/agendamento/#config=' + obCodificar({
+      bizName: o.nome, bizWpp: nomeWpp, googleReviewUrl: o.google,
+      services: o.servicos.map(function(sv, i){
+        return { id: i + 1, icon: '•', name: sv.name, desc: sv.desc, price: sv.price, duration: 30, durationStr: '30 min', popular: false };
+      }),
+      professionals: [{ id:0, name:'Qualquer', emoji:'⭐', color:o.cor, rating:null, reviews:null }],
+    });
+  }
+  if (o.ligados.indexOf('bio') !== -1) {
+    out.bio = OB_BASE + '/bio/#config=' + obCodificar({
+      bizName: o.nome, bizType: o.tipo, bizEmoji: obEmoji(o.tipo), bizWpp: nomeWpp, coverColor: o.cor,
+      city: o.cidade, address: o.endereco, about: o.sobre,
+      instagram: o.ig, googleReviewUrl: o.google,
+      agendamentoUrl: out.agendamento || '',
+      services: o.servicos.map(function(sv, i){
+        return { id: i + 1, icon: '•', name: sv.name, price: sv.price, popular: false };
+      }),
+    });
+  }
+  if (o.ligados.indexOf('catalogo') !== -1) {
+    out.catalogo = OB_BASE + '/catalogo/#config=' + obCodificar({
+      bizName: o.nome, bizSub: o.endereco, bizWpp: nomeWpp, corPrimaria: o.cor,
+      pixChave: o.pix, pixNome: o.nome, pixCidade: (o.cidade || '').split('/')[0],
+      entrega: o.entrega, sobre: o.sobre, endereco: o.endereco,
+      categories: o.categorias, products: o.produtos, hours: o.horarios,
+    });
+  }
+  if (o.ligados.indexOf('site') !== -1) {
+    out.site = OB_BASE + '/site/#config=' + obCodificar({
+      bizName: o.nome, bizTipo: o.tipo, bizWpp: nomeWpp, corPrimaria: o.cor,
+      sobre: o.sobre, endereco: o.endereco, googleReviewUrl: o.google,
+      catalogoUrl: out.catalogo || '',
+      servicos: o.servicos.map(function(sv){ return { name: sv.name, desc: sv.desc, price: sv.price }; }),
+      hours: o.horarios,
+    });
+  }
+  return out;
+}
+
+function obBriefingTrafego(o) {
+  let L = [];
+  let cidade = o.cidade || 'a cidade do cliente';
+  let tipo = o.tipo || 'o negócio';
+  let dif = o.diferencial || '(preencher o diferencial)';
+  let obj = o.objecao || '(preencher a objeção)';
+
+  L.push('BRIEFING DE ANÚNCIO — ' + o.nome);
+  L.push('Gerado em ' + new Date().toLocaleDateString('pt-BR') + ' · SyncTech Automation');
+  L.push('');
+  L.push('1. OBJETIVO DA CAMPANHA');
+  L.push('   Mensagens no WhatsApp. Não usar "alcance" nem "engajamento":');
+  L.push('   eles entregam número bonito e nenhuma conversa.');
+  L.push('');
+  L.push('2. PÚBLICO');
+  L.push('   Local: ' + cidade + ', raio de ' + o.raio + ' km');
+  L.push('   Idade: 25 a 55');
+  L.push('   Interesses: deixar em branco nas duas primeiras semanas.');
+  L.push('   Com verba pequena, segmentar demais encarece cada conversa.');
+  L.push('');
+  L.push('3. VERBA');
+  if (o.verba) {
+    L.push('   R$ ' + o.verba.toFixed(2).replace('.', ',') + ' por dia');
+    L.push('   ≈ R$ ' + (o.verba * 30).toFixed(2).replace('.', ',') + ' por mês');
+    L.push('   Quem paga: o cliente, direto no cartão dele, dentro da conta de anúncio dele.');
+  } else {
+    L.push('   (não informada — sem isso não dá pra prever volume)');
+  }
+  L.push('');
+  L.push('4. QUANTO PODE CUSTAR CADA CLIENTE NOVO');
+  if (o.ticket && o.margem) {
+    let lucro = o.ticket * (o.margem / 100);
+    let alvo = lucro / 3;
+    L.push('   Ticket médio informado: R$ ' + o.ticket.toFixed(2).replace('.', ','));
+    L.push('   Margem informada: ' + o.margem + '%');
+    L.push('   Lucro por venda: R$ ' + lucro.toFixed(2).replace('.', ','));
+    L.push('');
+    L.push('   TETO ABSOLUTO: R$ ' + lucro.toFixed(2).replace('.', ',') + ' por cliente trazido.');
+    L.push('   Acima disso o anúncio custa mais do que a venda dá.');
+    L.push('   ALVO BOM: abaixo de R$ ' + alvo.toFixed(2).replace('.', ','));
+    L.push('');
+    L.push('   Regra de decisão, revisada toda semana:');
+    L.push('   · abaixo de R$ ' + alvo.toFixed(2).replace('.', ',') + ' → aumentar a verba');
+    L.push('   · entre R$ ' + alvo.toFixed(2).replace('.', ',') + ' e R$ ' + lucro.toFixed(2).replace('.', ',') + ' → manter e trocar o criativo');
+    L.push('   · acima de R$ ' + lucro.toFixed(2).replace('.', ',') + ' → pausar e refazer');
+    if (o.verba) {
+      L.push('');
+      L.push('   Com R$ ' + (o.verba * 30).toFixed(0) + '/mês de verba e custo no alvo,');
+      L.push('   a expectativa é de ' + Math.floor((o.verba * 30) / alvo) + ' a ' + Math.floor((o.verba * 30) / lucro) + ' clientes novos por mês.');
+    }
+  } else {
+    L.push('   Faltou ticket médio e/ou margem. Sem esses dois números não existe');
+    L.push('   teto de custo, e a campanha vira aposta. Perguntar ao cliente antes de subir.');
+  }
+  L.push('');
+  L.push('   As duas primeiras semanas vêm piores: é a fase de aprendizado do Meta.');
+  L.push('   Não pausar nem mexer na verba nesse período.');
+  L.push('');
+  L.push('5. TEXTOS DO ANÚNCIO — testar um por vez');
+  L.push('');
+  L.push('   [A] Ataca a objeção');
+  L.push('   ' + obj + '? Na ' + o.nome + ' não é assim: ' + dif + '.');
+  L.push('   Chama no WhatsApp e veja.');
+  L.push('');
+  L.push('   [B] Para quem já conhece e não sabe de tudo');
+  L.push('   Você passa na frente da ' + o.nome + ' e talvez não saiba: ' + dif + '.');
+  L.push('   É só mandar mensagem.');
+  L.push('');
+  L.push('   [C] Direto');
+  L.push('   ' + tipo.charAt(0).toUpperCase() + tipo.slice(1) + ' em ' + cidade + ': ' + dif + '.');
+  L.push('   Peça pelo WhatsApp, sem cadastro e sem app.');
+  L.push('');
+  L.push('   [D] Prova de vizinhança');
+  L.push('   Quem é de ' + cidade + ' já conhece a ' + o.nome + '. ' + dif + '.');
+  L.push('   Fale com a gente agora.');
+  L.push('');
+  L.push('   [E] Convite simples');
+  L.push('   Ainda não experimentou a ' + o.nome + '? ' + dif + '.');
+  L.push('   Manda um oi no WhatsApp.');
+  L.push('');
+  L.push('   REGRA: nada de escassez inventada ("restam 2", "só hoje") se não for verdade.');
+  L.push('   O Meta reprova e o cliente perde a confiança.');
+  L.push('');
+  L.push('6. ANTES DE SUBIR — checklist');
+  L.push('   [ ] Ser administrador no Business Manager DO CLIENTE');
+  L.push('   [ ] Conta de anúncio própria do cliente, com o cartão dele');
+  L.push('       (misturar com outra conta impede o relatório por cliente)');
+  L.push('   [ ] Página do Facebook vinculada ao Instagram');
+  L.push('   [ ] WhatsApp respondido em até 30 minutos no horário comercial');
+  L.push('   [ ] Foto ou vídeo real do negócio, não banco de imagem');
+  return L.join('\n');
+}
+
+function obFluxoWhatsApp(o) {
+  let L = [];
+  L.push('FLUXO DO ATENDIMENTO AUTOMÁTICO — ' + o.nome);
+  L.push('');
+  L.push('MENSAGEM DE BOAS-VINDAS (primeiro contato)');
+  L.push('Oi! Aqui é a ' + o.nome + '. 👋');
+  L.push('Me diz o que você precisa que eu já te ajudo:');
+  L.push('1 - Ver preços');
+  L.push('2 - Fazer um pedido');
+  L.push('3 - Endereço e horário');
+  L.push('4 - Falar com uma pessoa');
+  L.push('');
+  L.push('RESPOSTA 1 — preços');
+  if (o.servicos.length) {
+    o.servicos.slice(0, 8).forEach(function(sv){
+      L.push('· ' + sv.name + (sv.price ? ' — R$ ' + sv.price.toFixed(2).replace('.', ',') : ''));
+    });
+  } else {
+    L.push('(cadastrar os serviços no formulário para esta lista sair pronta)');
+  }
+  L.push('');
+  L.push('RESPOSTA 3 — endereço e horário');
+  if (o.endereco) L.push(o.endereco);
+  o.horarios.forEach(function(h){ L.push(h.day + ': ' + (h.fechado ? 'fechado' : h.value)); });
+  L.push('');
+  L.push('RESPOSTA 4 — passa para uma pessoa');
+  L.push('Já chamei alguém da equipe, é só aguardar aqui. 😊');
+  L.push('');
+  L.push('REGRA DE OURO: o bot nunca insiste. Se a pessoa escrever qualquer coisa');
+  L.push('fora do menu duas vezes, passa direto para um humano.');
+  L.push('');
+  L.push('ONDE ISSO RODA: precisa de uma conta Z-API conectada ao número do cliente.');
+  L.push('É serviço externo pago, contratado no nome do cliente.');
+  return L.join('\n');
+}
+
+function obRoteiroInstagram(o) {
+  let L = [];
+  L.push('AUTOMAÇÃO DO INSTAGRAM — ' + o.nome);
+  L.push('');
+  L.push('GATILHO 1 — comentou no post');
+  L.push('Manda no direct: "Oi! Vi seu comentário 😊 Quer que eu te mande os preços?"');
+  L.push('');
+  L.push('GATILHO 2 — começou a seguir');
+  L.push('Manda: "Obrigado por seguir a ' + o.nome + '! Qualquer coisa é só chamar por aqui."');
+  L.push('');
+  L.push('GATILHO 3 — respondeu um story');
+  L.push('Manda o link do WhatsApp para continuar a conversa lá.');
+  L.push('');
+  L.push('MONTAGEM NO MAKE.COM');
+  L.push('Cenário: Instagram for Business (watch comments) → Filtro → Instagram (send DM)');
+  L.push('Pré-requisitos: conta Business vinculada a uma Página do Facebook.');
+  L.push('O plano gratuito do Make atende o começo.');
+  if (o.ig) {
+    L.push('');
+    L.push('AJUSTE RÁPIDO QUE RENDE: conferir se o link da bio do ' + o.ig);
+    L.push('aponta para o produto (cardápio ou agendamento), não só para o WhatsApp.');
+  }
+  return L.join('\n');
+}
+
+function obPendencias(o) {
+  let itens = [];
+  if (o.ligados.indexOf('trafego') !== -1) {
+    itens.push('Ser adicionado como <b>administrador no Business Manager</b> do cliente, com conta de anúncio e cartão próprios dele.');
+  }
+  if (o.ligados.indexOf('whatsbot') !== -1) {
+    itens.push('Conta <b>Z-API</b> conectada ao número do cliente. É serviço externo pago, contratado no nome dele.');
+  }
+  if (o.ligados.indexOf('instagram') !== -1) {
+    itens.push('Instagram <b>Business</b> vinculado a uma Página do Facebook, e acesso como usuário no Business Suite. Nunca pedir a senha.');
+  }
+  if (o.ligados.indexOf('dashboard') !== -1) {
+    itens.push('<b>Planilha do negócio</b> compartilhada. Até lá o painel mostra dados de exemplo.');
+  }
+  if (o.ligados.indexOf('reputacao') !== -1 && !o.google) {
+    itens.push('<b>Link de avaliação do Google</b> do cliente (perfil no Google Meu Negócio).');
+  }
+  if (o.ligados.indexOf('notafiscal') !== -1) {
+    itens.push('<b>Contadora</b>: abrir conta no emissor no CNPJ do cliente, subir o certificado A1, pedir série nova de NFC-e, passar NCM/CFOP/CST dos itens e gerar o token.');
+  }
+  if (o.ligados.indexOf('catalogo') !== -1 && !o.pix) {
+    itens.push('<b>Chave Pix</b> do cliente, se quiser o QR de pagamento no aplicativo.');
+  }
+  if (o.ligados.indexOf('trafego') !== -1 && (!o.ticket || !o.margem)) {
+    itens.push('<b>Ticket médio e margem reais</b>. Sem eles não existe teto de custo por cliente e a campanha vira aposta.');
+  }
+  if (!o.horarios.length) {
+    itens.push('<b>Horário de funcionamento</b>, para aparecer no site e no catálogo.');
+  }
+  return itens;
+}
+
+function obCopiar(chave) {
+  let v = OB_GERADO[chave];
+  if (!v) return;
+  let fn = function(){ showToast('Copiado!', 'success'); };
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(v).then(fn).catch(function(){ obCopiarAntigo(v); fn(); });
+  } else { obCopiarAntigo(v); fn(); }
+}
+function obCopiarAntigo(texto) {
+  let a = document.createElement('textarea');
+  a.value = texto; a.style.position = 'fixed'; a.style.opacity = '0';
+  document.body.appendChild(a); a.select();
+  try { document.execCommand('copy'); } catch (e) { console.error('Falha ao copiar:', e); }
+  document.body.removeChild(a);
+}
+
+let OB_GERADO = {};
+
+function obGerar() {
+  let o = obMontarConfig();
+  let alerta = obEl('ob-alerta');
+  alerta.innerHTML = '';
+
+  if (!o.nome || !o.wpp) {
+    alerta.innerHTML = '<div class="ob-aviso err">Preenche o nome do negócio e o WhatsApp — sem os dois nenhum link funciona.</div>';
+    showToast('Faltou nome ou WhatsApp', 'error');
+    return;
+  }
+  if (!o.ligados.length) {
+    alerta.innerHTML = '<div class="ob-aviso err">Marque pelo menos um serviço.</div>';
+    showToast('Nenhum serviço marcado', 'error');
+    return;
+  }
+
+  let links = obLinks(o);
+  let avisos = [];
+
+  /* Guarda de tamanho: config grande estoura a URL e o link vira inútil
+     sem avisar. O cardápio da padaria (211 produtos) cai neste caso e
+     continua sendo arquivo próprio, não link. */
+  let maior = 0, produtoMaior = '';
+  Object.keys(links).forEach(function(k){
+    if (links[k].length > maior) { maior = links[k].length; produtoMaior = k; }
+  });
+  if (maior > 30000) {
+    alerta.innerHTML = '<div class="ob-aviso err">O link de <b>' + produtoMaior + '</b> ficou com ' +
+      maior.toLocaleString('pt-BR') + ' caracteres e não vai funcionar. Reduza a quantidade de produtos ' +
+      '(ou publique um arquivo próprio para este cliente, como foi feito na padaria).</div>';
+    showToast('Catálogo grande demais para link', 'error');
+    return;
+  }
+  if (maior > 8000) {
+    avisos.push('O link de <b>' + produtoMaior + '</b> tem ' + maior.toLocaleString('pt-BR') +
+      ' caracteres. Funciona, mas é comprido para mandar no WhatsApp — considere encurtar a lista.');
+  }
+  if (o.orfaos.length) {
+    avisos.push(o.orfaos.length + ' produto(s) apontam para uma categoria que não existe e não vão aparecer: <b>' +
+      escapeHtml(o.orfaos.map(function(x){ return x.name; }).join(', ')) + '</b>.');
+  }
+  if (avisos.length) {
+    alerta.innerHTML = avisos.map(function(a){ return '<div class="ob-aviso warn">' + a + '</div>'; }).join('');
+  }
+
+  OB_GERADO = {};
+  let cards = [];
+
+  let rotulos = { agendamento:'Agendamento Online', bio:'Link na Bio', catalogo:'Catálogo / Aplicativo', site:'Site do cliente' };
+  Object.keys(links).forEach(function(k){
+    OB_GERADO[k] = links[k];
+    cards.push('<div class="ob-card"><h4>' + rotulos[k] + '</h4>' +
+      '<div class="ob-desc">Pronto para enviar. Abre no celular do cliente sem instalar nada.</div>' +
+      '<div class="result-link">' + escapeHtml(links[k]) + '</div>' +
+      '<button class="copy-btn" type="button" onclick="obCopiar(\'' + k + '\')">Copiar link</button> ' +
+      '<a class="copy-btn" href="' + escapeHtml(links[k]) + '" target="_blank" rel="noopener">Abrir</a></div>');
+  });
+
+  if (o.ligados.indexOf('trafego') !== -1) {
+    OB_GERADO.briefing = obBriefingTrafego(o);
+    cards.push('<div class="ob-card"><h4>Briefing do anúncio</h4>' +
+      '<div class="ob-desc">Cole no Meta Ads. O sistema não cria a campanha sozinho: isso exige a API do Meta e um backend.</div>' +
+      '<div class="ob-txt">' + escapeHtml(OB_GERADO.briefing) + '</div>' +
+      '<button class="copy-btn" type="button" style="margin-top:8px" onclick="obCopiar(\'briefing\')">Copiar briefing</button></div>');
+  }
+  if (o.ligados.indexOf('whatsbot') !== -1) {
+    OB_GERADO.fluxo = obFluxoWhatsApp(o);
+    cards.push('<div class="ob-card"><h4>Fluxo do WhatsApp Bot</h4>' +
+      '<div class="ob-desc">Mensagens prontas para montar no Make.com com a Z-API.</div>' +
+      '<div class="ob-txt">' + escapeHtml(OB_GERADO.fluxo) + '</div>' +
+      '<button class="copy-btn" type="button" style="margin-top:8px" onclick="obCopiar(\'fluxo\')">Copiar fluxo</button></div>');
+  }
+  if (o.ligados.indexOf('instagram') !== -1) {
+    OB_GERADO.instagram = obRoteiroInstagram(o);
+    cards.push('<div class="ob-card"><h4>Automação do Instagram</h4>' +
+      '<div class="ob-desc">Gatilhos e respostas para montar no Make.com.</div>' +
+      '<div class="ob-txt">' + escapeHtml(OB_GERADO.instagram) + '</div>' +
+      '<button class="copy-btn" type="button" style="margin-top:8px" onclick="obCopiar(\'instagram\')">Copiar roteiro</button></div>');
+  }
+
+  let pend = obPendencias(o);
+  if (pend.length) {
+    cards.push('<div class="ob-card ob-pend"><h4>Falta destravar (' + pend.length + ')</h4>' +
+      '<div class="ob-desc">Depende de acesso ou informação de terceiro. Enquanto não chegar, o serviço fica pausado.</div>' +
+      '<ul>' + pend.map(function(i){ return '<li>' + i + '</li>'; }).join('') + '</ul></div>');
+  }
+
+  obEl('ob-out').innerHTML = cards.join('');
+  obEl('ob-result-sub').textContent = o.nome + ' · ' + (o.modo === 'plano' ? 'Plano ' + o.plano : 'Serviços avulsos') +
+    ' · ' + o.ligados.length + ' serviço(s)';
+  obEl('ob-result').style.display = 'block';
+  obEl('ob-result').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  obSalvar(o, links);
+  showToast('Cliente cadastrado e material gerado!', 'success');
+}
+
+function obSalvar(o, links) {
+  let registro = {
+    id: (crypto.randomUUID ? crypto.randomUUID() : 'ob' + Date.now()),
+    bizName: o.nome,
+    plan: o.modo === 'plano' ? 'Plano ' + o.plano : 'Serviços avulsos',
+    tipoNegocio: o.tipo,
+    observacoes: 'Serviços: ' + o.ligados.join(', ') + (o.cidade ? ' · ' + o.cidade : ''),
+    agendLink: links.agendamento || '',
+    bioLink: links.bio || '',
+    catalogoLink: links.catalogo || '',
+    siteLink: links.site || '',
+    wpp: o.wpp,
+    createdAt: new Date().toISOString(),
+  };
+  let stored = getStoredClients();
+  stored.push(registro);
+  localStorage.setItem('synctech_new_clients', JSON.stringify(stored));
+  if (typeof renderClients === 'function') renderClients();
+
+  enviarRegistroComFila(
+    Object.assign({ action: 'add-onboarding', secret: PIPELINE_SYNC_SECRET }, registro),
+    'Cliente salvo aqui — sem conexão com a planilha agora, vai sincronizar depois.'
+  );
+}
+
 // ═══════════════ CONFIG: NOVO CLIENTE ═══════════════
 function gerarCliente() {
   let name = document.getElementById('nc-name').value.trim();
@@ -1738,6 +2495,7 @@ renderClients();
 renderAvulsos();
 renderReport();
 renderPlans();
+obInit();
 renderFooterStatus();
 document.getElementById('topbar-date').textContent = new Date().toLocaleDateString('pt-BR', { weekday:'short', day:'2-digit', month:'short' });
 </script>

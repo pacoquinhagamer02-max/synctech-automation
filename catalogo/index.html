@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Cardápio digital</title>
+<meta name="description" content="Monte seu pedido e finalize direto no WhatsApp.">
+<meta name="theme-color" content="#FBF8F4">
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+  /* Regra global: uma classe com `display` explícito vence o atributo `hidden`
+     do navegador. Este bug apareceu três vezes no projeto antes de virar regra
+     global. Não repetir o remendo classe a classe. */
+  [hidden]{display:none!important}
+
+  :root{
+    color-scheme: light;
+    --primary:#84411F; --primary-esc:#5E2E15; --primary-claro:#F3E7DE;
+    --bg:#FBF8F4; --card:#FFFFFF; --ink:#241A14; --ink2:#5B4A40; --muted:#8A7A6E;
+    --linha:#E9DFD4; --butter:#E9C46A; --whats:#1F9D55; --whats-esc:#177A41;
+    --erro:#B3261E; --raio:14px;
+    --sombra:0 8px 26px rgba(36,26,20,.09);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+  h1,h2,h3{font-family:Fraunces,Georgia,serif;font-weight:600;margin:0;line-height:1.15;text-wrap:balance}
+  p{margin:0}
+  img{max-width:100%;display:block}
+  button,input,select,textarea{font:inherit;color:inherit}
+  button{touch-action:manipulation}
+  a{color:var(--primary)}
+  :focus-visible{outline:3px solid var(--primary);outline-offset:2px;border-radius:6px}
+  .wrap{max-width:860px;margin:0 auto;padding:0 16px}
+  .pular{position:absolute;left:-9999px;top:0;background:var(--card);padding:10px 16px;border-radius:8px;z-index:100}
+  .pular:focus{left:12px;top:12px}
+
+  header.topo{position:sticky;top:0;z-index:30;background:var(--bg);border-bottom:1px solid var(--linha)}
+  .topo-in{display:flex;align-items:center;gap:12px;padding:12px 0;min-height:68px}
+  .logo{width:44px;height:44px;border-radius:12px;background:var(--primary);color:#fff;display:grid;place-items:center;font-family:Fraunces,serif;font-weight:700;font-size:1.15rem;flex:none}
+  .nome{font-family:Fraunces,serif;font-weight:700;font-size:1.06rem;line-height:1.2}
+  .sub{font-size:.8rem;color:var(--muted)}
+  .aberto{margin-left:auto;font-size:.76rem;font-weight:600;padding:4px 10px;border-radius:999px;white-space:nowrap}
+  .aberto.on{background:#E4F2EA;color:var(--whats-esc)}
+  .aberto.off{background:#F1ECE6;color:var(--muted)}
+
+  .hero{padding:22px 0 8px}
+  .hero h1{font-size:clamp(1.6rem,5.2vw,2.3rem)}
+  .hero p{color:var(--ink2);margin-top:8px;max-width:52ch}
+  .aviso{margin-top:14px;background:var(--primary-claro);border-radius:var(--raio);padding:11px 15px;font-size:.9rem;color:var(--primary-esc)}
+
+  .busca{position:relative;margin:16px 0 6px}
+  .busca input{width:100%;padding:13px 15px 13px 42px;border:1px solid var(--linha);border-radius:var(--raio);background:var(--card)}
+  .busca svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);opacity:.45}
+
+  .menu-bar{position:sticky;top:68px;z-index:20;background:var(--bg);padding:8px 0;border-bottom:1px solid var(--linha)}
+  .cats{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+  .cats::-webkit-scrollbar{display:none}
+  .cat-btn{flex:none;padding:8px 15px;border-radius:999px;border:1px solid var(--linha);background:var(--card);font-size:.88rem;font-weight:600;cursor:pointer;min-height:38px}
+  .cat-btn[aria-pressed="true"]{background:var(--primary);color:#fff;border-color:var(--primary)}
+
+  .cat-block{padding-top:22px;scroll-margin-top:130px}
+  .cat-block h2{font-size:1.2rem}
+  .cat-nota{font-size:.86rem;color:var(--muted);margin-top:3px}
+  .grade{display:grid;gap:12px;margin-top:14px}
+  @media(min-width:560px){.grade{grid-template-columns:1fr 1fr}}
+
+  .item{background:var(--card);border:1px solid var(--linha);border-radius:var(--raio);padding:14px;display:flex;gap:12px;align-items:flex-start}
+  .item-txt{flex:1;min-width:0}
+  .item h3{font-size:1rem;font-family:Inter,sans-serif;font-weight:600}
+  .item p{font-size:.87rem;color:var(--ink2);margin-top:3px}
+  .preco{font-family:Fraunces,serif;font-weight:700;font-size:1.06rem;margin-top:7px;font-variant-numeric:tabular-nums}
+  .preco .cur{font-size:.78em;font-weight:600;color:var(--muted)}
+  .tag{display:inline-block;font-size:.68rem;font-weight:700;letter-spacing:.03em;background:var(--butter);color:var(--ink);padding:2px 8px;border-radius:999px;margin-bottom:5px}
+  .item-acao{flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:6px;min-width:96px}
+  .add{width:40px;height:40px;border-radius:50%;border:0;background:var(--primary);color:#fff;font-size:1.3rem;line-height:1;cursor:pointer;display:grid;place-items:center}
+  .stepper{display:flex;align-items:center;gap:4px;background:var(--primary-claro);border-radius:999px;padding:3px}
+  .stepper[hidden]{display:none!important}
+  .step-btn{width:32px;height:32px;border-radius:50%;border:0;background:var(--primary);color:#fff;font-size:1.05rem;cursor:pointer;display:grid;place-items:center}
+  .qtd{min-width:24px;text-align:center;font-weight:700;font-variant-numeric:tabular-nums}
+
+  .vazio{text-align:center;color:var(--muted);padding:40px 0}
+
+  .bloco{background:var(--card);border:1px solid var(--linha);border-radius:var(--raio);padding:18px;margin-top:26px}
+  .bloco h2{font-size:1.12rem;margin-bottom:10px}
+  .faq details{border-top:1px solid var(--linha)}
+  .faq details:first-of-type{border-top:0}
+  .faq summary{cursor:pointer;padding:12px 0;font-weight:600;list-style:none;display:flex;justify-content:space-between;gap:12px;min-height:44px;align-items:center}
+  .faq summary::-webkit-details-marker{display:none}
+  .faq summary::after{content:"+";color:var(--primary);font-family:Fraunces,serif;font-size:1.25rem}
+  .faq details[open] summary::after{content:"–"}
+  .faq p{padding-bottom:13px;color:var(--ink2);font-size:.92rem}
+  .horarios{display:grid;gap:5px;font-size:.92rem}
+  .horarios div{display:flex;justify-content:space-between;gap:12px;padding:4px 0;border-bottom:1px solid var(--linha)}
+  .horarios div:last-child{border-bottom:0}
+  .horarios .hoje{font-weight:700;color:var(--primary)}
+
+  .repetir{margin-top:16px}
+  .repetir[hidden]{display:none!important}
+  .repetir h2{font-size:1rem;margin-bottom:8px}
+  .repetir-fila{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px}
+  .repetir-fila::-webkit-scrollbar{display:none}
+  .rep-card{flex:none;width:210px;background:var(--card);border:1px solid var(--linha);border-radius:var(--raio);padding:12px}
+  .rep-card small{color:var(--muted);font-size:.78rem}
+  .rep-card b{display:block;margin:4px 0 8px;font-size:.9rem;font-weight:600}
+  .rep-card button{width:100%;padding:9px;border-radius:9px;border:0;background:var(--primary);color:#fff;font-weight:600;cursor:pointer;min-height:40px}
+
+  .barra{position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--card);border-top:1px solid var(--linha);padding:11px 16px calc(11px + env(safe-area-inset-bottom));transform:translateY(120%);transition:transform .2s ease}
+  .barra.on{transform:none}
+  .barra-in{max-width:860px;margin:0 auto;display:flex;align-items:center;gap:12px}
+  .barra .resumo{flex:1;min-width:0}
+  .barra .resumo small{display:block;color:var(--muted);font-size:.78rem}
+  .barra .resumo b{font-family:Fraunces,serif;font-size:1.1rem;font-variant-numeric:tabular-nums}
+  .btn-whats{background:var(--whats);color:#fff;border:0;border-radius:11px;padding:13px 20px;font-weight:700;cursor:pointer;min-height:48px}
+
+  .fundo{position:fixed;inset:0;background:rgba(36,26,20,.45);opacity:0;pointer-events:none;transition:opacity .2s;z-index:50}
+  .fundo.on{opacity:1;pointer-events:auto}
+  .painel{position:fixed;top:0;right:0;bottom:0;width:min(100%,28rem);background:var(--bg);z-index:60;transform:translateX(100%);transition:transform .24s ease;display:flex;flex-direction:column;overscroll-behavior:contain}
+  .painel.on{transform:none}
+  .painel-topo{display:flex;align-items:center;gap:12px;padding:16px;border-bottom:1px solid var(--linha)}
+  .painel-topo h2{font-size:1.1rem;flex:1}
+  .fechar{width:40px;height:40px;border-radius:50%;border:1px solid var(--linha);background:var(--card);cursor:pointer;font-size:1.1rem}
+  .painel-corpo{flex:1;overflow-y:auto;padding:16px;overscroll-behavior:contain}
+  .painel-pe{padding:14px 16px calc(14px + env(safe-area-inset-bottom));border-top:1px solid var(--linha);background:var(--card)}
+
+  .linha-item{display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--linha)}
+  .linha-item .n{flex:1;min-width:0;font-size:.92rem}
+  .linha-item .v{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .totalbox{display:flex;justify-content:space-between;align-items:baseline;margin:14px 0;font-family:Fraunces,serif}
+  .totalbox b{font-size:1.4rem;font-variant-numeric:tabular-nums}
+
+  .campo{margin-top:12px}
+  .campo label{display:block;font-size:.85rem;font-weight:600;margin-bottom:5px}
+  .campo input,.campo textarea,.campo select{width:100%;padding:12px;border:1px solid var(--linha);border-radius:10px;background:var(--card);min-height:46px}
+  .campo .erro{color:var(--erro);font-size:.82rem;margin-top:5px}
+  .campo .erro[hidden]{display:none!important}
+  .modos{display:flex;gap:8px;margin-top:10px}
+  .modo{flex:1;padding:11px;border-radius:10px;border:1px solid var(--linha);background:var(--card);font-weight:600;cursor:pointer;min-height:46px}
+  .modo[aria-pressed="true"]{border-color:var(--primary);background:var(--primary-claro);color:var(--primary-esc)}
+
+  .pix{margin-top:16px;background:var(--card);border:1px solid var(--linha);border-radius:var(--raio);padding:14px;text-align:center}
+  .pix[hidden]{display:none!important}
+  .pix h3{font-size:.98rem;margin-bottom:8px}
+  .pix-qr{max-width:200px;margin:0 auto}
+  .pix-qr svg{width:100%;height:auto}
+  .pix button{margin-top:10px;width:100%;padding:11px;border-radius:10px;border:1px solid var(--primary);background:transparent;color:var(--primary);font-weight:600;cursor:pointer;min-height:44px}
+  .pix .obs{font-size:.8rem;color:var(--muted);margin-top:8px}
+
+  .ok{text-align:center;padding:30px 16px}
+  .ok[hidden]{display:none!important}
+  .ok .marca{width:62px;height:62px;border-radius:50%;background:#E4F2EA;color:var(--whats-esc);display:grid;place-items:center;font-size:1.7rem;margin:0 auto 14px}
+
+  footer{padding:30px 0 120px;color:var(--muted);font-size:.85rem;text-align:center}
+  footer a{color:var(--muted)}
+  .aria-so-leitor{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+</style>
+</head>
+<body>
+<a class="pular" href="#cardapio">Pular para o cardápio</a>
+
+<header class="topo">
+  <div class="wrap topo-in">
+    <div class="logo" id="logo">N</div>
+    <div>
+      <div class="nome" id="biz-nome">Negócio</div>
+      <div class="sub" id="biz-sub"></div>
+    </div>
+    <span class="aberto off" id="status">—</span>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <h1 id="hero-titulo">Monte seu pedido</h1>
+    <p id="hero-sub">Escolha os itens e mande direto no WhatsApp. Sem cadastro, sem baixar aplicativo.</p>
+    <div class="aviso" id="aviso" hidden></div>
+  </section>
+
+  <section class="repetir" id="repetir" hidden>
+    <h2>Peça de novo</h2>
+    <div class="repetir-fila" id="repetir-fila"></div>
+  </section>
+
+  <div class="busca">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+    <input type="search" id="busca" placeholder="Buscar no cardápio" aria-label="Buscar no cardápio">
+  </div>
+
+  <div class="menu-bar">
+    <div class="cats" id="cats" role="group" aria-label="Categorias"></div>
+  </div>
+
+  <div id="cardapio"></div>
+  <p class="vazio" id="vazio" hidden>Nenhum item encontrado. Tente outra palavra.</p>
+
+  <section class="bloco" id="bloco-horarios" hidden>
+    <h2>Horário de funcionamento</h2>
+    <div class="horarios" id="horarios"></div>
+  </section>
+
+  <section class="bloco faq" id="bloco-faq" hidden>
+    <h2>Dúvidas frequentes</h2>
+    <div id="faq"></div>
+  </section>
+
+  <section class="bloco" id="bloco-sobre" hidden>
+    <h2 id="sobre-titulo">Sobre</h2>
+    <p id="sobre-texto" style="color:var(--ink2)"></p>
+    <p style="margin-top:10px"><a id="maps-link" href="#" target="_blank" rel="noopener" hidden>Ver no mapa</a></p>
+  </section>
+
+  <footer>
+    <span id="rodape-nome"></span><br>
+    Cardápio digital por <a href="https://pacoquinhagamer02-max.github.io/synctech-automation/" target="_blank" rel="noopener">SyncTech Automation</a>
+  </footer>
+</main>
+
+<p class="aria-so-leitor" id="aria-carrinho" aria-live="polite"></p>
+
+<div class="barra" id="barra">
+  <div class="barra-in">
+    <div class="resumo">
+      <small id="barra-itens">0 itens</small>
+      <b id="barra-total">R$ 0,00</b>
+    </div>
+    <button class="btn-whats" id="abrir-pedido" type="button">Ver pedido</button>
+  </div>
+</div>
+
+<div class="fundo" id="fundo"></div>
+
+<aside class="painel" id="painel" role="dialog" aria-modal="true" aria-labelledby="painel-titulo" inert>
+  <div class="painel-topo">
+    <h2 id="painel-titulo">Seu pedido</h2>
+    <button class="fechar" id="fechar-painel" type="button" aria-label="Fechar pedido">✕</button>
+  </div>
+
+  <div class="painel-corpo" id="painel-corpo">
+    <div id="form-pedido">
+      <div id="lista-itens"></div>
+      <div class="totalbox"><span>Total</span><b id="total-valor">R$ 0,00</b></div>
+
+      <div class="modos" role="group" aria-label="Como receber">
+        <button type="button" class="modo" id="modo-retirada" aria-pressed="true">Retirar no local</button>
+        <button type="button" class="modo" id="modo-entrega" aria-pressed="false">Entrega</button>
+      </div>
+
+      <div class="campo">
+        <label for="c-nome">Seu nome</label>
+        <input id="c-nome" type="text" autocomplete="name" aria-describedby="e-nome">
+        <p class="erro" id="e-nome" role="alert" hidden></p>
+      </div>
+
+      <div class="campo" id="campo-endereco" hidden>
+        <label for="c-endereco">Endereço de entrega</label>
+        <input id="c-endereco" type="text" autocomplete="street-address" aria-describedby="e-endereco">
+        <p class="erro" id="e-endereco" role="alert" hidden></p>
+      </div>
+
+      <div class="campo">
+        <label for="c-obs">Observações (opcional)</label>
+        <textarea id="c-obs" rows="2" placeholder="Sem cebola, troco para R$50…"></textarea>
+      </div>
+
+      <div class="pix" id="pix-box" hidden>
+        <h3>Pagar com Pix</h3>
+        <div class="pix-qr" id="pix-qr"></div>
+        <p style="font-weight:700;margin-top:8px" id="pix-valor"></p>
+        <button type="button" id="pix-copiar">Copiar código Pix</button>
+        <p class="obs">Depois de pagar, toque em enviar para avisar. A confirmação é conferida no banco.</p>
+      </div>
+    </div>
+
+    <div class="ok" id="enviado" hidden>
+      <div class="marca">✓</div>
+      <h2>Pedido enviado!</h2>
+      <p style="color:var(--ink2);margin-top:8px">Ele foi aberto no WhatsApp. Se a janela não abriu, toque no botão abaixo.</p>
+      <p style="margin-top:14px"><a id="link-manual" href="#" target="_blank" rel="noopener">Abrir o WhatsApp</a></p>
+    </div>
+  </div>
+
+  <div class="painel-pe" id="painel-pe">
+    <button class="btn-whats" id="enviar" type="button" style="width:100%">Enviar pedido</button>
+  </div>
+</aside>
+
+<script src="assets/qrcode-lib.js"></script>
+<script>
+(function(){
+  'use strict';
+
+  /* ══════════════ CONFIG ══════════════
+     Tudo que muda de cliente pra cliente mora aqui. O Hub da SyncTech monta
+     este objeto e manda codificado em #config=BASE64 (mesmo mecanismo de
+     /bio/ e /agendamento/). Campo vazio = recurso desligado, convenção já
+     usada no resto do projeto (PIX_CHAVE, PEDIDOS_LOG_URL, webhookUrl). */
+  var CONFIG = {
+    bizName: 'Negócio Exemplo',
+    bizSub: '',
+    bizWpp: '5511999990000',
+    heroTitulo: '',
+    heroSub: '',
+    aviso: '',
+    corPrimaria: '#84411F',
+    pixChave: '',
+    pixNome: '',
+    pixCidade: '',
+    entrega: false,
+    entregaTaxa: 0,
+    sobre: '',
+    endereco: '',
+    mapsUrl: '',
+    logUrl: '',
+    categories: [
+      { id: 'geral', label: 'Geral', note: '' }
+    ],
+    products: [
+      { id: 1, name: 'Item de exemplo', description: 'Configure este catálogo pelo Hub da SyncTech.', price: 10, category: 'geral' }
+    ],
+    hours: [],
+    faq: []
+  };
+
+  /* ══════════════ loader do #config= ══════════════
+     Mesma whitelist de chaves usada em bio/index.html — é o padrão mais
+     limpo dos dois loaders que já existem no projeto. */
+  (function(){
+    try {
+      var hash = window.location.hash;
+      if (hash.indexOf('#config=') !== 0) return;
+      var dec = JSON.parse(decodeURIComponent(escape(atob(hash.slice(8)))));
+      ['bizName','bizSub','bizWpp','heroTitulo','heroSub','aviso','corPrimaria',
+       'pixChave','pixNome','pixCidade','entrega','entregaTaxa','sobre','endereco',
+       'mapsUrl','logUrl'].forEach(function(k){
+        if (dec[k] !== undefined && dec[k] !== null && dec[k] !== '') CONFIG[k] = dec[k];
+      });
+      ['categories','products','hours','faq'].forEach(function(k){
+        if (Array.isArray(dec[k]) && dec[k].length) CONFIG[k] = dec[k];
+      });
+    } catch (err) {
+      console.error('Config inválida na URL, usando os valores padrão:', err);
+    }
+  })();
+
+  CONFIG.bizWpp = String(CONFIG.bizWpp).replace(/\D/g, '');
+
+  /* chaves de localStorage isoladas por negócio — dois clientes abertos no
+     mesmo navegador não podem misturar carrinho nem histórico */
+  var NS = 'cat_' + (CONFIG.bizWpp || 'demo') + '_';
+  var K_CART = NS + 'carrinho';
+  var K_PEDIDOS = NS + 'pedidos';
+  var K_NOME = NS + 'nome';
+  var K_END = NS + 'endereco';
+
+  var el = function(id){ return document.getElementById(id); };
+  var cart = {};
+  var modoEntrega = false;
+  var focoAnterior = null;
+
+  function formatBRL(v){
+    return 'R$ ' + v.toFixed(2).replace('.', ',');
+  }
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c];
+    });
+  }
+  /* escape unicode explícito: gravar os caracteres combinantes literais aqui
+     já quebrou duas vezes neste projeto ao editar o arquivo */
+  function normalizar(s){
+    return String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  }
+  function lerSalvo(chave){
+    try { return localStorage.getItem(chave) || ''; } catch (e) { return ''; }
+  }
+  function gravarSalvo(chave, valor){
+    try { localStorage.setItem(chave, valor); } catch (e) { /* modo privado */ }
+  }
+
+  /* ══════════════ tema ══════════════ */
+  function aplicarTema(){
+    var c = CONFIG.corPrimaria;
+    if (!/^#[0-9a-fA-F]{6}$/.test(c)) return;
+    var r = parseInt(c.slice(1,3),16), g = parseInt(c.slice(3,5),16), b = parseInt(c.slice(5,7),16);
+    var esc = '#' + [r,g,b].map(function(x){ return Math.round(x*0.7).toString(16).padStart(2,'0'); }).join('');
+    var claro = 'rgba(' + r + ',' + g + ',' + b + ',.12)';
+    document.documentElement.style.setProperty('--primary', c);
+    document.documentElement.style.setProperty('--primary-esc', esc);
+    document.documentElement.style.setProperty('--primary-claro', claro);
+  }
+
+  /* ══════════════ produtos ══════════════ */
+  function produtoPorId(id){
+    for (var i = 0; i < CONFIG.products.length; i++){
+      if (String(CONFIG.products[i].id) === String(id)) return CONFIG.products[i];
+    }
+    return null;
+  }
+
+  function salvarCarrinho(){
+    try { localStorage.setItem(K_CART, JSON.stringify(cart)); } catch (e) {}
+  }
+  /* Defensivo de propósito: o preço vem sempre do catálogo atual, nunca do
+     que ficou salvo — senão um preço velho congela no carrinho do cliente.
+     Item que saiu do cardápio é descartado e quantidade inválida é ignorada. */
+  function restaurarCarrinho(){
+    var bruto;
+    try { bruto = JSON.parse(localStorage.getItem(K_CART) || '{}'); } catch (e) { return; }
+    if (!bruto || typeof bruto !== 'object') return;
+    Object.keys(bruto).forEach(function(id){
+      var qtd = Number(bruto[id]);
+      if (!produtoPorId(id) || !isFinite(qtd) || qtd < 1) return;
+      cart[id] = Math.min(Math.floor(qtd), 99);
+    });
+  }
+
+  function linhas(){
+    return Object.keys(cart).map(function(id){
+      var p = produtoPorId(id);
+      return p ? { p: p, qtd: cart[id] } : null;
+    }).filter(Boolean);
+  }
+  function total(){
+    return linhas().reduce(function(s, l){ return s + l.p.price * l.qtd; }, 0);
+  }
+  function contar(){
+    return linhas().reduce(function(s, l){ return s + l.qtd; }, 0);
+  }
+  function setQtd(id, qtd){
+    if (qtd <= 0) delete cart[id];
+    else cart[id] = Math.min(qtd, 99);
+    salvarCarrinho();
+    pintarTudo();
+  }
+
+  /* ══════════════ montagem do cardápio ══════════════ */
+  function montarCategorias(){
+    var c = el('cats');
+    var todas = [{ id: 'tudo', label: 'Tudo' }].concat(CONFIG.categories);
+    c.innerHTML = todas.map(function(cat){
+      return '<button type="button" class="cat-btn" data-cat="' + escapeHtml(cat.id) + '" aria-pressed="' +
+        (cat.id === 'tudo' ? 'true' : 'false') + '">' + escapeHtml(cat.label) + '</button>';
+    }).join('');
+  }
+
+  function cardHTML(p){
+    return '<article class="item" data-id="' + escapeHtml(p.id) + '">' +
+      '<div class="item-txt">' +
+        (p.badge ? '<span class="tag">' + escapeHtml(p.badge) + '</span>' : '') +
+        '<h3>' + escapeHtml(p.name) + '</h3>' +
+        (p.description ? '<p>' + escapeHtml(p.description) + '</p>' : '') +
+        '<div class="preco"><span class="cur">R$</span> ' + p.price.toFixed(2).replace('.', ',') + '</div>' +
+      '</div>' +
+      '<div class="item-acao">' +
+        '<button type="button" class="add" data-add="' + escapeHtml(p.id) + '" aria-label="Adicionar ' + escapeHtml(p.name) + '">+</button>' +
+        '<div class="stepper" data-step="' + escapeHtml(p.id) + '" hidden>' +
+          '<button type="button" class="step-btn" data-menos="' + escapeHtml(p.id) + '" aria-label="Tirar um">−</button>' +
+          '<span class="qtd" data-qtd="' + escapeHtml(p.id) + '">0</span>' +
+          '<button type="button" class="step-btn" data-mais="' + escapeHtml(p.id) + '" aria-label="Somar um">+</button>' +
+        '</div>' +
+      '</div>' +
+    '</article>';
+  }
+
+  function montarCardapio(){
+    el('cardapio').innerHTML = CONFIG.categories.map(function(cat){
+      var itens = CONFIG.products.filter(function(p){ return p.category === cat.id; });
+      if (!itens.length) return '';
+      return '<section class="cat-block" data-cat="' + escapeHtml(cat.id) + '">' +
+        '<h2>' + escapeHtml(cat.label) + '</h2>' +
+        (cat.note ? '<p class="cat-nota">' + escapeHtml(cat.note) + '</p>' : '') +
+        '<div class="grade">' + itens.map(cardHTML).join('') + '</div>' +
+      '</section>';
+    }).join('');
+  }
+
+  var catAtiva = 'tudo';
+
+  function aplicarFiltro(){
+    var termo = normalizar(el('busca').value.trim());
+    var algum = false;
+    Array.prototype.forEach.call(document.querySelectorAll('.cat-block'), function(bloco){
+      var visiveis = 0;
+      Array.prototype.forEach.call(bloco.querySelectorAll('.item'), function(item){
+        var p = produtoPorId(item.dataset.id);
+        var casaTermo = !termo || normalizar(p.name + ' ' + (p.description || '')).indexOf(termo) !== -1;
+        var casaCat = termo ? true : (catAtiva === 'tudo' || p.category === catAtiva);
+        var mostra = casaTermo && casaCat;
+        item.hidden = !mostra;
+        if (mostra) visiveis++;
+      });
+      bloco.hidden = visiveis === 0;
+      if (visiveis) algum = true;
+    });
+    el('vazio').hidden = algum;
+  }
+
+  /* Achado real do projeto: filtrar sem rolar deixa a pessoa parada numa
+     categoria diferente da que clicou, porque os blocos acima encolhem. */
+  function rolarParaCategoria(){
+    if (catAtiva === 'tudo') return;
+    var alvo = document.querySelector('.cat-block[data-cat="' + catAtiva + '"]');
+    if (!alvo || alvo.hidden) return;
+    var barra = document.querySelector('.menu-bar');
+    var folga = 68 + (barra ? barra.offsetHeight : 0) + 14;
+    var y = alvo.getBoundingClientRect().top + window.scrollY - folga;
+    window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+  }
+
+  /* ══════════════ pintura ══════════════ */
+  function pintarSteppers(){
+    Array.prototype.forEach.call(document.querySelectorAll('[data-step]'), function(st){
+      var id = st.dataset.step;
+      var qtd = cart[id] || 0;
+      st.hidden = qtd === 0;
+      var add = document.querySelector('[data-add="' + id + '"]');
+      if (add) add.hidden = qtd > 0;
+      var span = document.querySelector('[data-qtd="' + id + '"]');
+      if (span) span.textContent = qtd;
+    });
+  }
+  function pintarBarra(){
+    var n = contar();
+    var t = total();
+    el('barra').classList.toggle('on', n > 0);
+    el('barra-itens').textContent = n === 1 ? '1 item' : n + ' itens';
+    el('barra-total').textContent = formatBRL(t);
+    el('aria-carrinho').textContent = n === 0 ? 'Pedido vazio' : n + (n === 1 ? ' item' : ' itens') + ', total ' + formatBRL(t);
+  }
+  function pintarPainel(){
+    var ls = linhas();
+    el('lista-itens').innerHTML = ls.length ? ls.map(function(l){
+      return '<div class="linha-item">' +
+        '<div class="stepper" style="position:static">' +
+          '<button type="button" class="step-btn" data-menos="' + escapeHtml(l.p.id) + '" aria-label="Tirar um ' + escapeHtml(l.p.name) + '">' + (l.qtd === 1 ? '🗑' : '−') + '</button>' +
+          '<span class="qtd">' + l.qtd + '</span>' +
+          '<button type="button" class="step-btn" data-mais="' + escapeHtml(l.p.id) + '" aria-label="Somar um ' + escapeHtml(l.p.name) + '">+</button>' +
+        '</div>' +
+        '<span class="n">' + escapeHtml(l.p.name) + '</span>' +
+        '<span class="v">' + formatBRL(l.p.price * l.qtd) + '</span>' +
+      '</div>';
+    }).join('') : '<p style="color:var(--muted);padding:16px 0">Seu pedido está vazio.</p>';
+    var t = total();
+    el('total-valor').textContent = formatBRL(t);
+    el('enviar').textContent = t > 0 ? 'Enviar pedido — ' + formatBRL(t) : 'Enviar pedido';
+    el('enviar').disabled = t <= 0;
+    renderPix(t);
+  }
+  function pintarTudo(){
+    pintarSteppers();
+    pintarBarra();
+    pintarPainel();
+  }
+
+  /* ══════════════ Pix (BR Code / EMV do Banco Central) ══════════════ */
+  function paraPixTexto(s, max){
+    var limpo = String(s).normalize('NFD').replace(/[̀-ͯ]/g, '')
+      .toUpperCase().replace(/[^A-Z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
+    return limpo.slice(0, max);
+  }
+  function campoEMV(id, valor){
+    return id + String(valor.length).padStart(2, '0') + valor;
+  }
+  function crc16(texto){
+    var crc = 0xFFFF;
+    for (var i = 0; i < texto.length; i++){
+      crc ^= texto.charCodeAt(i) << 8;
+      for (var b = 0; b < 8; b++){
+        crc = (crc & 0x8000) ? ((crc << 1) ^ 0x1021) : (crc << 1);
+        crc &= 0xFFFF;
+      }
+    }
+    return crc.toString(16).toUpperCase().padStart(4, '0');
+  }
+  function pixPayload(valor){
+    var valorFmt = (Math.round(valor * 100) / 100).toFixed(2);
+    var infoConta = campoEMV('00', 'BR.GOV.BCB.PIX') + campoEMV('01', String(CONFIG.pixChave).trim());
+    var p =
+      campoEMV('00', '01') +
+      campoEMV('01', '12') +
+      campoEMV('26', infoConta) +
+      campoEMV('52', '0000') +
+      campoEMV('53', '986') +
+      campoEMV('54', valorFmt) +
+      campoEMV('58', 'BR') +
+      campoEMV('59', paraPixTexto(CONFIG.pixNome || CONFIG.bizName, 25) || 'RECEBEDOR') +
+      campoEMV('60', paraPixTexto(CONFIG.pixCidade, 15) || 'BRASIL') +
+      campoEMV('62', campoEMV('05', '***'));
+    p += '6304';
+    return p + crc16(p);
+  }
+  function renderPix(valor){
+    var caixa = el('pix-box');
+    if (!String(CONFIG.pixChave).trim() || !(valor > 0) || typeof qrcode !== 'function') {
+      caixa.hidden = true;
+      return;
+    }
+    caixa.hidden = false;
+    el('pix-valor').textContent = formatBRL(valor);
+    var payload = pixPayload(valor);
+    try {
+      var qr = qrcode(0, 'M');
+      qr.addData(payload);
+      qr.make();
+      el('pix-qr').innerHTML = qr.createSvgTag({ scalable: true });
+    } catch (e) {
+      console.error('Falha ao gerar o QR do Pix:', e);
+      caixa.hidden = true;
+      return;
+    }
+    el('pix-copiar').onclick = function(){
+      copiarTexto(payload).then(function(){
+        var btn = el('pix-copiar');
+        var antes = btn.textContent;
+        btn.textContent = 'Código copiado!';
+        setTimeout(function(){ btn.textContent = antes; }, 2200);
+      });
+    };
+  }
+  function copiarTexto(texto){
+    if (navigator.clipboard && window.isSecureContext) {
+      return navigator.clipboard.writeText(texto).catch(function(){ return copiarAntigo(texto); });
+    }
+    return copiarAntigo(texto);
+  }
+  function copiarAntigo(texto){
+    return new Promise(function(resolve){
+      var area = document.createElement('textarea');
+      area.value = texto;
+      area.style.position = 'fixed';
+      area.style.opacity = '0';
+      document.body.appendChild(area);
+      area.select();
+      try { document.execCommand('copy'); } catch (e) { console.error('Falha ao copiar:', e); }
+      document.body.removeChild(area);
+      resolve();
+    });
+  }
+
+  /* ══════════════ registro do pedido (opcional) ══════════════ */
+  function logPedido(dados){
+    if (!CONFIG.logUrl) return;
+    var corpo = JSON.stringify(Object.assign({ data: new Date().toISOString() }, dados));
+    /* sendBeacon porque a página pula pro WhatsApp logo depois e um fetch
+       comum seria cancelado no meio, perdendo o registro */
+    try {
+      if (navigator.sendBeacon && navigator.sendBeacon(CONFIG.logUrl, new Blob([corpo], { type: 'text/plain' }))) return;
+    } catch (e) { console.error('sendBeacon falhou:', e); }
+    fetch(CONFIG.logUrl, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: corpo, keepalive: true })
+      .catch(function(e){ console.error('Falha ao registrar pedido:', e); });
+  }
+
+  /* ══════════════ mensagem do WhatsApp ══════════════ */
+  function mensagemPedido(pedido){
+    var L = [];
+    L.push('*Novo pedido — ' + CONFIG.bizName + '*');
+    L.push('');
+    pedido.itens.forEach(function(i){
+      L.push(i.qtd + 'x ' + i.nome + ' — ' + formatBRL(i.subtotal));
+    });
+    L.push('');
+    L.push('*Total:* ' + formatBRL(pedido.total));
+    L.push('*Modo:* ' + pedido.modo);
+    L.push('*Nome:* ' + pedido.nome);
+    if (pedido.endereco) L.push('*Endereço:* ' + pedido.endereco);
+    if (pedido.obs) L.push('*Observações:* ' + pedido.obs);
+    return L.join('\n');
+  }
+  function urlWhats(msg){
+    return 'https://wa.me/' + CONFIG.bizWpp + '?text=' + encodeURIComponent(msg);
+  }
+  function abrirWhatsApp(url){
+    /* noopener: sem isso a aba nova ganha window.opener e poderia redirecionar
+       esta aba sem o cliente perceber (reverse tabnabbing) */
+    var janela = window.open(url, '_blank', 'noopener');
+    if (!janela) location.href = url;
+  }
+
+  /* ══════════════ histórico ══════════════ */
+  function lerPedidos(){
+    try {
+      var v = JSON.parse(localStorage.getItem(K_PEDIDOS) || '[]');
+      return Array.isArray(v) ? v : [];
+    } catch (e) { return []; }
+  }
+  function salvarPedido(p){
+    var lista = lerPedidos();
+    lista.unshift(p);
+    try { localStorage.setItem(K_PEDIDOS, JSON.stringify(lista.slice(0, 20))); } catch (e) {}
+  }
+  function montarRepeticao(){
+    var lista = lerPedidos();
+    var box = el('repetir');
+    if (!lista.length) { box.hidden = true; return; }
+    box.hidden = false;
+    el('repetir-fila').innerHTML = lista.slice(0, 5).map(function(p, i){
+      var resumo = p.itens.map(function(it){ return it.qtd + 'x ' + it.nome; }).join(', ');
+      return '<div class="rep-card">' +
+        '<small>' + escapeHtml(p.quando || '') + '</small>' +
+        '<b>' + escapeHtml(resumo.length > 60 ? resumo.slice(0, 60) + '…' : resumo) + '</b>' +
+        '<button type="button" data-repetir="' + i + '">Pedir de novo</button>' +
+      '</div>';
+    }).join('');
+  }
+  function repetirPedido(indice){
+    var p = lerPedidos()[indice];
+    if (!p) return;
+    cart = {};
+    p.itens.forEach(function(it){
+      if (produtoPorId(it.id)) cart[it.id] = it.qtd;
+    });
+    salvarCarrinho();
+    pintarTudo();
+    abrirPainel();
+  }
+
+  /* ══════════════ painel ══════════════ */
+  function sincronizarInert(aberto){
+    /* o painel fica no DOM quando fechado (só deslocado por transform), então
+       sem `inert` o Tab do rodapé cai dentro dele. Bug real achado com teclado. */
+    el('painel').inert = !aberto;
+  }
+  function abrirPainel(){
+    focoAnterior = document.activeElement;
+    el('enviado').hidden = true;
+    el('form-pedido').hidden = false;
+    el('painel-pe').hidden = false;
+    el('c-nome').value = el('c-nome').value || lerSalvo(K_NOME);
+    el('c-endereco').value = el('c-endereco').value || lerSalvo(K_END);
+    el('fundo').classList.add('on');
+    el('painel').classList.add('on');
+    sincronizarInert(true);
+    pintarPainel();
+    setTimeout(function(){ el('fechar-painel').focus(); }, 60);
+  }
+  function fecharPainel(){
+    el('fundo').classList.remove('on');
+    el('painel').classList.remove('on');
+    sincronizarInert(false);
+    if (focoAnterior && focoAnterior.focus) focoAnterior.focus();
+  }
+
+  function marcarErro(idCampo, idErro, mensagem){
+    var campo = el(idCampo), erro = el(idErro);
+    if (mensagem) {
+      campo.setAttribute('aria-invalid', 'true');
+      /* escrever o texto na hora é o que dispara o anúncio do role="alert";
+         só revelar um span já preenchido não anuncia */
+      erro.textContent = mensagem;
+      erro.hidden = false;
+    } else {
+      campo.removeAttribute('aria-invalid');
+      erro.textContent = '';
+      erro.hidden = true;
+    }
+  }
+
+  function enviar(){
+    var nome = el('c-nome').value.trim();
+    var endereco = el('c-endereco').value.trim();
+    var obs = el('c-obs').value.trim();
+    var ls = linhas();
+    if (!ls.length) return;
+
+    var falhou = false;
+    if (!nome) { marcarErro('c-nome', 'e-nome', 'Escreva seu nome para a loja saber quem é.'); falhou = true; }
+    else marcarErro('c-nome', 'e-nome', '');
+    if (modoEntrega && !endereco) { marcarErro('c-endereco', 'e-endereco', 'Precisamos do endereço para entregar.'); falhou = true; }
+    else marcarErro('c-endereco', 'e-endereco', '');
+    if (falhou) { (nome ? el('c-endereco') : el('c-nome')).focus(); return; }
+
+    var pedido = {
+      itens: ls.map(function(l){ return { id: l.p.id, nome: l.p.name, qtd: l.qtd, subtotal: l.p.price * l.qtd }; }),
+      total: total(),
+      modo: modoEntrega ? 'Entrega' : 'Retirada no local',
+      nome: nome,
+      endereco: modoEntrega ? endereco : '',
+      obs: obs,
+      quando: new Date().toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
+    };
+
+    /* gravar ANTES de abrir o WhatsApp: o fallback de popup bloqueado faz
+       location.href e pode levar embora o resto do handler */
+    gravarSalvo(K_NOME, nome);
+    if (modoEntrega && endereco) gravarSalvo(K_END, endereco);
+    salvarPedido(pedido);
+    logPedido({ tipo: 'pedido', total: pedido.total, modo: pedido.modo, nome: nome, itens: pedido.itens.map(function(i){ return i.qtd + 'x ' + i.nome; }).join(' | ') });
+
+    var url = urlWhats(mensagemPedido(pedido));
+    el('link-manual').href = url;
+    abrirWhatsApp(url);
+
+    cart = {};
+    salvarCarrinho();
+    pintarTudo();
+    montarRepeticao();
+    el('form-pedido').hidden = true;
+    el('painel-pe').hidden = true;
+    el('enviado').hidden = false;
+  }
+
+  /* ══════════════ horários ══════════════ */
+  function montarHorarios(){
+    if (!CONFIG.hours.length) return;
+    el('bloco-horarios').hidden = false;
+    var hoje = new Date().getDay();
+    el('horarios').innerHTML = CONFIG.hours.map(function(h){
+      return '<div class="' + (h.dia === hoje ? 'hoje' : '') + '"><span>' + escapeHtml(h.day) + '</span><span>' +
+        escapeHtml(h.fechado ? 'Fechado' : h.value) + '</span></div>';
+    }).join('');
+    var linha = CONFIG.hours.filter(function(h){ return h.dia === hoje; })[0];
+    var badge = el('status');
+    if (!linha) { badge.textContent = '—'; return; }
+    if (linha.fechado) { badge.textContent = 'Fechado hoje'; badge.className = 'aberto off'; return; }
+    badge.textContent = 'Hoje: ' + linha.value;
+    badge.className = 'aberto on';
+  }
+
+  function montarFaq(){
+    if (!CONFIG.faq.length) return;
+    el('bloco-faq').hidden = false;
+    el('faq').innerHTML = CONFIG.faq.map(function(par){
+      return '<details><summary>' + escapeHtml(par[0]) + '</summary><p>' + escapeHtml(par[1]) + '</p></details>';
+    }).join('');
+  }
+
+  function montarTopo(){
+    document.title = CONFIG.bizName + ' — Cardápio';
+    el('logo').textContent = (CONFIG.bizName || 'N').trim().charAt(0).toUpperCase();
+    el('biz-nome').textContent = CONFIG.bizName;
+    el('biz-sub').textContent = CONFIG.bizSub || CONFIG.endereco || '';
+    el('rodape-nome').textContent = CONFIG.bizName;
+    el('hero-titulo').textContent = CONFIG.heroTitulo || 'Monte seu pedido';
+    if (CONFIG.heroSub) el('hero-sub').textContent = CONFIG.heroSub;
+    if (CONFIG.aviso) { el('aviso').textContent = CONFIG.aviso; el('aviso').hidden = false; }
+    if (CONFIG.sobre) {
+      el('bloco-sobre').hidden = false;
+      el('sobre-titulo').textContent = 'Sobre ' + CONFIG.bizName;
+      el('sobre-texto').textContent = CONFIG.sobre;
+    }
+    if (CONFIG.mapsUrl) {
+      el('bloco-sobre').hidden = false;
+      el('maps-link').href = CONFIG.mapsUrl;
+      el('maps-link').hidden = false;
+    }
+    if (!CONFIG.entrega) {
+      el('modo-entrega').hidden = true;
+    }
+  }
+
+  /* ══════════════ eventos ══════════════ */
+  function ligarEventos(){
+    document.addEventListener('click', function(ev){
+      var t = ev.target.closest('[data-add],[data-mais],[data-menos],[data-cat],[data-repetir]');
+      if (!t) return;
+      if (t.dataset.add !== undefined)   { setQtd(t.dataset.add, (cart[t.dataset.add] || 0) + 1); return; }
+      if (t.dataset.mais !== undefined)  { setQtd(t.dataset.mais, (cart[t.dataset.mais] || 0) + 1); return; }
+      if (t.dataset.menos !== undefined) { setQtd(t.dataset.menos, (cart[t.dataset.menos] || 0) - 1); return; }
+      if (t.dataset.repetir !== undefined) { repetirPedido(Number(t.dataset.repetir)); return; }
+      if (t.dataset.cat !== undefined) {
+        catAtiva = t.dataset.cat;
+        Array.prototype.forEach.call(document.querySelectorAll('.cat-btn'), function(b){
+          b.setAttribute('aria-pressed', String(b.dataset.cat === catAtiva));
+        });
+        aplicarFiltro();
+        rolarParaCategoria();
+      }
+    });
+
+    el('busca').addEventListener('input', aplicarFiltro);
+    el('abrir-pedido').addEventListener('click', abrirPainel);
+    el('fechar-painel').addEventListener('click', fecharPainel);
+    el('fundo').addEventListener('click', fecharPainel);
+    el('enviar').addEventListener('click', enviar);
+    document.addEventListener('keydown', function(ev){
+      if (ev.key === 'Escape' && el('painel').classList.contains('on')) fecharPainel();
+    });
+
+    el('modo-retirada').addEventListener('click', function(){
+      modoEntrega = false;
+      el('modo-retirada').setAttribute('aria-pressed', 'true');
+      el('modo-entrega').setAttribute('aria-pressed', 'false');
+      el('campo-endereco').hidden = true;
+    });
+    el('modo-entrega').addEventListener('click', function(){
+      modoEntrega = true;
+      el('modo-entrega').setAttribute('aria-pressed', 'true');
+      el('modo-retirada').setAttribute('aria-pressed', 'false');
+      el('campo-endereco').hidden = false;
+    });
+  }
+
+  /* ══════════════ início ══════════════ */
+  aplicarTema();
+  montarTopo();
+  montarCategorias();
+  montarCardapio();
+  montarHorarios();
+  montarFaq();
+  restaurarCarrinho();
+  montarRepeticao();
+  ligarEventos();
+  aplicarFiltro();
+  pintarTudo();
+  sincronizarInert(false);
+})();
+</script>
+</body>
+</html>
