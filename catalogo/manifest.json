@@ -1,0 +1,26 @@
+{
+  "name": "Cardápio digital",
+  "short_name": "Cardápio",
+  "description": "Monte seu pedido e finalize direto no WhatsApp.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FBF8F4",
+  "theme_color": "#84411F",
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='42' fill='%2384411F'/%3E%3Cpath d='M64 72h64l-5 50a13 13 0 0 1-13 12H82a13 13 0 0 1-13-12z' fill='none' stroke='%23fff' stroke-width='9' stroke-linejoin='round'/%3E%3Cpath d='M80 72V63a16 16 0 0 1 32 0v9' fill='none' stroke='%23fff' stroke-width='9' stroke-linecap='round'/%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='112' fill='%2384411F'/%3E%3Cpath d='M170 192h172l-13 134a35 35 0 0 1-35 32H218a35 35 0 0 1-35-32z' fill='none' stroke='%23fff' stroke-width='24' stroke-linejoin='round'/%3E%3Cpath d='M213 192v-24a43 43 0 0 1 86 0v24' fill='none' stroke='%23fff' stroke-width='24' stroke-linecap='round'/%3E%3C/svg%3E",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

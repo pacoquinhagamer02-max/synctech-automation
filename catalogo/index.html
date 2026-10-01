@@ -2,11 +2,24 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2384411F'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='Georgia,serif' font-weight='700' font-size='18' fill='%23ffffff'%3EC%3C/text%3E%3C/svg%3E">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="SyncTech Automation">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:title" content="Cardápio digital">
+<meta property="og:description" content="Monte seu pedido e finalize direto no WhatsApp.">
+<meta name="twitter:card" content="summary">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Cardápio digital</title>
 <meta name="description" content="Monte seu pedido e finalize direto no WhatsApp.">
 <meta name="theme-color" content="#FBF8F4">
 <meta name="robots" content="noindex, nofollow">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%2384411F'/%3E%3C/svg%3E">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Cardápio">
+<meta name="mobile-web-app-capable" content="yes">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap">
@@ -17,6 +30,16 @@
      do navegador. Este bug apareceu três vezes no projeto antes de virar regra
      global. Não repetir o remendo classe a classe. */
   [hidden]{display:none!important}
+
+  /* Botao de instalar: so aparece quando o navegador oferece o convite
+     (beforeinstallprompt). No iOS o convite nao existe, entao a dica de
+     "Compartilhar > Adicionar a Tela de Inicio" entra no lugar. */
+  .instalar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom));
+    z-index:60;display:flex;align-items:center;gap:8px;border:0;border-radius:999px;
+    padding:12px 20px;font:inherit;font-size:.9rem;font-weight:700;cursor:pointer;
+    background:var(--primary,#84411F);color:#fff;box-shadow:0 8px 24px rgba(0,0,0,.28)}
+  .instalar svg{flex:none}
+  .instalar .fechar{margin-left:4px;opacity:.75;font-weight:700}
 
   :root{
     color-scheme: light;
@@ -302,6 +325,13 @@
 </aside>
 
 <script src="assets/qrcode-lib.js"></script>
+<button class="instalar" id="btn-instalar" hidden>
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"
+       stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M8 1.6v8.4M4.6 7l3.4 3.4L11.4 7"/><path d="M2.4 11.6v1.3a1.5 1.5 0 001.5 1.5h8.2a1.5 1.5 0 001.5-1.5v-1.3"/>
+  </svg>
+  <span id="btn-instalar-txt">Instalar aplicativo</span>
+</button>
 <script>
 (function(){
   'use strict';
@@ -1055,6 +1085,107 @@
   aplicarFiltro();
   pintarTudo();
   sincronizarInert(false);
+
+  /* ═══════════ Aplicativo instalavel ═══════════
+     O manifest estatico garante que a instalacao existe; aqui ele e
+     trocado por um com o nome e a cor do cliente. start_url leva o hash
+     inteiro para o icone abrir o cardapio DAQUELE cliente — sem isso o
+     atalho instalado abriria o exemplo. */
+  function iconeSVG(tamanho, letra, cor) {
+    var fonte = Math.round(tamanho * 0.46);
+    return 'data:image/svg+xml,' + encodeURIComponent(
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + tamanho + ' ' + tamanho + '">' +
+      '<rect width="' + tamanho + '" height="' + tamanho + '" rx="' + Math.round(tamanho * 0.22) + '" fill="' + cor + '"/>' +
+      '<text x="50%" y="50%" dy="' + Math.round(fonte * 0.35) + '" text-anchor="middle" ' +
+      'font-family="Georgia,serif" font-weight="700" font-size="' + fonte + '" fill="#ffffff">' +
+      letra + '</text></svg>');
+  }
+
+  function montarManifest() {
+    try {
+      var nome = (CONFIG.bizName || 'Card\u00e1pio').trim();
+      var letra = nome.charAt(0).toUpperCase().replace(/[<>&"]/g, '');
+      var cor = CONFIG.corPrimaria || '#84411F';
+      var manifesto = {
+        name: nome,
+        short_name: nome.length > 12 ? nome.slice(0, 12).trim() : nome,
+        description: CONFIG.heroSub || 'Monte seu pedido e finalize direto no WhatsApp.',
+        start_url: location.href,
+        scope: './',
+        display: 'standalone',
+        orientation: 'portrait',
+        background_color: '#FBF8F4',
+        theme_color: cor,
+        lang: 'pt-BR',
+        icons: [
+          { src: iconeSVG(192, letra, cor), sizes: '192x192', type: 'image/svg+xml', purpose: 'any' },
+          { src: iconeSVG(512, letra, cor), sizes: '512x512', type: 'image/svg+xml', purpose: 'any maskable' }
+        ]
+      };
+      var url = URL.createObjectURL(new Blob([JSON.stringify(manifesto)], { type: 'application/manifest+json' }));
+      var link = document.querySelector('link[rel="manifest"]');
+      if (link) link.href = url;
+
+      document.title = nome;
+      var t = document.querySelector('meta[name="apple-mobile-web-app-title"]');
+      if (t) t.content = manifesto.short_name;
+      var ti = document.querySelector('link[rel="apple-touch-icon"]');
+      if (ti) ti.href = iconeSVG(180, letra, cor);
+      var tc = document.querySelector('meta[name="theme-color"]');
+      if (tc) tc.content = cor;
+    } catch (e) {}
+  }
+  montarManifest();
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('sw.js').catch(function () {});
+    });
+  }
+
+  /* O convite de instalacao so pode ser disparado dentro do gesto do
+     usuario, entao o evento e guardado e usado no clique. */
+  var convite = null;
+  var btn = document.getElementById('btn-instalar');
+  var btnTxt = document.getElementById('btn-instalar-txt');
+
+  window.addEventListener('beforeinstallprompt', function (ev) {
+    ev.preventDefault();
+    convite = ev;
+    if (localStorage.getItem(NS + 'instalar_dispensado') === '1') return;
+    btn.hidden = false;
+  });
+
+  btn.addEventListener('click', function () {
+    if (!convite) { btn.hidden = true; return; }
+    convite.prompt();
+    convite.userChoice.then(function () {
+      convite = null;
+      btn.hidden = true;
+      try { localStorage.setItem(NS + 'instalar_dispensado', '1'); } catch (e) {}
+    });
+  });
+
+  window.addEventListener('appinstalled', function () {
+    btn.hidden = true;
+    try { localStorage.setItem(NS + 'instalar_dispensado', '1'); } catch (e) {}
+  });
+
+  /* iOS nao dispara beforeinstallprompt: a instalacao e manual pelo menu
+     Compartilhar. Sem essa dica o usuario de iPhone nunca descobre. */
+  (function dicaIOS() {
+    var ehIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    var jaInstalado = window.navigator.standalone === true ||
+      window.matchMedia('(display-mode: standalone)').matches;
+    if (!ehIOS || jaInstalado) return;
+    if (localStorage.getItem(NS + 'instalar_dispensado') === '1') return;
+    btnTxt.textContent = 'Compartilhar \u2192 Adicionar \u00e0 Tela de In\u00edcio';
+    btn.hidden = false;
+    btn.addEventListener('click', function () {
+      btn.hidden = true;
+      try { localStorage.setItem(NS + 'instalar_dispensado', '1'); } catch (e) {}
+    });
+  })();
 })();
 </script>
 </body>

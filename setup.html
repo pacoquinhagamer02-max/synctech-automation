@@ -127,11 +127,11 @@ h1,h2,h3,.logo{font-family:var(--font-head)}
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">Nome do negócio *</label>
-        <input class="form-input" id="s1-name" placeholder="Ex: Barbearia do João">
+        <input class="form-input" id="s1-name" placeholder="Ex: Barbearia do João" aria-label="Nome do negócio">
       </div>
       <div class="form-group">
         <label class="form-label">Tipo de negócio</label>
-        <select class="form-input" id="s1-type">
+        <select class="form-input" id="s1-type" aria-label="Tipo de negócio">
           <option value="">Selecione...</option>
           <option>Barbearia</option>
           <option>Salão de beleza</option>
@@ -147,21 +147,21 @@ h1,h2,h3,.logo{font-family:var(--font-head)}
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">WhatsApp do dono *</label>
-        <input class="form-input" id="s1-wpp" placeholder="(11) 99999-9999" type="tel">
+        <input class="form-input" id="s1-wpp" placeholder="(11) 99999-9999" type="tel" aria-label="WhatsApp do negócio">
         <div class="form-hint">Número que vai receber as notificações de agendamento</div>
       </div>
       <div class="form-group">
         <label class="form-label">Instagram</label>
-        <input class="form-input" id="s1-ig" placeholder="@seunegocio">
+        <input class="form-input" id="s1-ig" placeholder="@seunegocio" aria-label="Instagram do negócio">
       </div>
     </div>
     <div class="form-group">
       <label class="form-label">Endereço</label>
-      <input class="form-input" id="s1-addr" placeholder="Rua das Flores, 123 — Centro — SP">
+      <input class="form-input" id="s1-addr" placeholder="Rua das Flores, 123 — Centro — SP" aria-label="Endereço">
     </div>
     <div class="form-group">
       <label class="form-label">Link avaliação Google <span style="font-size:0.65rem;color:var(--faint);font-weight:400;text-transform:none">(opcional — aparece na confirmação do agendamento)</span></label>
-      <input class="form-input" id="s1-review" placeholder="https://g.page/r/XXXXX/review">
+      <input class="form-input" id="s1-review" placeholder="https://g.page/r/XXXXX/review" aria-label="Link de avaliação do Google">
       <div class="form-hint">Google Maps → seu negócio → "Peça avaliações" → copie o link curto</div>
     </div>
 
@@ -212,7 +212,7 @@ h1,h2,h3,.logo{font-family:var(--font-head)}
 
     <div class="form-group">
       <label class="form-label">URL do Webhook *</label>
-      <input class="form-input" id="s3-webhook" placeholder="https://hook.eu1.make.com/abc123xyz">
+      <input class="form-input" id="s3-webhook" placeholder="https://hook.eu1.make.com/abc123xyz" aria-label="URL do webhook">
       <div class="form-hint">Deixe em branco por enquanto se ainda não tiver — pode configurar depois no Dashboard → Configurações</div>
     </div>
 
@@ -337,9 +337,9 @@ function renderSvcs() {
   var icons = getIcons();
   b.innerHTML = DATA.services.map(function(s,i){
     return '<div class="svc-row" id="sr-'+s.id+'">' +
-      '<input class="form-input" placeholder="Nome do serviço" value="'+s.name+'" oninput="DATA.services['+i+'].name=this.value" style="grid-column:span 2">' +
-      '<input class="form-input" placeholder="R$" value="'+s.price+'" type="number" min="0" oninput="DATA.services['+i+'].price=+this.value">' +
-      '<input class="form-input" placeholder="min" value="'+s.duration+'" type="number" min="5" oninput="DATA.services['+i+'].duration=+this.value">' +
+      '<input aria-label="Nome do serviço" class="form-input" placeholder="Nome do serviço" value="'+s.name+'" oninput="DATA.services['+i+'].name=this.value" style="grid-column:span 2">' +
+      '<input aria-label="Preço do serviço" class="form-input" placeholder="R$" value="'+s.price+'" type="number" min="0" oninput="DATA.services['+i+'].price=+this.value">' +
+      '<input aria-label="Duração em minutos" class="form-input" placeholder="min" value="'+s.duration+'" type="number" min="5" oninput="DATA.services['+i+'].duration=+this.value">' +
       '<button class="btn-del" onclick="delSvc('+s.id+')" title="Remover">✕</button>' +
     '</div>';
   }).join('') +
@@ -490,8 +490,8 @@ function addIntakeQuestion() {
   row.className = 'iq-row';
   row.style.cssText = 'display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center';
   row.innerHTML =
-    '<input class="form-input iq-label" placeholder="Ex: Tem alguma alergia?" style="font-size:0.82rem">' +
-    '<select class="form-input iq-type" style="width:110px;font-size:0.78rem">' +
+    '<input aria-label="Pergunta ao cliente" class="form-input iq-label" placeholder="Ex: Tem alguma alergia?" style="font-size:0.82rem">' +
+    '<select aria-label="Tipo da pergunta" class="form-input iq-type" style="width:110px;font-size:0.78rem">' +
       '<option value="text">Texto</option>' +
       '<option value="textarea">Texto longo</option>' +
     '</select>' +
