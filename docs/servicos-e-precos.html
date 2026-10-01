@@ -1,0 +1,519 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Serviços e Preços SyncTech</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+  :root{
+    color-scheme: light dark;
+    --paper:#FFFFFF;
+    --ground:#F6F3FC;
+    --raised:#FBF9FF;
+    --ink:#140C24;
+    --ink2:#453A60;
+    --muted:#6E648A;
+    --line:#E5DDF4;
+    --line2:#D5C8ED;
+    --violet:#6E3BD1;
+    --violet-deep:#43208A;
+    --lilac:#F1EAFF;
+    --good:#1C6A45;
+    --good-bg:#E2F1E9;
+    --warn:#7A4A12;
+    --warn-bg:#FBEEDC;
+    --on-violet:#FFFFFF;
+    --shadow:0 1px 2px rgba(20,12,36,.05), 0 8px 24px -16px rgba(20,12,36,.22);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#1A1430;
+      --ground:#100B1E;
+      --raised:#221A3D;
+      --ink:#EFE9FB;
+      --ink2:#C3B8DE;
+      --muted:#9387B4;
+      --line:#2E2550;
+      --line2:#3D3268;
+      --violet:#B18CFF;
+      --violet-deep:#CDB3FF;
+      --lilac:#261D46;
+      --good:#7FD6A9;
+      --good-bg:#15301F;
+      --warn:#E8BE86;
+      --warn-bg:#352512;
+      --on-violet:#140C24;
+      --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 28px -18px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#1A1430; --ground:#100B1E; --raised:#221A3D;
+    --ink:#EFE9FB; --ink2:#C3B8DE; --muted:#9387B4;
+    --line:#2E2550; --line2:#3D3268;
+    --violet:#B18CFF; --violet-deep:#CDB3FF; --lilac:#261D46;
+    --good:#7FD6A9; --good-bg:#15301F; --warn:#E8BE86; --warn-bg:#352512;
+    --on-violet:#140C24;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 28px -18px rgba(0,0,0,.8);
+  }
+
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0; background:var(--ground); color:var(--ink);
+    font-family:Figtree,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+    font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.num{font-family:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;letter-spacing:-.02em;text-wrap:balance;margin:0;line-height:1.1}
+  h1{font-size:clamp(2rem,6vw,3.1rem);font-weight:800}
+  h2{font-size:clamp(1.3rem,3.6vw,1.75rem);font-weight:700}
+  h3{font-size:1.07rem;font-weight:700;line-height:1.25}
+  p{margin:0}
+  a{color:var(--violet-deep)}
+  :focus-visible{outline:2.5px solid var(--violet);outline-offset:3px;border-radius:6px}
+  [hidden]{display:none !important}
+
+  main{max-width:1020px;margin:0 auto;padding:0 16px 72px}
+
+  /* ---------- cabeçalho ---------- */
+  .mark{display:flex;align-items:center;gap:11px;padding:28px 0 22px}
+  .mark .dot{width:38px;height:38px;border-radius:11px;background:var(--violet);color:var(--on-violet);display:grid;place-items:center;font-family:"Bricolage Grotesque";font-weight:800;font-size:1.1rem;flex:none}
+  .mark b{font-family:"Bricolage Grotesque";font-weight:700;font-size:1.02rem;display:block}
+  .mark span{color:var(--muted);font-size:.84rem}
+
+  .hero{background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:clamp(22px,4vw,38px);box-shadow:var(--shadow)}
+  .kicker{font-size:.72rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--violet);margin-bottom:12px}
+  .lead{color:var(--ink2);max-width:62ch;font-size:clamp(1rem,2.2vw,1.1rem);margin-top:14px}
+  .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin-top:22px}
+  .fact{background:var(--lilac);border:1px solid var(--line2);border-radius:13px;padding:13px 15px}
+  .fact b{font-family:"Bricolage Grotesque";font-weight:700;font-size:.94rem;display:block;margin-bottom:2px}
+  .fact span{font-size:.86rem;color:var(--ink2);line-height:1.45;display:block}
+
+  /* ---------- faixas ---------- */
+  .band{margin:44px 0 16px}
+  .band h2{margin-bottom:5px}
+  .band p{color:var(--muted);font-size:.93rem;max-width:62ch}
+
+  /* ---------- planos ---------- */
+  .toggle{display:inline-flex;background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:4px;gap:3px;margin:14px 0 18px}
+  .toggle button{font:inherit;font-weight:600;font-size:.86rem;border:0;background:transparent;color:var(--ink2);padding:7px 15px;border-radius:999px;cursor:pointer;white-space:nowrap}
+  .toggle button[aria-pressed="true"]{background:var(--violet);color:var(--on-violet)}
+
+  .plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(265px,1fr));gap:14px;align-items:start}
+  .plan{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:22px;display:flex;flex-direction:column;gap:12px;box-shadow:var(--shadow);position:relative}
+  .plan.feat{border-color:var(--violet);border-width:2px;padding:21px}
+  .plan .badge{position:absolute;top:-11px;left:21px;background:var(--violet);color:var(--on-violet);font-size:.68rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:4px 11px;border-radius:999px}
+  .plan .pdesc{font-size:.88rem;color:var(--muted);line-height:1.45}
+  .price{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}
+  .price .num{font-size:2.1rem;font-weight:800;color:var(--violet-deep);font-variant-numeric:tabular-nums}
+  .price .per{font-size:.86rem;color:var(--muted);font-weight:600}
+  .price-note{font-size:.8rem;color:var(--muted);margin-top:-6px}
+  .plan ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:7px;font-size:.9rem;color:var(--ink2)}
+  .plan li{display:flex;gap:8px;align-items:flex-start}
+  .plan li svg{flex:none;margin-top:3px;color:var(--violet)}
+  .plan li.off{color:var(--muted)}
+  .plan li.off svg{color:var(--muted);opacity:.6}
+
+  /* ---------- cards de serviço ---------- */
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+  .svc{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:20px;display:flex;flex-direction:column;gap:11px;box-shadow:var(--shadow)}
+  .svc-top{display:flex;gap:12px;align-items:flex-start}
+  .ico{width:38px;height:38px;border-radius:11px;background:var(--lilac);border:1px solid var(--line2);color:var(--violet);display:grid;place-items:center;flex:none}
+  .svc-top .t{min-width:0;flex:1}
+  .svc .what{font-size:.92rem;color:var(--ink2);line-height:1.5}
+  .svc ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;font-size:.88rem;color:var(--ink2)}
+  .svc li{display:flex;gap:8px;align-items:flex-start}
+  .svc li::before{content:"";flex:none;width:5px;height:5px;border-radius:50%;background:var(--violet);margin-top:8px}
+  .need{font-size:.84rem;background:var(--warn-bg);color:var(--warn);border-radius:10px;padding:9px 12px;line-height:1.45}
+  .need b{font-weight:700}
+  .svc-foot{margin-top:auto;padding-top:12px;border-top:1px solid var(--line);display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap}
+  .svc-foot .v{font-family:"Bricolage Grotesque";font-weight:800;font-size:1.5rem;color:var(--violet-deep);font-variant-numeric:tabular-nums;white-space:nowrap}
+  .svc-foot .v span{font-size:.78rem;font-weight:600;color:var(--muted)}
+  .svc-foot .obs{font-size:.8rem;color:var(--muted);text-align:right}
+
+  .pill{display:inline-block;font-size:.67rem;font-weight:700;padding:2.5px 8px;border-radius:999px;letter-spacing:.04em;vertical-align:middle;margin-left:7px;white-space:nowrap}
+  .pill.ok{background:var(--good-bg);color:var(--good)}
+  .pill.soon{background:var(--warn-bg);color:var(--warn)}
+
+  /* ---------- calculadora ---------- */
+  .calc{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:clamp(18px,3vw,26px);box-shadow:var(--shadow)}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 18px}
+  .chip{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line2);background:var(--raised);color:var(--ink2);border-radius:999px;padding:8px 14px;font:inherit;font-size:.86rem;font-weight:500;cursor:pointer;min-height:38px}
+  .chip b{font-variant-numeric:tabular-nums;font-weight:700;color:var(--muted)}
+  .chip[aria-pressed="true"]{background:var(--lilac);border-color:var(--violet);color:var(--ink)}
+  .chip[aria-pressed="true"] b{color:var(--violet-deep)}
+  .calc-out{border-top:1px solid var(--line);padding-top:16px;display:flex;flex-wrap:wrap;gap:18px;align-items:flex-end;justify-content:space-between}
+  .calc-out .tot{font-family:"Bricolage Grotesque";font-weight:800;font-size:2.2rem;color:var(--violet-deep);font-variant-numeric:tabular-nums;line-height:1}
+  .calc-out .lbl{font-size:.74rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700;margin-bottom:5px}
+  .hint{background:var(--good-bg);color:var(--good);border-radius:12px;padding:11px 15px;font-size:.89rem;font-weight:500;line-height:1.45;flex:1;min-width:230px}
+  .hint b{font-weight:700}
+
+  /* ---------- tabela resumo ---------- */
+  .tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:16px;background:var(--paper);box-shadow:var(--shadow)}
+  table{width:100%;border-collapse:collapse;font-size:.92rem;min-width:430px}
+  th,td{text-align:left;padding:12px 15px;border-bottom:1px solid var(--line)}
+  th{background:var(--lilac);font-family:"Bricolage Grotesque";font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--violet-deep);font-weight:700}
+  tbody tr:last-child td{border-bottom:0}
+  td.v{font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:700;color:var(--violet-deep);font-family:"Bricolage Grotesque"}
+  td.m{font-variant-numeric:tabular-nums;color:var(--muted);white-space:nowrap}
+  .save{color:var(--good);font-weight:700;font-size:.82rem;display:block;font-family:Figtree}
+
+  /* ---------- condições ---------- */
+  .cond{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:11px}
+  .cond div{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:16px 18px;font-size:.89rem;color:var(--ink2);line-height:1.5}
+  .cond b{font-family:"Bricolage Grotesque";color:var(--ink);display:block;margin-bottom:4px;font-size:.96rem}
+
+  .soonbox{background:var(--paper);border:1px dashed var(--line2);border-radius:16px;padding:18px 20px;color:var(--ink2);font-size:.9rem;line-height:1.6}
+  .soonbox b{font-family:"Bricolage Grotesque";color:var(--ink)}
+
+  footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:.84rem;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
+
+  @media (max-width:520px){
+    .svc-foot{flex-direction:column;align-items:flex-start;gap:4px}
+    .svc-foot .obs{text-align:left}
+  }
+  @media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important}}
+</style>
+</head>
+<body>
+<main>
+
+  <div class="mark">
+    <div class="dot">S</div>
+    <div><b>SyncTech Automation</b><span>Automação para negócios locais · Mariana/MG</span></div>
+  </div>
+
+  <section class="hero">
+    <p class="kicker">Serviços e preços · 2026</p>
+    <h1>O que cada serviço faz, e quanto custa</h1>
+    <p class="lead">Cada valor abaixo é o preço final por mês. Não existe taxa de configuração, adesão, instalação nem fidelidade. O que está escrito é o que entra na sua conta.</p>
+    <div class="facts">
+      <div class="fact"><b>Preço final</b><span>Montagem, ajustes, manutenção e suporte no WhatsApp já estão dentro do valor.</span></div>
+      <div class="fact"><b>Sem fidelidade</b><span>Nenhum serviço tem prazo mínimo nem multa. Avise com 15 dias e encerramos.</span></div>
+      <div class="fact"><b>Contas no seu nome</b><span>Google, Meta, emissor de nota: tudo aberto no CNPJ da sua empresa, e fica com você.</span></div>
+    </div>
+  </section>
+
+  <!-- ============ PLANOS ============ -->
+  <div class="band">
+    <h2>Planos mensais</h2>
+    <p>Vários serviços numa mensalidade só, mais barato do que contratar um por um.</p>
+  </div>
+
+  <div class="toggle" role="group" aria-label="Forma de pagamento do plano">
+    <button type="button" id="bt-mensal" aria-pressed="true">Mensal</button>
+    <button type="button" id="bt-anual" aria-pressed="false">Anual · 20% off</button>
+  </div>
+
+  <div class="plans" id="plans"></div>
+
+  <!-- ============ AVULSOS ============ -->
+  <div class="band">
+    <h2>Serviços avulsos</h2>
+    <p>Dá para contratar só um, sem plano nenhum. O preço é o mesmo sozinho ou somado a um plano.</p>
+  </div>
+
+  <div class="grid" id="grid-avulso"></div>
+
+  <!-- ============ CALCULADORA ============ -->
+  <div class="band">
+    <h2>Monte o seu pacote</h2>
+    <p>Marque o que você quer e veja o total. Se um plano cobrir a mesma coisa por menos, o cálculo avisa.</p>
+  </div>
+
+  <section class="calc">
+    <div class="chips" id="chips" role="group" aria-label="Serviços do pacote"></div>
+    <div class="calc-out">
+      <div>
+        <p class="lbl">Total por mês</p>
+        <p class="tot" id="total">R$ 0</p>
+      </div>
+      <p class="hint" id="hint" aria-live="polite">Marque os serviços acima para ver o total.</p>
+    </div>
+  </section>
+
+  <!-- ============ ÚNICO ============ -->
+  <div class="band">
+    <h2>Pagamento único</h2>
+    <p>Paga uma vez, é seu. Sem mensalidade.</p>
+  </div>
+
+  <div class="grid" id="grid-unico"></div>
+
+  <!-- ============ COMPARATIVO ============ -->
+  <div class="band">
+    <h2>Quanto o plano economiza</h2>
+    <p>A coluna "avulso daria" é a soma das mensalidades desta mesma página para os serviços do plano.</p>
+  </div>
+
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Plano</th><th>Avulso daria</th><th>No plano</th></tr></thead>
+      <tbody>
+        <tr><td class="v">Starter</td><td class="m">R$ 1.247/mês</td><td class="v">R$ 797/mês<span class="save">economiza R$ 450</span></td></tr>
+        <tr><td class="v">Negócio</td><td class="m">R$ 2.435/mês</td><td class="v">R$ 1.497/mês<span class="save">economiza R$ 938</span></td></tr>
+        <tr><td class="v">Pro</td><td class="m">R$ 3.585/mês</td><td class="v">R$ 1.997/mês<span class="save">economiza R$ 1.588</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ============ EM DESENVOLVIMENTO ============ -->
+  <div class="band">
+    <h2>Ainda em desenvolvimento</h2>
+    <p>Entram na tabela quando ficarem prontos.</p>
+  </div>
+  <div class="soonbox">
+    <b>Chat ao Vivo no Site</b> — janela de conversa que captura o visitante e encaminha para o WhatsApp.<br>
+    <b>E-mail Marketing</b> — sequências automáticas para clientes e leads, com métricas de abertura.<br>
+    <span style="color:var(--muted)">Quem já é cliente entra primeiro quando lançarem, sem custo adicional.</span>
+  </div>
+
+  <!-- ============ CONDIÇÕES ============ -->
+  <div class="band">
+    <h2>Como funciona na prática</h2>
+  </div>
+  <div class="cond">
+    <div><b>Pagamento</b>Uma mensalidade só, todo dia 10, por Pix ou transferência. A primeira cobrança acontece depois que o serviço estiver no ar.</div>
+    <div><b>Prazo de entrega</b>De 3 a 7 dias úteis por serviço, contados de quando você entregar o material. Tráfego Pago e Nota Fiscal podem levar mais, por dependerem de terceiros.</div>
+    <div><b>Acessos</b>Nunca pedimos sua senha de Instagram ou de banco. Somos adicionados como usuário ou administrador, e você remove o acesso quando quiser.</div>
+    <div><b>Saída</b>Sem multa e sem prazo mínimo. Avise com 15 dias e encerramos. Isso obriga o resultado a aparecer.</div>
+  </div>
+
+  <footer>
+    <span>SyncTech Automation · Rafael Santos · Mariana/MG</span>
+    <span>Valores válidos a partir de outubro de 2026</span>
+  </footer>
+
+</main>
+
+<script>
+(function(){
+  'use strict';
+
+  function brl(n){ return 'R$ ' + n.toLocaleString('pt-BR'); }
+  function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+
+  var ic = {
+    check:'<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2.8 8.4l3.4 3.4L13.2 4.8"/></svg>',
+    cross:'<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4.5 4.5l7 7M11.5 4.5l-7 7"/></svg>'
+  };
+  function g(path){
+    return '<svg width="19" height="19" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">' + path + '</svg>';
+  }
+
+  /* ───────── PLANOS ───────── */
+  var PLANOS = [
+    { nome:'Starter', mensal:797, anual:637,
+      desc:'Para quem quer começar a automatizar com o essencial.',
+      inc:['WhatsApp Bot básico','Agendamento Online','Link na Bio profissional','Suporte via WhatsApp'],
+      fora:['Instagram Automático','CRM e Métricas'] },
+    { nome:'Negócio', mensal:1497, anual:1197, dest:true,
+      desc:'O pacote completo para quem quer crescer de verdade.',
+      inc:['WhatsApp Bot completo','Instagram Automático (DM + comentários)','Agendamento Online completo','CRM com pipeline de vendas','Catálogo Digital','Dashboard de Métricas','Suporte prioritário'],
+      fora:[] },
+    { nome:'Pro', mensal:1997, anual:1597,
+      desc:'Para quem quer automação total e acompanhamento de perto.',
+      inc:['Tudo do Negócio','Gestão de Reputação no Google','Relatório de Resultados mensal','Suporte 7 dias por semana','Reunião mensal de resultados'],
+      fora:['E-mail Marketing (em desenvolvimento)','Chat ao Vivo (em desenvolvimento)'] }
+  ];
+
+  var anual = false;
+
+  function renderPlanos(){
+    document.getElementById('plans').innerHTML = PLANOS.map(function(p){
+      var valor = anual ? p.anual : p.mensal;
+      var nota = anual
+        ? 'cobrado uma vez por ano · economia de ' + brl((p.mensal - p.anual) * 12) + ' no ano'
+        : 'preço final, configuração inclusa';
+      return '<article class="plan' + (p.dest ? ' feat' : '') + '">' +
+        (p.dest ? '<span class="badge">Mais procurado</span>' : '') +
+        '<h3>' + esc(p.nome) + '</h3>' +
+        '<p class="pdesc">' + esc(p.desc) + '</p>' +
+        '<div class="price"><span class="num">' + brl(valor) + '</span><span class="per">/mês</span></div>' +
+        '<p class="price-note">' + nota + '</p>' +
+        '<ul>' +
+          p.inc.map(function(f){ return '<li>' + ic.check + '<span>' + esc(f) + '</span></li>'; }).join('') +
+          p.fora.map(function(f){ return '<li class="off">' + ic.cross + '<span>' + esc(f) + '</span></li>'; }).join('') +
+        '</ul>' +
+      '</article>';
+    }).join('');
+  }
+
+  var btM = document.getElementById('bt-mensal'), btA = document.getElementById('bt-anual');
+  function setCiclo(v){
+    anual = v;
+    btM.setAttribute('aria-pressed', String(!v));
+    btA.setAttribute('aria-pressed', String(v));
+    renderPlanos();
+  }
+  btM.addEventListener('click', function(){ setCiclo(false); });
+  btA.addEventListener('click', function(){ setCiclo(true); });
+
+  /* ───────── SERVIÇOS ───────── */
+  var AVULSOS = [
+    { id:'trafego', nome:'Gestão de Tráfego Pago', preco:1500, obs:'+ verba, paga por você',
+      icone:g('<path d="M2 13l4.5-5 3 3L16 4"/><path d="M12 4h4v4"/>'),
+      what:'Anúncio no Instagram e no Facebook para trazer cliente novo toda semana, com alguém cuidando e ajustando.',
+      itens:['Campanha montada do zero, com público por região e perfil','Produção do criativo do anúncio inclusa','Acompanhamento e ajuste semanal, não é "liga e esquece"','Teto de custo por cliente calculado com o seu ticket e a sua margem','Relatório mensal do que foi gasto e do que voltou'],
+      need:'A <b>verba do anúncio é separada</b> e paga por você direto para a Meta. Ela não passa pelo nosso caixa e não cobramos percentual sobre ela.' },
+
+    { id:'app', nome:'Aplicativo Personalizado', preco:1250, obs:'sem valor de entrada',
+      icone:g('<rect x="5" y="1.5" width="8" height="15" rx="2"/><path d="M7.8 3.6h2.4"/><path d="M7.5 14.3h3"/>'),
+      what:'O seu negócio virando um aplicativo de verdade na tela do celular do cliente, sem passar por loja de aplicativo.',
+      itens:['O cliente instala pelo link e o ícone fica na tela dele','Pedido, carrinho e checkout com o fluxo do seu negócio','Histórico com "pedir de novo" em um toque','Pagamento por Pix com QR Code e valor já preenchido','Funciona com internet ruim e abre rápido'] },
+
+    { id:'whatsapp', nome:'WhatsApp Bot 24/7', preco:950, obs:'+ conta Z-API',
+      icone:g('<path d="M2 8.6c0-3.5 3.1-6.4 7-6.4s7 2.9 7 6.4-3.1 6.4-7 6.4c-1 0-2-.15-2.9-.43L3 15.8l.8-3.4C2.7 11.3 2 10 2 8.6z"/>'),
+      what:'Um atendente que responde em segundos, a qualquer hora, inclusive domingo e madrugada, e só chama uma pessoa quando precisa.',
+      itens:['Responde na hora as perguntas que mais se repetem','Agenda, confirma e remarca sozinho','Pergunta o que a pessoa precisa antes de chegar em você','Passa a conversa para um humano quando o caso é complexo','Nunca deixa mensagem sem resposta fora do horário'],
+      need:'Precisa de uma <b>conta Z-API</b> conectada ao seu número. É serviço externo pago, contratado no seu nome, à parte desta tabela.' },
+
+    { id:'reputacao', nome:'Gestão de Reputação no Google', preco:650,
+      icone:g('<path d="M9 1.8l2.1 4.3 4.7.7-3.4 3.3.8 4.7L9 12.6l-4.2 2.2.8-4.7L2.2 6.8l4.7-.7z"/>'),
+      what:'Transforma cliente satisfeito em avaliação pública, e cliente insatisfeito em conversa privada antes de virar nota baixa.',
+      itens:['Depois do atendimento, a pessoa recebe o pedido de avaliação','Nota 4 ou 5 vai direto para a sua página no Google','Nota 1 a 3 chega como mensagem privada para você resolver','Perfil no Google Meu Negócio revisado e mantido','Acompanhamento mensal da nota e do volume de avaliações'] },
+
+    { id:'relatorio', nome:'Relatório de Resultados', preco:500,
+      icone:g('<rect x="3" y="1.8" width="12" height="14.4" rx="2"/><path d="M6 6.2h6M6 9h6M6 11.8h3.5"/>'),
+      what:'Todo mês, uma página mostrando o que foi feito e o que saiu disso em número, sem você precisar abrir planilha.',
+      itens:['Indicadores com comparação contra o mês anterior','Evolução de seguidores em gráfico','Lista do que foi entregue no período','Próximos passos combinados para o mês seguinte'],
+      need:'Os números são <b>medidos e conferidos manualmente</b> nas datas informadas. Não é leitura automática das redes, e o próprio relatório diz isso ao cliente.' },
+
+    { id:'instagram', nome:'Instagram Automático', preco:497, obs:'valor fixo, não sobe com a base',
+      icone:g('<rect x="2" y="2" width="14" height="14" rx="4"/><circle cx="9" cy="9" r="3.4"/><path d="M13 5h.01"/>'),
+      what:'O Instagram respondendo sozinho quem interage, em vez de deixar a pessoa esperando.',
+      itens:['Comentou no post, recebe mensagem no direct','Começou a seguir, recebe boas-vindas','Respondeu um story, recebe o link do WhatsApp','Dá para agendar pelo próprio direct'],
+      need:'Precisa de <b>conta Instagram Business</b> vinculada a uma Página do Facebook e de uma conta <b>Make.com</b> conectada.' },
+
+    { id:'agendamento', nome:'Agendamento Online', preco:297,
+      icone:g('<rect x="2" y="3" width="14" height="13" rx="2"/><path d="M2 7h14M6 1.5v3M12 1.5v3"/><path d="M6.3 11l1.5 1.5L11.7 9"/>'),
+      what:'Uma agenda que trabalha sozinha, 24 horas. O cliente marca pelo celular sem falar com ninguém.',
+      itens:['Escolhe serviço, dia e horário por um link','Recebe confirmação na hora e lembrete antes','Entra em lista de espera automática quando o dia lota','Você vê tudo num painel, e o horário some da agenda sozinho'] },
+
+    { id:'crm', nome:'CRM com Pipeline', preco:297, obs:'sem cobrar por usuário',
+      icone:g('<rect x="2" y="3" width="4" height="12" rx="1"/><rect x="7" y="6.5" width="4" height="8.5" rx="1"/><rect x="12" y="9.5" width="4" height="5.5" rx="1"/>'),
+      what:'O lugar onde nenhum cliente se perde. Cada pessoa que chega vira um cartão que você arrasta até fechar.',
+      itens:['Quadro em colunas: Novo, Contatado, Fechado','Histórico por cliente: quantas vezes veio, quanto gastou, último serviço','Botão que abre o WhatsApp já na conversa daquela pessoa','Disparo de mensagem para todos de uma coluna'] },
+
+    { id:'nfce', nome:'Nota Fiscal no pedido (NFC-e)', preco:297, obs:'+ emissor (~R$ 60/mês)', soon:true,
+      icone:g('<path d="M4 1.8h10v14.4l-2-1.4-1.7 1.4L9 14.8l-1.3 1.4L6 14.8l-2 1.4z"/><path d="M6.8 5.6h4.4M6.8 8.4h4.4M6.8 11.2h2.6"/>'),
+      what:'Cada venda feita pelo aplicativo sai com nota fiscal autorizada, sem ninguém digitar nada de novo no caixa.',
+      itens:['A nota é emitida quando você confirma o pedido, não antes','Pedido cancelado nunca vira nota, então não há cancelamento na Sefaz','O cliente recebe o QR Code e o link da nota no próprio pedido','Série de numeração separada, sem mexer no sistema do balcão'],
+      need:'Exige <b>CNPJ credenciado na Sefaz, certificado digital A1</b> e uma plataforma emissora, contratada no CNPJ da sua empresa.' },
+
+    { id:'catalogo', nome:'Catálogo Digital', preco:247,
+      icone:g('<path d="M4 6h10l-.8 8.2a2 2 0 01-2 1.8H6.8a2 2 0 01-2-1.8z"/><path d="M6.5 6V4.5a2.5 2.5 0 015 0V6"/>'),
+      what:'Seu cardápio ou catálogo online, com foto e preço. O cliente monta o pedido e ele chega pronto no seu WhatsApp.',
+      itens:['O cliente vê a foto, escolhe a quantidade e fecha o pedido','A mensagem chega organizada: itens, total, nome e endereço','Sem aplicativo para baixar e sem taxa por pedido','Preço e item atualizados sempre que você pedir'] },
+
+    { id:'estoque', nome:'Controle de Estoque', preco:197,
+      icone:g('<path d="M2.5 5.5L9 2.2l6.5 3.3v7L9 15.8l-6.5-3.3z"/><path d="M2.5 5.5L9 8.8l6.5-3.3M9 8.8v7"/>'),
+      what:'Conta o que tem, avisa o que está acabando e monta a lista de compras pronta para mandar no WhatsApp.',
+      itens:['Cada item com a quantidade mínima que você define','Separa na hora o que acabou, o que está acabando e o que tem de sobra','Filtro "só o que falta" para a contagem render','Lista de compras formatada, pronta para enviar ao fornecedor'] },
+
+    { id:'dashboard', nome:'Dashboard de Métricas', preco:147,
+      icone:g('<path d="M3 15V9M9 15V4M15 15V8"/><path d="M2 15.5h14"/>'),
+      what:'Um painel que responde, sem abrir planilha: quanto entrou, quantos clientes novos, o que mais vendeu.',
+      itens:['Agendamentos e pedidos do período','Receita e ticket médio','Clientes novos contra clientes que voltaram','Atualiza sozinho, você só abre o link'],
+      need:'Precisa que os dados estejam numa <b>planilha conectada</b>. A montagem dessa planilha já está inclusa.' }
+  ];
+
+  var UNICOS = [
+    { nome:'Site do cliente', valorTxt:'R$ 1.497', obs:'+ R$ 97/mês de manutenção',
+      icone:g('<rect x="2" y="3" width="14" height="11" rx="2"/><path d="M2 6.5h14M4.6 4.75h.01M6.6 4.75h.01"/>'),
+      what:'Uma página própria do negócio: o que você faz, onde fica, horário e botão de WhatsApp sempre à vista.',
+      itens:['Feito para abrir rápido no celular','Serviços com preço, endereço e horário do dia','Nota do Google em destaque, quando houver','Botão de WhatsApp fixo na tela inteira'] },
+    { nome:'Link na Bio', valorTxt:'R$ 497', obs:'hospedagem inclusa',
+      icone:g('<path d="M7.2 10.8l3.6-3.6"/><path d="M6 8.3L4.4 9.9a2.5 2.5 0 003.5 3.5l1.6-1.6"/><path d="M12 9.7l1.6-1.6a2.5 2.5 0 00-3.5-3.5L8.5 6.2"/>'),
+      what:'Uma página só sua para o Instagram, no lugar daquele link genérico.',
+      itens:['Seus serviços com preço, um embaixo do outro','Botão de agendar e de WhatsApp sempre à vista','Link direto para avaliar no Google','Alteração de preço ou serviço quando quiser'] }
+  ];
+
+  function cardSvc(s){
+    var valor = s.valorTxt ? s.valorTxt : brl(s.preco) + '<span>/mês</span>';
+    return '<article class="svc">' +
+      '<div class="svc-top">' +
+        '<div class="ico" aria-hidden="true">' + s.icone + '</div>' +
+        '<div class="t"><h3>' + esc(s.nome) +
+          (s.soon ? '<span class="pill soon">em implantação</span>' : '') +
+        '</h3></div>' +
+      '</div>' +
+      '<p class="what">' + esc(s.what) + '</p>' +
+      '<ul>' + s.itens.map(function(i){ return '<li><span>' + esc(i) + '</span></li>'; }).join('') + '</ul>' +
+      (s.need ? '<p class="need">' + s.need + '</p>' : '') +
+      '<div class="svc-foot"><span class="v">' + valor + '</span>' +
+        (s.obs ? '<span class="obs">' + esc(s.obs) + '</span>' : '') +
+      '</div>' +
+    '</article>';
+  }
+
+  document.getElementById('grid-avulso').innerHTML = AVULSOS.map(cardSvc).join('');
+  document.getElementById('grid-unico').innerHTML  = UNICOS.map(cardSvc).join('');
+
+  /* ───────── CALCULADORA ───────── */
+  /* Os planos cobrem só os serviços listados aqui. Tráfego, Aplicativo,
+     Nota Fiscal e Estoque ficam de fora de propósito: são contratados à
+     parte, com o mesmo preço, dentro ou fora de plano. */
+  var COBERTURA = {
+    Starter:  ['whatsapp','agendamento'],
+    'Negócio':['whatsapp','agendamento','instagram','crm','catalogo','dashboard'],
+    Pro:      ['whatsapp','agendamento','instagram','crm','catalogo','dashboard','reputacao','relatorio']
+  };
+  var VALOR_PLANO = { Starter:797, 'Negócio':1497, Pro:1997 };
+  var ORDEM_PLANO = ['Starter','Negócio','Pro'];
+
+  var escolhidos = Object.create(null);
+
+  document.getElementById('chips').innerHTML = AVULSOS.map(function(s){
+    return '<button type="button" class="chip" data-id="' + esc(s.id) + '" aria-pressed="false">' +
+      esc(s.nome) + ' <b>' + brl(s.preco) + '</b></button>';
+  }).join('');
+
+  function recalcular(){
+    var ids = Object.keys(escolhidos).filter(function(k){ return escolhidos[k]; });
+    var total = ids.reduce(function(acc, id){
+      var s = AVULSOS.filter(function(x){ return x.id === id; })[0];
+      return acc + (s ? s.preco : 0);
+    }, 0);
+    document.getElementById('total').textContent = brl(total);
+
+    var hint = document.getElementById('hint');
+    if (!ids.length){
+      hint.textContent = 'Marque os serviços acima para ver o total.';
+      return;
+    }
+    /* o menor plano que cobre TUDO que foi marcado e sai mais barato */
+    var melhor = null;
+    for (var i = 0; i < ORDEM_PLANO.length; i++){
+      var nome = ORDEM_PLANO[i], cobre = COBERTURA[nome];
+      var dentro = ids.every(function(id){ return cobre.indexOf(id) !== -1; });
+      if (dentro && VALOR_PLANO[nome] < total){ melhor = nome; break; }
+    }
+    if (melhor){
+      hint.innerHTML = 'O plano <b>' + esc(melhor) + '</b> já inclui tudo isso por <b>' +
+        brl(VALOR_PLANO[melhor]) + '/mês</b> — economia de <b>' + brl(total - VALOR_PLANO[melhor]) +
+        ' por mês</b>.';
+    } else {
+      hint.textContent = ids.length === 1
+        ? 'Contratado sozinho, sem plano. Nenhum plano sai mais barato só com esse serviço.'
+        : 'Nenhum plano cobre exatamente essa combinação — fica como avulso, pelo valor acima.';
+    }
+  }
+
+  document.getElementById('chips').addEventListener('click', function(ev){
+    var b = ev.target.closest('.chip');
+    if (!b) return;
+    var id = b.getAttribute('data-id');
+    escolhidos[id] = !escolhidos[id];
+    b.setAttribute('aria-pressed', String(!!escolhidos[id]));
+    recalcular();
+  });
+
+  setCiclo(false);
+  recalcular();
+})();
+</script>
+</body>
+</html>
