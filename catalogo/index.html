@@ -9,7 +9,9 @@
 <meta name="robots" content="noindex, nofollow">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media='all';this.onload=null">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap"></noscript>
 <style>
   /* Regra global: uma classe com `display` explícito vence o atributo `hidden`
      do navegador. Este bug apareceu três vezes no projeto antes de virar regra
@@ -70,6 +72,17 @@
   @media(min-width:560px){.grade{grid-template-columns:1fr 1fr}}
 
   .item{background:var(--card);border:1px solid var(--linha);border-radius:var(--raio);padding:14px;display:flex;gap:12px;align-items:flex-start}
+  /* Com foto o item vira card vertical. Mistura de card com foto e linha
+     sem foto na mesma grade fica torta, entao quando QUALQUER produto tem
+     imagem todos viram card e os sem foto ganham marca d'agua da letra. */
+  .com-foto .item{flex-direction:column;align-items:stretch;padding:0;overflow:hidden}
+  .com-foto .item-txt{padding:12px 14px 0}
+  .com-foto .item-acao{flex-direction:row;align-items:center;justify-content:space-between;min-width:0;padding:0 14px 13px}
+  .item-foto{position:relative;width:100%;aspect-ratio:4/3;background:var(--primary-claro);overflow:hidden}
+  .item-foto img{width:100%;height:100%;object-fit:cover;display:block}
+  .item-foto .sem{position:absolute;inset:0;display:grid;place-items:center;font-family:Fraunces,serif;font-size:2.6rem;font-weight:700;color:var(--primary);opacity:.3}
+  .item-foto .ia{position:absolute;left:8px;bottom:8px;background:rgba(36,26,20,.72);color:#fff;font-size:.62rem;font-weight:600;padding:2px 7px;border-radius:999px}
+  .com-foto .tag{position:absolute;left:8px;top:8px;margin:0;z-index:2}
   .item-txt{flex:1;min-width:0}
   .item h3{font-size:1rem;font-family:Inter,sans-serif;font-weight:600}
   .item p{font-size:.87rem;color:var(--ink2);margin-top:3px}
@@ -449,10 +462,29 @@
     }).join('');
   }
 
-  function cardHTML(p){
-    return '<article class="item" data-id="' + escapeHtml(p.id) + '">' +
-      '<div class="item-txt">' +
+  function cardHTML(p, indice){
+    /* alt honesto: imagem gerada por computador precisa dizer que e, senao
+       o cliente acha que a foto e do produto real daquela loja */
+    var foto = '';
+    if (temFoto) {
+      var legenda = escapeHtml(p.name) + (p.ia ? ' (imagem ilustrativa)' : '');
+      foto = '<div class="item-foto">' +
         (p.badge ? '<span class="tag">' + escapeHtml(p.badge) + '</span>' : '') +
+        (p.image
+          ? '<img src="' + escapeHtml(p.image) + '" alt="' + legenda + '"' +
+              /* lazy em TUDO atrasa justamente a foto que o cliente ve
+                 primeiro, que e a que decide o pedido. As duas primeiras
+                 carregam na hora; o resto so ao chegar perto. */
+              (indice < 2 ? ' loading="eager" fetchpriority="high"' : ' loading="lazy"') +
+              ' decoding="async" width="400" height="300">'
+          : '<span class="sem" aria-hidden="true">' + escapeHtml(String(p.name).trim().charAt(0).toUpperCase()) + '</span>') +
+        (p.ia ? '<span class="ia">imagem ilustrativa</span>' : '') +
+      '</div>';
+    }
+    return '<article class="item" data-id="' + escapeHtml(p.id) + '">' +
+      foto +
+      '<div class="item-txt">' +
+        (p.badge && !temFoto ? '<span class="tag">' + escapeHtml(p.badge) + '</span>' : '') +
         '<h3>' + escapeHtml(p.name) + '</h3>' +
         (p.description ? '<p>' + escapeHtml(p.description) + '</p>' : '') +
         '<div class="preco"><span class="cur">R$</span> ' + p.price.toFixed(2).replace('.', ',') + '</div>' +
@@ -469,16 +501,22 @@
   }
 
   function montarCardapio(){
+    var ordem = 0;
+    el('cardapio').classList.toggle('com-foto', temFoto);
     el('cardapio').innerHTML = CONFIG.categories.map(function(cat){
       var itens = CONFIG.products.filter(function(p){ return p.category === cat.id; });
       if (!itens.length) return '';
       return '<section class="cat-block" data-cat="' + escapeHtml(cat.id) + '">' +
         '<h2>' + escapeHtml(cat.label) + '</h2>' +
         (cat.note ? '<p class="cat-nota">' + escapeHtml(cat.note) + '</p>' : '') +
-        '<div class="grade">' + itens.map(cardHTML).join('') + '</div>' +
+        '<div class="grade">' + itens.map(function(pr){ return cardHTML(pr, ordem++); }).join('') + '</div>' +
       '</section>';
     }).join('');
   }
+
+  /* um unico produto com foto ja muda o layout de todos, pra grade nao
+     ficar com metade card e metade linha */
+  var temFoto = CONFIG.products.some(function(pr){ return !!pr.image; });
 
   var catAtiva = 'tudo';
 
