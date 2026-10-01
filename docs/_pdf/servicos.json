@@ -1,0 +1,232 @@
+[
+ {
+  "nome": "Gestão de Tráfego Pago (Meta Ads)",
+  "valor": "R$ 1.000/mês",
+  "unico": false,
+  "obs": "+ verba, paga por você",
+  "what": "Anúncio no Instagram e no Facebook para trazer cliente novo toda semana, com alguém cuidando e ajustando.",
+  "itens": [
+   "Campanha montada do zero, com público por região e perfil",
+   "Produção do criativo do anúncio inclusa",
+   "Acompanhamento e ajuste semanal, não é \"liga e esquece\"",
+   "Teto de custo por cliente calculado antes de começar, com o seu ticket e a sua margem",
+   "Relatório mensal do que foi gasto e do que voltou"
+  ],
+  "need": "A verba do anúncio é separada e paga por você direto para a Meta. Ela não passa pelo nosso caixa e não cobramos percentual sobre ela.",
+  "soon": false
+ },
+ {
+  "nome": "Aplicativo Personalizado",
+  "valor": "R$ 1.000/mês",
+  "unico": false,
+  "obs": "sem valor de entrada",
+  "what": "O seu negócio virando um aplicativo de verdade na tela do celular do cliente, sem passar por loja de aplicativo.",
+  "itens": [
+   "O cliente instala pelo link e o ícone fica na tela dele",
+   "Pedido, carrinho e checkout com o fluxo do seu negócio",
+   "Histórico com \"pedir de novo\" em um toque",
+   "Pagamento por Pix com QR Code e valor já preenchido",
+   "Funciona com internet ruim e abre rápido"
+  ],
+  "need": "",
+  "soon": false
+ },
+ {
+  "nome": "WhatsApp Bot 24/7",
+  "valor": "R$ 500/mês",
+  "unico": false,
+  "obs": "+ conta Z-API",
+  "what": "Um atendente que responde em segundos, a qualquer hora, inclusive domingo e madrugada, e só chama uma pessoa quando precisa.",
+  "itens": [
+   "Responde na hora as perguntas que mais se repetem",
+   "Agenda, confirma e remarca sozinho",
+   "Pergunta o que a pessoa precisa antes de chegar em você",
+   "Passa a conversa para um humano quando o caso é complexo",
+   "Nunca deixa mensagem sem resposta fora do horário"
+  ],
+  "need": "Precisa de uma conta Z-API conectada ao seu número. É serviço externo pago, contratado no seu nome, à parte desta tabela.",
+  "soon": false
+ },
+ {
+  "nome": "SEO Local no Google",
+  "valor": "R$ 697/mês",
+  "unico": false,
+  "obs": "",
+  "what": "Fazer o seu negócio aparecer quando alguém da sua cidade procura o que você vende, no Google e no Maps.",
+  "itens": [
+   "Perfil do Google Meu Negócio escrito e revisado",
+   "Palavras que a sua cidade realmente busca, aplicadas no perfil",
+   "8 publicações por mês no perfil, prontas para postar",
+   "Nome, endereço e telefone conferidos em todo lugar onde aparecem",
+   "Preparação para aparecer também nas respostas de inteligência artificial"
+  ],
+  "need": "Precisa do perfil do Google Meu Negócio verificado no nome da sua empresa. Se ainda não existir, a verificação entra junto.",
+  "soon": false
+ },
+ {
+  "nome": "Gestão de Reputação no Google",
+  "valor": "R$ 650/mês",
+  "unico": false,
+  "obs": "",
+  "what": "Transforma cliente satisfeito em avaliação pública, e cliente insatisfeito em conversa privada antes de virar nota baixa.",
+  "itens": [
+   "Depois do atendimento, a pessoa recebe o pedido de avaliação",
+   "Nota 4 ou 5 vai direto para a sua página no Google",
+   "Nota 1 a 3 chega como mensagem privada para você resolver",
+   "Perfil no Google Meu Negócio revisado e mantido",
+   "Acompanhamento mensal da nota e do volume de avaliações"
+  ],
+  "need": "",
+  "soon": false
+ },
+ {
+  "nome": "Relatório de Resultados",
+  "valor": "R$ 500/mês",
+  "unico": false,
+  "obs": "",
+  "what": "Todo mês, uma página mostrando o que foi feito e o que saiu disso em número, sem você precisar abrir planilha.",
+  "itens": [
+   "Indicadores com comparação contra o mês anterior",
+   "Evolução de seguidores em gráfico",
+   "Lista do que foi entregue no período",
+   "Próximos passos combinados para o mês seguinte"
+  ],
+  "need": "Os números são medidos e conferidos manualmente nas datas informadas. Não é leitura automática das redes sociais, e o próprio relatório diz isso ao cliente.",
+  "soon": false
+ },
+ {
+  "nome": "Instagram Automático",
+  "valor": "R$ 497/mês",
+  "unico": false,
+  "obs": "valor fixo, não sobe com a base",
+  "what": "O Instagram respondendo sozinho quem interage, em vez de deixar a pessoa esperando.",
+  "itens": [
+   "Comentou no post, recebe mensagem no direct",
+   "Começou a seguir, recebe boas-vindas",
+   "Respondeu um story, recebe o link do WhatsApp",
+   "Dá para agendar pelo próprio direct"
+  ],
+  "need": "Precisa de conta Instagram Business vinculada a uma Página do Facebook e de uma conta Make.com conectada.",
+  "soon": false
+ },
+ {
+  "nome": "Agendamento Online",
+  "valor": "R$ 297/mês",
+  "unico": false,
+  "obs": "",
+  "what": "Uma agenda que trabalha sozinha, 24 horas. O cliente marca pelo celular sem falar com ninguém.",
+  "itens": [
+   "Escolhe serviço, dia e horário por um link",
+   "Recebe confirmação na hora e lembrete antes",
+   "Entra em lista de espera automática quando o dia lota",
+   "Você vê tudo num painel, e o horário some da agenda sozinho"
+  ],
+  "need": "",
+  "soon": false
+ },
+ {
+  "nome": "CRM com Pipeline",
+  "valor": "R$ 297/mês",
+  "unico": false,
+  "obs": "sem cobrar por usuário",
+  "what": "O lugar onde nenhum cliente se perde. Cada pessoa que chega vira um cartão que você arrasta até fechar.",
+  "itens": [
+   "Quadro em colunas: Novo, Contatado, Fechado",
+   "Histórico por cliente: quantas vezes veio, quanto gastou, último serviço",
+   "Botão que abre o WhatsApp já na conversa daquela pessoa",
+   "Disparo de mensagem para todos de uma coluna"
+  ],
+  "need": "",
+  "soon": false
+ },
+ {
+  "nome": "Nota Fiscal no pedido (NFC-e)",
+  "valor": "R$ 297/mês",
+  "unico": false,
+  "obs": "+ emissor (~R$ 60/mês)",
+  "what": "Cada venda feita pelo aplicativo sai com nota fiscal autorizada, sem ninguém digitar nada de novo no caixa.",
+  "itens": [
+   "A nota é emitida quando você confirma o pedido, não antes",
+   "Pedido cancelado nunca vira nota, então não há cancelamento na Sefaz",
+   "O cliente recebe o QR Code e o link da nota no próprio pedido",
+   "Série de numeração separada, sem mexer no sistema do balcão"
+  ],
+  "need": "Exige CNPJ credenciado na Sefaz, certificado digital A1 e uma plataforma emissora (cerca de R$ 60/mês, contratada no CNPJ da sua empresa).",
+  "soon": true
+ },
+ {
+  "nome": "Catálogo Digital",
+  "valor": "R$ 247/mês",
+  "unico": false,
+  "obs": "",
+  "what": "Seu cardápio ou catálogo online, com foto e preço. O cliente monta o pedido e ele chega pronto no seu WhatsApp.",
+  "itens": [
+   "O cliente vê a foto, escolhe a quantidade e fecha o pedido",
+   "A mensagem chega organizada: itens, total, nome e endereço",
+   "Sem aplicativo para baixar e sem taxa por pedido",
+   "Preço e item atualizados sempre que você pedir"
+  ],
+  "need": "",
+  "soon": false
+ },
+ {
+  "nome": "Controle de Estoque",
+  "valor": "R$ 197/mês",
+  "unico": false,
+  "obs": "",
+  "what": "Conta o que tem, avisa o que está acabando e monta a lista de compras pronta para mandar no WhatsApp.",
+  "itens": [
+   "Cada item com a quantidade mínima que você define",
+   "Separa na hora o que acabou, o que está acabando e o que tem de sobra",
+   "Filtro \"só o que falta\" para a contagem render",
+   "Lista de compras formatada, pronta para enviar ao fornecedor"
+  ],
+  "need": "",
+  "soon": false
+ },
+ {
+  "nome": "Dashboard de Métricas",
+  "valor": "R$ 147/mês",
+  "unico": false,
+  "obs": "",
+  "what": "Um painel que responde, sem abrir planilha: quanto entrou, quantos clientes novos, o que mais vendeu.",
+  "itens": [
+   "Agendamentos e pedidos do período",
+   "Receita e ticket médio",
+   "Clientes novos contra clientes que voltaram",
+   "Atualiza sozinho, você só abre o link"
+  ],
+  "need": "Precisa que os dados estejam numa planilha conectada. A montagem dessa planilha já está inclusa.",
+  "soon": false
+ },
+ {
+  "nome": "Site do cliente",
+  "valor": "R$ 800",
+  "unico": true,
+  "obs": "+ R$ 97/mês de manutenção",
+  "what": "Uma página própria do negócio: o que você faz, onde fica, horário e botão de WhatsApp sempre à vista.",
+  "itens": [
+   "Feito para abrir rápido no celular",
+   "Serviços com preço, endereço e horário do dia",
+   "Nota do Google em destaque, quando houver",
+   "Botão de WhatsApp fixo na tela inteira"
+  ],
+  "need": "",
+  "soon": false
+ },
+ {
+  "nome": "Link na Bio",
+  "valor": "R$ 497",
+  "unico": true,
+  "obs": "hospedagem inclusa",
+  "what": "Uma página só sua para o Instagram, no lugar daquele link genérico.",
+  "itens": [
+   "Seus serviços com preço, um embaixo do outro",
+   "Botão de agendar e de WhatsApp sempre à vista",
+   "Link direto para avaliar no Google",
+   "Alteração de preço ou serviço quando quiser"
+  ],
+  "need": "",
+  "soon": false
+ }
+]
