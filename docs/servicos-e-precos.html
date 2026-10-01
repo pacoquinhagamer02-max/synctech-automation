@@ -212,6 +212,7 @@
   td.v{font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:700;color:var(--violet-deep);font-family:"Bricolage Grotesque"}
   td.m{font-variant-numeric:tabular-nums;color:var(--muted);white-space:nowrap}
   .save{color:var(--good);font-weight:700;font-size:.82rem;display:block;font-family:Figtree}
+  .ent{font-size:.79rem;color:var(--muted);font-weight:500;font-family:Figtree}
 
   .cond{display:grid;grid-template-columns:repeat(auto-fit,minmax(252px,1fr));gap:11px}
   .cond div{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:17px 19px;font-size:.89rem;color:var(--ink2);line-height:1.5}
@@ -358,15 +359,15 @@
     <div class="band">
       <p class="eyebrow">Comparando</p>
       <h2>Quanto o plano economiza</h2>
-      <p>A coluna "avulso daria" é a soma das mensalidades desta mesma página para os serviços do plano.</p>
+      <p>A coluna "avulso daria" é a soma das mensalidades desta mesma página para os serviços do plano. A entrada de R$ 1.994 é o Site (R$ 1.497) mais o Link na Bio (R$ 497), que nos planos não se paga.</p>
     </div>
     <div class="tablewrap">
       <table>
         <thead><tr><th>Plano</th><th>Avulso daria</th><th>No plano</th></tr></thead>
         <tbody>
-          <tr><td class="v">Starter</td><td class="m">R$ 1.247/mês</td><td class="v">R$ 797/mês<span class="save">economiza R$ 450</span></td></tr>
-          <tr><td class="v">Negócio</td><td class="m">R$ 2.435/mês</td><td class="v">R$ 1.497/mês<span class="save">economiza R$ 938</span></td></tr>
-          <tr><td class="v">Pro</td><td class="m">R$ 3.585/mês</td><td class="v">R$ 1.997/mês<span class="save">economiza R$ 1.588</span></td></tr>
+          <tr><td class="v">Starter</td><td class="m">R$ 1.738/mês<br><span class="ent">+ R$ 1.994 de entrada</span></td><td class="v">R$ 1.397/mês<span class="save">economiza R$ 341/mês e os R$ 1.994</span></td></tr>
+          <tr><td class="v">Negócio</td><td class="m">R$ 4.576/mês<br><span class="ent">+ R$ 1.994 de entrada</span></td><td class="v">R$ 2.897/mês<span class="save">economiza R$ 1.679/mês e os R$ 1.994</span></td></tr>
+          <tr><td class="v">Pro</td><td class="m">R$ 7.623/mês<br><span class="ent">+ R$ 1.994 de entrada</span></td><td class="v">R$ 4.997/mês<span class="save">economiza R$ 2.626/mês e os R$ 1.994</span></td></tr>
         </tbody>
       </table>
     </div>
@@ -441,17 +442,17 @@
 
   /* ═════════ PLANOS ═════════ */
   var PLANOS = [
-    { nome:'Starter', mensal:797, anual:637,
-      desc:'Para quem quer começar a automatizar com o essencial.',
-      inc:['WhatsApp Bot básico','Agendamento Online','Link na Bio profissional','Suporte via WhatsApp'],
-      fora:['Instagram Automático','CRM e Métricas'] },
-    { nome:'Negócio', mensal:1497, anual:1197, dest:true,
-      desc:'O pacote completo para quem quer crescer de verdade.',
-      inc:['WhatsApp Bot completo','Instagram Automático (DM + comentários)','Agendamento Online completo','CRM com pipeline de vendas','Catálogo Digital','Dashboard de Métricas','Suporte prioritário'],
-      fora:[] },
-    { nome:'Pro', mensal:1997, anual:1597,
-      desc:'Para quem quer automação total e acompanhamento de perto.',
-      inc:['Tudo do Negócio','Gestão de Reputação no Google','Relatório de Resultados mensal','Suporte 7 dias por semana','Reunião mensal de resultados'],
+    { nome:'Starter', mensal:1397, anual:1117,
+      desc:'A presença completa do seu negócio, no ar em até 7 dias.',
+      inc:['Site personalizado, sem valor de entrada','Link na Bio profissional','Catálogo Digital','Agendamento Online','WhatsApp Bot 24/7','Dashboard de Métricas','Suporte via WhatsApp'],
+      fora:['Instagram Automático','CRM com pipeline','Tráfego Pago'] },
+    { nome:'Negócio', mensal:2897, anual:2317, dest:true,
+      desc:'Tudo do Starter mais o que faz o cliente achar você, voltar e indicar.',
+      inc:['Tudo do Starter','Instagram Automático (DM + comentários)','CRM com pipeline de vendas','SEO Local no Google e no Maps','Gestão de Reputação no Google','Controle de Estoque','Relatório de Resultados mensal','Suporte prioritário'],
+      fora:['Aplicativo próprio','Tráfego Pago'] },
+    { nome:'Pro', mensal:4997, anual:3997,
+      desc:'Os 15 serviços, inclusive anúncio e aplicativo próprio.',
+      inc:['Tudo do Negócio','Aplicativo Personalizado','Gestão de Tráfego Pago (verba à parte)','Nota Fiscal no pedido (NFC-e)','Suporte 7 dias por semana','Reunião mensal de resultados'],
       fora:['E-mail Marketing (em desenvolvimento)','Chat ao Vivo (em desenvolvimento)'] }
   ];
 
@@ -505,6 +506,12 @@
       what:'Um atendente que responde em segundos, a qualquer hora, inclusive domingo e madrugada, e só chama uma pessoa quando precisa.',
       itens:['Responde na hora as perguntas que mais se repetem','Agenda, confirma e remarca sozinho','Pergunta o que a pessoa precisa antes de chegar em você','Passa a conversa para um humano quando o caso é complexo','Nunca deixa mensagem sem resposta fora do horário'],
       need:'Precisa de uma <b>conta Z-API</b> conectada ao seu número. É serviço externo pago, contratado no seu nome, à parte desta tabela.' },
+
+    { id:'seolocal', nome:'SEO Local no Google', preco:697,
+      icone:g('<path d="M9 1.8c2.7 0 4.9 2.1 4.9 4.7C13.9 10 9 16.2 9 16.2S4.1 10 4.1 6.5C4.1 3.9 6.3 1.8 9 1.8z"/><circle cx="9" cy="6.4" r="1.8"/>'),
+      what:'Fazer o seu negócio aparecer quando alguém da sua cidade procura o que você vende, no Google e no Maps.',
+      itens:['Perfil do Google Meu Negócio escrito e revisado','Palavras que a sua cidade realmente busca, aplicadas no perfil','8 publicações por mês no perfil, prontas','Nome, endereço e telefone conferidos em todo lugar','Preparação para aparecer também nas respostas de IA'],
+      need:'Precisa do <b>perfil do Google Meu Negócio verificado</b> no nome da sua empresa. Se ainda não existir, a verificação entra junto.' },
 
     { id:'reputacao', nome:'Gestão de Reputação no Google', preco:650,
       icone:g('<path d="M9 1.8l2.1 4.3 4.7.7-3.4 3.3.8 4.7L9 12.6l-4.2 2.2.8-4.7L2.2 6.8l4.7-.7z"/>'),
@@ -574,22 +581,22 @@
   var PERFIS = [
     { id:'alimentacao', nome:'Padaria, restaurante ou delivery',
       icone:g('<path d="M6 2v6a2 2 0 004 0V2M8 10v6"/><path d="M14 2c-1.3 1.3-1.8 3-1.8 4.7S13.1 10 14 10v6"/>', 18),
-      rec:['catalogo','whatsapp','estoque','dashboard','nfce'],
+      rec:['catalogo','whatsapp','estoque','dashboard','nfce','seolocal'],
       frase:'O que mais muda o caixa aqui é o pedido chegando pronto no WhatsApp, o estoque parando de furar e a nota saindo sozinha no fim do pedido.' },
 
     { id:'beleza', nome:'Barbearia, salão ou estética',
       icone:g('<path d="M6 4l8 9M6 13l8-9"/><circle cx="4.3" cy="3.2" r="1.7"/><circle cx="4.3" cy="14" r="1.7"/>', 18),
-      rec:['agendamento','whatsapp','instagram','reputacao','relatorio','trafego'],
+      rec:['agendamento','whatsapp','instagram','reputacao','relatorio','trafego','seolocal'],
       frase:'Agenda cheia vem de duas coisas: ninguém ficar sem resposta e gente nova descobrindo você toda semana.' },
 
     { id:'loja', nome:'Loja ou comércio',
       icone:g('<path d="M4 6h10l-.8 8.2a2 2 0 01-2 1.8H6.8a2 2 0 01-2-1.8z"/><path d="M6.5 6V4.5a2.5 2.5 0 015 0V6"/>', 18),
-      rec:['catalogo','whatsapp','instagram','crm','estoque','trafego'],
+      rec:['catalogo','whatsapp','instagram','crm','estoque','trafego','seolocal'],
       frase:'Catálogo com foto e preço faz o cliente escolher antes de chegar, e o CRM garante que ninguém que perguntou preço suma sem resposta.' },
 
     { id:'saude', nome:'Clínica ou consultório',
       icone:g('<path d="M9 2.5v13M2.5 9h13"/><rect x="2.2" y="2.2" width="13.6" height="13.6" rx="4"/>', 18),
-      rec:['agendamento','whatsapp','reputacao','crm','relatorio','dashboard'],
+      rec:['agendamento','whatsapp','reputacao','crm','relatorio','dashboard','seolocal'],
       frase:'Aqui a confiança decide. Agenda que confirma sozinha, atendimento que não deixa ninguém no vácuo e nota alta no Google valem mais que anúncio.' },
 
     { id:'servicos', nome:'Prestador de serviço',
@@ -598,14 +605,15 @@
       frase:'Começar leve faz sentido: atendimento automático, agenda e um lugar onde nenhum orçamento se perde. Quando o movimento firmar, o anúncio entra para trazer gente nova.' }
   ];
 
-  var VALOR_PLANO = { Starter:797, 'Negócio':1497, Pro:1997 };
-  /* Os planos cobrem só os serviços listados aqui. Tráfego, Aplicativo,
-     Nota Fiscal e Estoque ficam de fora de propósito: são contratados à
-     parte, com o mesmo preço, dentro ou fora de plano. */
+  var VALOR_PLANO = { Starter:1397, 'Negócio':2897, Pro:4997 };
+  /* Desde out/2026 o Pro cobre os 13 serviços mensais; Starter e Negócio
+     cobrem os subconjuntos abaixo. Site e Link na Bio não aparecem aqui
+     porque são pagamento único, não mensalidade — os planos simplesmente
+     dispensam o valor de entrada dos dois. */
   var COBERTURA = {
-    Starter:  ['whatsapp','agendamento'],
-    'Negócio':['whatsapp','agendamento','instagram','crm','catalogo','dashboard'],
-    Pro:      ['whatsapp','agendamento','instagram','crm','catalogo','dashboard','reputacao','relatorio']
+    Starter:  ['catalogo','agendamento','whatsapp','dashboard'],
+    'Negócio':['catalogo','agendamento','whatsapp','dashboard','instagram','crm','reputacao','seolocal','estoque','relatorio'],
+    Pro:      ['catalogo','agendamento','whatsapp','dashboard','instagram','crm','reputacao','seolocal','estoque','relatorio','app','trafego','nfce']
   };
   var ORDEM_PLANO = ['Starter','Negócio','Pro'];
 
@@ -620,17 +628,40 @@
      em dentro.length < 2. */
   function melhorCaminho(ids){
     var avulso = ids.reduce(function(a, id){ var sv = servico(id); return a + (sv ? sv.preco : 0); }, 0);
-    var melhor = null;
+    var rota = null;
     ORDEM_PLANO.forEach(function(nome){
       var cobre = COBERTURA[nome];
       var dentro = ids.filter(function(id){ return cobre.indexOf(id) !== -1; });
       var fora   = ids.filter(function(id){ return cobre.indexOf(id) === -1; });
+      /* um servico so dentro do plano nunca justifica o plano */
       if (dentro.length < 2) return;
       var custo = VALOR_PLANO[nome] + fora.reduce(function(a, id){ return a + servico(id).preco; }, 0);
-      if (custo >= avulso) return;
-      if (!melhor || custo < melhor.custo) melhor = { plano:nome, custo:custo, fora:fora };
+      if (!rota || custo < rota.custo){
+        rota = {
+          plano: nome, custo: custo, fora: fora,
+          /* o que o plano traz que a pessoa nem marcou */
+          brinde: cobre.filter(function(id){ return ids.indexOf(id) === -1; })
+        };
+      }
     });
-    return { avulso:avulso, plano:melhor };
+    return { avulso:avulso, rota:rota, ganha: !!rota && rota.custo < avulso };
+  }
+
+  /* Site e Link na Bio sao pagamento unico; nenhum plano cobra entrada
+     por eles. Vale dinheiro e some de qualquer conta so mensal. */
+  var ENTRADA_DISPENSADA = 1994;
+
+  function fraseRota(r){
+    var nome = esc(r.rota.plano);
+    var txt = 'plano <b>' + nome + '</b> por ' + brl(VALOR_PLANO[r.rota.plano]) + '/m\u00eas';
+    if (r.rota.fora.length) txt += ', mais ' + juntar(listar(r.rota.fora)) + ' \u00e0 parte';
+    return txt;
+  }
+
+  function fraseBrinde(r){
+    if (!r.rota.brinde.length) return '';
+    return ' Junto vem ' + juntar(r.rota.brinde.map(function(id){ return esc(servico(id).nome); })) +
+      ', que voc\u00ea nem marcou.';
   }
 
   function listar(ids){
@@ -699,27 +730,36 @@
     if (!ids.length){
       elTot.textContent = brl(0);
       hint.className = 'hint flat';
-      hint.textContent = 'Marque os serviços acima para ver o total.';
+      hint.textContent = 'Marque os servi\u00e7os acima para ver o total.';
       return;
     }
 
     var r = melhorCaminho(ids);
 
-    if (!r.plano){
-      elTot.textContent = brl(r.avulso);
-      hint.className = 'hint flat';
-      hint.textContent = ids.length === 1
-        ? 'Contratado sozinho, sem plano. Nenhum plano sai mais barato só com esse serviço.'
-        : 'Nenhum plano sai mais barato nessa combinação. Avulso é o melhor caminho aqui.';
+    if (r.ganha){
+      elTot.textContent = brl(r.rota.custo);
+      hint.className = 'hint';
+      hint.innerHTML = 'Melhor caminho: ' + fraseRota(r) + '. Tudo avulso daria ' + brl(r.avulso) +
+        ' \u2014 <b>economia de ' + brl(r.avulso - r.rota.custo) + ' por m\u00eas</b>, mais os ' +
+        brl(ENTRADA_DISPENSADA) + ' de entrada do site e do Link na Bio, que o plano dispensa.' + fraseBrinde(r);
       return;
     }
 
-    elTot.textContent = brl(r.plano.custo);
-    var txt = 'Melhor caminho: <b>plano ' + esc(r.plano.plano) + '</b> por ' + brl(VALOR_PLANO[r.plano.plano]) + '/mês';
-    if (r.plano.fora.length) txt += ', mais ' + juntar(listar(r.plano.fora)) + ' à parte';
-    txt += '. Tudo avulso daria ' + brl(r.avulso) + ' — <b>economia de ' + brl(r.avulso - r.plano.custo) + ' por mês</b>.';
-    hint.className = 'hint';
-    hint.innerHTML = txt;
+    /* avulso ganha no numero: o numero grande e o do avulso, sem maquiagem */
+    elTot.textContent = brl(r.avulso);
+
+    if (!r.rota){
+      hint.className = 'hint flat';
+      hint.textContent = ids.length === 1
+        ? 'Contratado sozinho, sem plano. Nenhum plano sai mais barato s\u00f3 com esse servi\u00e7o.'
+        : 'Nenhum plano cobre o suficiente dessa combina\u00e7\u00e3o. Avulso \u00e9 o melhor caminho aqui.';
+      return;
+    }
+
+    hint.className = 'hint flat';
+    hint.innerHTML = 'Avulso \u00e9 o mais barato aqui. Mas por <b>' + brl(r.rota.custo - r.avulso) +
+      ' a mais por m\u00eas</b> voc\u00ea tem o ' + fraseRota(r) + ', sem os ' + brl(ENTRADA_DISPENSADA) +
+      ' de entrada do site e do Link na Bio.' + fraseBrinde(r);
   }
 
   document.getElementById('chips').addEventListener('click', function(ev){
@@ -760,20 +800,27 @@
     var r = melhorCaminho(p.rec);
     var titulo, total, detalhe;
 
-    if (r.plano){
-      total = r.plano.custo;
-      titulo = 'Plano ' + esc(r.plano.plano) +
-        (r.plano.fora.length ? ' + ' + r.plano.fora.map(function(id){ return esc(servico(id).nome); }).join(' + ') : '');
-      detalhe = r.plano.fora.length
-        ? 'O plano cobre a maior parte; ' + juntar(listar(r.plano.fora)) + (r.plano.fora.length > 1 ? ' ficam ' : ' fica ') + 'à parte, porque não entra' + (r.plano.fora.length > 1 ? 'm' : '') + ' em plano nenhum.'
-        : 'Uma mensalidade só, tudo incluso.';
-      detalhe += ' Separado, daria ' + brl(r.avulso) + ' — economia de ' + brl(r.avulso - total) + ' por mês.';
+    if (r.ganha){
+      total = r.rota.custo;
+      titulo = 'Plano ' + esc(r.rota.plano) +
+        (r.rota.fora.length ? ' + ' + r.rota.fora.map(function(id){ return esc(servico(id).nome); }).join(' + ') : '');
+      detalhe = r.rota.fora.length
+        ? 'O plano cobre a maior parte; ' + juntar(listar(r.rota.fora)) + (r.rota.fora.length > 1 ? ' ficam ' : ' fica ') + '\u00e0 parte, porque n\u00e3o entra' + (r.rota.fora.length > 1 ? 'm' : '') + ' em plano nenhum.'
+        : 'Uma mensalidade s\u00f3, tudo incluso.';
+      detalhe += ' Separado, daria ' + brl(r.avulso) + ' \u2014 economia de ' + brl(r.avulso - total) +
+        ' por m\u00eas, fora os ' + brl(ENTRADA_DISPENSADA) + ' de entrada que o plano dispensa.' + fraseBrinde(r);
+    } else if (r.rota){
+      /* O plano perde por pouco. Mostra os dois numeros e deixa a conta
+         na mesa, em vez de esconder o caminho mais completo. */
+      total = r.avulso;
+      titulo = 'Avulso ' + brl(r.avulso) + ', ou plano ' + esc(r.rota.plano) + ' por ' + brl(r.rota.custo - r.avulso) + ' a mais';
+      detalhe = 'Esses servi\u00e7os separados somam ' + brl(r.avulso) + ' por m\u00eas. O ' + fraseRota(r) +
+        ' custa ' + brl(r.rota.custo) + ' \u2014 ' + brl(r.rota.custo - r.avulso) + ' a mais, sem os ' +
+        brl(ENTRADA_DISPENSADA) + ' de entrada do site e do Link na Bio.' + fraseBrinde(r);
     } else {
-      /* Nem todo negocio se encaixa em plano. Quando o plano sai mais caro
-         que a soma, a pagina diz isso em vez de empurrar o plano. */
       total = r.avulso;
       titulo = 'Avulso, sem plano';
-      detalhe = 'Nesse caso o plano sairia mais caro do que os serviços separados, então o melhor é contratar só o que você vai usar: ' +
+      detalhe = 'Nenhum plano cobre o suficiente dessa combina\u00e7\u00e3o, ent\u00e3o o melhor \u00e9 contratar s\u00f3 o que voc\u00ea vai usar: ' +
         juntar(listar(p.rec)) + '.';
     }
 
@@ -783,9 +830,9 @@
       '<h3>' + titulo + '</h3>' +
       '<p>' + esc(p.frase) + ' ' + detalhe + '</p>' +
       '<div class="rrow">' +
-        '<span class="rprice">' + brl(total) + ' <small>/mês no total</small></span>' +
+        '<span class="rprice">' + brl(total) + ' <small>/m\u00eas no total</small></span>' +
         '<button type="button" class="linkish" data-ir="montar">ver a conta no simulador</button>' +
-        '<button type="button" class="linkish" data-limpar="1">ver todos os serviços</button>' +
+        '<button type="button" class="linkish" data-limpar="1">ver todos os servi\u00e7os</button>' +
       '</div>' +
     '</div>';
   }
