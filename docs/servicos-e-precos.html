@@ -359,15 +359,15 @@
     <div class="band">
       <p class="eyebrow">Comparando</p>
       <h2>Quanto o plano economiza</h2>
-      <p>A coluna "avulso daria" é a soma das mensalidades desta mesma página para os serviços do plano. A entrada de R$ 1.994 é o Site (R$ 1.497) mais o Link na Bio (R$ 497), que nos planos não se paga.</p>
+      <p>A coluna "avulso daria" é a soma das mensalidades desta mesma página para os serviços do plano. A entrada de R$ 1.297 é o Site (R$ 800) mais o Link na Bio (R$ 497), que nos planos não se paga.</p>
     </div>
     <div class="tablewrap">
       <table>
         <thead><tr><th>Plano</th><th>Avulso daria</th><th>No plano</th></tr></thead>
         <tbody>
-          <tr><td class="v">Starter</td><td class="m">R$ 1.738/mês<br><span class="ent">+ R$ 1.994 de entrada</span></td><td class="v">R$ 1.397/mês<span class="save">economiza R$ 341/mês e os R$ 1.994</span></td></tr>
-          <tr><td class="v">Negócio</td><td class="m">R$ 4.576/mês<br><span class="ent">+ R$ 1.994 de entrada</span></td><td class="v">R$ 2.897/mês<span class="save">economiza R$ 1.679/mês e os R$ 1.994</span></td></tr>
-          <tr><td class="v">Pro</td><td class="m">R$ 7.623/mês<br><span class="ent">+ R$ 1.994 de entrada</span></td><td class="v">R$ 4.997/mês<span class="save">economiza R$ 2.626/mês e os R$ 1.994</span></td></tr>
+          <tr><td class="v">Starter</td><td class="m">R$ 1.288/mês<br><span class="ent">+ R$ 1.297 de entrada</span></td><td class="v">R$ 997/mês<span class="save">economiza R$ 291/mês e os R$ 1.297</span></td></tr>
+          <tr><td class="v">Negócio</td><td class="m">R$ 4.126/mês<br><span class="ent">+ R$ 1.297 de entrada</span></td><td class="v">R$ 2.597/mês<span class="save">economiza R$ 1.529/mês e os R$ 1.297</span></td></tr>
+          <tr><td class="v">Pro</td><td class="m">R$ 6.423/mês<br><span class="ent">+ R$ 1.297 de entrada</span></td><td class="v">R$ 4.197/mês<span class="save">economiza R$ 2.226/mês e os R$ 1.297</span></td></tr>
         </tbody>
       </table>
     </div>
@@ -442,15 +442,15 @@
 
   /* ═════════ PLANOS ═════════ */
   var PLANOS = [
-    { nome:'Starter', mensal:1397, anual:1117,
+    { nome:'Starter', mensal:997, anual:797,
       desc:'A presença completa do seu negócio, no ar em até 7 dias.',
       inc:['Site personalizado, sem valor de entrada','Link na Bio profissional','Catálogo Digital','Agendamento Online','WhatsApp Bot 24/7','Dashboard de Métricas','Suporte via WhatsApp'],
       fora:['Instagram Automático','CRM com pipeline','Tráfego Pago'] },
-    { nome:'Negócio', mensal:2897, anual:2317, dest:true,
+    { nome:'Negócio', mensal:2597, anual:2077, dest:true,
       desc:'Tudo do Starter mais o que faz o cliente achar você, voltar e indicar.',
       inc:['Tudo do Starter','Instagram Automático (DM + comentários)','CRM com pipeline de vendas','SEO Local no Google e no Maps','Gestão de Reputação no Google','Controle de Estoque','Relatório de Resultados mensal','Suporte prioritário'],
       fora:['Aplicativo próprio','Tráfego Pago'] },
-    { nome:'Pro', mensal:4997, anual:3997,
+    { nome:'Pro', mensal:4197, anual:3357,
       desc:'Os 15 serviços, inclusive anúncio e aplicativo próprio.',
       inc:['Tudo do Negócio','Aplicativo Personalizado','Gestão de Tráfego Pago (verba à parte)','Nota Fiscal no pedido (NFC-e)','Suporte 7 dias por semana','Reunião mensal de resultados'],
       fora:['E-mail Marketing (em desenvolvimento)','Chat ao Vivo (em desenvolvimento)'] }
@@ -490,18 +490,18 @@
 
   /* ═════════ SERVIÇOS ═════════ */
   var AVULSOS = [
-    { id:'trafego', nome:'Gestão de Tráfego Pago', preco:1500, obs:'+ verba, paga por você',
+    { id:'trafego', nome:'Gestão de Tráfego Pago', preco:1000, obs:'+ verba, paga por você',
       icone:g('<path d="M2 13l4.5-5 3 3L16 4"/><path d="M12 4h4v4"/>'),
       what:'Anúncio no Instagram e no Facebook para trazer cliente novo toda semana, com alguém cuidando e ajustando.',
       itens:['Campanha montada do zero, com público por região e perfil','Produção do criativo do anúncio inclusa','Acompanhamento e ajuste semanal, não é "liga e esquece"','Teto de custo por cliente calculado com o seu ticket e a sua margem','Relatório mensal do que foi gasto e do que voltou'],
       need:'A <b>verba do anúncio é separada</b> e paga por você direto para a Meta. Ela não passa pelo nosso caixa e não cobramos percentual sobre ela.' },
 
-    { id:'app', nome:'Aplicativo Personalizado', preco:1250, obs:'sem valor de entrada',
+    { id:'app', nome:'Aplicativo Personalizado', preco:1000, obs:'sem valor de entrada',
       icone:g('<rect x="5" y="1.5" width="8" height="15" rx="2"/><path d="M7.8 3.6h2.4"/><path d="M7.5 14.3h3"/>'),
       what:'O seu negócio virando um aplicativo de verdade na tela do celular do cliente, sem passar por loja de aplicativo.',
       itens:['O cliente instala pelo link e o ícone fica na tela dele','Pedido, carrinho e checkout com o fluxo do seu negócio','Histórico com "pedir de novo" em um toque','Pagamento por Pix com QR Code e valor já preenchido','Funciona com internet ruim e abre rápido'] },
 
-    { id:'whatsapp', nome:'WhatsApp Bot 24/7', preco:950, obs:'+ conta Z-API',
+    { id:'whatsapp', nome:'WhatsApp Bot 24/7', preco:500, obs:'+ conta Z-API',
       icone:g('<path d="M2 8.6c0-3.5 3.1-6.4 7-6.4s7 2.9 7 6.4-3.1 6.4-7 6.4c-1 0-2-.15-2.9-.43L3 15.8l.8-3.4C2.7 11.3 2 10 2 8.6z"/>'),
       what:'Um atendente que responde em segundos, a qualquer hora, inclusive domingo e madrugada, e só chama uma pessoa quando precisa.',
       itens:['Responde na hora as perguntas que mais se repetem','Agenda, confirma e remarca sozinho','Pergunta o que a pessoa precisa antes de chegar em você','Passa a conversa para um humano quando o caso é complexo','Nunca deixa mensagem sem resposta fora do horário'],
@@ -564,7 +564,7 @@
   ];
 
   var UNICOS = [
-    { id:'site', nome:'Site do cliente', valorTxt:'R$ 1.497', obs:'+ R$ 97/mês de manutenção',
+    { id:'site', nome:'Site do cliente', valorTxt:'R$ 800', obs:'+ R$ 97/mês de manutenção',
       icone:g('<rect x="2" y="3" width="14" height="11" rx="2"/><path d="M2 6.5h14M4.6 4.75h.01M6.6 4.75h.01"/>'),
       what:'Uma página própria do negócio: o que você faz, onde fica, horário e botão de WhatsApp sempre à vista.',
       itens:['Feito para abrir rápido no celular','Serviços com preço, endereço e horário do dia','Nota do Google em destaque, quando houver','Botão de WhatsApp fixo na tela inteira'] },
@@ -605,7 +605,7 @@
       frase:'Começar leve faz sentido: atendimento automático, agenda e um lugar onde nenhum orçamento se perde. Quando o movimento firmar, o anúncio entra para trazer gente nova.' }
   ];
 
-  var VALOR_PLANO = { Starter:1397, 'Negócio':2897, Pro:4997 };
+  var VALOR_PLANO = { Starter:997, 'Negócio':2597, Pro:4197 };
   /* Desde out/2026 o Pro cobre os 13 serviços mensais; Starter e Negócio
      cobrem os subconjuntos abaixo. Site e Link na Bio não aparecem aqui
      porque são pagamento único, não mensalidade — os planos simplesmente
@@ -649,7 +649,7 @@
 
   /* Site e Link na Bio sao pagamento unico; nenhum plano cobra entrada
      por eles. Vale dinheiro e some de qualquer conta so mensal. */
-  var ENTRADA_DISPENSADA = 1994;
+  var ENTRADA_DISPENSADA = 1297;
 
   function fraseRota(r){
     var nome = esc(r.rota.plano);

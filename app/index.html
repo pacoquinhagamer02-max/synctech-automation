@@ -506,9 +506,9 @@ details[open] summary { margin-bottom: 4px; }
           <div class="form-group">
             <label class="form-label" for="pl-val">Plano estimado</label>
             <select class="form-input" id="pl-val">
-              <option value="1397">Starter — R$1.397/mês</option>
-              <option value="2897" selected>Negócio — R$2.897/mês</option>
-              <option value="4997">Pro — R$4.997/mês</option>
+              <option value="997">Starter — R$997/mês</option>
+              <option value="2597" selected>Negócio — R$2.597/mês</option>
+              <option value="4197">Pro — R$4.197/mês</option>
             </select>
           </div>
         </div>
@@ -750,9 +750,9 @@ function doGet(e) {
           <div class="form-group">
             <label class="form-label" for="nc-plan">Plano</label>
             <select class="form-input" id="nc-plan">
-              <option value="Starter">Starter — R$1.397/mês</option>
-              <option value="Negócio" selected>Negócio — R$2.897/mês</option>
-              <option value="Pro">Pro — R$4.997/mês</option>
+              <option value="Starter">Starter — R$997/mês</option>
+              <option value="Negócio" selected>Negócio — R$2.597/mês</option>
+              <option value="Pro">Pro — R$4.197/mês</option>
             </select>
           </div>
           <div class="form-group">
@@ -857,9 +857,9 @@ function doGet(e) {
             <div class="form-group" id="ob-grp-plano">
               <label class="form-label" for="ob-plano">Plano</label>
               <select class="form-input" id="ob-plano">
-                <option value="Starter">Starter &mdash; R$1.397/m&ecirc;s</option>
-                <option value="Neg&oacute;cio" selected>Neg&oacute;cio &mdash; R$2.897/m&ecirc;s</option>
-                <option value="Pro">Pro &mdash; R$4.997/m&ecirc;s</option>
+                <option value="Starter">Starter &mdash; R$997/m&ecirc;s</option>
+                <option value="Neg&oacute;cio" selected>Neg&oacute;cio &mdash; R$2.597/m&ecirc;s</option>
+                <option value="Pro">Pro &mdash; R$4.197/m&ecirc;s</option>
               </select>
             </div>
           </div>
@@ -1089,12 +1089,12 @@ let SERVICES = [
   { icon:svcIc('<path d="M2.5 5.5L9 2.2l6.5 3.3v7L9 15.8l-6.5-3.3z"/><path d="M2.5 5.5L9 8.8l6.5-3.3M9 8.8v7"/>'), name:'Controle de Estoque',      status:'ok',   desc:'Conta, avisa o que está acabando e monta a lista de compras pro WhatsApp.' },
   { icon:svcIc('<rect x="3" y="1.8" width="12" height="14.4" rx="2"/><path d="M6 6.2h6M6 9h6M6 11.8h3.5"/>'), name:'Relatório de Resultados',  status:'ok',   desc:'Página mensal com indicadores, gráfico e o que foi entregue. Números conferidos à mão.' },
   { icon:svcIc('<path d="M4 1.8h10v14.4l-2-1.4-1.7 1.4L9 14.8l-1.3 1.4L6 14.8l-2 1.4z"/><path d="M6.8 5.6h4.4M6.8 8.4h4.4"/>'), name:'Nota Fiscal (NFC-e)',      status:'warn', desc:'Nota autorizada no fim do pedido. Depende de CNPJ na Sefaz, certificado A1 e emissora.' },
-  { icon:svcIc('<path d="M2 13l4.5-5 3 3L16 4"/><path d="M12 4h4v4"/>'), name:'Tráfego Pago (Meta Ads)',  status:'ok',   desc:'Prestado manualmente por você — R$1.500/mês, preço final (inclui produção do vídeo do anúncio). Alinhado à média de gestor com carteira formada. Vale como add-on de plano ou avulso, mesmo preço.' },
+  { icon:svcIc('<path d="M2 13l4.5-5 3 3L16 4"/><path d="M12 4h4v4"/>'), name:'Tráfego Pago (Meta Ads)',  status:'ok',   desc:'Prestado manualmente por você — R$1.000/mês, preço final (inclui produção do vídeo do anúncio). Abaixo do piso de mercado (R$1.200), por decisão comercial. Vale como add-on de plano ou avulso, mesmo preço.' },
 ];
 
 // Mesmo conteúdo real da landing page pública (index.html raiz, seção #planos) — não duplicar com números diferentes.
 let PLANS = [
-  { name:'Starter', desc:'A presença completa do negócio, no ar em até 7 dias.', price:'R$1.397', setup:'Preço final · site sem valor de entrada', features:[
+  { name:'Starter', desc:'A presença completa do negócio, no ar em até 7 dias.', price:'R$997', setup:'Preço final · site sem valor de entrada', features:[
     { on:true,  text:'Site personalizado (sem entrada)' },
     { on:true,  text:'Link na Bio profissional' },
     { on:true,  text:'Catálogo Digital' },
@@ -1104,7 +1104,7 @@ let PLANS = [
     { on:false, text:'Instagram Automático' },
     { on:false, text:'CRM com pipeline' },
   ]},
-  { name:'Negócio', badge:'Mais procurado', featured:true, desc:'O que faz o cliente achar você, voltar e indicar.', price:'R$2.897', setup:'Preço final · site sem valor de entrada', features:[
+  { name:'Negócio', badge:'Mais procurado', featured:true, desc:'O que faz o cliente achar você, voltar e indicar.', price:'R$2.597', setup:'Preço final · site sem valor de entrada', features:[
     { on:true, text:'Tudo do Starter' },
     { on:true, text:'Instagram Auto (DM + comentários)' },
     { on:true, text:'CRM com pipeline de vendas' },
@@ -1114,7 +1114,7 @@ let PLANS = [
     { on:true, text:'Relatório de Resultados mensal' },
     { on:true, text:'Suporte prioritário' },
   ]},
-  { name:'Pro', desc:'Os 15 serviços, inclusive anúncio e app próprio.', price:'R$4.997', setup:'Preço final · verba de anúncio à parte', features:[
+  { name:'Pro', desc:'Os 15 serviços, inclusive anúncio e app próprio.', price:'R$4.197', setup:'Preço final · verba de anúncio à parte', features:[
     { on:true, text:'Tudo do Negócio' },
     { on:true, text:'Aplicativo Personalizado' },
     { on:true, text:'Gestão de Tráfego Pago' },
@@ -1558,7 +1558,7 @@ let CLIENTS_FIXED = [
           'CRM com Pipeline',
           'Gestão de Reputação',
           'Dashboard de Métricas',
-          'Tráfego Pago (Meta Ads) — R$1.500/mês, preço final (com vídeo do anúncio incluso)',
+          'Tráfego Pago (Meta Ads) — R$1.000/mês, preço final (com vídeo do anúncio incluso)',
         ],
         pending: [
           'Instagram Automático (token gerado, cenário Make.com falta montar)',
@@ -1573,7 +1573,7 @@ let CLIENTS_FIXED = [
         { done:false, text:'Reduzir posts em foto/carrossel estático: são o formato com pior retorno no período (12, 22 curtidas).' },
         { done:false, text:'Ativar Google Meu Negócio — gratuito, o site já tem o schema pronto, só falta cadastrar.' },
         { done:false, text:'Configurar o link real de "Peça avaliações" do Google (hoje é placeholder na ferramenta de avaliação).' },
-        { done:true, text:'Tráfego pago ligado — R$15–20/dia, raio 60km (Mariana + Ouro Preto/Itabirito/Congonhas), homens 30–55. Cobrança da gestão (tabela 2026: R$1.500/mês) ainda não decidida — hoje sem custo extra pra ela. O contrato atual de R$1.200 é anterior à tabela nova.' },
+        { done:true, text:'Tráfego pago ligado — R$15–20/dia, raio 60km (Mariana + Ouro Preto/Itabirito/Congonhas), homens 30–55. Cobrança da gestão (tabela 2026: R$1.000/mês) ainda não decidida — hoje sem custo extra pra ela. O contrato atual de R$1.200 é anterior à tabela nova.' },
       ],
     }},
     { name:'Padaria Cantinho do Pão', plan:'Plano Pro — R$1.000/mês, contrato de 3 meses (assinatura prevista 10/09/2026) + R$899 de implantação já quitado. Verba de anúncio custeada pela cliente, direto na plataforma.', links:[

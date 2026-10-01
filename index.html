@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>SyncTech Automation | Atendimento no automático 24h</title>
-<meta name="description" content="WhatsApp Bot, agendamento automático, Instagram e CRM para pequenos negócios. Setup em 7 dias, com site incluído, a partir de R$1.397/mês.">
+<meta name="description" content="WhatsApp Bot, agendamento automático, Instagram e CRM para pequenos negócios. Setup em 7 dias, com site incluído, a partir de R$997/mês.">
 <meta name="theme-color" content="#0A0714">
 <link rel="canonical" href="https://pacoquinhagamer02-max.github.io/synctech-automation/">
 
 <meta property="og:type" content="website">
 <meta property="og:locale" content="pt_BR">
 <meta property="og:title" content="SyncTech Automation | Atendimento no automático 24h">
-<meta property="og:description" content="WhatsApp Bot, agendamento automático, Instagram e CRM para pequenos negócios. Setup em 7 dias, com site incluído, a partir de R$1.397/mês.">
+<meta property="og:description" content="WhatsApp Bot, agendamento automático, Instagram e CRM para pequenos negócios. Setup em 7 dias, com site incluído, a partir de R$997/mês.">
 <meta property="og:url" content="https://pacoquinhagamer02-max.github.io/synctech-automation/">
 <meta name="twitter:card" content="summary_large_image">
 
@@ -193,7 +193,7 @@ const PROVA = {
   stats: [
     ['+18%',   'Crescimento real em 23 dias'],
     ['24h',    'Atendimento contínuo'],
-    ['R$1.397','A partir de, por mês'],
+    ['R$997',  'A partir de, por mês'],
     ['7 dias', 'Para estar no ar']
   ],
   caso: {
@@ -232,6 +232,12 @@ const ICONES = {
   check:   ['M20 6L9 17l-5-5'],
   x:       ['M18 6L6 18M6 6l12 12'],
   relogio: ['M12 21a9 9 0 100-18 9 9 0 000 18z','M12 7v5l3.2 2'],
+  site:    ['M3 7.5A1.5 1.5 0 014.5 6h15A1.5 1.5 0 0121 7.5v9a1.5 1.5 0 01-1.5 1.5h-15A1.5 1.5 0 013 16.5z','M3 10h18M6.2 8.2h.01M8.4 8.2h.01'],
+  celular: ['M7.5 3.5A1.5 1.5 0 019 2h6a1.5 1.5 0 011.5 1.5v17A1.5 1.5 0 0115 22H9a1.5 1.5 0 01-1.5-1.5z','M10.6 4.8h2.8M10.5 19.4h3'],
+  mapa:    ['M12 2.6c3.4 0 6.2 2.7 6.2 6C18.2 12.9 12 21 12 21S5.8 12.9 5.8 8.6c0-3.3 2.8-6 6.2-6z','M12 11.1a2.3 2.3 0 100-4.6 2.3 2.3 0 000 4.6z'],
+  caixa:   ['M3 7.4L12 3l9 4.4v9.2L12 21l-9-4.4z','M3 7.4L12 12l9-4.6M12 12v9'],
+  folha:   ['M5 3.5A1.5 1.5 0 016.5 2h11A1.5 1.5 0 0119 3.5v17A1.5 1.5 0 0117.5 22h-11A1.5 1.5 0 015 20.5z','M8.4 7.6h7.2M8.4 12h7.2M8.4 16.4h4.2'],
+  nota:    ['M5 2.4h14v19.2l-2.8-1.9-2.4 1.9L12 19.7l-1.8 1.9-2.4-1.9L5 21.6z','M9 7.4h6M9 11.4h6M9 15.4h3.5'],
   seta:    ['M5 12h14M13 6l6 6-6 6'],
   tesoura: ['M6 4l12 12M6 20L18 8','M6.5 8a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM6.5 21a2.5 2.5 0 100-5 2.5 2.5 0 000 5z'],
   coracao: ['M12 20s-7-4.4-7-9.2A4 4 0 0112 8a4 4 0 017 2.8C19 15.6 12 20 12 20z'],
@@ -526,7 +532,7 @@ function Hero() {
     </section>`;
 }
 
-/* ═══════════════ Serviços — as 11 ferramentas ═══════════════ */
+/* ═══════════════ Serviços — os 15 serviços + 2 em desenvolvimento ═══════════════ */
 const SERVICOS = [
   { ico: ICONES.whats, nome: 'WhatsApp Bot 24/7', tag: 'Mais popular', grande: true,
     txt: 'Atende clientes, responde perguntas, agenda horários e fecha vendas automaticamente enquanto você dorme.',
@@ -549,6 +555,18 @@ const SERVICOS = [
     txt: 'Widget que captura visitante, responde dúvida e encaminha pro WhatsApp automaticamente.' },
   { ico: ICONES.grafico, nome: 'Dashboard de Métricas',
     txt: 'Agendamentos, receita, clientes novos e performance do bot — em tempo real.' },
+  { ico: ICONES.site, nome: 'Site personalizado', tag: 'Novo',
+    txt: 'Página própria do negócio: serviços com preço, endereço, horário e botão de WhatsApp sempre à vista. Entra no plano sem valor de entrada.' },
+  { ico: ICONES.celular, nome: 'Aplicativo Personalizado',
+    txt: 'Seu negócio vira aplicativo na tela do cliente, sem loja de aplicativo. Pedido, carrinho, Pix com QR Code e "pedir de novo" num toque.' },
+  { ico: ICONES.mapa, nome: 'SEO Local no Google', tag: 'Novo',
+    txt: 'Aparecer quando alguém da sua cidade procura o que você vende. Perfil escrito, palavras locais e 8 publicações por mês.' },
+  { ico: ICONES.caixa, nome: 'Controle de Estoque',
+    txt: 'Conta o que tem, avisa o que está acabando e monta a lista de compras pronta pra mandar no WhatsApp do fornecedor.' },
+  { ico: ICONES.folha, nome: 'Relatório de Resultados',
+    txt: 'Todo mês, uma página com o que foi feito e o que saiu disso em número — sem você abrir planilha.' },
+  { ico: ICONES.nota, nome: 'Nota Fiscal no pedido',
+    txt: 'Cada venda feita pelo aplicativo sai com nota fiscal autorizada, sem ninguém digitar nada de novo no caixa.' },
   { ico: ICONES.alvo, nome: 'Gestão de Tráfego Pago', tag: 'Novo',
     txt: 'Campanhas no Meta Ads criadas e otimizadas pra trazer cliente novo toda semana. A verba vai direto pra plataforma; você paga só a gestão.' }
 ];
@@ -559,7 +577,7 @@ function Servicos() {
       <div className="mx-auto max-w-6xl">
         <${Reveal}>
           <${TituloSecao} tag="O hub completo"
-            titulo=${html`11 ferramentas em uma <span className="texto-gradiente">única mensalidade</span>`}
+            titulo=${html`15 serviços em uma <span className="texto-gradiente">única mensalidade</span>`}
             sub="Tudo que seu negócio precisa pra automatizar, atender melhor e vender mais — sem equipe técnica." />
         <//>
         <div className="grid gap-4 md:grid-cols-3">
@@ -595,7 +613,7 @@ function Servicos() {
 }
 
 /* ═══════════════ Calculadora de ROI ═══════════════ */
-const CUSTO_MES = 500; // plano Negócio, mensal
+const CUSTO_MES = 997; // plano Starter, o de entrada. Tem de acompanhar PLANOS[0].mensal.
 
 function Slider({ rotulo, valor, min, max, passo, onChange, formata, dica }) {
   const pct = ((valor - min) / (max - min)) * 100;
@@ -626,8 +644,8 @@ function CartaoResultado({ rotulo, valor, sufixo, destaque, ativo, formata }) {
 }
 
 function Calculadora() {
-  const [clientes, setClientes] = useState(80);
-  const [ticket, setTicket] = useState(60);
+  const [clientes, setClientes] = useState(250);
+  const [ticket, setTicket] = useState(70);
   const [retorno, setRetorno] = useState(40);
   const [horas, setHoras] = useState(2);
   const [ativo, setAtivo] = useState(semMovimento);
@@ -692,7 +710,7 @@ function Calculadora() {
                 <${CartaoResultado} rotulo="Horas devolvidas por ano" valor=${r.horasAno} sufixo="h"
                                     ativo=${ativo} formata=${num} />
                 <div className="sm:col-span-2">
-                  <${CartaoResultado} rotulo=${'Sobra no ano, já pagando o plano Negócio de ' + brl(CUSTO_MES) + '/mês'}
+                  <${CartaoResultado} rotulo=${'Sobra no ano, já pagando o plano Starter de ' + brl(CUSTO_MES) + '/mês'}
                                       valor=${r.sobraAno} ativo=${ativo} formata=${brl} />
                 </div>
                 <p className="text-xs leading-relaxed text-txt3 sm:col-span-2">
@@ -763,7 +781,7 @@ function Processo() {
 
 /* ═══════════════ Comparativo ═══════════════ */
 const COLUNAS = [
-  ['SyncTech', 'R$1.397/mês · site e serviço inclusos'],
+  ['SyncTech', 'R$997/mês · site e serviço inclusos'],
   ['Trinks / Booksy', 'R$150/mês · ferramenta, você opera'],
   ['WhatsApp manual', 'R$0/mês · o custo é o seu tempo']
 ];
@@ -896,20 +914,20 @@ function Segmentos() {
 
 /* ═══════════════ Planos ═══════════════ */
 const PLANOS = [
-  { chave: 'starter', nome: 'Starter', mensal: 1397, anual: 1117, dest: false,
+  { chave: 'starter', nome: 'Starter', mensal: 997, anual: 797, dest: false,
     desc: 'A presença completa do seu negócio, no ar em até 7 dias.',
     inclui: ['Site personalizado, sem valor de entrada', 'Link na Bio profissional',
              'Catálogo Digital', 'Agendamento Online', 'WhatsApp Bot 24/7',
              'Dashboard de Métricas', 'Suporte via WhatsApp'],
     emBreve: [], fora: ['Instagram Automático', 'CRM com pipeline', 'Tráfego Pago'] },
-  { chave: 'negocio', nome: 'Negócio', mensal: 2897, anual: 2317, dest: true,
+  { chave: 'negocio', nome: 'Negócio', mensal: 2597, anual: 2077, dest: true,
     desc: 'Tudo do Starter mais o que faz o cliente achar você, voltar e indicar.',
     inclui: ['Tudo do Starter', 'Instagram Automático (DM + comentários)',
              'CRM com pipeline de vendas', 'SEO Local no Google e no Maps',
              'Gestão de Reputação no Google', 'Controle de Estoque',
              'Relatório de Resultados mensal', 'Suporte prioritário'],
     emBreve: [], fora: ['Aplicativo próprio', 'Tráfego Pago'] },
-  { chave: 'pro', nome: 'Pro', mensal: 4997, anual: 3997, dest: false,
+  { chave: 'pro', nome: 'Pro', mensal: 4197, anual: 3357, dest: false,
     desc: 'Os 15 serviços, inclusive anúncio e aplicativo próprio.',
     inclui: ['Tudo do Negócio', 'Aplicativo Personalizado',
              'Gestão de Tráfego Pago (verba à parte)', 'Nota Fiscal no pedido (NFC-e)',
@@ -1012,7 +1030,7 @@ function Planos() {
             </div>
             <div className="text-right">
               <p className="text-xs text-txt3">Preço final</p>
-              <p className="font-disp text-3xl font-bold">${brl(1500)}<span className="text-sm font-medium text-txt3">/mês</span></p>
+              <p className="font-disp text-3xl font-bold">${brl(1000)}<span className="text-sm font-medium text-txt3">/mês</span></p>
               <p className="mt-1 text-xs text-txt3">configuração inclusa</p>
             </div>
           </div>
