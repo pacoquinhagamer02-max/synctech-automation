@@ -912,6 +912,56 @@ function Segmentos() {
     </section>`;
 }
 
+/* ═══════════════ Serviços avulsos ═══════════════
+   Mesmos valores de docs/tabela-precos-2026.html e do Hub. Mudou aqui,
+   muda nos três. */
+const AVULSOS_MES = [
+  ['Gestão de Tráfego Pago',    1000, 'Anúncio no Instagram e no Facebook pra trazer cliente novo toda semana.', 'verba à parte'],
+  ['Aplicativo Personalizado',  1000, 'Seu negócio vira um app na tela do cliente, com pedido, carrinho e Pix.', ''],
+  ['SEO Local no Google',        697, 'Aparecer quando alguém da sua cidade procura o que você vende.', ''],
+  ['Gestão de Reputação',        650, 'Cliente satisfeito vira avaliação. Insatisfeito vira conversa privada.', ''],
+  ['WhatsApp Bot 24 horas',      500, 'Responde, agenda e confirma sozinho, inclusive domingo e de madrugada.', 'requer Z-API'],
+  ['Relatório de Resultados',    500, 'Todo mês, uma página com o que foi feito e o que isso deu em número.', ''],
+  ['Instagram Automático',       497, 'Comentou no post, recebe mensagem. Começou a seguir, recebe boas-vindas.', ''],
+  ['Agendamento Online',         297, 'O cliente marca pelo celular, a qualquer hora, sem falar com ninguém.', ''],
+  ['CRM com Pipeline',           297, 'Nenhum cliente se perde: cada pessoa vira um cartão até fechar.', ''],
+  ['Nota Fiscal no pedido',      297, 'Cada venda feita pelo aplicativo sai com nota fiscal autorizada.', 'requer emissora'],
+  ['Catálogo Digital',           247, 'Seu cardápio online. O pedido chega pronto no seu WhatsApp.', ''],
+  ['Controle de Estoque',        197, 'Avisa o que está acabando e monta a lista de compras pronta.', ''],
+  ['Dashboard de Métricas',      147, 'Quanto entrou, quantos clientes novos e o que mais vendeu.', ''],
+];
+
+const AVULSOS_UNICO = [
+  ['Site do cliente', 'R$ 800', 'Página própria do negócio, com WhatsApp sempre à vista.', 'mais R$ 97/mês de manutenção'],
+  ['Link na Bio',     'R$ 497', 'Uma página só sua pro Instagram, com serviços e preço.', 'hospedagem inclusa'],
+];
+
+/* Soma dos mesmos avulsos que cada plano cobre, mais a entrada de
+   R$1.297 (Site R$800 + Link na Bio R$497) que nenhum plano cobra. */
+const ECONOMIA = [
+  { plano: 'Starter', avulso: 1288, mensal:  997, guarda:  291 },
+  { plano: 'Negócio', avulso: 4126, mensal: 2597, guarda: 1529 },
+  { plano: 'Pro',     avulso: 6423, mensal: 4197, guarda: 2226 },
+];
+const ENTRADA_DISPENSADA = 1297;
+
+/* Mecanismo, não promessa de faturamento: cada linha diz o que passa a
+   acontecer na operação, não quanto o cliente vai ganhar. */
+const PORQUE = [
+  { plano: 'Starter', titulo: 'Parar de perder quem já estava te procurando',
+    antes: 'A mensagem que chega às 22h espera até você abrir. Quem procura seu negócio no Google não acha um site — acha o concorrente.',
+    depois: 'Site no ar, agenda aberta 24 horas e um atendente automático respondendo na hora, qualquer dia.',
+    muda: 'O cliente que decidiu à noite não esfria até amanhã.' },
+  { plano: 'Negócio', titulo: 'Ser achado, fazer voltar e ser indicado',
+    antes: 'Quem pediu preço e não fechou some, e ninguém lembra de responder. A nota do Google não sobe porque ninguém pede avaliação.',
+    depois: 'Cada contato vira um cartão que você arrasta até fechar, a avaliação é pedida sozinha depois do atendimento e o perfil do Google é trabalhado todo mês.',
+    muda: 'Cliente antigo volta, e o novo te acha sem você pagar anúncio.' },
+  { plano: 'Pro', titulo: 'Trazer rosto novo toda semana',
+    antes: 'O movimento depende de quem passa na porta e de quem já te conhece.',
+    depois: 'Anúncio rodando com teto de custo por cliente calculado a partir do seu ticket e da sua margem, mais um aplicativo próprio na tela do cliente.',
+    muda: 'Você passa a escolher quanto movimento quer no mês.' },
+];
+
 /* ═══════════════ Planos ═══════════════ */
 const PLANOS = [
   { chave: 'starter', nome: 'Starter', mensal: 997, anual: 797, dest: false,
@@ -961,6 +1011,51 @@ function Planos() {
             <span className="rounded-full border border-violeta/50 bg-violeta/15 px-3.5 py-1.5 text-xs font-extrabold text-lilas">
               Anual economiza 20%
             </span>
+          </div>
+        <//>
+
+        <${Reveal} delay=${80}>
+          <div className="mb-14">
+            <div className="grid gap-4 md:grid-cols-3">
+              ${PORQUE.map((b) => html`
+                <div key=${b.plano} className="card flex flex-col rounded-3xl p-6">
+                  <p className="text-xs font-extrabold uppercase tracking-wider text-lilas">${b.plano}</p>
+                  <h3 className="mt-2 font-disp text-lg font-bold leading-snug">${b.titulo}</h3>
+                  <div className="mt-5 flex-1 space-y-4 text-sm leading-relaxed">
+                    <div>
+                      <p className="text-[11px] font-bold uppercase tracking-wider text-txt3">Como é hoje</p>
+                      <p className="mt-1 text-txt3">${b.antes}</p>
+                    </div>
+                    <div>
+                      <p className="text-[11px] font-bold uppercase tracking-wider text-lilas">Com o plano</p>
+                      <p className="mt-1 text-txt2">${b.depois}</p>
+                    </div>
+                  </div>
+                  <p className="mt-5 rounded-xl bg-violeta/10 px-4 py-3 text-sm font-semibold leading-snug text-txt">${b.muda}</p>
+                </div>`)}
+            </div>
+
+            <div className="card mt-5 overflow-hidden rounded-3xl">
+              <div className="border-b border-linha px-6 py-5">
+                <h3 className="font-disp text-lg font-bold">E em dinheiro, quanto o plano economiza</h3>
+                <p className="mt-1 text-sm text-txt3">A coluna do meio é a soma das mensalidades dos mesmos serviços contratados um a um, nesta própria página.</p>
+              </div>
+              ${ECONOMIA.map((e) => html`
+                <div key=${e.plano} className="flex flex-wrap items-center gap-x-6 gap-y-2 border-b border-linha px-6 py-4">
+                  <p className="w-20 font-disp font-bold">${e.plano}</p>
+                  <p className="flex-1 text-sm text-txt3">
+                    avulso daria ${brl(e.avulso)}/mês + ${brl(ENTRADA_DISPENSADA)} de entrada
+                  </p>
+                  <div className="text-right">
+                    <p className="font-disp text-xl font-bold text-lilas">${brl(e.mensal)}<span className="text-xs font-medium text-txt3">/mês</span></p>
+                    <p className="text-xs font-semibold text-emerald-400">guarda ${brl(e.guarda * 12 + ENTRADA_DISPENSADA)} no primeiro ano</p>
+                  </div>
+                </div>`)}
+              <p className="px-6 py-4 text-xs leading-relaxed text-txt3">
+                A entrada de ${brl(ENTRADA_DISPENSADA)} é o Site (R$ 800) e o Link na Bio (R$ 497), que em plano nenhum se paga.
+                Nenhum serviço promete faturamento: o que garantimos é a operação rodando todo dia — o resultado depende do seu negócio.
+              </p>
+            </div>
           </div>
         <//>
 
@@ -1019,19 +1114,41 @@ function Planos() {
         </div>
 
         <${Reveal} delay=${330}>
-          <div className="card mx-auto mt-8 flex max-w-3xl flex-wrap items-center gap-6 rounded-3xl p-7">
-            <div className="min-w-[240px] flex-1">
-              <p className="text-xs font-extrabold uppercase tracking-wider text-lilas">Também vendido avulso — sem precisar de plano</p>
-              <h3 className="mt-1.5 font-disp text-lg font-bold">Gestão de Tráfego Pago (Meta Ads)</h3>
-              <p className="mt-2 text-sm leading-relaxed text-txt2">
-                Montagem da campanha, criativo e otimização mensal, tudo incluso no valor. A verba de anúncio é paga
-                direto pra Meta, separada da nossa taxa de gestão. Mesmo preço como add-on de um plano ou contratado sozinho.
+          <div className="mx-auto mt-16 max-w-4xl">
+            <div className="text-center">
+              <p className="text-xs font-extrabold uppercase tracking-wider text-lilas">Sem plano, se preferir</p>
+              <h3 className="mt-2 font-disp text-2xl font-bold sm:text-3xl">Cada serviço também é vendido sozinho</h3>
+              <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-txt2">
+                O preço é o mesmo contratado sozinho ou somado a um plano. Sem taxa de adesão e sem fidelidade em nenhum deles.
               </p>
             </div>
-            <div className="text-right">
-              <p className="text-xs text-txt3">Preço final</p>
-              <p className="font-disp text-3xl font-bold">${brl(1000)}<span className="text-sm font-medium text-txt3">/mês</span></p>
-              <p className="mt-1 text-xs text-txt3">configuração inclusa</p>
+
+            <div className="card mt-7 overflow-hidden rounded-3xl">
+              ${AVULSOS_MES.map((sv) => html`
+                <div key=${sv[0]} className="flex flex-wrap items-baseline gap-x-4 gap-y-1 border-b border-linha px-6 py-4">
+                  <div className="min-w-[210px] flex-1">
+                    <p className="font-semibold">${sv[0]}</p>
+                    <p className="mt-0.5 text-sm leading-snug text-txt3">${sv[2]}${sv[3] ? ' — ' + sv[3] : ''}</p>
+                  </div>
+                  <p className="whitespace-nowrap font-disp text-xl font-bold text-lilas">
+                    ${brl(sv[1])}<span className="text-xs font-medium text-txt3">/mês</span>
+                  </p>
+                </div>`)}
+            </div>
+
+            <p className="mt-7 text-center text-xs font-extrabold uppercase tracking-wider text-txt3">
+              Pagamento único — paga uma vez, é seu
+            </p>
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              ${AVULSOS_UNICO.map((sv) => html`
+                <div key=${sv[0]} className="card rounded-2xl p-5">
+                  <div className="flex items-baseline justify-between gap-3">
+                    <p className="font-semibold">${sv[0]}</p>
+                    <p className="whitespace-nowrap font-disp text-xl font-bold text-lilas">${sv[1]}</p>
+                  </div>
+                  <p className="mt-1.5 text-sm leading-snug text-txt3">${sv[2]}</p>
+                  <p className="mt-1 text-xs text-txt3/80">${sv[3]}</p>
+                </div>`)}
             </div>
           </div>
         <//>
