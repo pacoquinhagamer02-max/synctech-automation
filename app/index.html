@@ -506,9 +506,9 @@ details[open] summary { margin-bottom: 4px; }
           <div class="form-group">
             <label class="form-label" for="pl-val">Plano estimado</label>
             <select class="form-input" id="pl-val">
-              <option value="250">Starter — R$250/mês</option>
-              <option value="500" selected>Negócio — R$500/mês</option>
-              <option value="1000">Pro — R$1.000/mês</option>
+              <option value="797">Starter — R$797/mês</option>
+              <option value="1497" selected>Negócio — R$1.497/mês</option>
+              <option value="1997">Pro — R$1.997/mês</option>
             </select>
           </div>
         </div>
@@ -750,9 +750,9 @@ function doGet(e) {
           <div class="form-group">
             <label class="form-label" for="nc-plan">Plano</label>
             <select class="form-input" id="nc-plan">
-              <option value="Starter">Starter — R$250/mês</option>
-              <option value="Negócio" selected>Negócio — R$500/mês</option>
-              <option value="Pro">Pro — R$1.000/mês</option>
+              <option value="Starter">Starter — R$797/mês</option>
+              <option value="Negócio" selected>Negócio — R$1.497/mês</option>
+              <option value="Pro">Pro — R$1.997/mês</option>
             </select>
           </div>
           <div class="form-group">
@@ -857,9 +857,9 @@ function doGet(e) {
             <div class="form-group" id="ob-grp-plano">
               <label class="form-label" for="ob-plano">Plano</label>
               <select class="form-input" id="ob-plano">
-                <option value="Starter">Starter &mdash; R$250/m&ecirc;s</option>
-                <option value="Neg&oacute;cio" selected>Neg&oacute;cio &mdash; R$500/m&ecirc;s</option>
-                <option value="Pro">Pro &mdash; R$1.000/m&ecirc;s</option>
+                <option value="Starter">Starter &mdash; R$797/m&ecirc;s</option>
+                <option value="Neg&oacute;cio" selected>Neg&oacute;cio &mdash; R$1.497/m&ecirc;s</option>
+                <option value="Pro">Pro &mdash; R$1.997/m&ecirc;s</option>
               </select>
             </div>
           </div>
@@ -1079,12 +1079,12 @@ let SERVICES = [
   { icon:svcIc('<path d="M4 6h10l-.8 8.2a2 2 0 01-2 1.8H6.8a2 2 0 01-2-1.8z"/><path d="M6.5 6V4.5a2.5 2.5 0 015 0V6"/>'), name:'Catálogo Digital',         status:'ok',   desc:'Reaproveita a mesma tela de serviços do agendamento/bio.' },
   { icon:svcIc('<path d="M2 8.5c0-3.6 3.1-6.5 7-6.5s7 2.9 7 6.5-3.1 6.5-7 6.5c-.9 0-1.8-.15-2.6-.43L3 16l.5-3.2C2.5 11.7 2 10.2 2 8.5z"/><circle cx="6.3" cy="8.5" r="0.9" fill="currentColor" stroke="none"/><circle cx="9" cy="8.5" r="0.9" fill="currentColor" stroke="none"/><circle cx="11.7" cy="8.5" r="0.9" fill="currentColor" stroke="none"/>'), name:'Chat ao Vivo no Site',     status:'off',  desc:'Ainda não implementado. Recomendado: Tawk.to (grátis, sem limite).' },
   { icon:svcIc('<rect x="2" y="4" width="14" height="10" rx="1.5"/><path d="M2.5 5l6.5 5 6.5-5"/>'), name:'Email Marketing',          status:'off',  desc:'Ainda não implementado. Recomendado: Brevo (grátis até 9 mil emails/mês).' },
-  { icon:svcIc('<path d="M2 13l4.5-5 3 3L16 4"/><path d="M12 4h4v4"/>'), name:'Tráfego Pago (Meta Ads)',  status:'ok',   desc:'Prestado manualmente por você — R$397/mês, preço final, sem setup (inclui produção do vídeo do anúncio). Vale como add-on de plano ou avulso, mesmo preço.' },
+  { icon:svcIc('<path d="M2 13l4.5-5 3 3L16 4"/><path d="M12 4h4v4"/>'), name:'Tráfego Pago (Meta Ads)',  status:'ok',   desc:'Prestado manualmente por você — R$1.500/mês, preço final (inclui produção do vídeo do anúncio). Alinhado à média de gestor com carteira formada. Vale como add-on de plano ou avulso, mesmo preço.' },
 ];
 
 // Mesmo conteúdo real da landing page pública (index.html raiz, seção #planos) — não duplicar com números diferentes.
 let PLANS = [
-  { name:'Starter', desc:'Para quem quer começar a automatizar com o essencial.', price:'R$250', setup:'Preço final · configuração inclusa', features:[
+  { name:'Starter', desc:'Para quem quer começar a automatizar com o essencial.', price:'R$797', setup:'Preço final · configuração inclusa', features:[
     { on:true,  text:'WhatsApp Bot básico' },
     { on:true,  text:'Agendamento Online' },
     { on:true,  text:'Link Bio Profissional' },
@@ -1092,7 +1092,7 @@ let PLANS = [
     { on:false, text:'Instagram Automático' },
     { on:false, text:'CRM e Métricas' },
   ]},
-  { name:'Negócio', badge:'Mais popular', featured:true, desc:'O pacote completo para quem quer crescer de verdade.', price:'R$500', setup:'Preço final · configuração inclusa', features:[
+  { name:'Negócio', badge:'Mais popular', featured:true, desc:'O pacote completo para quem quer crescer de verdade.', price:'R$1.497', setup:'Preço final · configuração inclusa', features:[
     { on:true, text:'WhatsApp Bot completo com IA' },
     { on:true, text:'Instagram Auto (DM + comentários)' },
     { on:true, text:'Agendamento Online completo' },
@@ -1101,7 +1101,7 @@ let PLANS = [
     { on:true, text:'Dashboard de Métricas' },
     { on:true, text:'Suporte prioritário' },
   ]},
-  { name:'Pro', desc:'Para empresas que querem automação total e resultado máximo.', price:'R$1.000', setup:'Preço final · configuração inclusa', features:[
+  { name:'Pro', desc:'Para empresas que querem automação total e resultado máximo.', price:'R$1.997', setup:'Preço final · configuração inclusa', features:[
     { on:true, text:'Tudo do Negócio' },
     { on:true, text:'Gestão de Reputação Google' },
     { on:true, text:'Suporte 7 dias por semana' },
@@ -1544,7 +1544,7 @@ let CLIENTS_FIXED = [
           'CRM com Pipeline',
           'Gestão de Reputação',
           'Dashboard de Métricas',
-          'Tráfego Pago (Meta Ads) — R$397/mês, preço final (com vídeo do anúncio incluso)',
+          'Tráfego Pago (Meta Ads) — R$1.500/mês, preço final (com vídeo do anúncio incluso)',
         ],
         pending: [
           'Instagram Automático (token gerado, cenário Make.com falta montar)',
@@ -1559,7 +1559,7 @@ let CLIENTS_FIXED = [
         { done:false, text:'Reduzir posts em foto/carrossel estático: são o formato com pior retorno no período (12, 22 curtidas).' },
         { done:false, text:'Ativar Google Meu Negócio — gratuito, o site já tem o schema pronto, só falta cadastrar.' },
         { done:false, text:'Configurar o link real de "Peça avaliações" do Google (hoje é placeholder na ferramenta de avaliação).' },
-        { done:true, text:'Tráfego pago ligado — R$15–20/dia, raio 60km (Mariana + Ouro Preto/Itabirito/Congonhas), homens 30–55. Cobrança da gestão (R$397/mês, preço final, já com vídeo do anúncio incluso) ainda não decidida — hoje sem custo extra pra ela.' },
+        { done:true, text:'Tráfego pago ligado — R$15–20/dia, raio 60km (Mariana + Ouro Preto/Itabirito/Congonhas), homens 30–55. Cobrança da gestão (tabela 2026: R$1.500/mês) ainda não decidida — hoje sem custo extra pra ela. O contrato atual de R$1.200 é anterior à tabela nova.' },
       ],
     }},
     { name:'Padaria Cantinho do Pão', plan:'Plano Pro — R$1.000/mês, contrato de 3 meses (assinatura prevista 10/09/2026) + R$899 de implantação já quitado. Verba de anúncio custeada pela cliente, direto na plataforma.', links:[
