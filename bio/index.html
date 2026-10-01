@@ -228,7 +228,11 @@ let CONFIG = {
        'city','address','schedule','about','instagram','website','googleReviewUrl','agendamentoUrl'].forEach(function(k){
         if (dec[k] !== undefined && dec[k] !== null && dec[k] !== '') CONFIG[k] = dec[k];
       });
-      if (dec.services && dec.services.length) CONFIG.services = dec.services;
+      /* Lista vazia e uma resposta legitima: "este cliente nao cadastrou
+         servico". Exigir .length fazia a pagina manter o exemplo e anunciar
+         Corte Masculino embaixo do nome de uma padaria. O render ja esconde
+         a secao quando a lista fica vazia. */
+      if (Array.isArray(dec.services)) CONFIG.services = dec.services;
     }
   } catch(e){}
 })();

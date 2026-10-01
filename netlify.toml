@@ -1,0 +1,37 @@
+# SyncTech Automation — site estático, sem etapa de build.
+# O repositório inteiro é o site: a raiz tem a landing e cada pasta é um
+# produto (app/, agendamento/, bio/, catalogo/, site/, estoque/,
+# relatorio/, docs/).
+
+[build]
+  publish = "."
+  command = ""
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    X-Frame-Options = "SAMEORIGIN"
+    Permissions-Policy = "geolocation=(), microphone=(), camera=()"
+
+# O service worker nunca pode ficar em cache: é ele que controla a versão
+# do Hub, e um sw velho prende o usuário numa versão antiga da aplicação.
+# Esse bug já aconteceu neste projeto e custou uma auditoria pra achar.
+[[headers]]
+  for = "/app/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+
+# O HTML carrega a configuração do cliente no próprio arquivo; servir uma
+# cópia velha mostra preço antigo. Os assets podem ficar em cache longo
+# porque mudam de nome quando mudam.
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/sites/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"

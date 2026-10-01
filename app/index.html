@@ -621,7 +621,7 @@ function doGet(e) {
     <!-- ── SERVIÇOS ── -->
     <div class="page" id="page-servicos">
       <div class="hero">
-        <h1 class="hero-greet" style="font-size:1.25rem">Os 11 serviços do hub</h1>
+        <h1 class="hero-greet" style="font-size:1.25rem">Os 15 serviços do hub</h1>
         <div class="hero-sub">Status real de cada módulo — o que já funciona e o que precisa de configuração</div>
       </div>
       <div class="svc-grid2" id="services-grid"></div>
@@ -1170,7 +1170,7 @@ function renderHome() {
     { label:'Clientes fechados', val: fechados.length, delta: 'MRR ~R$'+mrr.toLocaleString('pt-BR'), cls:'up' },
     { label:'A receber este mês', val: 'R$'+(mrr+avulsosMes).toLocaleString('pt-BR'), delta: 'R$'+mrr.toLocaleString('pt-BR')+' fixo + R$'+avulsosMes.toLocaleString('pt-BR')+' avulso', cls:'up' },
     { label:'Leads em aberto',   val: abertos, delta: 'no funil agora', cls:'up' },
-    { label:'Serviços ativos',   val: ativos+'/11', delta: (11-ativos)+' pendentes de config', cls: (11-ativos)>0 ? 'warn':'up' },
+    { label:'Serviços ativos',   val: ativos+'/'+SERVICES.length, delta: (SERVICES.length-ativos)+' pendentes de config', cls: (SERVICES.length-ativos)>0 ? 'warn':'up' },
   ];
   if (martinsStats) {
     let igGrowthPct = Math.round((martinsStats.followers - martinsStats.followersPrev) / martinsStats.followersPrev * 100);
@@ -1453,7 +1453,7 @@ function renderPipeline() {
       let srcLabel = l.src==='wa' ? 'WhatsApp' : l.src==='ig' ? 'Instagram' : 'Google';
       let cidadeTxt = l.city ? ' aqui em '+String(l.city).replace(/[<>&"']/g, '') : '';
       let wppMsg = encodeURIComponent('Oi! Vi o '+String(l.name||'')+cidadeTxt+'. Ajudei uma barbearia em Mariana a crescer 18% em agendamentos sem gastar mais com anúncio — usando automação de WhatsApp e Instagram. Posso te mostrar como funcionaria pro seu negócio? Leva 5 minutos.');
-      let wppNum = l.phone ? '55'+String(l.phone).replace(/\D/g,'') : '55';
+      let wppNum = l.phone ? obTelefone(l.phone) : '';
       let isStored = !!l.id;
       let nextStage = isStored ? STAGE_ORDER[STAGE_ORDER.indexOf(l.stage)+1] : null;
       let valNum = Number(l.val) || 0;
@@ -1462,7 +1462,7 @@ function renderPipeline() {
         '<div class="lc-biz">'+escapeHtml(l.biz)+'</div>' +
         '<div class="lc-row"><span class="lc-val">R$'+valNum+'/mês</span><span class="lc-source '+srcCls+'">'+srcLabel+'</span></div>' +
         '<div class="lc-time">'+escapeHtml(l.time)+'</div>' +
-        '<a href="https://wa.me/'+encodeURIComponent(wppNum)+'?text='+wppMsg+'" target="_blank" style="display:block;text-align:center;margin-top:10px;background:rgba(37,211,102,0.12);border:1px solid rgba(37,211,102,0.25);color:#25D366;border-radius:7px;padding:7px;font-size:0.7rem;font-weight:700;text-decoration:none">💬 WhatsApp</a>' +
+        (wppNum ? '<a href="https://wa.me/'+encodeURIComponent(wppNum)+'?text='+wppMsg+'" target="_blank" style="display:block;text-align:center;margin-top:10px;background:rgba(37,211,102,0.12);border:1px solid rgba(37,211,102,0.25);color:#25D366;border-radius:7px;padding:7px;font-size:0.7rem;font-weight:700;text-decoration:none">💬 WhatsApp</a>' : '') +
         (nextStage ? '<button onclick="avancarLead(\''+escapeHtml(l.id)+'\')" style="width:100%;margin-top:7px;background:var(--s3);border:1px solid var(--border-s);color:var(--pl);border-radius:7px;padding:7px;font-size:0.68rem;font-weight:700;cursor:pointer;font-family:var(--font-head),sans-serif;text-transform:uppercase;letter-spacing:0.03em">→ '+escapeHtml(nextStage)+'</button>' : '') +
       '</div>';
     }).join('');
@@ -1551,7 +1551,7 @@ let CLIENTS_FIXED = [
       ],
       cadence: { before: 0.6, after: 3.0, beforeLabel:'19 meses anteriores (11 posts)', afterLabel:'Últimos 2 meses (6 posts)' },
       goal: { label:'Meta: próteses fechadas via WhatsApp/Instagram', target:10, closed:4, commissionPerUnit:160, fixedMonthly:1200 },
-      // Mapeamento real dos 11 módulos do hub — quais fazem sentido pro porte/perfil da Martins (não é genérico).
+      // Mapeamento real dos módulos do hub — quais fazem sentido pro porte/perfil da Martins (não é genérico).
       servicesUsed: {
         active: [
           'Pacote de conteúdo (4 reels/mês + atendimento pessoal)',
@@ -1576,8 +1576,8 @@ let CLIENTS_FIXED = [
         { done:true, text:'Tráfego pago ligado — R$15–20/dia, raio 60km (Mariana + Ouro Preto/Itabirito/Congonhas), homens 30–55. Cobrança da gestão (tabela 2026: R$1.000/mês) ainda não decidida — hoje sem custo extra pra ela. O contrato atual de R$1.200 é anterior à tabela nova.' },
       ],
     }},
-    { name:'Padaria Cantinho do Pão', plan:'Plano Pro — R$1.000/mês, contrato de 3 meses (assinatura prevista 10/09/2026) + R$899 de implantação já quitado. Verba de anúncio custeada pela cliente, direto na plataforma.', links:[
-      { label:'Cardápio-app', url:'https://pacoquinhagamer02-max.github.io/cantinhodopao/' },
+    { name:'Padaria Cantinho do Pão', plan:'Plano Pro — R$1.000/mês (valor anterior à tabela de out/2026, onde o Pro é R$4.197), contrato de 3 meses (assinatura prevista 10/09/2026) + R$899 de implantação já quitado. Verba de anúncio custeada pela cliente, direto na plataforma.', links:[
+      { label:'Cardápio-app', url:'https://cantinhodopaomariana.netlify.app/' },
       { label:'WhatsApp', url:'https://wa.me/553137913010' },
       { label:'Instagram', url:'https://www.instagram.com/padaria__cantinho_do_pao/' },
       { label:'Contrato', url:'https://claude.ai/code/artifact/3319631c-c16f-4d5b-a1c9-2062feb25819' },
@@ -1882,7 +1882,15 @@ function renderReport() {
    visível no código-fonte. Onde não dá pra executar, o sistema gera a
    instrução pronta e registra a pendência. */
 
-let OB_BASE = 'https://pacoquinhagamer02-max.github.io/synctech-automation';
+/* A base dos links gerados acompanha o dominio onde o Hub esta aberto.
+   Era fixa no GitHub Pages, e com isso o cadastro gerava link de um
+   dominio enquanto o cliente via o outro — justamente nos links que vao
+   pro WhatsApp do cliente. O Hub mora em /app/, entao a base e um nivel
+   acima. file:// nao tem origem util, dai o padrao. */
+let OB_BASE = (function(){
+  if (location.protocol === 'file:') return 'https://synctechautomation.netlify.app';
+  return location.origin + location.pathname.replace(/\/app\/[^\/]*$/, '').replace(/\/$/, '');
+})();
 
 let OB_SERVICOS = [
   { id:'agendamento', nome:'Agendamento Online',       hint:'Agenda 24h por link' },

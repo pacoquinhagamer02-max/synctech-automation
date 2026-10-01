@@ -163,7 +163,9 @@
       ['bizName','bizWpp','corPrimaria'].forEach(function(k){
         if (dec[k] !== undefined && dec[k] !== null && dec[k] !== '') CONFIG[k] = dec[k];
       });
-      if (Array.isArray(dec.itens) && dec.itens.length) CONFIG.itens = dec.itens;
+      /* Mesmo motivo do bio: lista vazia e resposta, nao ausencia de
+         resposta. Sem isso o cliente recebe a pagina com "Item de exemplo". */
+      if (Array.isArray(dec.itens)) CONFIG.itens = dec.itens;
     } catch (err) {
       console.error('Config inválida na URL, usando os valores padrão:', err);
     }
