@@ -292,6 +292,93 @@
     el('final-titulo').textContent = 'Fale com a ' + CONFIG.bizName;
   }
 
+
+  /* ══════════════ GEO / AEO: schema markup ══════════════
+     Monta o JSON-LD a partir do CONFIG e injeta no topo da pagina.
+     E isto que
+     faz o ChatGPT, o Gemini e os resumos de IA do Google entenderem o
+     negocio: nome, endereco, horario, nota e as perguntas frequentes.
+     Sem schema, a IA so enxerga texto solto e raramente cita a empresa.
+     Campo que nao existe simplesmente nao entra: schema com dado
+     inventado e pior que schema nenhum, porque o Google penaliza. */
+  function diaSchema(n){
+    return ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][n] || '';
+  }
+  /* "18h-23h" / "5h30 as 20h" / "8h as 18h" -> {abre:'18:00', fecha:'23:00'} */
+  function faixaHorario(txt){
+    var m = String(txt).match(/(\d{1,2})\s*h\s*(\d{2})?\D+(\d{1,2})\s*h\s*(\d{2})?/i);
+    if (!m) return null;
+    var p = function(h, mi){ return String(h).padStart(2,'0') + ':' + (mi || '00'); };
+    return { abre: p(m[1], m[2]), fecha: p(m[3], m[4]) };
+  }
+  function injetarSchema(extra){
+    try {
+      var neg = {
+        '@context': 'https://schema.org',
+        '@type': 'LocalBusiness',
+        name: CONFIG.bizName
+      };
+      var tipo = CONFIG.bizTipo || CONFIG.bizSub || '';
+      if (tipo) neg.description = tipo;
+      if (CONFIG.sobre) neg.description = CONFIG.sobre;
+      if (CONFIG.bizWpp) neg.telephone = '+' + CONFIG.bizWpp;
+      if (CONFIG.endereco) {
+        neg.address = { '@type': 'PostalAddress', streetAddress: CONFIG.endereco };
+        var partes = String(CONFIG.endereco).split(/[—-]/);
+        if (partes.length > 1) {
+          var cidadeUf = partes[partes.length - 1].trim().split('/');
+          if (cidadeUf[0]) neg.address.addressLocality = cidadeUf[0].trim();
+          if (cidadeUf[1]) neg.address.addressRegion = cidadeUf[1].trim();
+        }
+        neg.address.addressCountry = 'BR';
+      }
+      if (CONFIG.mapsUrl) neg.hasMap = CONFIG.mapsUrl;
+      if (CONFIG.bizWpp) neg.sameAs = ['https://wa.me/' + CONFIG.bizWpp];
+      if (CONFIG.rating) {
+        neg.aggregateRating = {
+          '@type': 'AggregateRating',
+          ratingValue: String(CONFIG.rating),
+          bestRating: '5'
+        };
+        if (CONFIG.reviewCount) neg.aggregateRating.reviewCount = String(CONFIG.reviewCount);
+      }
+      var horas = (CONFIG.hours || []).filter(function(h){ return !h.fechado && h.value; })
+        .map(function(h){
+          var f = faixaHorario(h.value);
+          if (!f || !diaSchema(h.dia)) return null;
+          return { '@type': 'OpeningHoursSpecification', dayOfWeek: diaSchema(h.dia), opens: f.abre, closes: f.fecha };
+        }).filter(Boolean);
+      if (horas.length) neg.openingHoursSpecification = horas;
+
+      var blocos = [neg];
+      if (extra && extra.length) blocos = blocos.concat(extra);
+
+      /* FAQPage: e o formato que as IAs mais citam, porque ja vem no
+         formato pergunta-resposta que elas devolvem ao usuario */
+      var faq = CONFIG.faq || [];
+      if (faq.length) {
+        blocos.push({
+          '@context': 'https://schema.org',
+          '@type': 'FAQPage',
+          mainEntity: faq.map(function(par){
+            return {
+              '@type': 'Question',
+              name: par[0],
+              acceptedAnswer: { '@type': 'Answer', text: par[1] }
+            };
+          })
+        });
+      }
+
+      var tag = document.createElement('script');
+      tag.type = 'application/ld+json';
+      tag.textContent = JSON.stringify(blocos.length === 1 ? blocos[0] : blocos);
+      document.head.appendChild(tag);
+    } catch (err) {
+      console.error('Falha ao montar o schema markup:', err);
+    }
+  }
+
   /* revelação no scroll, com fallback pra quem não tem IntersectionObserver */
   function revelar(){
     var alvos = document.querySelectorAll('.rev');
@@ -309,6 +396,24 @@
   aplicarTema();
   montar();
   revelar();
+
+  /* catalogo do cliente como OfferCatalog: e o que permite a IA
+     responder "quanto custa X na empresa Y" citando o negocio */
+  injetarSchema(CONFIG.servicos.length ? [{
+    '@context': 'https://schema.org',
+    '@type': 'OfferCatalog',
+    name: 'Serviços de ' + CONFIG.bizName,
+    itemListElement: CONFIG.servicos.map(function(sv, i){
+      var oferta = {
+        '@type': 'Offer',
+        position: i + 1,
+        itemOffered: { '@type': 'Service', name: sv.name || sv.nome || '' }
+      };
+      if (sv.desc || sv.description) oferta.itemOffered.description = sv.desc || sv.description;
+      if (sv.price || sv.preco) { oferta.price = String(sv.price || sv.preco); oferta.priceCurrency = 'BRL'; }
+      return oferta;
+    })
+  }] : null);
 })();
 </script>
 </body>

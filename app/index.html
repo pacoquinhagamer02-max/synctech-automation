@@ -989,6 +989,7 @@ function doGet(e) {
 
         <button class="btn btn-primary" style="margin-top:6px" onclick="obGerar()">Gerar tudo para este cliente &rarr;</button>
         <div id="ob-alerta"></div>
+        <p class="ob-hint" id="ob-rascunho" style="margin-top:10px" hidden></p>
       </div>
 
       <div class="card" id="ob-result" style="display:none">
@@ -1023,9 +1024,12 @@ function obInit() {
   if (!document.getElementById('ob-svcs')) return;
   obRenderServicos();
   obMontarSeletorExistente();
+  document.getElementById('page-onboarding').addEventListener('input', obSalvarRascunho);
+  document.getElementById('page-onboarding').addEventListener('change', obSalvarRascunho);
   document.getElementById('ob-modo').addEventListener('change', obAplicarPlano);
   document.getElementById('ob-plano').addEventListener('change', obAplicarPlano);
   obAplicarPlano();
+  obRestaurarRascunho();
 }
 
 function renderNav() {
@@ -1881,6 +1885,7 @@ let OB_SERVICOS = [
   { id:'reputacao',   nome:'Gestão de Reputação',      hint:'Avaliação no Google' },
   { id:'crm',         nome:'CRM com Pipeline',         hint:'Ferramenta interna sua' },
   { id:'dashboard',   nome:'Dashboard de Métricas',    hint:'Depende de planilha' },
+  { id:'seolocal',    nome:'SEO Local / Google',       hint:'Aparecer no Maps e na busca' },
   { id:'estoque',     nome:'Controle de Estoque',      hint:'Conta e avisa o que falta' },
   { id:'relatorio',   nome:'Relatório de Resultados',   hint:'Métricas do que foi feito' },
   { id:'notafiscal',  nome:'Nota Fiscal (NFC-e)',      hint:'Depende da contadora' },
@@ -1892,7 +1897,7 @@ let OB_SERVICOS = [
 let OB_PLANOS = {
   'Starter':  ['whatsbot','agendamento','bio'],
   'Negócio':  ['whatsbot','instagram','agendamento','crm','catalogo','dashboard','bio'],
-  'Pro':      ['whatsbot','instagram','agendamento','crm','catalogo','dashboard','bio','reputacao','relatorio'],
+  'Pro':      ['whatsbot','instagram','agendamento','crm','catalogo','dashboard','bio','reputacao','relatorio','seolocal'],
 };
 
 function obEl(id){ return document.getElementById(id); }
@@ -2085,6 +2090,74 @@ function obPuxarCliente() {
     obAtualizarCondicionais();
   }
   showToast('Dados de ' + c.name + ' carregados', 'success');
+}
+
+/* Rascunho: o formulario tem mais de 30 campos. Fechar a aba sem querer
+   e perder tudo era o jeito mais facil de desistir no meio. Grava a cada
+   digitada (com folga de 400ms pra nao escrever no storage a cada tecla)
+   e restaura ao abrir. Some sozinho depois de gerar. */
+let OB_K_RASCUNHO = 'synctech_onboarding_rascunho';
+let obTimerRascunho = null;
+
+function obCamposDoFormulario() {
+  return Array.prototype.slice.call(
+    document.querySelectorAll('#page-onboarding input, #page-onboarding select, #page-onboarding textarea')
+  ).filter(function(c){ return c.id && c.id !== 'ob-existente'; });
+}
+
+function obSalvarRascunho() {
+  clearTimeout(obTimerRascunho);
+  obTimerRascunho = setTimeout(function(){
+    let dados = {};
+    obCamposDoFormulario().forEach(function(c){
+      dados[c.id] = (c.type === 'checkbox') ? c.checked : c.value;
+    });
+    try { localStorage.setItem(OB_K_RASCUNHO, JSON.stringify({ quando: Date.now(), dados: dados })); }
+    catch (err) { /* modo privado: segue sem rascunho */ }
+    obMostrarAvisoRascunho();
+  }, 400);
+}
+
+function obMostrarAvisoRascunho() {
+  let el = obEl('ob-rascunho');
+  if (!el) return;
+  let nome = obVal('ob-nome');
+  el.hidden = !nome;
+  if (nome) el.textContent = 'Rascunho de "' + nome + '" salvo neste aparelho. Some quando você gerar.';
+}
+
+function obRestaurarRascunho() {
+  let bruto;
+  try { bruto = JSON.parse(localStorage.getItem(OB_K_RASCUNHO) || 'null'); } catch (err) { return; }
+  if (!bruto || !bruto.dados) return;
+  /* rascunho de mais de 7 dias provavelmente e lixo de outro cliente */
+  if (bruto.quando && (Date.now() - bruto.quando) > 7 * 24 * 60 * 60 * 1000) {
+    try { localStorage.removeItem(OB_K_RASCUNHO); } catch (err) {}
+    return;
+  }
+  obCamposDoFormulario().forEach(function(c){
+    let v = bruto.dados[c.id];
+    if (v === undefined) return;
+    if (c.type === 'checkbox') {
+      c.checked = !!v;
+      let caixa = c.closest('.ob-chk');
+      if (caixa) caixa.classList.toggle('on', c.checked);
+    } else {
+      c.value = v;
+    }
+  });
+  obAtualizarCondicionais();
+  obEl('ob-grp-plano').style.display = obVal('ob-modo') === 'plano' ? '' : 'none';
+  obMostrarAvisoRascunho();
+}
+
+function obLimparRascunho() {
+  /* cancelar o timer antes de apagar: sem isso a gravacao pendente roda
+     400ms depois e o rascunho volta sozinho */
+  clearTimeout(obTimerRascunho);
+  try { localStorage.removeItem(OB_K_RASCUNHO); } catch (err) {}
+  let el = obEl('ob-rascunho');
+  if (el) el.hidden = true;
 }
 
 function obPreencherHorarioPadrao() {
@@ -2339,6 +2412,126 @@ function obBriefingTrafego(o) {
   return L.join('\n');
 }
 
+function obSeoLocal(o) {
+  let L = [];
+  let cidade = o.cidade || '(cidade)';
+  let cidadeCurta = cidade.split('/')[0].trim();
+  let tipo = (o.tipo || 'negócio').toLowerCase();
+  let dif = o.diferencial || '(preencher o diferencial no formulário)';
+  let difFrase = dif.charAt(0).toUpperCase() + dif.slice(1);
+
+  L.push('KIT DE SEO LOCAL — ' + o.nome);
+  L.push('Gerado em ' + new Date().toLocaleDateString('pt-BR') + ' · SyncTech Automation');
+  L.push('');
+  L.push('Por que isto importa: quem procura "' + tipo + ' perto de mim" no celular');
+  L.push('decide pelo que aparece no Google Maps, não pelo site. E a mesma');
+  L.push('informação alimenta as respostas do ChatGPT e do Gemini.');
+  L.push('');
+  L.push('────────────────────────────────────────');
+  L.push('1. DESCRIÇÃO DO PERFIL (colar no Google Meu Negócio)');
+  L.push('');
+  L.push(o.nome + ' é ' + (o.tipo ? 'uma ' + tipo : 'um negócio') + ' em ' + cidadeCurta + '. ' + difFrase + '.');
+  if (o.endereco) L.push('Fica na ' + o.endereco + '.');
+  if (o.horarios.length) {
+    let abertos = o.horarios.filter(function(h){ return !h.fechado; });
+    if (abertos.length) L.push('Atende de ' + abertos[0].day.toLowerCase() + ' a ' + abertos[abertos.length-1].day.toLowerCase() + '.');
+  }
+  L.push('Atendimento e pedidos pelo WhatsApp.');
+  L.push('');
+  L.push('(máximo 750 caracteres no Google. Não repetir palavra-chave à toa:');
+  L.push('o Google reduz o alcance de descrição artificial.)');
+  L.push('');
+  L.push('────────────────────────────────────────');
+  L.push('2. PALAVRAS QUE AS PESSOAS DIGITAM');
+  L.push('');
+  let termos = [
+    tipo + ' em ' + cidadeCurta,
+    tipo + ' perto de mim',
+    'melhor ' + tipo + ' ' + cidadeCurta,
+    tipo + ' aberto agora ' + cidadeCurta,
+    tipo + ' que entrega ' + cidadeCurta,
+    tipo + ' ' + cidadeCurta + ' telefone'
+  ];
+  o.servicos.slice(0, 4).forEach(function(sv){
+    termos.push(sv.name.toLowerCase() + ' em ' + cidadeCurta);
+  });
+  termos.forEach(function(t){ L.push('· ' + t); });
+  L.push('');
+  L.push('Use estes termos nas postagens e nas respostas às avaliações,');
+  L.push('escrevendo natural. Nunca empilhar palavra-chave.');
+  L.push('');
+  L.push('────────────────────────────────────────');
+  L.push('3. OITO POSTAGENS PARA O MÊS (uma a cada 3 ou 4 dias)');
+  L.push('');
+  let posts = [
+    ['Bastidor', 'Foto de quem trabalha, em ação. "Todo dia começa assim na ' + o.nome + '."'],
+    ['Produto ou serviço campeão', o.servicos.length ? 'Foto de ' + o.servicos[0].name + '. Dizer o preço. Preço no post aumenta o clique.' : 'Foto do que mais sai. Dizer o preço.'],
+    ['Antes e depois', 'Só com autorização de quem aparece. É o formato que mais salva.'],
+    ['Resposta a uma dúvida real', 'Pegue uma pergunta que repete no WhatsApp e responda em 3 linhas.'],
+    ['Horário e localização', 'Útil em véspera de feriado. Avise mudança de horário antes.'],
+    ['Depoimento de cliente', 'Print de avaliação boa, com o nome recortado se a pessoa não autorizou.'],
+    ['O diferencial', difFrase + '. Mostre, não afirme.'],
+    ['Novidade da semana', 'Produto novo, horário novo, serviço novo. Qualquer mudança vira post.']
+  ];
+  posts.forEach(function(pst, i){
+    L.push((i + 1) + '. ' + pst[0]);
+    L.push('   ' + pst[1]);
+  });
+  L.push('');
+  L.push('Postagem no Google expira em 7 dias. Por isso a frequência importa');
+  L.push('mais que o capricho de cada uma.');
+  L.push('');
+  L.push('────────────────────────────────────────');
+  L.push('4. RESPOSTAS ÀS AVALIAÇÕES');
+  L.push('');
+  L.push('Responder TODAS, em até 48h. Perfil que responde sobe no Maps.');
+  L.push('');
+  L.push('Nota 5:');
+  L.push('"Obrigado, [nome]! Fico feliz que gostou. A gente espera você de novo na ' + o.nome + '."');
+  L.push('');
+  L.push('Nota 3:');
+  L.push('"Obrigado pelo retorno, [nome]. Me conta o que faltou pra ser 5?');
+  L.push('Pode chamar no WhatsApp que a gente resolve."');
+  L.push('');
+  L.push('Nota 1 ou 2:');
+  L.push('"[nome], desculpa pela experiência. Isso não é o nosso padrão.');
+  L.push('Chama no WhatsApp pra eu entender o que houve e corrigir."');
+  L.push('');
+  L.push('REGRA: nunca discutir em público, nunca dar desculpa, nunca pedir');
+  L.push('pra tirar a avaliação. Resposta calma na nota baixa convence mais');
+  L.push('quem lê do que dez elogios.');
+  L.push('');
+  L.push('────────────────────────────────────────');
+  L.push('5. CHECKLIST DO PERFIL');
+  L.push('');
+  L.push('[ ] Nome escrito EXATAMENTE igual em todo lugar (Google, Instagram, site)');
+  L.push('[ ] Endereço e telefone idênticos nos três — divergência derruba o ranqueamento');
+  L.push('[ ] Categoria principal certa' + (o.tipo ? ' (provável: ' + o.tipo + ')' : ''));
+  L.push('[ ] Horário preenchido, inclusive feriado');
+  L.push('[ ] No mínimo 10 fotos reais, nenhuma de banco de imagem');
+  L.push('[ ] Foto de capa e logo');
+  L.push('[ ] Link do WhatsApp no perfil');
+  L.push('[ ] Link do site ou cardápio no perfil, não só o WhatsApp');
+  L.push('[ ] Produtos e serviços cadastrados com preço');
+  L.push('[ ] Perguntas frequentes respondidas pelo próprio dono');
+  L.push('');
+  L.push('────────────────────────────────────────');
+  L.push('6. APARECER NAS RESPOSTAS DE IA (ChatGPT, Gemini)');
+  L.push('');
+  L.push('Isto já está feito nas páginas que a SyncTech gera: elas saem com');
+  L.push('schema markup, que é o formato que a IA lê para entender nome,');
+  L.push('endereço, horário, cardápio e perguntas frequentes do negócio.');
+  L.push('');
+  L.push('O que falta é do lado do cliente:');
+  L.push('[ ] Perfil do Google completo (checklist acima)');
+  L.push('[ ] Perguntas frequentes escritas em forma de pergunta e resposta');
+  L.push('[ ] Nome, endereço e telefone iguais em toda a internet');
+  L.push('');
+  L.push('Contexto: 65% das buscas comerciais no Brasil já se resolvem dentro');
+  L.push('da IA, sem clique em site nenhum. Quem não está estruturado some.');
+  return L.join('\n');
+}
+
 function obFluxoWhatsApp(o) {
   let L = [];
   L.push('FLUXO DO ATENDIMENTO AUTOMÁTICO — ' + o.nome);
@@ -2425,6 +2618,9 @@ function obPendencias(o) {
   }
   if (o.ligados.indexOf('trafego') !== -1 && (!o.ticket || !o.margem)) {
     itens.push('<b>Ticket médio e margem reais</b>. Sem eles não existe teto de custo por cliente e a campanha vira aposta.');
+  }
+  if (o.ligados.indexOf('seolocal') !== -1 && !o.google) {
+    itens.push('<b>Acesso ao Google Meu Negócio</b> do cliente, como gerente. Sem isso não dá para postar nem responder avaliação no lugar dele.');
   }
   if (o.ligados.indexOf('estoque') !== -1 && !o.estoque.length) {
     itens.push('<b>Lista de itens do estoque</b> com unidade e quantidade m\u00ednima. Sem ela o aplicativo abre vazio.');
@@ -2521,6 +2717,13 @@ function obGerar() {
       '<div class="ob-txt">' + escapeHtml(OB_GERADO.briefing) + '</div>' +
       '<button class="copy-btn" type="button" style="margin-top:8px" onclick="obCopiar(\'briefing\')">Copiar briefing</button></div>');
   }
+  if (o.ligados.indexOf('seolocal') !== -1) {
+    OB_GERADO.seolocal = obSeoLocal(o);
+    cards.push('<div class="ob-card"><h4>Kit de SEO Local</h4>' +
+      '<div class="ob-desc">Descrição do perfil, 8 postagens do mês, respostas às avaliações e o checklist do Google Meu Negócio.</div>' +
+      '<div class="ob-txt">' + escapeHtml(OB_GERADO.seolocal) + '</div>' +
+      '<button class="copy-btn" type="button" style="margin-top:8px" onclick="obCopiar(\'seolocal\')">Copiar kit</button></div>');
+  }
   if (o.ligados.indexOf('whatsbot') !== -1) {
     OB_GERADO.fluxo = obFluxoWhatsApp(o);
     cards.push('<div class="ob-card"><h4>Fluxo do WhatsApp Bot</h4>' +
@@ -2550,6 +2753,7 @@ function obGerar() {
   obEl('ob-result').scrollIntoView({ behavior: 'smooth', block: 'start' });
 
   obSalvar(o, links);
+  obLimparRascunho();
   showToast('Cliente cadastrado e material gerado!', 'success');
 }
 
