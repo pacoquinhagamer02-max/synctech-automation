@@ -162,7 +162,9 @@ def esc(t):
     return t.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
 
 
-def arte(i, familia, titulo, manchete, apoio, ganhos, servico, preco, brilho):
+def arte(i, familia, titulo, manchete, apoio, ganhos, servico, _preco, brilho):
+    """O preco saiu da arte a pedido do Rafael. O campo continua na lista
+    porque as legendas saem da mesma fonte e ainda o usam."""
     bolinhas = ''.join(
         '<span class="%s"></span>' % ('on' if k == i else '')
         for k in range(len(ARTES)))
@@ -193,10 +195,9 @@ li i{flex:none;width:30px;height:30px;margin-top:3px;border-radius:50%%;
   background:rgba(185,139,255,.17);display:flex;align-items:center;justify-content:center}
 li svg{display:block}
 
-.preco{margin-top:auto;padding-top:46px;display:flex;align-items:flex-end;justify-content:space-between;gap:28px}
-.preco .sv{font-size:25px;font-weight:600;color:#A392C9;letter-spacing:.01em}
-.preco .vl{font-size:52px;font-weight:800;color:#FFFFFF;letter-spacing:-.025em;white-space:nowrap}
-.preco .vl small{font-size:25px;font-weight:600;color:#A392C9}
+.selo{margin-top:auto;padding-top:46px}
+.selo span{display:inline-block;border:1px solid rgba(185,139,255,.34);border-radius:999px;
+  padding:15px 32px;font-size:27px;font-weight:600;color:#D9C9FF;letter-spacing:.01em}
 
 .rodape{margin-top:40px;padding-top:28px;border-top:1px solid rgba(185,139,255,.20);
   display:flex;align-items:center;justify-content:space-between}
@@ -216,10 +217,7 @@ li svg{display:block}
 
 <ul>%(ganhos)s</ul>
 
-<div class="preco">
-  <span class="sv">%(servico)s</span>
-  <span class="vl">%(precoNum)s<small>%(precoSuf)s</small></span>
-</div>
+<div class="selo"><span>%(servico)s</span></div>
 
 <div class="rodape">
   <div class="marca"><div class="mk">S</div><b>SyncTech Automation</b></div>
@@ -238,9 +236,7 @@ li svg{display:block}
             '<path d="M2.8 8.4l3.4 3.4L13.2 4.8"/></svg></i><span>%s</span></li>' % esc(g)
             for g in ganhos),
         'servico': esc(servico),
-        'precoNum': preco.split('/')[0].split(' \u00fa')[0],
-        'precoSuf': ('/m\u00eas' if '/m\u00eas' in preco else ' \u00fanico'),
-        'dots': bolinhas,
+                'dots': bolinhas,
     }
 
 
