@@ -1,0 +1,13 @@
+{
+  "name": "Marca aí",
+  "short_name": "Marca aí",
+  "description": "O app de entrega que trabalha pro motoboy.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#26282B",
+  "theme_color": "#26282B",
+  "lang": "pt-BR",
+  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}
