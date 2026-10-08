@@ -6,7 +6,7 @@
 let F = null;
 import { FIREBASE, NUVEM_ATIVA } from './config.js';
 import { S, transacao, usarConta } from './store.js';
-import { ATIVOS, r2 } from './regras.js';
+import { ATIVOS } from './regras.js';
 
 const params = new URLSearchParams(location.search);
 // ?demo = modo antigo, só no aparelho. ?aba = cada aba é uma conta (pra testar empresa e motoboy no mesmo navegador).
@@ -138,47 +138,51 @@ function espelhar() {
   });
 }
 
-/* ============ Ações (o servidor confere cada uma) ============ */
-const precisa = () => { if (!db || !uid) throw new Error('sem-servidor'); };
+/* ============ Adaptador "armazém do servidor" (porta de corridas.js) ============
+   O servidor confere cada mudança (firebase/firestore.rules). Recusa vira { motivo: 'recusado' }. */
 export const erroRecusado = e => /permission|insufficient/i.test(String(e?.code || e?.message));
+const traduzir = e => Object.assign(new Error(e?.message || 'erro'), { motivo: erroRecusado(e) ? 'recusado' : 'sem-conexao' });
+const precisa = () => { if (!db || !uid) throw Object.assign(new Error('sem-servidor'), { motivo: 'sem-conexao' }); };
 
-export async function criarChamado(c) {
-  precisa();
-  const ref = F.doc(F.collection(db, 'chamados'));
-  const b = F.writeBatch(db);
-  b.set(ref, {
-    empresaUid: uid, empresa: c.empresa, coleta: c.coleta, tel: c.tel || '', lojaGeo: c.lojaGeo || null, bairro: bairroDe(c.entrega),
-    km: c.km, chuva: !!c.chuva, valor: c.valor, taxa: c.taxa, obs: c.obs || '', status: 'aberto', criadoEm: Date.now(),
-    motoboyUid: null, preferidosUid: c.preferidosUid || [], prioridadeAte: c.prioridadeAte || null, temGeoCliente: !!c.clienteGeo
-  });
-  b.set(F.doc(db, 'chamados', ref.id, 'restrito', 'codigo'), { valor: c.codigo });
-  b.set(F.doc(db, 'chamados', ref.id, 'restrito', 'cliente'), { entrega: c.entrega, cliente: c.cliente || '', telCliente: c.telCliente || '', clienteGeo: c.clienteGeo || null });
-  await b.commit();
-  // A empresa já sabe o código e os dados do cliente: guarda e redesenha (sem esperar uma nova leitura).
-  extras.set(ref.id, { ...(extras.get(ref.id) || {}), codigo: c.codigo, cliente: { entrega: c.entrega, cliente: c.cliente || '', telCliente: c.telCliente || '', clienteGeo: c.clienteGeo || null } });
-  espelhar();
-  return ref.id;
-}
+export const armazemNuvem = {
+  lista: () => S().calls,
 
-const atualizar = (id, dados) => { precisa(); return F.updateDoc(F.doc(db, 'chamados', id), dados); };
-export const aceitar = (id, p) => atualizar(id, { status: 'aceito', motoboyUid: uid, motoboy: p.nome, moto: p.moto || '', placa: p.placa || '', aceitoEm: Date.now() });
-export const chegou = (id, kmReal, porGps) => atualizar(id, { status: 'coleta', chegouEm: Date.now(), chegadaGps: !!porGps, kmReal: r2(kmReal || 0) });
-export const coletou = (id, espera, kmReal, quando) => atualizar(id, { status: 'coletado', coletouEm: quando, espera, kmReal: r2(kmReal || 0) });
-export const entregar = (id, codigo, kmReal) => atualizar(id, { status: 'entregue', entregueEm: Date.now(), codigoInformado: codigo, kmReal: r2(kmReal || 0) });
-export const salvarKm = (id, kmReal) => atualizar(id, { kmReal: r2(kmReal) });
-export const avaliar = (id, nota, tags) => atualizar(id, { avaliado: true, nota: Math.round(nota), tags });
-export const cancelar = (id, compensacao) => atualizar(id, { status: 'cancelado', canceladoEm: Date.now(), compensacao });
-export const gorjeta = (id, valor) => atualizar(id, { gorjeta: valor });
+  async criar(c) {
+    precisa();
+    const ref = F.doc(F.collection(db, 'chamados'));
+    const cliente = { entrega: c.entrega, cliente: c.cliente || '', telCliente: c.telCliente || '', clienteGeo: c.clienteGeo || null };
+    const b = F.writeBatch(db);
+    b.set(ref, {
+      empresaUid: uid, empresa: c.empresa, coleta: c.coleta, tel: c.tel || '', lojaGeo: c.lojaGeo || null, bairro: bairroDe(c.entrega),
+      km: c.km, chuva: !!c.chuva, valor: c.valor, taxa: c.taxa, obs: c.obs || '', status: 'aberto', criadoEm: c.criadoEm,
+      motoboyUid: null, preferidosUid: c.preferidosUid || [], prioridadeAte: c.preferidosUid?.length ? c.prioridadeAte : null, temGeoCliente: !!c.clienteGeo
+    });
+    b.set(F.doc(db, 'chamados', ref.id, 'restrito', 'codigo'), { valor: c.codigo });
+    b.set(F.doc(db, 'chamados', ref.id, 'restrito', 'cliente'), cliente);
+    try { await b.commit(); } catch (e) { throw traduzir(e); }
+    // A empresa já sabe o código e os dados do cliente: guarda e redesenha (sem esperar uma nova leitura).
+    extras.set(ref.id, { ...(extras.get(ref.id) || {}), codigo: c.codigo, cliente });
+    espelhar();
+    return ref.id;
+  },
 
-// Posição do motoboy: só sobe com corrida em andamento, e some quando ela acaba.
-export function enviarPosicao(ponto, chamadoId) {
-  if (!db || !uid) return Promise.resolve();
-  return F.setDoc(F.doc(db, 'posicoes', uid), { lat: ponto.lat, lon: ponto.lon, precisao: Math.round(ponto.precisao || 0), em: Date.now(), chamadoId }).catch(() => {});
-}
-export function apagarPosicao() {
-  if (!db || !uid) return Promise.resolve();
-  return F.deleteDoc(F.doc(db, 'posicoes', uid)).catch(() => {});
-}
+  async aplicar(id, m) {
+    precisa();
+    // Quem aceita é sempre esta conta: o servidor confere que motoboyUid é de quem está pedindo.
+    const dados = m.status === 'aceito' ? { ...m, motoboyUid: uid } : m;
+    try { await F.updateDoc(F.doc(db, 'chamados', id), dados); } catch (e) { throw traduzir(e); }
+  },
+
+  // Posição do motoboy: só sobe com corrida em andamento, e some quando ela acaba.
+  publicarPosicao(ponto, corrida) {
+    if (!db || !uid || !corrida) return;
+    F.setDoc(F.doc(db, 'posicoes', uid), { lat: ponto.lat, lon: ponto.lon, precisao: Math.round(ponto.precisao || 0), em: Date.now(), chamadoId: corrida.id }).catch(() => {});
+  },
+  esquecerPosicao() {
+    if (!db || !uid) return;
+    F.deleteDoc(F.doc(db, 'posicoes', uid)).catch(() => {});
+  }
+};
 
 // Só no modo de teste (?aba): dá acesso ao banco pra testar se as regras do servidor barram fraude.
 // No app normal devolve null. Isso não abre brecha: quem decide são as regras, não o app.

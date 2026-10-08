@@ -1,9 +1,11 @@
 // Telas e ações do Marca aí.
 import { TABELA, LIMITES, ATIVOS, TAGS_BOAS, TAGS_RUINS, podeIr, frete, taxaEspera, ganho, quandoGanhou, mesmoDia,
-  custoKm, resumoDia, saldo, reputacao, novoCodigo, novoId, r2, ticketMedio, mensagemCliente, resumoMes, informeMes, faixasHorario,
-  distanciaKm, kmEstimado, etaMin, extrairGeo, RAIO_CHEGADA_M, PLANOS, taxaChamado, custoPlanos, kmCorrida } from './regras.js';
+  custoKm, resumoDia, saldo, reputacao, novoCodigo, r2, ticketMedio, mensagemCliente, resumoMes, informeMes, faixasHorario,
+  kmEstimado, etaMin, extrairGeo, PLANOS, taxaChamado, custoPlanos, kmCorrida } from './regras.js';
 import { ligarGps, desligarGps, estadoGps, aoMudarGps, pegarPosicao, urlMapaReal } from './gps.js';
 import * as nuvem from './nuvem.js';
+import { criarCorridas } from './corridas.js';
+import { armazemLocal, armazemMisto } from './armazens.js';
 import { limparPerfil, limparEmpresa, texto, numero, geo } from './esquema.js';
 import { S, transacao, aoMudar, sessao } from './store.js';
 import { esc, brl, km, mmss, hora, dia, ic, fone, mapsUrl, wazeUrl, html, toast, anunciar, dialogo, fecharDialogo, confirmar, bipe, urlScript } from './ui.js';
@@ -579,37 +581,13 @@ function telaAvaliar(c) {
 }
 
 /* ============ GPS ============ */
-const kmNuvem = new Map();      // km medido nesta corrida do servidor, antes de subir
-let kmSubidoEm = 0, posicaoNoServidor = false;
+// Cada leitura boa do GPS vai pro ciclo da corrida (km, posição e chegada automática ficam lá).
 function aoPontoGps(ponto, andou) {
-  // Não redesenha a tela no meio de um arraste do deslizador; a próxima leitura grava.
+  // Não redesenha a tela no meio de um arraste do deslizador; a próxima leitura chega em segundos.
   if (arrasto) return;
-  const ativa = corridaAtiva();
-  if (ativa?.nuvem) {
-    const kmAgora = r2((kmNuvem.get(ativa.id) ?? ativa.kmReal) + andou);
-    kmNuvem.set(ativa.id, kmAgora);
-    nuvem.enviarPosicao(ponto, ativa.id); posicaoNoServidor = true;
-    mudar(s => { s.posicao = ponto; });
-    if (ativa.status === 'aceito' && ativa.lojaGeo && distanciaKm(ponto, ativa.lojaGeo) * 1000 <= RAIO_CHEGADA_M) {
-      nuvem.chegou(ativa.id, kmAgora, true).then(() => { vibrar([60, 40, 60]); toast(`Chegada na ${ativa.empresa} registrada pelo GPS. A espera começou a contar.`); }).catch(() => {});
-    } else if (andou && Date.now() - kmSubidoEm > 60000) {
-      kmSubidoEm = Date.now(); nuvem.salvarKm(ativa.id, kmAgora).catch(() => {});
-    }
-    return;
-  }
-  if (posicaoNoServidor) { nuvem.apagarPosicao(); posicaoNoServidor = false; }
-  let chegou = '';
-  mudar(s => {
-    s.posicao = ponto;
-    const c = s.calls.find(x => x.motoboy && ATIVOS.includes(x.status));
-    if (!c) return;
-    if (andou) c.kmReal = r2(c.kmReal + andou);
-    // Chegada automática: dentro do raio da loja, a espera começa a contar sozinha (prova pro motoboy).
-    if (c.status === 'aceito' && c.lojaGeo && distanciaKm(ponto, c.lojaGeo) * 1000 <= RAIO_CHEGADA_M) {
-      c.status = 'coleta'; c.chegouEm = Date.now(); c.chegadaGps = true; chegou = c.empresa;
-    }
+  corridas.noGps(ponto, andou).then(r => {
+    if (r.chegouNa) { vibrar([60, 40, 60]); toast(`Chegada na ${r.chegouNa} registrada pelo GPS. A espera começou a contar.`); }
   });
-  if (chegou) { vibrar([60, 40, 60]); toast(`Chegada na ${chegou} registrada pelo GPS. A espera começou a contar.`); }
 }
 function sincronizarGps() {
   if (papel === 'moto' && S().online) ligarGps(aoPontoGps);
@@ -657,34 +635,26 @@ function tick() {
 setInterval(tick, 1000);
 
 /* ============ Ações ============ */
-const acharEm = (s, id) => s.calls.find(x => x.id === id);
 
-const tentativasNuvem = new Map();
 const vibrar = ms => { try { if (navigator.userActivation?.hasBeenActive) navigator.vibrate?.(ms); } catch {} };
 
-const falhaNuvem = e => (nuvem.erroRecusado(e) ? 'O servidor recusou: esse chamado mudou de situação.' : 'Sem conexão com o servidor. Confira a internet e tente de novo.');
-const kmDe = c => kmNuvem.get(c.id) ?? c.kmReal;
+// O ciclo da corrida: chamado do servidor vai pro servidor; chamado de teste fica no aparelho.
+const corridas = criarCorridas(armazemMisto(armazemLocal({ S, transacao: mudar }), nuvem.armazemNuvem, nuvem.nuvemLigada));
+const MOTIVOS = {
+  indisponivel: 'Esse chamado mudou de situação. A tela já mostra como ele está agora.',
+  ocupado: 'Termine a corrida atual antes de aceitar outra.',
+  invalido: 'Confira os dados e tente de novo.',
+  recusado: 'O servidor recusou essa ação. A tela já mostra a situação atual.',
+  'sem-conexao': 'Sem conexão com o servidor. Confira a internet e tente de novo.',
+  bloqueado: 'Muitas tentativas erradas. Espere 2 minutos ou ligue pra loja e confirme o código.'
+};
+const avisoFalha = r => toast(MOTIVOS[r.motivo] || MOTIVOS.indisponivel);
 
-function aceitarChamado(id) {
-  const c = S().calls.find(x => x.id === id);
-  if (c?.nuvem) {
-    if (corridaAtiva()) { toast('Termine a corrida atual antes de aceitar outra.'); return; }
-    oferta = { id: null, ate: 0 }; armado = null; escolhida = null;
-    nuvem.aceitar(id, S().profile)
-      .then(() => { vibrar(30); scrollTo(0, 0); toast('Corrida aceita. Bora!'); })
-      .catch(e => toast(nuvem.erroRecusado(e) ? 'Outro motoboy aceitou primeiro. Sem problema, o próximo chamado aparece aqui.' : falhaNuvem(e)));
-    return;
-  }
-  let motivo = 'Esse chamado já não está disponível.';
-  const ok = mudar(s => {
-    const c = acharEm(s, id);
-    if (!c || !podeIr(c.status, 'aceito')) return false;
-    if (s.calls.some(x => x.motoboy && ATIVOS.includes(x.status))) { motivo = 'Termine a corrida atual antes de aceitar outra.'; return false; }
-    Object.assign(c, { status: 'aceito', motoboy: s.profile.nome, moto: s.profile.moto, placa: s.profile.placa, aceitoEm: Date.now() });
-  });
+async function aceitarChamado(id) {
   oferta = { id: null, ate: 0 }; armado = null; escolhida = null;
-  if (ok) { vibrar(30); scrollTo(0, 0); }
-  toast(ok ? 'Corrida aceita. Bora!' : motivo);
+  const r = await corridas.aceitar(id, S().profile);
+  if (r.ok) { vibrar(30); scrollTo(0, 0); toast('Corrida aceita. Bora!'); return; }
+  toast(r.motivo === 'indisponivel' ? 'Outro motoboy aceitou primeiro. Sem problema, o próximo chamado aparece aqui.' : MOTIVOS[r.motivo]);
 }
 
 /* Arrastar a alça até o fim aceita. Soltar antes volta pro começo. */
@@ -758,7 +728,7 @@ const ACTS = {
     if (!S().profile.nome) { toast('Preencha seu nome no Perfil antes de ficar online.'); irAba('perfil'); return; }
     const ligar = !S().online;
     // Offline apaga a última posição: o app não guarda onde o motoboy está quando ele não está trabalhando.
-    if (!ligar) nuvem.apagarPosicao();
+    if (!ligar) nuvem.armazemNuvem.esquecerPosicao();
     mudar(s => { s.online = ligar; s.onlineDesde = ligar ? Date.now() : null; s.pausaAte = null; if (ligar) s.recusados = []; else s.posicao = null; });
     toast(ligar ? 'Você está online. O GPS liga só enquanto você estiver online.' : 'Você está offline. GPS desligado. Bom descanso.');
   },
@@ -825,11 +795,8 @@ const ACTS = {
   simular: () => {
     const lojas = [['Lanchonete Teste', 'Rua de Teste, 100, Centro'], ['Farmácia Teste', 'Av. Exemplo, 250, Centro'], ['Pizzaria Teste', 'Praça Modelo, 12']];
     const [empresa, coleta] = lojas[+novoCodigo() % lojas.length];
-    const dist = r2(1.5 + (+novoCodigo() % 600) / 100);
-    mudar(s => {
-      s.calls.push({ id: novoId(), empresa, coleta, tel: '', entrega: `Rua do Cliente, ${10 + (+novoCodigo() % 900)}, Bairro Teste`, cliente: 'Cliente teste',
-        km: dist, obs: '', chuva: +novoCodigo() % 10 < 3, teste: true, codigo: novoCodigo(), status: 'aberto', criadoEm: Date.now() });
-    });
+    corridas.chamar({ empresa, coleta, entrega: `Rua do Cliente, ${10 + (+novoCodigo() % 900)}, Bairro Teste`, cliente: 'Cliente teste',
+      km: r2(1.5 + (+novoCodigo() % 600) / 100), chuva: +novoCodigo() % 10 < 3, teste: true });
   },
   aceitar: el => aceitarChamado(el.dataset.id),
   // Deslizador: toque na alça arma, segundo toque em até 4 s aceita (alternativa a arrastar).
@@ -849,27 +816,11 @@ const ACTS = {
   },
   escolher: el => { escolhida = el.dataset.id; oferta = { id: escolhida, ate: Date.now() + TABELA.tempoOferta * 1000 }; armado = null; refresh(); scrollTo(0, 0); },
   recusar: el => { oferta = { id: null, ate: 0 }; mudar(s => { s.recusados.push(el.dataset.id); }); toast('Recusado. Nada muda pra você.'); },
-  cheguei: el => {
-    const c = S().calls.find(x => x.id === el.dataset.id);
-    if (c?.nuvem) { nuvem.chegou(c.id, kmDe(c), false).catch(e => toast(falhaNuvem(e))); return; }
-    ACTS.chegueiLocal(el);
-  },
-  chegueiLocal: el => mudar(s => { const c = acharEm(s, el.dataset.id); if (!c || !podeIr(c.status, 'coleta')) return false; c.status = 'coleta'; c.chegouEm = Date.now(); }),
-  coletei: el => {
-    const cn = S().calls.find(x => x.id === el.dataset.id);
-    if (cn?.nuvem) {
-      const quando = Date.now(), espera = taxaEspera({ ...cn, coletouEm: quando });
-      nuvem.coletou(cn.id, espera, kmDe(cn), quando)
-        .then(() => { if (espera) toast(`Espera de ${brl(espera)} somada ao seu ganho.`); })
-        .catch(e => toast(falhaNuvem(e)));
-      return;
-    }
-    let espera = 0;
-    mudar(s => {
-      const c = acharEm(s, el.dataset.id); if (!c || !podeIr(c.status, 'coletado')) return false;
-      c.coletouEm = Date.now(); c.espera = espera = taxaEspera(c); c.status = 'coletado';
-    });
-    if (espera) toast(`Espera de ${brl(espera)} somada ao seu ganho.`);
+  cheguei: async el => { const r = await corridas.avancar(el.dataset.id); if (!r.ok) avisoFalha(r); },
+  coletei: async el => {
+    const r = await corridas.avancar(el.dataset.id);
+    if (!r.ok) avisoFalha(r);
+    else if (r.espera) toast(`Espera de ${brl(r.espera)} somada ao seu ganho.`);
   },
   entregar: el => {
     const id = el.dataset.id;
@@ -880,48 +831,17 @@ const ACTS = {
       <p id="cod-erro" class="erro" role="alert"></p>
       <button class="btn btn-ok" type="submit">Confirmar entrega</button></form>
       ${c.teste ? `<p class="sub mt10">Chamado de teste: o código é ${c.codigo}.</p>` : ''}`,
-      d => d.querySelector('form').addEventListener('submit', e => {
+      d => d.querySelector('form').addEventListener('submit', async e => {
         e.preventDefault();
-        const cod = String(e.target.cod.value).replace(/\D/g, '');
-        const erro = d.querySelector('#cod-erro');
-        if (c.nuvem) {
-          const t = tentativasNuvem.get(id) || { n: 0, ate: 0 };
-          if (t.ate > Date.now()) { erro.textContent = 'Muitas tentativas erradas. Espere 2 minutos ou ligue pra loja e confirme o código.'; return; }
-          if (!/^\d{4}$/.test(cod)) { erro.textContent = 'O código tem 4 números.'; return; }
-          e.target.querySelector('button').disabled = true;
-          nuvem.entregar(id, cod, kmDe(c)).then(() => {
-            tentativasNuvem.delete(id); fecharDialogo(); bipe(); vibrar([40, 60, 40]); scrollTo(0, 0); anunciar('Entrega confirmada.');
-            if (posicaoNoServidor) { nuvem.apagarPosicao(); posicaoNoServidor = false; }
-          }).catch(x => {
-            e.target.querySelector('button').disabled = false;
-            if (!nuvem.erroRecusado(x)) { erro.textContent = falhaNuvem(x); return; }
-            t.n += 1; if (t.n >= LIMITES.tentativasCodigo) { t.n = 0; t.ate = Date.now() + LIMITES.bloqueioCodigoMs; }
-            tentativasNuvem.set(id, t);
-            e.target.cod.setAttribute('aria-invalid', 'true');
-            erro.textContent = t.ate > Date.now() ? 'Muitas tentativas erradas. Espere 2 minutos ou ligue pra loja e confirme o código.' : `O servidor não aceitou esse código. Confira com o cliente. Restam ${LIMITES.tentativasCodigo - t.n} tentativas.`;
-          });
-          return;
-        }
-        let res = '';
-        mudar(s => {
-          const x = acharEm(s, id);
-          if (!x || !podeIr(x.status, 'entregue')) { res = 'sumiu'; return false; }
-          if (x.bloqueadoAte && x.bloqueadoAte > Date.now()) { res = 'bloq'; return false; }
-          if (cod !== x.codigo) {
-            x.tentativas += 1;
-            if (x.tentativas >= LIMITES.tentativasCodigo) { x.bloqueadoAte = Date.now() + LIMITES.bloqueioCodigoMs; x.tentativas = 0; res = 'bloqueou'; }
-            else res = `errado:${LIMITES.tentativasCodigo - x.tentativas}`;
-            return true;
-          }
-          Object.assign(x, { status: 'entregue', entregueEm: Date.now(), tentativas: 0, bloqueadoAte: null });
-          res = 'ok';
-        });
-        if (res === 'ok') { fecharDialogo(); bipe(); vibrar([40, 60, 40]); scrollTo(0, 0); anunciar('Entrega confirmada.'); return; }
-        if (res === 'sumiu') { fecharDialogo(); toast('A empresa mudou esse chamado. A tela já mostra como ele está agora.'); return; }
+        const erro = d.querySelector('#cod-erro'), botao = e.target.querySelector('button');
+        botao.disabled = true;
+        const r = await corridas.avancar(id, { codigo: String(e.target.cod.value).replace(/\D/g, '') });
+        botao.disabled = false;
+        if (r.ok) { fecharDialogo(); bipe(); vibrar([40, 60, 40]); scrollTo(0, 0); anunciar('Entrega confirmada.'); return; }
+        if (r.motivo === 'indisponivel') { fecharDialogo(); toast(MOTIVOS.indisponivel); return; }
         e.target.cod.setAttribute('aria-invalid', 'true');
-        erro.textContent = res === 'bloq' || res === 'bloqueou'
-          ? 'Muitas tentativas erradas. Espere 2 minutos ou ligue pra loja e confirme o código.'
-          : `Código não confere. Confira com o cliente. Restam ${res.split(':')[1]} tentativas.`;
+        erro.textContent = r.motivo === 'codigo-errado' ? `Código não confere. Confira com o cliente. Restam ${r.restam} tentativas.`
+          : r.motivo === 'invalido' ? 'O código tem 4 números.' : MOTIVOS[r.motivo];
       }));
   },
   nota: el => { avaliacao.nota = Math.min(5, Math.max(1, +el.dataset.n)); refresh(); $(`[data-act="nota"][data-n="${avaliacao.nota}"]`)?.focus(); },
@@ -930,19 +850,11 @@ const ACTS = {
     avaliacao.tags = avaliacao.tags.includes(t) ? avaliacao.tags.filter(x => x !== t) : [...avaliacao.tags, t];
     refresh(); $(`[data-act="tag"][data-t="${CSS.escape(t)}"]`)?.focus();
   },
-  avaliar: el => {
-    const { nota, tags } = avaliacao;
-    const cn = S().calls.find(x => x.id === el.dataset.id);
-    if (cn?.nuvem) { nuvem.avaliar(cn.id, nota, tags).then(() => toast('Avaliação enviada. Valeu!')).catch(e => toast(falhaNuvem(e))); return; }
-    const ok = mudar(s => { const c = acharEm(s, el.dataset.id); if (!c || c.status !== 'entregue' || c.avaliado || !nota) return false; Object.assign(c, { avaliado: true, nota, tags }); });
-    if (ok) toast('Avaliação enviada. Valeu!');
+  avaliar: async el => {
+    const r = await corridas.avaliar(el.dataset.id, avaliacao.nota, avaliacao.tags);
+    if (r.ok) toast('Avaliação enviada. Valeu!'); else avisoFalha(r);
   },
-  pularAval: el => {
-    const cn = S().calls.find(x => x.id === el.dataset.id);
-    if (cn?.nuvem) { nuvem.avaliar(cn.id, 0, []).catch(e => toast(falhaNuvem(e))); return; }
-    ACTS.pularLocal(el);
-  },
-  pularLocal: el => mudar(s => { const c = acharEm(s, el.dataset.id); if (!c || c.status !== 'entregue') return false; c.avaliado = true; }),
+  pularAval: async el => { const r = await corridas.avaliar(el.dataset.id, 0, []); if (!r.ok) avisoFalha(r); },
   sacar: () => {
     const sd = saldo(S().calls, S().saques);
     if (!S().profile.pix) { toast('Cadastre sua chave Pix no Perfil.'); irAba('perfil'); return; }
@@ -990,31 +902,13 @@ const ACTS = {
       ? `O motoboy já está a caminho e recebe ${brl(TABELA.deslocamentoCancelado)} pelo deslocamento.`
       : 'Nenhum motoboy aceitou ainda, então não há custo.', 'Cancelar chamado', 'Manter chamado');
     if (!sim) return;
-    if (c.nuvem) {
-      const atual = S().calls.find(x => x.id === id) || c;
-      nuvem.cancelar(id, atual.status === 'aberto' ? 0 : TABELA.deslocamentoCancelado)
-        .then(() => toast('Chamado cancelado.'))
-        .catch(e => toast(nuvem.erroRecusado(e) ? 'O motoboy já saiu com o pedido, então não dá mais pra cancelar. Ligue pra ele se precisar.' : falhaNuvem(e)));
-      return;
-    }
-    const ok = mudar(s => {
-      const x = acharEm(s, id);
-      if (!x || x.empresa !== s.empresa.nome || !podeIr(x.status, 'cancelado')) return false;
-      const pagaAgora = x.status !== 'aberto';
-      x.status = 'cancelado'; x.canceladoEm = Date.now(); x.compensacao = pagaAgora ? TABELA.deslocamentoCancelado : 0;
-    });
-    toast(ok ? 'Chamado cancelado.' : 'O motoboy já saiu com o pedido, então não dá mais pra cancelar. Ligue pra ele se precisar.');
+    const r = await corridas.cancelar(id);
+    toast(r.ok ? 'Chamado cancelado.' : r.motivo === 'indisponivel' ? 'O motoboy já saiu com o pedido, então não dá mais pra cancelar. Ligue pra ele se precisar.' : MOTIVOS[r.motivo]);
   },
-  gorjeta: el => {
-    const v = +el.dataset.v; let quem = '';
-    const cn = S().calls.find(x => x.id === el.dataset.id);
-    if (cn?.nuvem) { nuvem.gorjeta(cn.id, v).then(() => toast(`Gorjeta de ${brl(v)} enviada pra ${cn.motoboy}.`)).catch(e => toast(falhaNuvem(e))); return; }
-    const ok = mudar(s => {
-      const c = acharEm(s, el.dataset.id);
-      if (!c || c.status !== 'entregue' || c.gorjeta || c.empresa !== s.empresa.nome || !LIMITES.gorjetas.includes(v)) return false;
-      c.gorjeta = v; quem = c.motoboy;
-    });
-    if (ok) toast(`Gorjeta de ${brl(v)} enviada pra ${quem}.`);
+  gorjeta: async el => {
+    const c = S().calls.find(x => x.id === el.dataset.id);
+    const r = await corridas.gorjeta(el.dataset.id, +el.dataset.v);
+    if (r.ok) toast(`Gorjeta de ${brl(+el.dataset.v)} enviada pra ${c?.motoboy || 'o motoboy'}.`); else avisoFalha(r);
   }
 };
 
@@ -1080,26 +974,17 @@ document.addEventListener('submit', e => {
     if (!entrega) return erroForm(f, 'Informe o endereço de entrega.', 'entrega');
     if (!(dist >= LIMITES.kmMin && dist <= LIMITES.kmMax)) return erroForm(f, `A distância precisa ficar entre ${km(LIMITES.kmMin)} e ${LIMITES.kmMax} km.`, 'km');
     const clienteGeo = extrairGeo(d.localCliente);
-    const taxa = taxaAgora();
-    const favoritos = d.soFavoritos === 'on' && PLANOS[S().empresa.plano].favoritos ? S().empresa.favoritos : [];
-    if (nuvem.nuvemLigada()) {
-      if (nuvem.estadoNuvem().estado !== 'conectado') return erroForm(f, nuvem.estadoNuvem().detalheErro || 'Ainda conectando ao servidor. Espere um instante e tente de novo.');
-      const botao = f.querySelector('[type="submit"]'); botao.disabled = true;
-      const favUid = favoritos.length ? S().empresa.favoritosUid : [];
-      nuvem.criarChamado({ empresa: S().empresa.nome, coleta, tel: S().empresa.tel, entrega, cliente: texto(d.cliente, LIMITES.nome), telCliente: texto(d.telCliente, LIMITES.tel),
-        km: r2(dist), obs: texto(d.obs, LIMITES.obs), chuva: d.chuva === 'on', valor: frete(r2(dist), d.chuva === 'on'), taxa, codigo: novoCodigo(),
-        lojaGeo: S().empresa.geo, clienteGeo, preferidosUid: favUid, prioridadeAte: favUid.length ? Date.now() + 30000 : null })
-        .then(() => { toast('Chamado enviado. Avisando os motoboys online.'); irAba('chamados'); })
-        .catch(e => { botao.disabled = false; erroForm(f, nuvem.erroRecusado(e) ? 'O servidor recusou o chamado. Confira os dados e tente de novo.' : 'Sem conexão com o servidor. Confira a internet e tente de novo.'); });
-      return;
-    }
-    mudar(s => {
-      s.calls.push({ id: novoId(), empresa: s.empresa.nome, coleta, tel: s.empresa.tel, entrega, cliente: d.cliente, telCliente: d.telCliente, km: r2(dist), obs: d.obs,
-        chuva: d.chuva === 'on', codigo: novoCodigo(), status: 'aberto', criadoEm: Date.now(),
-        lojaGeo: s.empresa.geo, clienteGeo, taxa, preferidos: favoritos, prioridadeAte: favoritos.length ? Date.now() + 30000 : null });
-    });
-    toast('Chamado enviado. Avisando os motoboys online.');
-    irAba('chamados');
+    const usarFav = d.soFavoritos === 'on' && PLANOS[S().empresa.plano].favoritos;
+    if (nuvem.nuvemLigada() && nuvem.estadoNuvem().estado !== 'conectado') return erroForm(f, nuvem.estadoNuvem().detalheErro || 'Ainda conectando ao servidor. Espere um instante e tente de novo.');
+    const botao = f.querySelector('[type="submit"]'); botao.disabled = true;
+    corridas.chamar({ empresa: S().empresa.nome, coleta, tel: S().empresa.tel, entrega, cliente: texto(d.cliente, LIMITES.nome), telCliente: texto(d.telCliente, LIMITES.tel),
+      km: dist, obs: texto(d.obs, LIMITES.obs), chuva: d.chuva === 'on', taxa: taxaAgora(), lojaGeo: S().empresa.geo, clienteGeo,
+      preferidos: usarFav ? S().empresa.favoritos : [], preferidosUid: usarFav ? S().empresa.favoritosUid : [] })
+      .then(r => {
+        botao.disabled = false;
+        if (r.ok) { toast('Chamado enviado. Avisando os motoboys online.'); irAba('chamados'); return; }
+        erroForm(f, r.motivo === 'recusado' ? 'O servidor recusou o chamado. Confira os dados e tente de novo.' : MOTIVOS[r.motivo]);
+      });
   }
 });
 
