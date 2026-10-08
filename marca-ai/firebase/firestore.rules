@@ -27,14 +27,22 @@ service cloud.firestore {
       let minutos = math.floor((coletou - chegou) / 60000);
       return minutos > 10 ? (minutos - 10) * 0.5 : 0;
     }
+    // km do GPS: número, até 500, e nunca menor que o já gravado.
+    function kmCresce() {
+      return novo().kmReal is number && novo().kmReal <= 500 && novo().kmReal >= resource.data.get('kmReal', 0);
+    }
     function chamado(id) { return get(/databases/$(db)/documents/chamados/$(id)).data; }
     function chamadoDepois(id) { return getAfter(/databases/$(db)/documents/chamados/$(id)).data; }
 
     match /perfis/{uid} {
       allow read, delete: if logado() && uid == eu();
-      allow create, update: if logado() && uid == eu() && request.resource.size() < 6000
+      allow create, update: if logado() && uid == eu()
         && novo().keys().hasOnly(['papel', 'nome', 'moto', 'placa', 'endereco', 'tel', 'geo', 'plano', 'favoritos'])
-        && novo().papel in ['moto', 'empresa'] && texto(novo().nome, 60);
+        && novo().papel in ['moto', 'empresa'] && texto(novo().nome, 60)
+        && texto(novo().get('moto', ''), 40) && texto(novo().get('placa', ''), 10) && texto(novo().get('endereco', ''), 160)
+        && texto(novo().get('tel', ''), 20) && geoOk(novo().get('geo', null))
+        && novo().get('plano', 'avulso') in ['avulso', 'loja', 'pro']
+        && novo().get('favoritos', []) is list && novo().get('favoritos', []).size() <= 30;
     }
 
     match /chamados/{id} {
@@ -64,25 +72,32 @@ service cloud.firestore {
         // Motoboy chega na loja.
         || (resource.data.motoboyUid == eu() && resource.data.status == 'aceito' && novo().status == 'coleta'
           && so(['status', 'chegouEm', 'chegadaGps', 'kmReal']) && horaCerta(novo().chegouEm) && novo().chegadaGps is bool
-          && novo().kmReal is number && novo().kmReal >= 0 && novo().kmReal <= 500)
+          && kmCresce())
         // Motoboy pega o pedido: a espera não pode passar do que o relógio do servidor permite.
         || (resource.data.motoboyUid == eu() && resource.data.status == 'coleta' && novo().status == 'coletado'
           && so(['status', 'coletouEm', 'espera', 'kmReal']) && horaCerta(novo().coletouEm)
           && novo().espera is number && novo().espera >= 0
           && novo().espera <= esperaMaxima(novo().coletouEm, resource.data.chegouEm) + 0.011
-          && novo().kmReal is number && novo().kmReal >= 0 && novo().kmReal <= 500)
-        // Motoboy entrega: o código digitado tem que bater com o código guardado (que ele não consegue ler).
+          && kmCresce())
+        // Motoboy registra um palpite do código. Fica gravado, então o servidor conta: no máximo 5.
+        || (resource.data.motoboyUid == eu() && resource.data.status == 'coletado'
+          && so(['codigoInformado', 'tentativas']) && novo().tentativas == resource.data.get('tentativas', 0) + 1
+          && novo().tentativas <= 5 && novo().codigoInformado is string && novo().codigoInformado.matches('^[0-9]{4}$'))
+        // Motoboy entrega: só se o último palpite gravado bater com o código guardado (que ele não consegue ler).
         || (resource.data.motoboyUid == eu() && resource.data.status == 'coletado' && novo().status == 'entregue'
-          && so(['status', 'entregueEm', 'codigoInformado', 'kmReal']) && horaCerta(novo().entregueEm)
-          && novo().codigoInformado == get(/databases/$(db)/documents/chamados/$(id)/restrito/codigo).data.valor
-          && novo().kmReal is number && novo().kmReal >= 0 && novo().kmReal <= 500)
+          && so(['status', 'entregueEm', 'kmReal']) && horaCerta(novo().entregueEm)
+          && resource.data.get('codigoInformado', '') == get(/databases/$(db)/documents/chamados/$(id)/restrito/codigo).data.valor
+          && kmCresce())
+        // Empresa libera novas tentativas (depois de conferir o código com o cliente por telefone).
+        || (resource.data.empresaUid == eu() && resource.data.status == 'coletado' && so(['tentativas']) && novo().tentativas == 0)
         // Motoboy atualiza o km medido pelo GPS durante a corrida (só pra mais).
         || (resource.data.motoboyUid == eu() && resource.data.status in ['aceito', 'coleta', 'coletado']
           && so(['kmReal']) && novo().kmReal is number && novo().kmReal >= resource.data.get('kmReal', 0) && novo().kmReal <= 500)
         // Motoboy avalia a empresa, uma vez.
         || (resource.data.motoboyUid == eu() && resource.data.status == 'entregue' && resource.data.get('avaliado', false) == false
           && so(['avaliado', 'nota', 'tags']) && novo().avaliado == true && novo().nota is int && novo().nota >= 0 && novo().nota <= 5
-          && novo().tags is list && novo().tags.size() <= 6)
+          && novo().tags is list && novo().tags.size() <= 6
+          && novo().tags.hasOnly(['Pedido estava pronto', 'Atendimento bom', 'Tem onde parar a moto', 'Demorou pra liberar', 'Endereço confuso', 'Me trataram mal']))
         // Empresa cancela: se o motoboy já aceitou, ele recebe R$ 5 de deslocamento.
         || (resource.data.empresaUid == eu() && resource.data.status in ['aberto', 'aceito', 'coleta'] && novo().status == 'cancelado'
           && so(['status', 'canceladoEm', 'compensacao']) && horaCerta(novo().canceladoEm)
@@ -102,7 +117,8 @@ service cloud.firestore {
             && texto(request.resource.data.entrega, 160) && texto(request.resource.data.cliente, 60)
             && texto(request.resource.data.telCliente, 20) && geoOk(request.resource.data.clienteGeo)));
         // Código: só a empresa lê. Cliente: a empresa e o motoboy que aceitou.
-        allow read: if logado() && (chamado(id).empresaUid == eu() || (doc == 'cliente' && chamado(id).motoboyUid == eu()));
+        allow read: if logado() && (chamado(id).empresaUid == eu()
+          || (doc == 'cliente' && chamado(id).motoboyUid == eu() && chamado(id).status in ['aceito', 'coleta', 'coletado']));
         allow update, delete: if false;
       }
     }
@@ -114,7 +130,8 @@ service cloud.firestore {
         && chamado(resource.data.chamadoId).status in ['aceito', 'coleta', 'coletado']);
       allow create, update: if logado() && uid == eu()
         && novo().keys().hasOnly(['lat', 'lon', 'precisao', 'em', 'chamadoId'])
-        && novo().lat is number && novo().lon is number && novo().precisao is int && horaCerta(novo().em)
+        && novo().lat is number && novo().lon is number && novo().lat >= -90 && novo().lat <= 90 && novo().lon >= -180 && novo().lon <= 180
+        && novo().precisao is int && novo().precisao >= 0 && novo().precisao <= 5000 && horaCerta(novo().em)
         && novo().chamadoId is string && chamado(novo().chamadoId).motoboyUid == eu()
         && chamado(novo().chamadoId).status in ['aceito', 'coleta', 'coletado'];
       allow delete: if logado() && uid == eu();

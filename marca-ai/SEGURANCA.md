@@ -21,7 +21,7 @@ Revisão feita em 07/10/2026 com as skills security-audit, security-and-hardenin
 | Mapa embutido abrir brecha | `frame-src` libera só `www.openstreetmap.org`, e o mapa abre em `<iframe sandbox>` sem referrer | `index.html`, `_headers` |
 | Memória do aparelho lotar | Histórico limitado a 500 chamados, sem apagar corrida em andamento | `js/store.js` |
 
-Testes automáticos: `node --test tests/*.test.mjs` (21 testes, incluindo valor adulterado, lixo no armazenamento e `__proto__`).
+Testes automáticos: `node --test tests/*.test.mjs` (29 testes, incluindo valor adulterado, lixo no armazenamento e `__proto__`).
 
 ## Servidor (Firebase, projeto marcaai-mariana) — ligado em 08/10/2026
 
@@ -46,8 +46,26 @@ Biblioteca do Firebase: empacotada no próprio app (`js/vendor/firebase.js`, só
 
 A chave de API em `js/config.js` é pública por natureza (identifica o projeto, não dá acesso). Melhoria futura: restringir essa chave aos domínios do app no Google Cloud.
 
+### Auditoria das regras (08/10/2026, skill oficial firebase-security-rules-auditor)
+
+Nota antes: **2 de 5** (controle de entrega furável). Nota depois das correções: **4 de 5**. Corrigido e testado contra o servidor real:
+
+| Achado | Gravidade | Correção |
+|---|---|---|
+| Código de entrega descobrível na força bruta (tentativas recusadas não ficavam gravadas) | Grave | Cada palpite agora é gravado (`tentativas`, máx. 5) e "entregue" só vale se o último palpite gravado estiver certo. Testado: 6º palpite recusado mesmo com o código certo; motoboy não zera a contagem; a empresa libera novas tentativas pelo app |
+| Motoboy lia os dados da cliente para sempre depois da entrega | Moderado (LGPD) | Leitura só com corrida em andamento |
+| km do GPS podia ser zerado ou inflado a cada etapa | Menor | km só cresce, em todas as etapas |
+| Avaliação aceitava qualquer etiqueta | Menor | Só as 6 etiquetas do app |
+| Posição sem limite de coordenadas | Menor | Latitude, longitude e precisão com faixa |
+| Regra de perfis usava `request.resource.size()` (não mede bytes) e não tipava campos | Menor | Cada campo com tipo e tamanho |
+
+**Riscos que continuam (dependem de decisão ou de plano pago):**
+- **Contas anônimas ilimitadas:** qualquer pessoa pode criar contas e mandar chamados falsos (motoboy se desloca à toa). Correção: login por telefone pra empresa e Firebase App Check.
+- **Identidade autodeclarada:** nome, moto e placa do motoboy (e nome da empresa) são digitados pela própria pessoa. Correção: cadastro verificado (documento/placa) gravado só pelo administrador.
+- **Taxa do app informada pelo celular da empresa:** sem cobrança real ainda, não dá prejuízo; quando houver cobrança, calcular no servidor.
+- **Observação do chamado é pública pros motoboys antes do aceite:** a loja não deve escrever dados da cliente ali.
+
 **Limitações conhecidas do servidor:**
-- O limite de 5 tentativas de código errado fica só no app; o servidor confere o código, mas não conta as falhas. Resolver com Cloud Function (exige plano Blaze, pago).
 - Login anônimo: se a pessoa limpar os dados do navegador ou trocar de celular, perde a conta e o histórico. Próximo passo: login por telefone (SMS) ou Google.
 
 ## O que ainda falta antes de dinheiro de verdade

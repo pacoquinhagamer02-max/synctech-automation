@@ -8,6 +8,7 @@
 //   cancelar(id)             empresa cancela (paga deslocamento se o motoboy já aceitou)
 //   gorjeta(id, valor)       empresa dá gorjeta, uma vez
 //   avaliar(id, nota, tags)  motoboy avalia a empresa (nota 0 = pulou)
+//   liberarCodigo(id)        empresa libera novas tentativas do código (depois de conferir com o cliente)
 //
 // Motivos de falha: indisponivel | ocupado | invalido | codigo-errado | bloqueado | recusado | sem-conexao
 //
@@ -35,7 +36,7 @@ export function criarCorridas(armazem, { agora = Date.now } = {}) {
 
   async function gravar(id, mudanca, extraOk = {}) {
     try { await armazem.aplicar(id, mudanca); return { ok: true, ...extraOk }; }
-    catch (e) { return falha(e?.motivo === 'recusado' ? 'recusado' : 'sem-conexao'); }
+    catch (e) { return falha(['recusado', 'bloqueado'].includes(e?.motivo) ? e.motivo : 'sem-conexao'); }
   }
 
   const api = {
@@ -119,6 +120,13 @@ export function criarCorridas(armazem, { agora = Date.now } = {}) {
       if (!LIMITES.gorjetas.includes(valor)) return falha('invalido');
       if (!c || c.status !== 'entregue' || c.gorjeta) return falha('indisponivel');
       return gravar(id, { gorjeta: valor });
+    },
+
+    async liberarCodigo(id) {
+      const c = ler(id);
+      if (!c || c.status !== 'coletado') return falha('indisponivel');
+      tentativas.delete(id);
+      return gravar(id, { tentativas: 0 });
     },
 
     async avaliar(id, nota, tags = []) {

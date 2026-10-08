@@ -101,3 +101,15 @@ test('dados inválidos não viram chamado', async () => {
   assert.equal((await corridas.chamar(pedido({ entrega: '' }))).motivo, 'invalido');
   assert.equal(estado().calls.length, 0);
 });
+
+test('empresa libera novas tentativas depois do bloqueio do código', async () => {
+  const { corridas, estado } = montar();
+  const { id } = await corridas.chamar(pedido());
+  await corridas.aceitar(id, joao); await corridas.avancar(id); await corridas.avancar(id);
+  const certo = estado().calls[0].codigo, errado = certo === '1111' ? '2222' : '1111';
+  for (let i = 0; i < 5; i++) await corridas.avancar(id, { codigo: errado });
+  assert.equal((await corridas.avancar(id, { codigo: certo })).motivo, 'bloqueado');
+  assert.equal((await corridas.liberarCodigo(id)).ok, true);
+  assert.equal((await corridas.avancar(id, { codigo: certo })).ok, true);
+  assert.equal((await corridas.liberarCodigo(id)).motivo, 'indisponivel');
+});

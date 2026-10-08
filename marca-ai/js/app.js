@@ -251,7 +251,8 @@ const VIEWS = {
           ${campo('cliente', 'Cliente', rs.cliente || '', 'text', `placeholder="Ex.: Ana" maxlength="${LIMITES.nome}" autocomplete="off"`)}
           ${campo('telCliente', 'WhatsApp do cliente', rs.telCliente || '', 'tel', `placeholder="(31) 9…" inputmode="tel" maxlength="${LIMITES.tel}" autocomplete="off"`)}
         </div>
-        <label class="campo"><span>Observação pro motoboy</span><textarea class="inp" name="obs" maxlength="${LIMITES.obs}" placeholder="Ex.: pedido grande, levar bag térmica, troco pra R$ 50…">${esc(rs.obs || '')}</textarea></label>
+        <label class="campo"><span>Observação pro motoboy</span><textarea class="inp" name="obs" maxlength="${LIMITES.obs}" placeholder="Ex.: pedido grande, levar bag térmica, troco pra R$ 50…" aria-describedby="obs-dica">${esc(rs.obs || '')}</textarea></label>
+        <small id="obs-dica" class="mudo dica">Os motoboys leem isso antes de aceitar. Não coloque nome, telefone ou endereço do cliente aqui.</small>
         <label class="check"><input type="checkbox" name="chuva"> Está chovendo (+${brl(TABELA.chuva)} pro motoboy)</label>
         ${S().empresa.favoritos.length ? (PLANOS[S().empresa.plano].favoritos
           ? `<label class="check"><input type="checkbox" name="soFavoritos" checked> Oferecer primeiro ${S().empresa.favoritos.length === 1 ? 'ao meu motoboy favorito' : `aos meus ${S().empresa.favoritos.length} motoboys favoritos`} (30 segundos)</label>`
@@ -451,6 +452,10 @@ const LIVE = {
         <div class="mudo pq">${esc(c.entrega)} (${km(c.km)} km)</div>
         ${c.motoboy ? `<div class="mt6">Motoboy: <b>${esc(c.motoboy)}</b>${c.moto ? `, ${esc(c.moto)}` : ''}${c.placa ? `, placa ${esc(c.placa)}` : ''}</div>` : ''}
         ${rastreio(c)}
+        ${c.status === 'coletado' && c.tentativas ? `<div class="aviso ${c.tentativas >= LIMITES.tentativasCodigo ? 'freio' : ''}">${c.tentativas >= LIMITES.tentativasCodigo
+          ? `O motoboy errou o código ${c.tentativas} vezes e a entrega travou. Ligue pra ele ou pro cliente, confira o código e libere.`
+          : `O motoboy digitou um código errado ${c.tentativas === 1 ? '1 vez' : `${c.tentativas} vezes`}.`}</div>
+          ${c.tentativas >= LIMITES.tentativasCodigo ? `<button class="btn btn-sinal btn-sm mt8" data-act="liberarCodigo" data-id="${esc(c.id)}">Liberar novas tentativas</button>` : ''}` : ''}
         ${c.status === 'coleta' ? `<div class="aviso">${c.chegadaGps ? 'Chegada confirmada pelo GPS. ' : ''}Esperando há <b class="num" data-desde="${c.chegouEm}">--:--</b>. Depois de ${TABELA.esperaGratisMin} min, a espera custa ${brl(TABELA.esperaPorMin)}/min.</div>` : ''}
         ${emAndamento ? `<div class="mt8"><small class="mudo">Código de entrega (passe só pro cliente)</small><div class="codigo">${c.codigo}</div></div>
           <a class="btn btn-ok btn-sm mt10" href="${esc(linkCliente(c))}" target="_blank" rel="noopener noreferrer">${ic('balao')}Avisar cliente no WhatsApp</a>` : ''}
@@ -646,7 +651,7 @@ const MOTIVOS = {
   invalido: 'Confira os dados e tente de novo.',
   recusado: 'O servidor recusou essa ação. A tela já mostra a situação atual.',
   'sem-conexao': 'Sem conexão com o servidor. Confira a internet e tente de novo.',
-  bloqueado: 'Muitas tentativas erradas. Espere 2 minutos ou ligue pra loja e confirme o código.'
+  bloqueado: 'Muitas tentativas erradas. Ligue pra loja: ela confere o código com o cliente e libera novas tentativas.'
 };
 const avisoFalha = r => toast(MOTIVOS[r.motivo] || MOTIVOS.indisponivel);
 
@@ -904,6 +909,10 @@ const ACTS = {
     if (!sim) return;
     const r = await corridas.cancelar(id);
     toast(r.ok ? 'Chamado cancelado.' : r.motivo === 'indisponivel' ? 'O motoboy já saiu com o pedido, então não dá mais pra cancelar. Ligue pra ele se precisar.' : MOTIVOS[r.motivo]);
+  },
+  liberarCodigo: async el => {
+    const r = await corridas.liberarCodigo(el.dataset.id);
+    if (r.ok) toast('Novas tentativas liberadas. O motoboy já pode digitar o código de novo.'); else avisoFalha(r);
   },
   gorjeta: async el => {
     const c = S().calls.find(x => x.id === el.dataset.id);

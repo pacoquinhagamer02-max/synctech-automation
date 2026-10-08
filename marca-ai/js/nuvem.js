@@ -168,9 +168,19 @@ export const armazemNuvem = {
 
   async aplicar(id, m) {
     precisa();
+    const ref = F.doc(db, 'chamados', id);
+    // Entrega em dois passos: 1) grava o palpite do código (o servidor conta, no máximo 5);
+    // 2) pede "entregue", que o servidor só aceita se o palpite gravado estiver certo.
+    if (m.status === 'entregue') {
+      const feitas = S().calls.find(c => c.id === id)?.tentativas || 0;
+      if (feitas >= 5) throw Object.assign(new Error('bloqueado'), { motivo: 'bloqueado' });
+      try { await F.updateDoc(ref, { codigoInformado: m.codigoInformado, tentativas: feitas + 1 }); } catch (e) { throw traduzir(e); }
+      try { await F.updateDoc(ref, { status: 'entregue', entregueEm: m.entregueEm, kmReal: m.kmReal }); } catch (e) { throw traduzir(e); }
+      return;
+    }
     // Quem aceita é sempre esta conta: o servidor confere que motoboyUid é de quem está pedindo.
     const dados = m.status === 'aceito' ? { ...m, motoboyUid: uid } : m;
-    try { await F.updateDoc(F.doc(db, 'chamados', id), dados); } catch (e) { throw traduzir(e); }
+    try { await F.updateDoc(ref, dados); } catch (e) { throw traduzir(e); }
   },
 
   // Posição do motoboy: só sobe com corrida em andamento, e some quando ela acaba.
