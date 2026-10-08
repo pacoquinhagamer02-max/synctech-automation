@@ -1,7 +1,7 @@
 # Cabeçalhos de segurança (Netlify e Cloudflare Pages leem este arquivo).
 # O GitHub Pages ignora: lá vale só o CSP que está no <meta> do index.html.
 /*
-  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self'; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'; frame-src https://www.openstreetmap.org; frame-ancestors 'none'; require-trusted-types-for 'script'; trusted-types marcaai
+  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'; frame-src https://www.openstreetmap.org; frame-ancestors 'none'; require-trusted-types-for 'script'; trusted-types marcaai
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
   Referrer-Policy: no-referrer

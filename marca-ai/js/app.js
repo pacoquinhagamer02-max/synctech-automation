@@ -3,6 +3,7 @@ import { TABELA, LIMITES, ATIVOS, TAGS_BOAS, TAGS_RUINS, podeIr, frete, taxaEspe
   custoKm, resumoDia, saldo, reputacao, novoCodigo, novoId, r2, ticketMedio, mensagemCliente, resumoMes, informeMes, faixasHorario,
   distanciaKm, kmEstimado, etaMin, extrairGeo, RAIO_CHEGADA_M, PLANOS, taxaChamado, custoPlanos, kmCorrida } from './regras.js';
 import { ligarGps, desligarGps, estadoGps, aoMudarGps, pegarPosicao, urlMapaReal } from './gps.js';
+import * as nuvem from './nuvem.js';
 import { limparPerfil, limparEmpresa, texto, numero, geo } from './esquema.js';
 import { S, transacao, aoMudar, sessao } from './store.js';
 import { esc, brl, km, mmss, hora, dia, ic, fone, mapsUrl, wazeUrl, html, toast, anunciar, dialogo, fecharDialogo, confirmar, bipe, urlScript } from './ui.js';
@@ -105,6 +106,7 @@ let aba = papel ? sessao.get('aba', ABAS[papel].map(a => a[0])) || ABAS[papel][0
 
 function entrar(p) {
   papel = p; sessao.set('papel', p);
+  nuvem.conectar(p);
   aba = ABAS[p][0][0]; sessao.set('aba', aba);
   montar();
 }
@@ -121,10 +123,14 @@ function montar() {
   html(app, `
     <a class="pular" href="#view">Pular pro conteúdo</a>
     <header class="top">
-      <div class="logo" translate="no">${ic('pin', 'class="pin"')}Marca aí</div>
-      <div class="acoes-topo">
-        <div class="quem">${esc(quem)}<br><button class="link pq" data-act="trocar">Trocar perfil</button></div>
-        <button class="tema" data-act="tema" aria-pressed="${tema === 'sol'}" aria-label="Modo sol: tela clara pra ler no sol">${ic('sol')}</button>
+      <div class="top-linha">
+        <div class="logo" translate="no">${ic('pin', 'class="pin"')}Marca aí</div>
+        <button class="tema" role="switch" data-act="tema" aria-checked="${tema === 'sol'}" aria-label="Modo sol, tela clara pra ler no sol">${ic('sol')}<span>Modo sol</span><i class="mini-chave" aria-hidden="true"></i></button>
+      </div>
+      <div class="top-sub">
+        <span class="quem">${esc(quem)}</span>
+        <button class="link pq" data-act="trocar">Trocar perfil</button>
+        <span class="top-status" data-live="nuvem-status"></span>
       </div>
     </header>
     <main id="view"><h1 class="vh" tabindex="-1">${TITULOS[aba]}</h1>${VIEWS[papel][aba]()}</main>
@@ -159,7 +165,7 @@ function telaBoasVindas() {
       ${p(`Ficou esperando no balcão mais de ${TABELA.esperaGratisMin} min? A espera é paga.`)}
       ${p('Saque via Pix na hora, sem taxa.')}
     </ul>
-    <p class="demo">Versão de demonstração: os dados ficam neste aparelho. Abra o app em duas abas, uma como empresa e outra como motoboy, e veja o chamado chegar ao vivo.</p>
+    <p class="demo">${nuvem.nuvemLigada() ? 'Funciona entre celulares: abra num celular como empresa e em outro como motoboy.' : 'Modo demonstração: os dados ficam neste aparelho.'}</p>
   </main>`;
 }
 
@@ -275,6 +281,12 @@ let ultimaAtiva = null;
 let avaliacao = { id: null, nota: 0, tags: [] };
 
 const LIVE = {
+  'nuvem-status': el => {
+    if (!nuvem.nuvemLigada()) { html(el, '<small class="servidor">Modo demonstração</small>'); return; }
+    const { estado, detalheErro } = nuvem.estadoNuvem();
+    const t = { conectado: 'Online no servidor', conectando: 'Conectando…', erro: detalheErro || 'Sem servidor', desligado: '' }[estado];
+    html(el, t ? `<small class="servidor servidor-${estado}">${esc(t)}</small>` : '');
+  },
   'mb-status': el => {
     const s = S();
     html(el, `<div class="status ${s.online && !emPausa() ? 'on' : ''}">
@@ -441,7 +453,7 @@ const LIVE = {
         ${emAndamento ? `<div class="mt8"><small class="mudo">Código de entrega (passe só pro cliente)</small><div class="codigo">${c.codigo}</div></div>
           <a class="btn btn-ok btn-sm mt10" href="${esc(linkCliente(c))}" target="_blank" rel="noopener noreferrer">${ic('balao')}Avisar cliente no WhatsApp</a>` : ''}
         ${c.status === 'entregue' ? `<div class="mudo pq mt6">Frete ${brl(c.valor)}${c.espera ? ` + espera ${brl(c.espera)}` : ''}${c.gorjeta ? ` + gorjeta ${brl(c.gorjeta)}` : ''}${c.kmReal ? `. Rodou ${km(c.kmReal)} km (GPS)` : ''}</div>
-          ${c.motoboy ? (() => { const fav = S().empresa.favoritos.includes(c.motoboy); return `<button class="btn btn-sm ${fav ? 'btn-sinal' : 'btn-fantasma'} mt10" data-act="favoritar" data-nome="${esc(c.motoboy)}" aria-pressed="${fav}">${ic('estrela')}${fav ? `${esc(c.motoboy)} é seu favorito` : `Favoritar ${esc(c.motoboy)}`}</button>`; })() : ''}
+          ${c.motoboy ? (() => { const fav = S().empresa.favoritos.includes(c.motoboy); return `<button class="btn btn-sm ${fav ? 'btn-sinal' : 'btn-fantasma'} mt10" data-act="favoritar" data-nome="${esc(c.motoboy)}" data-uid="${esc(c.motoboyUid)}" aria-pressed="${fav}">${ic('estrela')}${fav ? `${esc(c.motoboy)} é seu favorito` : `Favoritar ${esc(c.motoboy)}`}</button>`; })() : ''}
           ${c.gorjeta ? '' : `<div class="acoes acoes3">${LIMITES.gorjetas.map(v => `<button class="btn btn-fantasma btn-sm" data-act="gorjeta" data-id="${esc(c.id)}" data-v="${v}">+${brl(v)}</button>`).join('')}</div><small class="mudo">Mandar gorjeta pro motoboy</small>`}` : ''}
         ${c.status === 'cancelado' && c.compensacao ? `<div class="mudo pq mt6">Deslocamento pago ao motoboy: ${brl(c.compensacao)}</div>` : ''}
         ${!emAndamento ? `<button class="btn btn-fantasma btn-sm mt10" data-act="repetir" data-id="${esc(c.id)}">${ic('repetir')}Chamar de novo</button>` : ''}
@@ -453,7 +465,7 @@ const LIVE = {
 
 // Onde está o motoboy agora, visto pela empresa (nesta versão, entre abas do mesmo aparelho).
 function rastreio(c) {
-  const pos = posicaoAtual();
+  const pos = c.posMotoboy && Date.now() - c.posMotoboy.em < 120000 ? c.posMotoboy : (c.nuvem ? null : posicaoAtual());
   if (!pos || !['aceito', 'coletado'].includes(c.status)) return '';
   const alvo = c.status === 'aceito' ? c.lojaGeo : c.clienteGeo;
   if (!alvo) return `<div class="rastreio">${ic('nav')}<span>${esc(c.motoboy)} está com o GPS ligado. Salve a localização ${c.status === 'aceito' ? 'da loja' : 'do cliente'} pra ver a distância.</span></div>`;
@@ -567,9 +579,25 @@ function telaAvaliar(c) {
 }
 
 /* ============ GPS ============ */
+const kmNuvem = new Map();      // km medido nesta corrida do servidor, antes de subir
+let kmSubidoEm = 0, posicaoNoServidor = false;
 function aoPontoGps(ponto, andou) {
   // Não redesenha a tela no meio de um arraste do deslizador; a próxima leitura grava.
   if (arrasto) return;
+  const ativa = corridaAtiva();
+  if (ativa?.nuvem) {
+    const kmAgora = r2((kmNuvem.get(ativa.id) ?? ativa.kmReal) + andou);
+    kmNuvem.set(ativa.id, kmAgora);
+    nuvem.enviarPosicao(ponto, ativa.id); posicaoNoServidor = true;
+    mudar(s => { s.posicao = ponto; });
+    if (ativa.status === 'aceito' && ativa.lojaGeo && distanciaKm(ponto, ativa.lojaGeo) * 1000 <= RAIO_CHEGADA_M) {
+      nuvem.chegou(ativa.id, kmAgora, true).then(() => { vibrar([60, 40, 60]); toast(`Chegada na ${ativa.empresa} registrada pelo GPS. A espera começou a contar.`); }).catch(() => {});
+    } else if (andou && Date.now() - kmSubidoEm > 60000) {
+      kmSubidoEm = Date.now(); nuvem.salvarKm(ativa.id, kmAgora).catch(() => {});
+    }
+    return;
+  }
+  if (posicaoNoServidor) { nuvem.apagarPosicao(); posicaoNoServidor = false; }
   let chegou = '';
   mudar(s => {
     s.posicao = ponto;
@@ -631,9 +659,22 @@ setInterval(tick, 1000);
 /* ============ Ações ============ */
 const acharEm = (s, id) => s.calls.find(x => x.id === id);
 
+const tentativasNuvem = new Map();
 const vibrar = ms => { try { if (navigator.userActivation?.hasBeenActive) navigator.vibrate?.(ms); } catch {} };
 
+const falhaNuvem = e => (nuvem.erroRecusado(e) ? 'O servidor recusou: esse chamado mudou de situação.' : 'Sem conexão com o servidor. Confira a internet e tente de novo.');
+const kmDe = c => kmNuvem.get(c.id) ?? c.kmReal;
+
 function aceitarChamado(id) {
+  const c = S().calls.find(x => x.id === id);
+  if (c?.nuvem) {
+    if (corridaAtiva()) { toast('Termine a corrida atual antes de aceitar outra.'); return; }
+    oferta = { id: null, ate: 0 }; armado = null; escolhida = null;
+    nuvem.aceitar(id, S().profile)
+      .then(() => { vibrar(30); scrollTo(0, 0); toast('Corrida aceita. Bora!'); })
+      .catch(e => toast(nuvem.erroRecusado(e) ? 'Outro motoboy aceitou primeiro. Sem problema, o próximo chamado aparece aqui.' : falhaNuvem(e)));
+    return;
+  }
   let motivo = 'Esse chamado já não está disponível.';
   const ok = mudar(s => {
     const c = acharEm(s, id);
@@ -685,8 +726,8 @@ const ACTS = {
     try { localStorage.setItem('marcaai:tema', tema); } catch {}
     // Só troca as cores: não redesenha a tela, pra não apagar formulário em andamento.
     aplicarTema();
-    document.querySelectorAll('[data-act="tema"]').forEach(b => b.setAttribute('aria-pressed', String(tema === 'sol')));
-    toast(tema === 'sol' ? 'Modo sol ligado: tela clara pra ler na rua.' : 'Modo noite ligado.');
+    document.querySelectorAll('[data-act="tema"]').forEach(b => b.setAttribute('aria-checked', String(tema === 'sol')));
+    // Sem aviso flutuante: ele cobria o próprio botão. A chavinha já mostra se está ligado; leitor de tela anuncia pelo aria-checked.
   },
   repetir: el => {
     const c = S().calls.find(x => x.id === el.dataset.id); if (!c) return;
@@ -717,6 +758,7 @@ const ACTS = {
     if (!S().profile.nome) { toast('Preencha seu nome no Perfil antes de ficar online.'); irAba('perfil'); return; }
     const ligar = !S().online;
     // Offline apaga a última posição: o app não guarda onde o motoboy está quando ele não está trabalhando.
+    if (!ligar) nuvem.apagarPosicao();
     mudar(s => { s.online = ligar; s.onlineDesde = ligar ? Date.now() : null; s.pausaAte = null; if (ligar) s.recusados = []; else s.posicao = null; });
     toast(ligar ? 'Você está online. O GPS liga só enquanto você estiver online.' : 'Você está offline. GPS desligado. Bom descanso.');
   },
@@ -751,6 +793,8 @@ const ACTS = {
       const f = s.empresa.favoritos;
       agora = !f.includes(nome);
       s.empresa.favoritos = agora ? [...f, nome] : f.filter(x => x !== nome);
+      const fu = s.empresa.favoritosUid, id = el.dataset.uid;
+      if (id) s.empresa.favoritosUid = agora ? [...new Set([...fu, id])] : fu.filter(x => x !== id);
     });
     toast(agora ? `${nome} agora é seu favorito. Seus chamados aparecem primeiro pra ele.` : `${nome} saiu dos favoritos.`);
   },
@@ -805,8 +849,21 @@ const ACTS = {
   },
   escolher: el => { escolhida = el.dataset.id; oferta = { id: escolhida, ate: Date.now() + TABELA.tempoOferta * 1000 }; armado = null; refresh(); scrollTo(0, 0); },
   recusar: el => { oferta = { id: null, ate: 0 }; mudar(s => { s.recusados.push(el.dataset.id); }); toast('Recusado. Nada muda pra você.'); },
-  cheguei: el => mudar(s => { const c = acharEm(s, el.dataset.id); if (!c || !podeIr(c.status, 'coleta')) return false; c.status = 'coleta'; c.chegouEm = Date.now(); }),
+  cheguei: el => {
+    const c = S().calls.find(x => x.id === el.dataset.id);
+    if (c?.nuvem) { nuvem.chegou(c.id, kmDe(c), false).catch(e => toast(falhaNuvem(e))); return; }
+    ACTS.chegueiLocal(el);
+  },
+  chegueiLocal: el => mudar(s => { const c = acharEm(s, el.dataset.id); if (!c || !podeIr(c.status, 'coleta')) return false; c.status = 'coleta'; c.chegouEm = Date.now(); }),
   coletei: el => {
+    const cn = S().calls.find(x => x.id === el.dataset.id);
+    if (cn?.nuvem) {
+      const quando = Date.now(), espera = taxaEspera({ ...cn, coletouEm: quando });
+      nuvem.coletou(cn.id, espera, kmDe(cn), quando)
+        .then(() => { if (espera) toast(`Espera de ${brl(espera)} somada ao seu ganho.`); })
+        .catch(e => toast(falhaNuvem(e)));
+      return;
+    }
     let espera = 0;
     mudar(s => {
       const c = acharEm(s, el.dataset.id); if (!c || !podeIr(c.status, 'coletado')) return false;
@@ -827,6 +884,24 @@ const ACTS = {
         e.preventDefault();
         const cod = String(e.target.cod.value).replace(/\D/g, '');
         const erro = d.querySelector('#cod-erro');
+        if (c.nuvem) {
+          const t = tentativasNuvem.get(id) || { n: 0, ate: 0 };
+          if (t.ate > Date.now()) { erro.textContent = 'Muitas tentativas erradas. Espere 2 minutos ou ligue pra loja e confirme o código.'; return; }
+          if (!/^\d{4}$/.test(cod)) { erro.textContent = 'O código tem 4 números.'; return; }
+          e.target.querySelector('button').disabled = true;
+          nuvem.entregar(id, cod, kmDe(c)).then(() => {
+            tentativasNuvem.delete(id); fecharDialogo(); bipe(); vibrar([40, 60, 40]); scrollTo(0, 0); anunciar('Entrega confirmada.');
+            if (posicaoNoServidor) { nuvem.apagarPosicao(); posicaoNoServidor = false; }
+          }).catch(x => {
+            e.target.querySelector('button').disabled = false;
+            if (!nuvem.erroRecusado(x)) { erro.textContent = falhaNuvem(x); return; }
+            t.n += 1; if (t.n >= LIMITES.tentativasCodigo) { t.n = 0; t.ate = Date.now() + LIMITES.bloqueioCodigoMs; }
+            tentativasNuvem.set(id, t);
+            e.target.cod.setAttribute('aria-invalid', 'true');
+            erro.textContent = t.ate > Date.now() ? 'Muitas tentativas erradas. Espere 2 minutos ou ligue pra loja e confirme o código.' : `O servidor não aceitou esse código. Confira com o cliente. Restam ${LIMITES.tentativasCodigo - t.n} tentativas.`;
+          });
+          return;
+        }
         let res = '';
         mudar(s => {
           const x = acharEm(s, id);
@@ -857,10 +932,17 @@ const ACTS = {
   },
   avaliar: el => {
     const { nota, tags } = avaliacao;
+    const cn = S().calls.find(x => x.id === el.dataset.id);
+    if (cn?.nuvem) { nuvem.avaliar(cn.id, nota, tags).then(() => toast('Avaliação enviada. Valeu!')).catch(e => toast(falhaNuvem(e))); return; }
     const ok = mudar(s => { const c = acharEm(s, el.dataset.id); if (!c || c.status !== 'entregue' || c.avaliado || !nota) return false; Object.assign(c, { avaliado: true, nota, tags }); });
     if (ok) toast('Avaliação enviada. Valeu!');
   },
-  pularAval: el => mudar(s => { const c = acharEm(s, el.dataset.id); if (!c || c.status !== 'entregue') return false; c.avaliado = true; }),
+  pularAval: el => {
+    const cn = S().calls.find(x => x.id === el.dataset.id);
+    if (cn?.nuvem) { nuvem.avaliar(cn.id, 0, []).catch(e => toast(falhaNuvem(e))); return; }
+    ACTS.pularLocal(el);
+  },
+  pularLocal: el => mudar(s => { const c = acharEm(s, el.dataset.id); if (!c || c.status !== 'entregue') return false; c.avaliado = true; }),
   sacar: () => {
     const sd = saldo(S().calls, S().saques);
     if (!S().profile.pix) { toast('Cadastre sua chave Pix no Perfil.'); irAba('perfil'); return; }
@@ -908,6 +990,13 @@ const ACTS = {
       ? `O motoboy já está a caminho e recebe ${brl(TABELA.deslocamentoCancelado)} pelo deslocamento.`
       : 'Nenhum motoboy aceitou ainda, então não há custo.', 'Cancelar chamado', 'Manter chamado');
     if (!sim) return;
+    if (c.nuvem) {
+      const atual = S().calls.find(x => x.id === id) || c;
+      nuvem.cancelar(id, atual.status === 'aberto' ? 0 : TABELA.deslocamentoCancelado)
+        .then(() => toast('Chamado cancelado.'))
+        .catch(e => toast(nuvem.erroRecusado(e) ? 'O motoboy já saiu com o pedido, então não dá mais pra cancelar. Ligue pra ele se precisar.' : falhaNuvem(e)));
+      return;
+    }
     const ok = mudar(s => {
       const x = acharEm(s, id);
       if (!x || x.empresa !== s.empresa.nome || !podeIr(x.status, 'cancelado')) return false;
@@ -918,6 +1007,8 @@ const ACTS = {
   },
   gorjeta: el => {
     const v = +el.dataset.v; let quem = '';
+    const cn = S().calls.find(x => x.id === el.dataset.id);
+    if (cn?.nuvem) { nuvem.gorjeta(cn.id, v).then(() => toast(`Gorjeta de ${brl(v)} enviada pra ${cn.motoboy}.`)).catch(e => toast(falhaNuvem(e))); return; }
     const ok = mudar(s => {
       const c = acharEm(s, el.dataset.id);
       if (!c || c.status !== 'entregue' || c.gorjeta || c.empresa !== s.empresa.nome || !LIMITES.gorjetas.includes(v)) return false;
@@ -991,6 +1082,17 @@ document.addEventListener('submit', e => {
     const clienteGeo = extrairGeo(d.localCliente);
     const taxa = taxaAgora();
     const favoritos = d.soFavoritos === 'on' && PLANOS[S().empresa.plano].favoritos ? S().empresa.favoritos : [];
+    if (nuvem.nuvemLigada()) {
+      if (nuvem.estadoNuvem().estado !== 'conectado') return erroForm(f, nuvem.estadoNuvem().detalheErro || 'Ainda conectando ao servidor. Espere um instante e tente de novo.');
+      const botao = f.querySelector('[type="submit"]'); botao.disabled = true;
+      const favUid = favoritos.length ? S().empresa.favoritosUid : [];
+      nuvem.criarChamado({ empresa: S().empresa.nome, coleta, tel: S().empresa.tel, entrega, cliente: texto(d.cliente, LIMITES.nome), telCliente: texto(d.telCliente, LIMITES.tel),
+        km: r2(dist), obs: texto(d.obs, LIMITES.obs), chuva: d.chuva === 'on', valor: frete(r2(dist), d.chuva === 'on'), taxa, codigo: novoCodigo(),
+        lojaGeo: S().empresa.geo, clienteGeo, preferidosUid: favUid, prioridadeAte: favUid.length ? Date.now() + 30000 : null })
+        .then(() => { toast('Chamado enviado. Avisando os motoboys online.'); irAba('chamados'); })
+        .catch(e => { botao.disabled = false; erroForm(f, nuvem.erroRecusado(e) ? 'O servidor recusou o chamado. Confira os dados e tente de novo.' : 'Sem conexão com o servidor. Confira a internet e tente de novo.'); });
+      return;
+    }
     mudar(s => {
       s.calls.push({ id: novoId(), empresa: s.empresa.nome, coleta, tel: s.empresa.tel, entrega, cliente: d.cliente, telCliente: d.telCliente, km: r2(dist), obs: d.obs,
         chuva: d.chuva === 'on', codigo: novoCodigo(), status: 'aberto', criadoEm: Date.now(),
@@ -1006,4 +1108,6 @@ addEventListener('error', () => toast('Essa tela travou. Feche e abra o app de n
 addEventListener('unhandledrejection', () => toast('Essa tela travou. Feche e abra o app de novo.'));
 
 montar();
+if (papel) nuvem.conectar(papel);
+nuvem.aoMudarNuvem(() => refresh());
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register(urlScript('sw.js')).catch(() => {});

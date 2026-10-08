@@ -20,7 +20,9 @@ export const PERFIL_PADRAO = Object.freeze({
   nome: '', moto: '', placa: '', pix: '', contato: '',
   consumo: 35, gasolina: 6.29, meta: 150, oleoCada: 1000, oleoDesde: 0
 });
-export const EMPRESA_PADRAO = Object.freeze({ nome: '', endereco: '', tel: '', geo: null, favoritos: [], plano: 'avulso' });
+export const EMPRESA_PADRAO = Object.freeze({ nome: '', endereco: '', tel: '', geo: null, favoritos: [], favoritosUid: [], plano: 'avulso' });
+// Identificador de conta do servidor (letras, números, - e _).
+const uid = v => typeof v === 'string' && /^[A-Za-z0-9_-]{1,128}$/.test(v);
 
 export function limparPerfil(p = {}) {
   const d = PERFIL_PADRAO;
@@ -45,6 +47,7 @@ export function limparEmpresa(e = {}) {
     tel: texto(e.tel, LIMITES.tel).replace(/[^\d()+ -]/g, ''),
     geo: geo(e.geo),
     favoritos: nomes(e.favoritos, 30),
+    favoritosUid: Array.isArray(e.favoritosUid) ? [...new Set(e.favoritosUid.filter(uid))].slice(0, 30) : [],
     plano: Object.hasOwn(PLANOS, e.plano) ? e.plano : 'avulso'
   };
 }
@@ -84,6 +87,12 @@ export function limparChamado(c) {
     preferidos: nomes(c.preferidos, 30),
     prioridadeAte: instante(c.prioridadeAte),
     taxa: numero(c.taxa, 0, 10, TABELA.taxaPlataforma),
+    nuvem: c.nuvem === true,
+    empresaUid: uid(c.empresaUid) ? c.empresaUid : '',
+    motoboyUid: uid(c.motoboyUid) ? c.motoboyUid : '',
+    bairro: texto(c.bairro, 60),
+    temGeoCliente: c.temGeoCliente === true,
+    posMotoboy: c.posMotoboy && geo(c.posMotoboy) ? { ...geo(c.posMotoboy), em: instante(c.posMotoboy.em) || 0 } : null,
     bloqueadoAte: instante(c.bloqueadoAte)
   };
 }

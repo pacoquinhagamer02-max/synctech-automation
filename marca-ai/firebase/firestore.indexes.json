@@ -1,0 +1,8 @@
+{
+  "indexes": [
+    { "collectionGroup": "chamados", "queryScope": "COLLECTION", "fields": [ { "fieldPath": "empresaUid", "order": "ASCENDING" }, { "fieldPath": "criadoEm", "order": "DESCENDING" } ] },
+    { "collectionGroup": "chamados", "queryScope": "COLLECTION", "fields": [ { "fieldPath": "motoboyUid", "order": "ASCENDING" }, { "fieldPath": "criadoEm", "order": "DESCENDING" } ] },
+    { "collectionGroup": "chamados", "queryScope": "COLLECTION", "fields": [ { "fieldPath": "status", "order": "ASCENDING" }, { "fieldPath": "criadoEm", "order": "ASCENDING" } ] }
+  ],
+  "fieldOverrides": []
+}

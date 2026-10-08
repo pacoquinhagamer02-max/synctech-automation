@@ -4,8 +4,9 @@
 import { limparEstado } from './esquema.js';
 import { ATIVOS, LIMITES } from './regras.js';
 
-const CHAVE = 'marcaai:v1';
-const canal = 'BroadcastChannel' in globalThis ? new BroadcastChannel('marcaai') : null;
+const BASE = 'marcaai:v1';
+let CHAVE = BASE;
+let canal = 'BroadcastChannel' in globalThis ? new BroadcastChannel(CHAVE) : null;
 const ouvintes = new Set();
 
 function ler() {
@@ -48,7 +49,26 @@ export function transacao(fn) {
 }
 
 function recarregar() { estado = ler(); avisar(); }
-canal && canal.addEventListener('message', e => { if (e.data === 'sync') recarregar(); });
+const ouvirCanal = e => { if (e.data === 'sync') recarregar(); };
+canal && canal.addEventListener('message', ouvirCanal);
+
+// Com servidor, cada conta tem sua gaveta no aparelho (empresa e motoboy podem dividir o mesmo celular).
+// Na primeira vez, aproveita perfil e dados da empresa já preenchidos sem conta.
+export function usarConta(id) {
+  const nova = `${BASE}:${id}`;
+  if (nova === CHAVE) return;
+  let existe = false;
+  try { existe = localStorage.getItem(nova) != null; } catch {}
+  if (!existe) {
+    const antigo = ler();
+    try { localStorage.setItem(nova, JSON.stringify(limparEstado({ profile: antigo.profile, empresa: antigo.empresa, saques: antigo.saques }))); } catch {}
+  }
+  CHAVE = nova;
+  if (canal) { canal.removeEventListener('message', ouvirCanal); canal.close(); }
+  canal = 'BroadcastChannel' in globalThis ? new BroadcastChannel(CHAVE) : null;
+  canal && canal.addEventListener('message', ouvirCanal);
+  recarregar();
+}
 globalThis.addEventListener?.('storage', e => { if (e.key === CHAVE) recarregar(); });
 
 // Preferências desta aba (papel e aba aberta). Só aceita valores conhecidos.
