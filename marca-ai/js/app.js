@@ -564,7 +564,7 @@ function telaAvaliar(c) {
     <p class="sub mb14">${c.espera ? `Inclui ${brl(c.espera)} de espera. ` : ''}Já está no seu saldo.</p>
     <div class="grade3">
       <div class="mini"><b>${brl(c.valor)}</b><small>frete</small></div>
-      <div class="mini"><b>${km(c.km)} km</b><small>rodados</small></div>
+      <div class="mini"><b>${km(kmCorrida(c))} km</b><small>${c.kmReal ? 'rodados (GPS)' : 'estimados'}</small></div>
       <div class="mini"><b>${minutos != null ? minutos + ' min' : '–'}</b><small>do aceite à entrega</small></div>
     </div>
   </section>

@@ -87,7 +87,7 @@ function buscarExtras() {
     const ex = extras.get(id) || {};
     if (!ex.cliente && (souEmpresa || souMotoboy) && !ex.pedindoCliente) {
       ex.pedindoCliente = true;
-      F.getDoc(F.doc(db, 'chamados', id, 'restrito', 'cliente')).then(s => { ex.cliente = s.data() || null; espelhar(); }).catch(() => { ex.pedindoCliente = false; });
+      F.getDoc(F.doc(db, 'chamados', id, 'restrito', 'cliente')).then(s => { ex.cliente = s.data() || null; if (!ex.cliente) ex.pedindoCliente = false; espelhar(); }).catch(() => { ex.pedindoCliente = false; });
     }
     if (!ex.codigo && souEmpresa && !ex.pedindoCodigo) {
       ex.pedindoCodigo = true;
@@ -104,7 +104,9 @@ function acompanharPosicoes() {
   ouvindoPos.forEach((sair, m) => { if (!ativos.has(m)) { sair(); ouvindoPos.delete(m); posicoes.delete(m); } });
   ativos.forEach(m => {
     if (ouvindoPos.has(m)) return;
-    ouvindoPos.set(m, F.onSnapshot(F.doc(db, 'posicoes', m), s => { if (s.exists()) posicoes.set(m, s.data()); else posicoes.delete(m); espelhar(); }, () => {}));
+    ouvindoPos.set(m, F.onSnapshot(F.doc(db, 'posicoes', m), s => { if (s.exists()) posicoes.set(m, s.data()); else posicoes.delete(m); espelhar(); },
+      // Escuta caiu (rede ou regra): solta e tenta de novo em 5 s.
+      () => { ouvindoPos.delete(m); setTimeout(acompanharPosicoes, 5000); }));
   });
 }
 
@@ -152,7 +154,9 @@ export async function criarChamado(c) {
   b.set(F.doc(db, 'chamados', ref.id, 'restrito', 'codigo'), { valor: c.codigo });
   b.set(F.doc(db, 'chamados', ref.id, 'restrito', 'cliente'), { entrega: c.entrega, cliente: c.cliente || '', telCliente: c.telCliente || '', clienteGeo: c.clienteGeo || null });
   await b.commit();
-  extras.set(ref.id, { codigo: c.codigo, cliente: { entrega: c.entrega, cliente: c.cliente || '', telCliente: c.telCliente || '', clienteGeo: c.clienteGeo || null } });
+  // A empresa já sabe o código e os dados do cliente: guarda e redesenha (sem esperar uma nova leitura).
+  extras.set(ref.id, { ...(extras.get(ref.id) || {}), codigo: c.codigo, cliente: { entrega: c.entrega, cliente: c.cliente || '', telCliente: c.telCliente || '', clienteGeo: c.clienteGeo || null } });
+  espelhar();
   return ref.id;
 }
 
@@ -175,3 +179,7 @@ export function apagarPosicao() {
   if (!db || !uid) return Promise.resolve();
   return F.deleteDoc(F.doc(db, 'posicoes', uid)).catch(() => {});
 }
+
+// Só no modo de teste (?aba): dá acesso ao banco pra testar se as regras do servidor barram fraude.
+// No app normal devolve null. Isso não abre brecha: quem decide são as regras, não o app.
+export const bancoParaTestes = () => (params.has('aba') && db ? { db, F, uid } : null);

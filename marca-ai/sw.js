@@ -1,6 +1,6 @@
 // Rede primeiro: com internet, sempre a versão nova; sem internet, a última cópia boa.
 // Mude VERSAO a cada publicação pra limpar o cache antigo.
-const VERSAO = 'marcaai-v7';
+const VERSAO = 'marcaai-v8';
 const ARQUIVOS = [
   './', 'index.html', 'manifest.json', 'icon.svg', 'css/app.css',
   'js/app.js', 'js/gps.js', 'js/nuvem.js', 'js/config.js', 'js/regras.js', 'js/esquema.js', 'js/store.js', 'js/ui.js',

@@ -22,6 +22,11 @@ service cloud.firestore {
       let esperado = 8 + (km > 3 ? (km - 3) * 2 : 0) + (chuva ? 2 : 0);
       return valor is number && math.abs(valor - esperado) < 0.011;
     }
+    // Espera paga: 10 min grátis, depois R$ 0,50 por minuto (as regras do Firebase não têm math.max).
+    function esperaMaxima(coletou, chegou) {
+      let minutos = math.floor((coletou - chegou) / 60000);
+      return minutos > 10 ? (minutos - 10) * 0.5 : 0;
+    }
     function chamado(id) { return get(/databases/$(db)/documents/chamados/$(id)).data; }
     function chamadoDepois(id) { return getAfter(/databases/$(db)/documents/chamados/$(id)).data; }
 
@@ -64,7 +69,7 @@ service cloud.firestore {
         || (resource.data.motoboyUid == eu() && resource.data.status == 'coleta' && novo().status == 'coletado'
           && so(['status', 'coletouEm', 'espera', 'kmReal']) && horaCerta(novo().coletouEm)
           && novo().espera is number && novo().espera >= 0
-          && novo().espera <= math.max(0, math.floor((novo().coletouEm - resource.data.chegouEm) / 60000) - 10) * 0.5 + 0.011
+          && novo().espera <= esperaMaxima(novo().coletouEm, resource.data.chegouEm) + 0.011
           && novo().kmReal is number && novo().kmReal >= 0 && novo().kmReal <= 500)
         // Motoboy entrega: o código digitado tem que bater com o código guardado (que ele não consegue ler).
         || (resource.data.motoboyUid == eu() && resource.data.status == 'coletado' && novo().status == 'entregue'
@@ -104,8 +109,9 @@ service cloud.firestore {
 
     // Posição do motoboy: ele grava a dele; só a empresa da corrida em andamento lê.
     match /posicoes/{uid} {
-      allow read: if logado() && resource.data.chamadoId is string && chamado(resource.data.chamadoId).empresaUid == eu()
-        && chamado(resource.data.chamadoId).status in ['aceito', 'coleta', 'coletado'];
+      // Posição que ainda não existe pode ser "escutada" (não revela nada); existente, só pela empresa da corrida.
+      allow read: if logado() && (resource == null || resource.data.chamadoId is string && chamado(resource.data.chamadoId).empresaUid == eu()
+        && chamado(resource.data.chamadoId).status in ['aceito', 'coleta', 'coletado']);
       allow create, update: if logado() && uid == eu()
         && novo().keys().hasOnly(['lat', 'lon', 'precisao', 'em', 'chamadoId'])
         && novo().lat is number && novo().lon is number && novo().precisao is int && horaCerta(novo().em)

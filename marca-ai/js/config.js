@@ -4,7 +4,7 @@
 // Liga o servidor pra todo mundo. Fica false até o login anônimo ser ativado no
 // console do Firebase e o fluxo empresa ↔ motoboy ser testado entre dois aparelhos.
 // Enquanto isso, dá pra testar o servidor abrindo o app com ?nuvem no endereço.
-export const NUVEM_ATIVA = false;
+export const NUVEM_ATIVA = true;
 
 export const FIREBASE = Object.freeze({
   apiKey: 'AIzaSyCIRVUqw0nxCrfuScwUXrvmCdkvkEeCnQU',
