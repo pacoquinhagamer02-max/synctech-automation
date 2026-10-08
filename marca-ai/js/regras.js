@@ -135,3 +135,50 @@ export function resumoMes(calls, empresa, quando = new Date()) {
     esperaMin: esperas.length ? Math.round(esperas.reduce((a, b) => a + b, 0) / esperas.length) : null
   };
 }
+
+const doMesmoMes = (t, quando) => { const d = new Date(t); return d.getMonth() === quando.getMonth() && d.getFullYear() === quando.getFullYear(); };
+
+/**
+ * Informe de ganhos do mês do motoboy (pra guardar ou declarar como MEI):
+ * cada corrida paga, totais, km, gasolina estimada e saques.
+ * @param {Array} calls
+ * @param {Array} saques
+ * @param {{consumo: number, gasolina: number}} profile
+ * @param {Date} [quando]
+ */
+export function informeMes(calls, saques, profile, quando = new Date()) {
+  const linhas = calls
+    .filter(c => c.motoboy && ganho(c) > 0 && doMesmoMes(quandoGanhou(c), quando))
+    .sort((a, b) => quandoGanhou(a) - quandoGanhou(b))
+    .map(c => ({ em: quandoGanhou(c), empresa: c.empresa, km: c.status === 'entregue' ? c.km : 0, valor: ganho(c), cancelada: c.status === 'cancelado' }));
+  const km = r2(linhas.reduce((a, l) => a + l.km, 0));
+  const sacado = r2(saques.filter(s => doMesmoMes(s.em, quando)).reduce((a, s) => a + s.valor, 0));
+  return {
+    linhas,
+    corridas: linhas.filter(l => !l.cancelada).length,
+    bruto: r2(linhas.reduce((a, l) => a + l.valor, 0)),
+    km,
+    comb: r2(km * custoKm(profile)),
+    sacado
+  };
+}
+
+export const FAIXAS = Object.freeze([
+  { nome: 'Manhã', de: 6, ate: 11 }, { nome: 'Almoço', de: 11, ate: 14 },
+  { nome: 'Tarde', de: 14, ate: 18 }, { nome: 'Noite', de: 18, ate: 23 }, { nome: 'Madrugada', de: 23, ate: 6 }
+]);
+
+/**
+ * Em que faixa do dia o motoboy mais ganha, pelo horário das entregas feitas.
+ * @param {Array} calls
+ * @returns {Array<{nome: string, de: number, ate: number, n: number, total: number}>} da que mais rende pra menos
+ */
+export function faixasHorario(calls) {
+  const dentro = (h, f) => (f.de < f.ate ? h >= f.de && h < f.ate : h >= f.de || h < f.ate);
+  const soma = FAIXAS.map(f => ({ ...f, n: 0, total: 0 }));
+  calls.filter(c => c.motoboy && c.status === 'entregue' && c.entregueEm).forEach(c => {
+    const f = soma.find(x => dentro(new Date(c.entregueEm).getHours(), x));
+    f.n += 1; f.total = r2(f.total + ganho(c));
+  });
+  return soma.filter(f => f.n).sort((a, b) => b.total - a.total);
+}

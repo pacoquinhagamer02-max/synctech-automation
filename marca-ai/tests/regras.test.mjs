@@ -113,3 +113,29 @@ test('resumo do mês soma taxa e deslocamento e ignora teste e outro mês', () =
   ];
   assert.deepEqual(resumoMes(calls, 'P', new Date(agora)), { total: 2, entregas: 1, gasto: 23.5, esperaMin: 6 });
 });
+
+import { informeMes, faixasHorario } from '../js/regras.js';
+
+test('informe do mês: só corridas pagas do mês, com gasolina e saques', () => {
+  const out = new Date(2026, 9, 10, 12).getTime();
+  const calls = [
+    { motoboy: 'J', status: 'entregue', valor: 12, espera: 2, gorjeta: 0, km: 5, entregueEm: out },
+    { motoboy: 'J', status: 'cancelado', compensacao: 5, canceladoEm: out + 1 },
+    { motoboy: 'J', status: 'entregue', valor: 8, espera: 0, gorjeta: 0, km: 2, entregueEm: new Date(2026, 8, 30).getTime() },
+    { motoboy: '', status: 'aberto', valor: 8, km: 2, criadoEm: out }
+  ];
+  const r = informeMes(calls, [{ valor: 10, em: out }, { valor: 3, em: new Date(2026, 8, 1).getTime() }], { consumo: 35, gasolina: 7 }, new Date(out));
+  assert.equal(r.linhas.length, 2);
+  assert.equal(r.corridas, 1);
+  assert.equal(r.bruto, 19);
+  assert.equal(r.km, 5);
+  assert.equal(r.comb, 1);
+  assert.equal(r.sacado, 10);
+});
+
+test('faixas de horário: soma por faixa, inclusive madrugada que vira o dia', () => {
+  const h = hr => new Date(2026, 9, 10, hr, 30).getTime();
+  const e = (hr, valor) => ({ motoboy: 'J', status: 'entregue', valor, espera: 0, gorjeta: 0, entregueEm: h(hr) });
+  const r = faixasHorario([e(12, 10), e(13, 10), e(19, 15), e(2, 9), { motoboy: 'J', status: 'aceito', valor: 50 }]);
+  assert.deepEqual(r.map(f => [f.nome, f.n, f.total]), [['Almoço', 2, 20], ['Noite', 1, 15], ['Madrugada', 1, 9]]);
+});

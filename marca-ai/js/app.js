@@ -1,6 +1,6 @@
 // Telas e ações do Marca aí.
 import { TABELA, LIMITES, ATIVOS, TAGS_BOAS, TAGS_RUINS, podeIr, frete, taxaEspera, ganho, quandoGanhou, mesmoDia,
-  custoKm, resumoDia, saldo, reputacao, novoCodigo, novoId, r2, ticketMedio, mensagemCliente, resumoMes } from './regras.js';
+  custoKm, resumoDia, saldo, reputacao, novoCodigo, novoId, r2, ticketMedio, mensagemCliente, resumoMes, informeMes, faixasHorario } from './regras.js';
 import { limparPerfil, limparEmpresa, texto, numero } from './esquema.js';
 import { S, transacao, aoMudar, sessao } from './store.js';
 import { esc, brl, km, mmss, hora, dia, ic, fone, mapsUrl, wazeUrl, html, toast, anunciar, dialogo, fecharDialogo, confirmar, bipe, urlScript } from './ui.js';
@@ -78,6 +78,17 @@ const ABAS = {
   empresa: [['novo', 'Chamar', 'mais'], ['chamados', 'Chamados', 'lista'], ['loja', 'Empresa', 'loja']]
 };
 const TITULOS = { corridas: 'Corridas', ganhos: 'Seus ganhos', apoio: 'Apoio e segurança', perfil: 'Seu perfil', novo: 'Chamar motoboy', chamados: 'Seus chamados', loja: 'Dados da empresa' };
+// Modo sol: preferência deste aparelho (só conveniência, não é dado do app).
+let tema = (() => { try { return localStorage.getItem('marcaai:tema') === 'sol' ? 'sol' : 'noite'; } catch { return 'noite'; } })();
+function aplicarTema() {
+  document.documentElement.dataset.tema = tema;
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', tema === 'sol' ? '#F3F1E9' : '#26282B');
+}
+aplicarTema();
+
+// Rascunho pra "Chamar de novo": preenche o formulário uma vez e some.
+let rascunho = null;
+
 let papel = sessao.get('papel', ['moto', 'empresa']);
 let aba = papel ? sessao.get('aba', ABAS[papel].map(a => a[0])) || ABAS[papel][0][0] : null;
 
@@ -100,7 +111,10 @@ function montar() {
     <a class="pular" href="#view">Pular pro conteúdo</a>
     <header class="top">
       <div class="logo" translate="no">${ic('pin', 'class="pin"')}Marca aí</div>
-      <div class="quem">${esc(quem)}<br><button class="link pq" data-act="trocar">Trocar perfil</button></div>
+      <div class="acoes-topo">
+        <div class="quem">${esc(quem)}<br><button class="link pq" data-act="trocar">Trocar perfil</button></div>
+        <button class="tema" data-act="tema" aria-pressed="${tema === 'sol'}" aria-label="Modo sol: tela clara pra ler no sol">${ic('sol')}</button>
+      </div>
     </header>
     <main id="view"><h1 class="vh" tabindex="-1">${TITULOS[aba]}</h1>${VIEWS[papel][aba]()}</main>
     <nav class="tabs" aria-label="Seções">${ABAS[papel].map(([id, nome, i]) =>
@@ -192,24 +206,25 @@ const VIEWS = {
     novo: () => {
       // Primeiro uso: a empresa se cadastra aqui mesmo, sem ser mandada pra outra aba.
       if (!S().empresa.nome) return formEmpresa('Comece pelos dados da sua empresa', 'Leva 30 segundos. O motoboy vê o nome e o endereço de retirada antes de aceitar.', 'Salvar e chamar motoboy');
+      const rs = rascunho || {}; rascunho = null;
       const recentes = [...new Set(S().calls.filter(c => c.empresa === S().empresa.nome && !c.teste).sort((x, y) => y.criadoEm - x.criadoEm).map(c => c.entrega))].slice(0, 8);
       return `<form class="bloco" data-form="chamado" novalidate>
         <h2>Chamar motoboy</h2>
         ${campo('coleta', 'Retirada', S().empresa.endereco, 'text', `placeholder="Endereço da sua loja…" maxlength="${LIMITES.endereco}" required autocomplete="off"`)}
-        ${campo('entrega', 'Entrega', '', 'text', `placeholder="Rua, número, bairro…" maxlength="${LIMITES.endereco}" required list="enderecos" autocomplete="off"`)}
+        ${campo('entrega', 'Entrega', rs.entrega || '', 'text', `placeholder="Rua, número, bairro…" maxlength="${LIMITES.endereco}" required list="enderecos" autocomplete="off"`)}
         <datalist id="enderecos">${recentes.map(e => `<option value="${esc(e)}"></option>`).join('')}</datalist>
         <div class="campo"><span id="km-rot">Distância da loja até o cliente (km)</span>
           <div class="passo-km">
             <button type="button" class="btn btn-fantasma btn-sm" data-act="km" data-d="-0.5" aria-label="Diminuir meio quilômetro">−</button>
-            <input class="inp num" name="km" type="number" value="3" step="0.1" min="${LIMITES.kmMin}" max="${LIMITES.kmMax}" inputmode="decimal" required aria-labelledby="km-rot">
+            <input class="inp num" name="km" type="number" value="${rs.km ?? 3}" step="0.1" min="${LIMITES.kmMin}" max="${LIMITES.kmMax}" inputmode="decimal" required aria-labelledby="km-rot">
             <button type="button" class="btn btn-fantasma btn-sm" data-act="km" data-d="0.5" aria-label="Aumentar meio quilômetro">+</button>
           </div>
         </div>
         <div class="grade2">
-          ${campo('cliente', 'Cliente', '', 'text', `placeholder="Ex.: Ana" maxlength="${LIMITES.nome}" autocomplete="off"`)}
-          ${campo('telCliente', 'WhatsApp do cliente', '', 'tel', `placeholder="(31) 9…" inputmode="tel" maxlength="${LIMITES.tel}" autocomplete="off"`)}
+          ${campo('cliente', 'Cliente', rs.cliente || '', 'text', `placeholder="Ex.: Ana" maxlength="${LIMITES.nome}" autocomplete="off"`)}
+          ${campo('telCliente', 'WhatsApp do cliente', rs.telCliente || '', 'tel', `placeholder="(31) 9…" inputmode="tel" maxlength="${LIMITES.tel}" autocomplete="off"`)}
         </div>
-        <label class="campo"><span>Observação pro motoboy</span><textarea class="inp" name="obs" maxlength="${LIMITES.obs}" placeholder="Ex.: pedido grande, levar bag térmica, troco pra R$ 50…"></textarea></label>
+        <label class="campo"><span>Observação pro motoboy</span><textarea class="inp" name="obs" maxlength="${LIMITES.obs}" placeholder="Ex.: pedido grande, levar bag térmica, troco pra R$ 50…">${esc(rs.obs || '')}</textarea></label>
         <label class="check"><input type="checkbox" name="chuva"> Está chovendo (+${brl(TABELA.chuva)} pro motoboy)</label>
         <div data-live="em-preco"></div>
         <p class="erro" data-erro role="alert"></p>
@@ -315,6 +330,15 @@ const LIVE = {
         <div class="barras" role="img" aria-label="Ganhos por dia: ${dias.map((d, i) => `${d.toLocaleDateString('pt-BR', { weekday: 'long' })} ${brl(vals[i])}`).join(', ')}">${dias.map((d, i) =>
           `<div class="${i === 6 ? 'hoje' : ''}"><i data-h="${vals[i] / max * 100}"></i><small>${d.toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '')}</small></div>`).join('')}</div>
       </section>
+      ${(() => {
+        const fx = faixasHorario(s.calls);
+        if (fx.reduce((a, f) => a + f.n, 0) < 3) return '';
+        const topo = fx[0].total;
+        return `<section class="bloco"><h2>Seus horários que mais rendem</h2><ul class="horas">${fx.slice(0, 4).map(f =>
+          `<li><span><b>${f.nome}</b> <small>${f.de}h–${f.ate}h</small></span><b class="num">${brl(f.total)}</b><small>${f.n} ${f.n === 1 ? 'entrega' : 'entregas'}</small><div class="barra"><i data-w="${f.total / topo * 100}"></i></div></li>`).join('')}</ul>
+          <p class="sub mt8">Conta as entregas feitas no app. Use pra decidir quando vale mais a pena rodar.</p></section>`;
+      })()}
+      <button class="btn btn-fantasma mb14" data-act="informe">${ic('doc')}Informe do mês em PDF</button>
       <section class="bloco"><h2>Extrato</h2>${extrato.length ? `<ul class="hist">${extrato.map(x => x.html).join('')}</ul>`
         : `<div class="vazio"><b>Nenhuma corrida ainda</b>Fica online na aba Corridas e seu extrato começa aqui.</div>`}</section>`);
   },
@@ -370,6 +394,7 @@ const LIVE = {
         ${c.status === 'entregue' ? `<div class="mudo pq mt6">Frete ${brl(c.valor)}${c.espera ? ` + espera ${brl(c.espera)}` : ''}${c.gorjeta ? ` + gorjeta ${brl(c.gorjeta)}` : ''}</div>
           ${c.gorjeta ? '' : `<div class="acoes acoes3">${LIMITES.gorjetas.map(v => `<button class="btn btn-fantasma btn-sm" data-act="gorjeta" data-id="${esc(c.id)}" data-v="${v}">+${brl(v)}</button>`).join('')}</div><small class="mudo">Mandar gorjeta pro motoboy</small>`}` : ''}
         ${c.status === 'cancelado' && c.compensacao ? `<div class="mudo pq mt6">Deslocamento pago ao motoboy: ${brl(c.compensacao)}</div>` : ''}
+        ${!emAndamento ? `<button class="btn btn-fantasma btn-sm mt10" data-act="repetir" data-id="${esc(c.id)}">${ic('repetir')}Chamar de novo</button>` : ''}
         ${podeIr(c.status, 'cancelado') ? `<button class="btn btn-fantasma btn-sm mt10" data-act="cancelar" data-id="${esc(c.id)}">Cancelar chamado</button>` : ''}
       </article>`;
     }).join(''));
@@ -562,6 +587,34 @@ const ACTS = {
   trocar: () => { papel = null; aba = null; sessao.set('papel', null); sessao.set('aba', null); montar(); },
   aba: el => irAba(el.dataset.aba),
   fechar: () => fecharDialogo(),
+  tema: () => {
+    tema = tema === 'sol' ? 'noite' : 'sol';
+    try { localStorage.setItem('marcaai:tema', tema); } catch {}
+    // Só troca as cores: não redesenha a tela, pra não apagar formulário em andamento.
+    aplicarTema();
+    document.querySelectorAll('[data-act="tema"]').forEach(b => b.setAttribute('aria-pressed', String(tema === 'sol')));
+    toast(tema === 'sol' ? 'Modo sol ligado: tela clara pra ler na rua.' : 'Modo noite ligado.');
+  },
+  repetir: el => {
+    const c = S().calls.find(x => x.id === el.dataset.id); if (!c) return;
+    rascunho = { entrega: c.entrega, km: c.km, cliente: c.cliente, telCliente: c.telCliente, obs: c.obs };
+    irAba('novo');
+    toast('Dados da entrega copiados. Confira e chame o motoboy.');
+  },
+  informe: () => {
+    const s = S(), p = s.profile, inf = informeMes(s.calls, s.saques, p);
+    if (!inf.linhas.length) { toast('Ainda não tem corrida paga este mês pra entrar no informe.'); return; }
+    const mes = new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+    html(document.getElementById('impressao'), `<h1>Informe de ganhos: ${esc(mes)}</h1>
+      <p>${esc(p.nome)}${p.placa ? `, placa ${esc(p.placa)}` : ''}${p.moto ? `, ${esc(p.moto)}` : ''}. Gerado pelo Marca aí em ${dia(Date.now())} às ${hora(Date.now())}.</p>
+      <table><thead><tr><th>Data</th><th>Empresa</th><th class="v">Km</th><th class="v">Valor</th></tr></thead><tbody>
+      ${inf.linhas.map(l => `<tr><td>${dia(l.em)} ${hora(l.em)}</td><td>${esc(l.empresa)}${l.cancelada ? ' (cancelada, deslocamento)' : ''}</td><td class="v">${km(l.km)}</td><td class="v">${brl(l.valor)}</td></tr>`).join('')}
+      <tr class="tot"><td colspan="2">${inf.corridas} ${inf.corridas === 1 ? 'entrega' : 'entregas'}</td><td class="v">${km(inf.km)}</td><td class="v">${brl(inf.bruto)}</td></tr>
+      </tbody></table>
+      <p>Gasolina estimada (${km(p.consumo)} km/l a ${brl(p.gasolina)}): ${brl(inf.comb)}. Lucro estimado: <b>${brl(inf.bruto - inf.comb)}</b>. Sacado no mês: ${brl(inf.sacado)}.</p>
+      <p class="nota">Documento de controle pessoal. Não substitui nota fiscal nem declaração oficial; use como apoio pra declarar sua renda como MEI.</p>`);
+    print();
+  },
   km: el => {
     const inp = el.closest('form').km;
     inp.value = String(r2(Math.min(LIMITES.kmMax, Math.max(LIMITES.kmMin, numero(inp.value, 0, LIMITES.kmMax, 3) + +el.dataset.d))));
