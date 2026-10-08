@@ -111,7 +111,7 @@ test('resumo do mês soma taxa e deslocamento e ignora teste e outro mês', () =
     { empresa: 'P', status: 'entregue', valor: 12, espera: 0, gorjeta: 0, criadoEm: agora, teste: true },
     { empresa: 'P', status: 'entregue', valor: 12, espera: 0, gorjeta: 0, criadoEm: new Date(2026, 8, 1).getTime() }
   ];
-  assert.deepEqual(resumoMes(calls, 'P', new Date(agora)), { total: 2, entregas: 1, gasto: 23.5, esperaMin: 6 });
+  assert.deepEqual(resumoMes(calls, 'P', new Date(agora)), { total: 2, entregas: 1, gasto: 23.99, esperaMin: 6 });
 });
 
 import { informeMes, faixasHorario } from '../js/regras.js';
@@ -138,4 +138,40 @@ test('faixas de horário: soma por faixa, inclusive madrugada que vira o dia', (
   const e = (hr, valor) => ({ motoboy: 'J', status: 'entregue', valor, espera: 0, gorjeta: 0, entregueEm: h(hr) });
   const r = faixasHorario([e(12, 10), e(13, 10), e(19, 15), e(2, 9), { motoboy: 'J', status: 'aceito', valor: 50 }]);
   assert.deepEqual(r.map(f => [f.nome, f.n, f.total]), [['Almoço', 2, 20], ['Noite', 1, 15], ['Madrugada', 1, 9]]);
+});
+
+import { distanciaKm, kmEstimado, etaMin, extrairGeo, taxaChamado, custoPlanos } from '../js/regras.js';
+
+test('distância: Praça Gomes Freire até a Catedral da Sé de Mariana (~250 m)', () => {
+  const praca = { lat: -20.37745, lon: -43.41623 }, se = { lat: -20.37800, lon: -43.41850 };
+  const d = distanciaKm(praca, se);
+  assert.ok(d > 0.2 && d < 0.3, String(d));
+  assert.equal(kmEstimado(praca, se), 0.5);
+  assert.equal(etaMin(11), 30);
+});
+
+test('lê coordenada de link do WhatsApp, Google Maps, OSM e texto puro', () => {
+  assert.deepEqual(extrairGeo('https://maps.google.com/maps?q=-20.3774,-43.4162'), { lat: -20.3774, lon: -43.4162 });
+  assert.deepEqual(extrairGeo('https://www.google.com/maps/place/Mariana/@-20.3774,-43.4162,15z'), { lat: -20.3774, lon: -43.4162 });
+  assert.deepEqual(extrairGeo('https://www.openstreetmap.org/?mlat=-20.3774&mlon=-43.4162'), { lat: -20.3774, lon: -43.4162 });
+  assert.deepEqual(extrairGeo('-20.3774, -43.4162'), { lat: -20.3774, lon: -43.4162 });
+  assert.equal(extrairGeo('Rua Direita, 120'), null);
+  assert.equal(extrairGeo('q=99.123,10.123'), null);
+});
+
+test('planos: taxa por chamado e qual compensa no mês', () => {
+  assert.equal(taxaChamado('avulso', 0), 1.99);
+  assert.equal(taxaChamado('loja', 149), 0);
+  assert.equal(taxaChamado('loja', 150), 0.79);
+  assert.equal(taxaChamado('pro', 9999), 0);
+  assert.equal(taxaChamado('inventado', 0), 1.99);
+  assert.deepEqual(custoPlanos(40), { avulso: 79.6, loja: 89, pro: 179 });
+  assert.deepEqual(custoPlanos(300), { avulso: 597, loja: 207.5, pro: 179 });
+});
+
+import { kmCorrida } from '../js/regras.js';
+test('km da corrida prefere o medido pelo GPS', () => {
+  assert.equal(kmCorrida({ km: 3, kmReal: 3.8 }), 3.8);
+  assert.equal(kmCorrida({ km: 3, kmReal: 0 }), 3);
+  assert.equal(resumoDia([{ motoboy: 'J', status: 'entregue', valor: 8, espera: 0, gorjeta: 0, km: 3, kmReal: 4, entregueEm: Date.now() }], { consumo: 40, gasolina: 6 }).km, 4);
 });

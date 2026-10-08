@@ -1,7 +1,9 @@
 // Telas e ações do Marca aí.
 import { TABELA, LIMITES, ATIVOS, TAGS_BOAS, TAGS_RUINS, podeIr, frete, taxaEspera, ganho, quandoGanhou, mesmoDia,
-  custoKm, resumoDia, saldo, reputacao, novoCodigo, novoId, r2, ticketMedio, mensagemCliente, resumoMes, informeMes, faixasHorario } from './regras.js';
-import { limparPerfil, limparEmpresa, texto, numero } from './esquema.js';
+  custoKm, resumoDia, saldo, reputacao, novoCodigo, novoId, r2, ticketMedio, mensagemCliente, resumoMes, informeMes, faixasHorario,
+  distanciaKm, kmEstimado, etaMin, extrairGeo, RAIO_CHEGADA_M, PLANOS, taxaChamado, custoPlanos, kmCorrida } from './regras.js';
+import { ligarGps, desligarGps, estadoGps, aoMudarGps, pegarPosicao, urlMapaReal } from './gps.js';
+import { limparPerfil, limparEmpresa, texto, numero, geo } from './esquema.js';
 import { S, transacao, aoMudar, sessao } from './store.js';
 import { esc, brl, km, mmss, hora, dia, ic, fone, mapsUrl, wazeUrl, html, toast, anunciar, dialogo, fecharDialogo, confirmar, bipe, urlScript } from './ui.js';
 
@@ -21,7 +23,16 @@ const aAvaliar = () => S().calls.find(c => c.motoboy && c.status === 'entregue' 
 // Chamados abertos que o motoboy ainda não recusou, do mais antigo pro mais novo.
 // Como no "Rotas disponíveis" do iFood, ele pode escolher qual quer ver primeiro.
 let escolhida = null;
-const ofertasAbertas = () => S().calls.filter(c => c.status === 'aberto' && !S().recusados.includes(c.id)).sort((a, b) => a.criadoEm - b.criadoEm);
+// Chamado com prioridade pros favoritos da loja só aparece pros outros depois que a janela acaba.
+const visivelPraMim = c => !c.preferidos.length || c.preferidos.includes(S().profile.nome) || !c.prioridadeAte || c.prioridadeAte <= Date.now();
+const ofertasAbertas = () => S().calls.filter(c => c.status === 'aberto' && !S().recusados.includes(c.id) && visivelPraMim(c)).sort((a, b) => a.criadoEm - b.criadoEm);
+// Posição do motoboy só vale se for recente (2 min).
+const posicaoAtual = () => (S().posicao && Date.now() - S().posicao.em < 120000 ? S().posicao : null);
+const coordTxt = g => `${g.lat.toFixed(6)},${g.lon.toFixed(6)}`;
+const hojeTxt = () => new Date().toLocaleDateString('sv');
+const CHECKLIST = ['Pneus calibrados', 'Freio da frente e de trás', 'Farol, lanterna e seta', 'Capacete e viseira', 'Celular carregado e suporte firme'];
+const feitosNoMes = () => resumoMes(S().calls, S().empresa.nome).total;
+const taxaAgora = () => taxaChamado(S().empresa.plano, feitosNoMes());
 const ofertaAtual = () => { const l = ofertasAbertas(); return l.find(c => c.id === escolhida) || l[0]; };
 
 // Mapa ilustrativo (SVG gerado pelo id do chamado, sem serviço externo).
@@ -162,6 +173,10 @@ function formEmpresa(titulo, texto, rotulo) {
     ${campo('nome', 'Nome da empresa', S().empresa.nome, 'text', `maxlength="${LIMITES.nome}" required autocomplete="organization"`)}
     ${campo('endereco', 'Endereço de retirada', S().empresa.endereco, 'text', `maxlength="${LIMITES.endereco}" autocomplete="street-address"`)}
     ${campo('tel', 'Telefone (o motoboy liga se precisar)', S().empresa.tel, 'tel', `inputmode="tel" maxlength="${LIMITES.tel}" autocomplete="tel"`)}
+    <div class="campo"><span>Localização da loja no GPS</span>
+      <button type="button" class="btn btn-fantasma btn-sm" data-act="geoLoja">${ic('nav')}${S().empresa.geo ? 'Atualizar com minha localização' : 'Usar minha localização (estou na loja)'}</button>
+      <small class="mudo dica" data-geo-loja>${S().empresa.geo ? 'Salva. O motoboy recebe a rota exata e o GPS registra a chegada dele.' : 'Recomendado: com ela o app calcula a distância sozinho e confirma a chegada do motoboy.'}</small>
+    </div>
     <p class="erro" data-erro role="alert"></p>
     <button class="btn btn-sinal" type="submit">${rotulo}</button>
   </form>`;
@@ -199,7 +214,9 @@ const VIEWS = {
         ${campo('contato', 'WhatsApp de um contato de emergência', p.contato, 'tel', `placeholder="(31) 99999-9999" inputmode="tel" maxlength="${LIMITES.tel}" autocomplete="off"`)}
         <p class="erro" data-erro role="alert"></p>
         <button class="btn btn-sinal" type="submit">Salvar dados</button>
-      </form>`;
+      </form>
+      ${p.nome ? `<section class="bloco"><h2>Divulgue seu trabalho</h2><p class="sub mb14">Mande seu cartão pras lojas do bairro: nome, moto, placa e quantas entregas você já fez.</p>
+        <button class="btn btn-azul" data-act="cartao">${ic('balao')}Compartilhar meu cartão</button></section>` : ''}`;
     }
   },
   empresa: {
@@ -220,12 +237,17 @@ const VIEWS = {
             <button type="button" class="btn btn-fantasma btn-sm" data-act="km" data-d="0.5" aria-label="Aumentar meio quilômetro">+</button>
           </div>
         </div>
+        ${campo('localCliente', 'Localização do cliente (opcional)', rs.localCliente || '', 'text', `placeholder="Cole o link da localização que ele mandou…" maxlength="300" autocomplete="off" spellcheck="false" aria-describedby="geo-cli"`)}
+        <small id="geo-cli" class="mudo dica" data-geo-cliente>Com o link, o app calcula a distância e o motoboy vai direto no ponto certo.</small>
         <div class="grade2">
           ${campo('cliente', 'Cliente', rs.cliente || '', 'text', `placeholder="Ex.: Ana" maxlength="${LIMITES.nome}" autocomplete="off"`)}
           ${campo('telCliente', 'WhatsApp do cliente', rs.telCliente || '', 'tel', `placeholder="(31) 9…" inputmode="tel" maxlength="${LIMITES.tel}" autocomplete="off"`)}
         </div>
         <label class="campo"><span>Observação pro motoboy</span><textarea class="inp" name="obs" maxlength="${LIMITES.obs}" placeholder="Ex.: pedido grande, levar bag térmica, troco pra R$ 50…">${esc(rs.obs || '')}</textarea></label>
         <label class="check"><input type="checkbox" name="chuva"> Está chovendo (+${brl(TABELA.chuva)} pro motoboy)</label>
+        ${S().empresa.favoritos.length ? (PLANOS[S().empresa.plano].favoritos
+          ? `<label class="check"><input type="checkbox" name="soFavoritos" checked> Oferecer primeiro ${S().empresa.favoritos.length === 1 ? 'ao meu motoboy favorito' : `aos meus ${S().empresa.favoritos.length} motoboys favoritos`} (30 segundos)</label>`
+          : `<p class="aviso">Chamar primeiro os seus motoboys favoritos é dos planos Loja e Pro. <button type="button" class="link" data-act="aba" data-aba="loja">Ver planos</button></p>`) : ''}
         <div data-live="em-preco"></div>
         <p class="erro" data-erro role="alert"></p>
         <button class="btn btn-sinal" type="submit" data-cta>Chamar motoboy</button>
@@ -240,9 +262,10 @@ const VIEWS = {
         <div class="linha"><span>Chuva</span><b>+${brl(TABELA.chuva)}</b></div>
         <div class="linha"><span>Espera acima de ${TABELA.esperaGratisMin} min</span><b>${brl(TABELA.esperaPorMin)}/min</b></div>
         <div class="linha"><span>Cancelar depois do aceite</span><b>${brl(TABELA.deslocamentoCancelado)}</b></div>
-        <div class="linha"><span>Taxa do app por chamado</span><b>${brl(TABELA.taxaPlataforma)}</b></div>
+        <div class="linha"><span>Taxa do app (plano ${PLANOS[S().empresa.plano].nome})</span><b>${taxaAgora() ? brl(taxaAgora()) + ' por chamado' : 'incluída no plano'}</b></div>
         <p class="sub mt8">O frete vai inteiro pro motoboy. Deixar o pedido pronto antes de chamar evita taxa de espera e melhora sua nota com os motoboys.</p>
-      </section>`
+      </section>
+      <div data-live="em-planos"></div>`
   }
 };
 
@@ -260,7 +283,12 @@ const LIVE = {
         ? `<b>Em pausa</b><small>Volta em <span class="num" data-ate="${s.pausaAte}">--:--</span>. Água, alongamento, respira.</small>`
         : s.online
           ? `<b>Online</b><small>Recebendo chamados há <span class="num" data-desde="${s.onlineDesde}">--:--</span></small>`
-          : `<b>Offline</b><small>Liga a chave pra receber chamados</small>`}</div></div>`);
+          : `<b>Offline</b><small>Liga a chave pra receber chamados</small>`}
+        ${s.online ? (() => {
+          const g = estadoGps(), pos = posicaoAtual();
+          const t = { ligado: `GPS ligado${pos ? `, precisão de ${pos.precisao} m` : ''}`, pedindo: 'Ligando o GPS…', negado: 'GPS bloqueado. Libere a localização pro app no navegador.', 'sem-gps': 'GPS indisponível agora.', desligado: 'GPS desligado.' }[g];
+          return `<small class="gps gps-${g}">${t}</small>`;
+        })() : ''}</div></div>`);
   },
   'mb-meta': el => {
     // Durante oferta ou corrida, a tela é só dela: a meta volta quando o motoboy estiver livre.
@@ -344,26 +372,46 @@ const LIVE = {
   },
   'mb-apoio': el => {
     const s = S(), p = s.profile;
-    const rodado = r2(s.calls.filter(c => c.motoboy && c.status === 'entregue' && (c.entregueEm || 0) > p.oleoDesde).reduce((a, c) => a + c.km, 0));
+    const rodado = r2(s.calls.filter(c => c.motoboy && c.status === 'entregue' && (c.entregueEm || 0) > p.oleoDesde).reduce((a, c) => a + kmCorrida(c), 0));
+    const feitos = s.checklist.dia === hojeTxt() ? s.checklist.itens : [];
     const pct = Math.min(100, rodado / p.oleoCada * 100), falta = Math.max(0, p.oleoCada - rodado);
     const tempo = s.online && s.onlineDesde ? (Date.now() - s.onlineDesde) / 60000 : 0;
     html(el, `${tempo >= 120 ? `<div class="aviso">Você está online há ${Math.floor(tempo / 60)}h${String(Math.floor(tempo % 60)).padStart(2, '0')}. Uma pausa de 15 min reduz o cansaço no trânsito. <button class="link" data-act="pausa">Pausar agora</button></div>` : ''}
       <section class="bloco meta"><h2>Manutenção da moto</h2>
         <div class="topo"><span>Óleo: <b class="num">${km(rodado)} km</b> rodados</span><small class="mudo">troca a cada ${km(p.oleoCada)} km</small></div>
         <div class="barra"><i data-w="${pct}" class="${pct >= 90 ? 'alerta' : ''}"></i></div>
-        <p class="sub mt8">${falta > 0 ? `Faltam ${km(falta)} km pra próxima troca.` : 'Passou da hora de trocar o óleo.'} Conta só os km das entregas feitas no app.</p>
+        <p class="sub mt8">${falta > 0 ? `Faltam ${km(falta)} km pra próxima troca.` : 'Passou da hora de trocar o óleo.'} Conta os km das entregas feitas no app (medidos pelo GPS quando ele está ligado).</p>
         <button class="btn btn-fantasma btn-sm mt10" data-act="oleo">Troquei o óleo hoje</button>
+      </section>
+      <section class="bloco"><h2>Antes de sair: ${feitos.length} de ${CHECKLIST.length}</h2>
+        <div class="chips" role="group" aria-label="Checklist da moto">${CHECKLIST.map((t, i) => `<button type="button" data-act="checar" data-i="${i}" aria-pressed="${feitos.includes(i)}">${esc(t)}</button>`).join('')}</div>
+        <p class="sub">${feitos.length === CHECKLIST.length ? 'Tudo conferido. Boa rodada!' : 'Dois minutos de conferência evitam a maioria das quedas e multas. Zera todo dia.'}</p>
       </section>`);
   },
   'em-preco': el => {
     const f = $('[data-form="chamado"]'); if (!f) return;
-    const v = frete(numero(f.km.value, LIMITES.kmMin, LIMITES.kmMax, 0), f.chuva.checked);
+    const v = frete(numero(f.km.value, LIMITES.kmMin, LIMITES.kmMax, 0), f.chuva.checked), taxa = taxaAgora();
     html(el, `<div class="preco">
       <div class="linha"><span>Frete (vai inteiro pro motoboy)</span><b>${brl(v)}</b></div>
-      <div class="linha"><span>Taxa do app</span><b>${brl(TABELA.taxaPlataforma)}</b></div>
-      <div class="total"><span>Você paga</span><b>${brl(v + TABELA.taxaPlataforma)}</b></div>
+      <div class="linha"><span>Taxa do app (plano ${PLANOS[S().empresa.plano].nome})</span><b>${taxa ? brl(taxa) : 'incluída'}</b></div>
+      <div class="total"><span>Você paga</span><b>${brl(v + taxa)}</b></div>
     </div>`);
-    const cta = $('[data-cta]'); if (cta) cta.textContent = `Chamar motoboy por ${brl(v + TABELA.taxaPlataforma)}`;
+    const cta = $('[data-cta]'); if (cta) cta.textContent = `Chamar motoboy por ${brl(v + taxa)}`;
+  },
+  'em-planos': el => {
+    const atual = S().empresa.plano, n = feitosNoMes(), custos = custoPlanos(Math.max(n, 1));
+    const melhor = Object.entries(custos).sort((a, b) => a[1] - b[1])[0][0];
+    html(el, `<section class="bloco"><h2>Planos</h2>
+      <p class="sub mb14">Quem paga o app é a empresa. O motoboy não paga nada e fica com 100% do frete.</p>
+      ${Object.entries(PLANOS).map(([k, p]) => `<article class="plano ${k === atual ? 'atual' : ''}">
+        <div class="plano-cab"><b>${p.nome}</b>${k === atual ? '<span class="pill entregue">Seu plano</span>' : ''}</div>
+        <div class="plano-preco"><b class="num">${p.mensal ? brl(p.mensal) : brl(p.taxa)}</b><small>${p.mensal ? 'por mês' : 'por chamado'}</small></div>
+        <p class="sub">${p.resumo}</p>
+        ${k === atual ? '' : `<button class="btn btn-sm ${k === 'loja' ? 'btn-sinal' : 'btn-fantasma'} mt10" data-act="plano" data-p="${k}">Mudar pro ${p.nome}</button>`}
+      </article>`).join('')}
+      <div class="aviso">Este mês você fez <b>${n}</b> ${n === 1 ? 'chamado' : 'chamados'}. Nesse ritmo: Avulso ${brl(custos.avulso)}, Loja ${brl(custos.loja)}, Pro ${brl(custos.pro)}. O que sai mais barato pra você: <b>${PLANOS[melhor].nome}</b>.</div>
+      <p class="sub">Por enquanto a escolha do plano só muda os valores mostrados. A cobrança entra quando o app tiver pagamento online.</p>
+    </section>`);
   },
   'em-rep': el => {
     const nome = S().empresa.nome;
@@ -388,10 +436,12 @@ const LIVE = {
         <div class="cab"><b>${esc(c.cliente || 'Entrega')}, ${hora(c.criadoEm)}</b><span class="pill ${cls}">${rot}</span></div>
         <div class="mudo pq">${esc(c.entrega)} (${km(c.km)} km)</div>
         ${c.motoboy ? `<div class="mt6">Motoboy: <b>${esc(c.motoboy)}</b>${c.moto ? `, ${esc(c.moto)}` : ''}${c.placa ? `, placa ${esc(c.placa)}` : ''}</div>` : ''}
-        ${c.status === 'coleta' ? `<div class="aviso">Esperando há <b class="num" data-desde="${c.chegouEm}">--:--</b>. Depois de ${TABELA.esperaGratisMin} min, a espera custa ${brl(TABELA.esperaPorMin)}/min.</div>` : ''}
+        ${rastreio(c)}
+        ${c.status === 'coleta' ? `<div class="aviso">${c.chegadaGps ? 'Chegada confirmada pelo GPS. ' : ''}Esperando há <b class="num" data-desde="${c.chegouEm}">--:--</b>. Depois de ${TABELA.esperaGratisMin} min, a espera custa ${brl(TABELA.esperaPorMin)}/min.</div>` : ''}
         ${emAndamento ? `<div class="mt8"><small class="mudo">Código de entrega (passe só pro cliente)</small><div class="codigo">${c.codigo}</div></div>
           <a class="btn btn-ok btn-sm mt10" href="${esc(linkCliente(c))}" target="_blank" rel="noopener noreferrer">${ic('balao')}Avisar cliente no WhatsApp</a>` : ''}
-        ${c.status === 'entregue' ? `<div class="mudo pq mt6">Frete ${brl(c.valor)}${c.espera ? ` + espera ${brl(c.espera)}` : ''}${c.gorjeta ? ` + gorjeta ${brl(c.gorjeta)}` : ''}</div>
+        ${c.status === 'entregue' ? `<div class="mudo pq mt6">Frete ${brl(c.valor)}${c.espera ? ` + espera ${brl(c.espera)}` : ''}${c.gorjeta ? ` + gorjeta ${brl(c.gorjeta)}` : ''}${c.kmReal ? `. Rodou ${km(c.kmReal)} km (GPS)` : ''}</div>
+          ${c.motoboy ? (() => { const fav = S().empresa.favoritos.includes(c.motoboy); return `<button class="btn btn-sm ${fav ? 'btn-sinal' : 'btn-fantasma'} mt10" data-act="favoritar" data-nome="${esc(c.motoboy)}" aria-pressed="${fav}">${ic('estrela')}${fav ? `${esc(c.motoboy)} é seu favorito` : `Favoritar ${esc(c.motoboy)}`}</button>`; })() : ''}
           ${c.gorjeta ? '' : `<div class="acoes acoes3">${LIMITES.gorjetas.map(v => `<button class="btn btn-fantasma btn-sm" data-act="gorjeta" data-id="${esc(c.id)}" data-v="${v}">+${brl(v)}</button>`).join('')}</div><small class="mudo">Mandar gorjeta pro motoboy</small>`}` : ''}
         ${c.status === 'cancelado' && c.compensacao ? `<div class="mudo pq mt6">Deslocamento pago ao motoboy: ${brl(c.compensacao)}</div>` : ''}
         ${!emAndamento ? `<button class="btn btn-fantasma btn-sm mt10" data-act="repetir" data-id="${esc(c.id)}">${ic('repetir')}Chamar de novo</button>` : ''}
@@ -400,6 +450,16 @@ const LIVE = {
     }).join(''));
   }
 };
+
+// Onde está o motoboy agora, visto pela empresa (nesta versão, entre abas do mesmo aparelho).
+function rastreio(c) {
+  const pos = posicaoAtual();
+  if (!pos || !['aceito', 'coletado'].includes(c.status)) return '';
+  const alvo = c.status === 'aceito' ? c.lojaGeo : c.clienteGeo;
+  if (!alvo) return `<div class="rastreio">${ic('nav')}<span>${esc(c.motoboy)} está com o GPS ligado. Salve a localização ${c.status === 'aceito' ? 'da loja' : 'do cliente'} pra ver a distância.</span></div>`;
+  const d = kmEstimado(pos, alvo);
+  return `<div class="rastreio">${ic('nav')}<span><b>${esc(c.motoboy)}</b> está a ${km(d)} km ${c.status === 'aceito' ? 'da loja' : 'do cliente'}, chega em ${etaMin(d) === 1 ? '1 minuto' : `uns ${etaMin(d)} min`}.</span></div>`;
+}
 
 function telaOferta(c) {
   const r = reputacao(S().calls, c.empresa);
@@ -417,12 +477,13 @@ function telaOferta(c) {
     <div class="bloco mt14">
       ${mapa(c, 'oferta')}
       <ul class="rota">
-        <li><b>${esc(c.empresa)}</b><small>${esc(c.coleta)}</small></li>
-        <li><b>${esc(c.entrega)}</b><small>${km(c.km)} km da loja até o cliente</small></li>
+        <li><b>${esc(c.empresa)}</b><small>${esc(c.coleta)}${posicaoAtual() && c.lojaGeo ? `. Você está a ${km(kmEstimado(posicaoAtual(), c.lojaGeo))} km, uns ${etaMin(kmEstimado(posicaoAtual(), c.lojaGeo))} min` : ''}</small></li>
+        <li><b>${esc(c.entrega)}</b><small>${km(c.km)} km da loja até o cliente${c.clienteGeo ? ', ponto exato no mapa' : ''}</small></li>
       </ul>
       <div class="rep">
         ${r ? `<span class="tag ${r.nota >= 4 ? 'boa' : r.nota < 3 ? 'ruim' : ''}">★ ${r.nota.toFixed(1).replace('.', ',')} pelos motoboys</span>${r.espera != null ? `<span class="tag ${r.espera > TABELA.esperaGratisMin ? 'ruim' : 'boa'}">espera média ${Math.round(r.espera)} min</span>` : ''}` : '<span class="tag">Empresa ainda sem avaliação</span>'}
         ${c.chuva ? `<span class="tag info">+${brl(TABELA.chuva)} de chuva incluso</span>` : ''}
+        ${c.preferidos.includes(S().profile.nome) ? '<span class="tag boa">Esta loja te favoritou</span>' : ''}
       </div>
       ${c.obs ? `<div class="aviso">${esc(c.obs)}</div>` : ''}
       <div class="contagem"><i data-oferta data-w="${resta / (TABELA.tempoOferta * 10)}"></i></div>
@@ -447,6 +508,9 @@ function telaCorrida(c) {
   const tel = fone(c.tel);
   const titulo = { aceito: 'Vai até a loja', coleta: 'Esperando o pedido', coletado: 'Leva até o cliente' }[c.status];
   const etapas = ['Indo à loja', 'Na loja', 'Entregando', 'Entregue'];
+  const alvoGeo = naLoja ? c.lojaGeo : c.clienteGeo, pos = posicaoAtual();
+  const destinoNav = alvoGeo ? coordTxt(alvoGeo) : alvo;
+  const falta = pos && alvoGeo && c.status !== 'coleta' ? kmEstimado(pos, alvoGeo) : null;
   return `<ol class="passos" aria-label="Etapa ${passo + 1} de 4: ${etapas[passo]}">${etapas.map((n, i) =>
       `<li class="${i < passo ? 'feito' : i === passo ? 'agora' : ''}" ${i === passo ? 'aria-current="step"' : ''}>${n}</li>`).join('')}</ol>
     ${mapa(c, { aceito: 'loja', coleta: 'naloja', coletado: 'cliente' }[c.status])}
@@ -454,18 +518,22 @@ function telaCorrida(c) {
       <h2 class="sub">${titulo}</h2>
       <p class="destino">${esc(naLoja ? c.empresa : (c.cliente || 'Cliente'))}</p>
       <p class="mudo">${esc(alvo)}</p>
+      ${falta != null ? `<div class="rastreio">${ic('nav')}<span>Faltam uns <b>${km(falta)} km</b>, ${etaMin(falta) === 1 ? '1 minuto' : `${etaMin(falta)} min`}.</span></div>` : ''}
+      ${c.status === 'aceito' && c.lojaGeo ? '<p class="sub mt6">Quando você chegar perto da loja, o GPS registra a chegada sozinho e a espera começa a contar.</p>' : ''}
+      ${c.status === 'coleta' && c.chegadaGps ? `<span class="tag boa mt6">Chegada registrada pelo GPS às ${hora(c.chegouEm)}</span>` : ''}
       ${c.status === 'coleta' ? `<div class="espera-box"><div class="relogio" data-desde="${c.chegouEm}" role="timer" aria-label="Tempo de espera">--:--</div>
         <p class="sub" data-espera="${esc(c.id)}"></p></div>` : ''}
       ${c.obs && c.status !== 'coleta' ? `<div class="aviso">${esc(c.obs)}</div>` : ''}
       <div class="acoes">
-        <a class="btn btn-azul btn-sm" href="${esc(mapsUrl(alvo))}" target="_blank" rel="noopener noreferrer">${ic('nav')}Google Maps</a>
-        <a class="btn btn-azul btn-sm" href="${esc(wazeUrl(alvo))}" target="_blank" rel="noopener noreferrer">${ic('nav')}Waze</a>
+        <a class="btn btn-azul btn-sm" href="${esc(mapsUrl(destinoNav))}" target="_blank" rel="noopener noreferrer">${ic('nav')}Google Maps</a>
+        <a class="btn btn-azul btn-sm" href="${esc(wazeUrl(destinoNav))}" target="_blank" rel="noopener noreferrer">${ic('nav')}Waze</a>
       </div>
+      ${alvoGeo ? `<button class="btn btn-fantasma btn-sm mt10" data-act="mapaReal" data-id="${esc(c.id)}">${ic('mapa')}Ver no mapa de verdade</button>` : ''}
       ${tel ? `<div class="acoes"><a class="btn btn-fantasma btn-sm" href="tel:+${tel}">${ic('fone')}Ligar pra loja</a><a class="btn btn-fantasma btn-sm" href="https://wa.me/${tel}" target="_blank" rel="noopener noreferrer">${ic('balao')}WhatsApp</a></div>` : ''}
     </section>
     <div class="grade2 mb12">
       <div class="mini"><b>${brl(c.valor)}</b><small>frete garantido</small></div>
-      <div class="mini"><b>${km(c.km)} km</b><small>até o cliente</small></div>
+      <div class="mini"><b>${c.kmReal ? km(c.kmReal) : km(c.km)} km</b><small>${c.kmReal ? 'rodados nesta corrida (GPS)' : 'até o cliente'}</small></div>
     </div>
     <div class="cta-fixa">
     ${c.status === 'aceito' ? `<button class="btn btn-sinal" data-act="cheguei" data-id="${esc(c.id)}">${ic('loja')}Cheguei na loja</button>` : ''}
@@ -498,7 +566,31 @@ function telaAvaliar(c) {
   </section>`;
 }
 
+/* ============ GPS ============ */
+function aoPontoGps(ponto, andou) {
+  // Não redesenha a tela no meio de um arraste do deslizador; a próxima leitura grava.
+  if (arrasto) return;
+  let chegou = '';
+  mudar(s => {
+    s.posicao = ponto;
+    const c = s.calls.find(x => x.motoboy && ATIVOS.includes(x.status));
+    if (!c) return;
+    if (andou) c.kmReal = r2(c.kmReal + andou);
+    // Chegada automática: dentro do raio da loja, a espera começa a contar sozinha (prova pro motoboy).
+    if (c.status === 'aceito' && c.lojaGeo && distanciaKm(ponto, c.lojaGeo) * 1000 <= RAIO_CHEGADA_M) {
+      c.status = 'coleta'; c.chegouEm = Date.now(); c.chegadaGps = true; chegou = c.empresa;
+    }
+  });
+  if (chegou) { vibrar([60, 40, 60]); toast(`Chegada na ${chegou} registrada pelo GPS. A espera começou a contar.`); }
+}
+function sincronizarGps() {
+  if (papel === 'moto' && S().online) ligarGps(aoPontoGps);
+  else if (estadoGps() !== 'desligado') desligarGps();
+}
+aoMudarGps(() => document.querySelectorAll('[data-live="mb-status"]').forEach(el => LIVE['mb-status'](el)));
+
 function refresh() {
+  sincronizarGps();
   document.querySelectorAll('[data-live]').forEach(el => LIVE[el.dataset.live]?.(el));
   const b = document.querySelector('[data-badge="corridas"]');
   if (b) b.className = aba !== 'corridas' && (corridaAtiva() || (S().online && ofertaAtual())) ? 'dot' : '';
@@ -528,6 +620,7 @@ function tick() {
       mudar(s => { s.recusados.push(id); });
     }
   }
+  if (papel === 'moto' && !oferta.id && S().online && !emPausa() && !corridaAtiva() && !aAvaliar() && ofertaAtual()) refresh();
   if (S().pausaAte && S().pausaAte <= agora) {
     mudar(s => { s.pausaAte = null; });
     if (papel === 'moto') toast('Pausa encerrada. Você está online de novo.');
@@ -597,7 +690,7 @@ const ACTS = {
   },
   repetir: el => {
     const c = S().calls.find(x => x.id === el.dataset.id); if (!c) return;
-    rascunho = { entrega: c.entrega, km: c.km, cliente: c.cliente, telCliente: c.telCliente, obs: c.obs };
+    rascunho = { entrega: c.entrega, km: c.km, cliente: c.cliente, telCliente: c.telCliente, obs: c.obs, localCliente: c.clienteGeo ? `${c.clienteGeo.lat},${c.clienteGeo.lon}` : '' };
     irAba('novo');
     toast('Dados da entrega copiados. Confira e chame o motoboy.');
   },
@@ -623,13 +716,66 @@ const ACTS = {
   online: () => {
     if (!S().profile.nome) { toast('Preencha seu nome no Perfil antes de ficar online.'); irAba('perfil'); return; }
     const ligar = !S().online;
-    mudar(s => { s.online = ligar; s.onlineDesde = ligar ? Date.now() : null; s.pausaAte = null; if (ligar) s.recusados = []; });
-    toast(ligar ? 'Você está online.' : 'Você está offline. Bom descanso.');
+    // Offline apaga a última posição: o app não guarda onde o motoboy está quando ele não está trabalhando.
+    mudar(s => { s.online = ligar; s.onlineDesde = ligar ? Date.now() : null; s.pausaAte = null; if (ligar) s.recusados = []; else s.posicao = null; });
+    toast(ligar ? 'Você está online. O GPS liga só enquanto você estiver online.' : 'Você está offline. GPS desligado. Bom descanso.');
   },
   pausa: () => {
     mudar(s => { s.pausaAte = Date.now() + 15 * 60000; });
     toast('Pausa de 15 min. Nenhum chamado vai tocar.');
     if (aba !== 'corridas') irAba('corridas');
+  },
+  geoLoja: async el => {
+    el.disabled = true;
+    const aviso = document.querySelector('[data-geo-loja]');
+    if (aviso) aviso.textContent = 'Pegando a localização…';
+    try {
+      const p = await pegarPosicao();
+      mudar(s => { s.empresa.geo = geo(p); });
+      const msg = p.precisao > 100 ? `Salva, mas com precisão de ${p.precisao} m. Se puder, tente de novo perto da porta.` : 'Salva. O motoboy recebe a rota exata e o GPS registra a chegada dele.';
+      if (aviso) aviso.textContent = msg;
+      toast('Localização da loja salva.');
+    } catch (e) {
+      if (aviso) aviso.textContent = e.message === 'negado' ? 'O navegador bloqueou a localização. Libere nas configurações do site e tente de novo.' : 'Não deu pra pegar a localização agora. Tente de novo em um lugar aberto.';
+    } finally { el.disabled = false; }
+  },
+  plano: el => {
+    const k = el.dataset.p;
+    if (!Object.hasOwn(PLANOS, k)) return;
+    mudar(s => { s.empresa.plano = k; });
+    toast(`Plano ${PLANOS[k].nome} escolhido.`);
+  },
+  favoritar: el => {
+    const nome = el.dataset.nome; let agora = false;
+    mudar(s => {
+      const f = s.empresa.favoritos;
+      agora = !f.includes(nome);
+      s.empresa.favoritos = agora ? [...f, nome] : f.filter(x => x !== nome);
+    });
+    toast(agora ? `${nome} agora é seu favorito. Seus chamados aparecem primeiro pra ele.` : `${nome} saiu dos favoritos.`);
+  },
+  checar: el => {
+    const i = +el.dataset.i;
+    mudar(s => {
+      const hoje = hojeTxt();
+      const itens = s.checklist.dia === hoje ? s.checklist.itens : [];
+      s.checklist = { dia: hoje, itens: itens.includes(i) ? itens.filter(x => x !== i) : [...itens, i] };
+    });
+  },
+  mapaReal: el => {
+    const c = S().calls.find(x => x.id === el.dataset.id); if (!c) return;
+    const alvo = c.status === 'coletado' ? c.clienteGeo : c.lojaGeo;
+    if (!alvo) return;
+    dialogo(`<h3 id="dlg-titulo">${c.status === 'coletado' ? 'Ponto de entrega' : 'Loja'} no mapa</h3>
+      <iframe class="mapa-real" title="Mapa do OpenStreetMap" src="${esc(urlMapaReal(alvo, posicaoAtual()))}" loading="lazy" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin"></iframe>
+      <p class="sub mt8">Mapa do OpenStreetMap. Pra seguir a rota com voz, use o Google Maps ou o Waze.</p>
+      <button class="btn btn-fantasma btn-sm mt10" data-act="fechar">Fechar</button>`);
+  },
+  cartao: () => {
+    const p = S().profile, n = S().calls.filter(c => c.motoboy && c.status === 'entregue').length;
+    const txt = `${p.nome}, motoboy no Marca aí.${p.moto ? ` Moto ${p.moto}` : ''}${p.placa ? `, placa ${p.placa}` : ''}.${n ? ` ${n} entregas feitas pelo app.` : ''} Precisa de entrega? Me chama pelo Marca aí: ${location.origin}${location.pathname}`;
+    if (navigator.share) navigator.share({ text: txt }).catch(() => {});
+    else location.href = `https://wa.me/?text=${encodeURIComponent(txt)}`;
   },
   maisTempo: () => { if (oferta.id) { oferta.ate += TABELA.maisTempoOferta * 1000; toast(`Mais ${TABELA.maisTempoOferta} segundos pra decidir.`); } },
   simular: () => {
@@ -787,7 +933,25 @@ document.addEventListener('click', e => {
 });
 
 /* ============ Formulários ============ */
-const atualizaPreco = e => { if (e.target.closest('[data-form="chamado"]')) LIVE['em-preco']($('[data-live="em-preco"]')); };
+function lerLocalCliente(f) {
+  const aviso = f.querySelector('[data-geo-cliente]');
+  const valor = f.localCliente.value.trim();
+  if (!valor) { aviso.textContent = 'Com o link, o app calcula a distância e o motoboy vai direto no ponto certo.'; return; }
+  const g = extrairGeo(valor);
+  if (!g) { aviso.textContent = 'Não achei a localização nesse link. Peça pro cliente mandar a localização pelo WhatsApp e cole aqui.'; return; }
+  const loja = S().empresa.geo;
+  if (!loja) { aviso.textContent = 'Localização do cliente lida. Salve a localização da loja na aba Empresa pra calcular a distância sozinho.'; return; }
+  const d = kmEstimado(loja, g);
+  if (d > LIMITES.kmMax) { aviso.textContent = `Esse ponto fica a ${km(d)} km da loja. Confira se o link está certo.`; return; }
+  f.km.value = String(d);
+  aviso.textContent = `Distância calculada pelo GPS: ${km(d)} km pelas ruas (estimativa).`;
+}
+const atualizaPreco = e => {
+  const f = e.target.closest('[data-form="chamado"]');
+  if (!f) return;
+  if (e.target.name === 'localCliente') lerLocalCliente(f);
+  LIVE['em-preco']($('[data-live="em-preco"]'));
+};
 document.addEventListener('input', atualizaPreco);
 document.addEventListener('change', atualizaPreco);
 
@@ -812,7 +976,7 @@ document.addEventListener('submit', e => {
     toast('Dados salvos.'); montar();
   }
   if (tipo === 'empresa') {
-    const emp = limparEmpresa(d);
+    const emp = limparEmpresa({ ...S().empresa, ...d });
     if (!emp.nome) return erroForm(f, 'Escreva o nome da empresa.', 'nome');
     mudar(s => { s.empresa = emp; });
     toast('Dados salvos.'); montar();
@@ -824,9 +988,13 @@ document.addEventListener('submit', e => {
     if (!coleta) return erroForm(f, 'Informe o endereço de retirada.', 'coleta');
     if (!entrega) return erroForm(f, 'Informe o endereço de entrega.', 'entrega');
     if (!(dist >= LIMITES.kmMin && dist <= LIMITES.kmMax)) return erroForm(f, `A distância precisa ficar entre ${km(LIMITES.kmMin)} e ${LIMITES.kmMax} km.`, 'km');
+    const clienteGeo = extrairGeo(d.localCliente);
+    const taxa = taxaAgora();
+    const favoritos = d.soFavoritos === 'on' && PLANOS[S().empresa.plano].favoritos ? S().empresa.favoritos : [];
     mudar(s => {
       s.calls.push({ id: novoId(), empresa: s.empresa.nome, coleta, tel: s.empresa.tel, entrega, cliente: d.cliente, telCliente: d.telCliente, km: r2(dist), obs: d.obs,
-        chuva: d.chuva === 'on', codigo: novoCodigo(), status: 'aberto', criadoEm: Date.now() });
+        chuva: d.chuva === 'on', codigo: novoCodigo(), status: 'aberto', criadoEm: Date.now(),
+        lojaGeo: s.empresa.geo, clienteGeo, taxa, preferidos: favoritos, prioridadeAte: favoritos.length ? Date.now() + 30000 : null });
     });
     toast('Chamado enviado. Avisando os motoboys online.');
     irAba('chamados');

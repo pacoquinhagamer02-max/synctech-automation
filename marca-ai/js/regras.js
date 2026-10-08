@@ -4,7 +4,7 @@
 export const TABELA = Object.freeze({
   base: 8, kmInclusos: 3, porKm: 2, chuva: 2,
   esperaGratisMin: 10, esperaPorMin: 0.5,
-  taxaPlataforma: 1.5, deslocamentoCancelado: 5,
+  taxaPlataforma: 1.99, deslocamentoCancelado: 5,
   tempoOferta: 30, maisTempoOferta: 30
 });
 
@@ -50,6 +50,9 @@ export function ganho(c) {
 }
 
 export const quandoGanhou = c => c.entregueEm || c.canceladoEm || c.criadoEm;
+
+/** Km da corrida: o medido pelo GPS quando existe, senão o informado pela empresa. */
+export const kmCorrida = c => (c.kmReal > 0 ? c.kmReal : c.km);
 export const mesmoDia = (a, b) => new Date(a).toDateString() === new Date(b).toDateString();
 
 export const custoKm = p => (+p.consumo > 0 ? (+p.gasolina || 0) / +p.consumo : 0);
@@ -58,7 +61,7 @@ export function resumoDia(calls, profile, dia = Date.now()) {
   const doDia = calls.filter(c => c.motoboy && ganho(c) > 0 && mesmoDia(quandoGanhou(c), dia));
   const entregues = doDia.filter(c => c.status === 'entregue');
   const bruto = r2(doDia.reduce((a, c) => a + ganho(c), 0));
-  const km = r2(entregues.reduce((a, c) => a + c.km, 0));
+  const km = r2(entregues.reduce((a, c) => a + kmCorrida(c), 0));
   return { n: entregues.length, bruto, km, comb: r2(km * custoKm(profile)) };
 }
 
@@ -126,7 +129,7 @@ export function resumoMes(calls, empresa, quando = new Date()) {
     return c.empresa === empresa && !c.teste && d.getMonth() === quando.getMonth() && d.getFullYear() === quando.getFullYear();
   });
   const entregues = doMes.filter(c => c.status === 'entregue');
-  const gasto = entregues.reduce((a, c) => a + ganho(c) + TABELA.taxaPlataforma, 0) + doMes.reduce((a, c) => a + (c.compensacao || 0), 0);
+  const gasto = entregues.reduce((a, c) => a + ganho(c) + (c.taxa ?? TABELA.taxaPlataforma), 0) + doMes.reduce((a, c) => a + (c.compensacao || 0), 0);
   const esperas = entregues.filter(c => c.chegouEm != null && c.coletouEm != null).map(c => (c.coletouEm - c.chegouEm) / 60000);
   return {
     total: doMes.length,
@@ -150,7 +153,7 @@ export function informeMes(calls, saques, profile, quando = new Date()) {
   const linhas = calls
     .filter(c => c.motoboy && ganho(c) > 0 && doMesmoMes(quandoGanhou(c), quando))
     .sort((a, b) => quandoGanhou(a) - quandoGanhou(b))
-    .map(c => ({ em: quandoGanhou(c), empresa: c.empresa, km: c.status === 'entregue' ? c.km : 0, valor: ganho(c), cancelada: c.status === 'cancelado' }));
+    .map(c => ({ em: quandoGanhou(c), empresa: c.empresa, km: c.status === 'entregue' ? kmCorrida(c) : 0, valor: ganho(c), cancelada: c.status === 'cancelado' }));
   const km = r2(linhas.reduce((a, l) => a + l.km, 0));
   const sacado = r2(saques.filter(s => doMesmoMes(s.em, quando)).reduce((a, s) => a + s.valor, 0));
   return {
@@ -181,4 +184,85 @@ export function faixasHorario(calls) {
     f.n += 1; f.total = r2(f.total + ganho(c));
   });
   return soma.filter(f => f.n).sort((a, b) => b.total - a.total);
+}
+
+/* ============ GPS e distância ============ */
+
+/**
+ * Distância em linha reta entre dois pontos (fórmula de Haversine), em km.
+ * @param {{lat: number, lon: number}} a
+ * @param {{lat: number, lon: number}} b
+ */
+export function distanciaKm(a, b) {
+  const R = 6371, rad = g => g * Math.PI / 180;
+  const dLat = rad(b.lat - a.lat), dLon = rad(b.lon - a.lon);
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(rad(a.lat)) * Math.cos(rad(b.lat)) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+
+// Rua não é linha reta: em cidade com ladeira e curva (Mariana), o caminho real fica ~35% maior.
+export const FATOR_RUA = 1.35;
+
+/** Km estimado pelas ruas entre loja e cliente, a partir das coordenadas. */
+export function kmEstimado(a, b) {
+  return Math.max(0.5, Math.round(distanciaKm(a, b) * FATOR_RUA * 10) / 10);
+}
+
+/** Minutos estimados de moto na cidade (média de 22 km/h com trânsito e ladeira). */
+export function etaMin(km, kmh = 22) {
+  return Math.max(1, Math.round(km / kmh * 60));
+}
+
+/** Raio (em metros) em que o motoboy é considerado "na loja" pelo GPS. */
+export const RAIO_CHEGADA_M = 120;
+
+/**
+ * Lê coordenadas de um link de localização (WhatsApp, Google Maps, Waze, OpenStreetMap)
+ * ou de um texto "lat, lon". Devolve null se não achar coordenada válida.
+ * @param {string} texto
+ * @returns {{lat: number, lon: number} | null}
+ */
+export function extrairGeo(texto) {
+  const t = String(texto || '');
+  const padroes = [
+    /[?&](?:q|query|ll|daddr|destination|center)=(-?\d{1,2}\.\d+)\s*(?:,|%2C)\s*(-?\d{1,3}\.\d+)/i,
+    /@(-?\d{1,2}\.\d+),(-?\d{1,3}\.\d+)/,
+    /[?&]mlat=(-?\d{1,2}\.\d+)&mlon=(-?\d{1,3}\.\d+)/i,
+    /(?:^|\s)(-?\d{1,2}\.\d{3,})\s*,\s*(-?\d{1,3}\.\d{3,})(?:\s|$)/
+  ];
+  for (const p of padroes) {
+    const m = t.match(p);
+    if (m) {
+      const lat = +m[1], lon = +m[2];
+      if (Math.abs(lat) <= 90 && Math.abs(lon) <= 180) return { lat, lon };
+    }
+  }
+  return null;
+}
+
+/* ============ Planos da empresa ============
+   Quem paga o app é a empresa. O motoboy nunca paga nada e fica com 100% do frete. */
+export const PLANOS = Object.freeze({
+  avulso: { nome: 'Avulso', mensal: 0, incluidos: 0, taxa: 1.99, extra: 1.99, favoritos: false, resumo: 'Sem mensalidade. Paga só quando chama.' },
+  loja: { nome: 'Loja', mensal: 89, incluidos: 150, taxa: 0, extra: 0.79, favoritos: true, resumo: '150 chamados no mês e motoboys favoritos. Depois de 150, R$ 0,79 cada.' },
+  pro: { nome: 'Pro', mensal: 179, incluidos: Infinity, taxa: 0, extra: 0, favoritos: true, resumo: 'Tudo do Loja, sem limite de chamados, com relatório do mês e suporte direto no WhatsApp.' }
+});
+
+/**
+ * Taxa do app pro próximo chamado, conforme o plano e quantos chamados a empresa já fez no mês.
+ * @param {keyof PLANOS} plano
+ * @param {number} feitosNoMes
+ */
+export function taxaChamado(plano, feitosNoMes) {
+  const p = PLANOS[plano] || PLANOS.avulso;
+  return feitosNoMes < p.incluidos ? p.taxa : p.extra;
+}
+
+/**
+ * Quanto a empresa pagaria ao app num mês com N chamados, em cada plano. Serve pra mostrar qual compensa.
+ * @param {number} n chamados no mês
+ */
+export function custoPlanos(n) {
+  return Object.fromEntries(Object.entries(PLANOS).map(([k, p]) =>
+    [k, r2(p.mensal + Math.max(0, n - p.incluidos) * p.extra + Math.min(n, p.incluidos === Infinity ? n : p.incluidos) * p.taxa)]));
 }

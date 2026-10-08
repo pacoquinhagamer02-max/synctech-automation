@@ -1,7 +1,7 @@
 // Validação de tudo que entra no app (armazenamento, outras abas, formulários).
 // Nada é confiado: tipos conferidos, textos cortados, números limitados e o valor
 // da corrida sempre recalculado pela tabela, nunca lido do dado salvo.
-import { LIMITES, STATUS, TABELA, TAGS_BOAS, TAGS_RUINS, frete } from './regras.js';
+import { LIMITES, STATUS, TABELA, TAGS_BOAS, TAGS_RUINS, PLANOS, frete } from './regras.js';
 
 const TAGS = new Set([...TAGS_BOAS, ...TAGS_RUINS]);
 
@@ -11,12 +11,16 @@ export const numero = (v, min, max, padrao) => {
   return Number.isFinite(n) ? Math.min(max, Math.max(min, n)) : padrao;
 };
 const instante = v => (Number.isFinite(v) && v > 0 ? v : null);
+// Coordenada só entra se for número dentro do globo; senão vira null.
+export const geo = g => (g && Number.isFinite(g.lat) && Number.isFinite(g.lon) && Math.abs(g.lat) <= 90 && Math.abs(g.lon) <= 180
+  ? { lat: Math.round(g.lat * 1e6) / 1e6, lon: Math.round(g.lon * 1e6) / 1e6 } : null);
+const nomes = (v, max) => (Array.isArray(v) ? [...new Set(v.map(x => texto(x, LIMITES.nome)).filter(Boolean))].slice(0, max) : []);
 
 export const PERFIL_PADRAO = Object.freeze({
   nome: '', moto: '', placa: '', pix: '', contato: '',
   consumo: 35, gasolina: 6.29, meta: 150, oleoCada: 1000, oleoDesde: 0
 });
-export const EMPRESA_PADRAO = Object.freeze({ nome: '', endereco: '', tel: '' });
+export const EMPRESA_PADRAO = Object.freeze({ nome: '', endereco: '', tel: '', geo: null, favoritos: [], plano: 'avulso' });
 
 export function limparPerfil(p = {}) {
   const d = PERFIL_PADRAO;
@@ -38,7 +42,10 @@ export function limparEmpresa(e = {}) {
   return {
     nome: texto(e.nome, LIMITES.nome),
     endereco: texto(e.endereco, LIMITES.endereco),
-    tel: texto(e.tel, LIMITES.tel).replace(/[^\d()+ -]/g, '')
+    tel: texto(e.tel, LIMITES.tel).replace(/[^\d()+ -]/g, ''),
+    geo: geo(e.geo),
+    favoritos: nomes(e.favoritos, 30),
+    plano: Object.hasOwn(PLANOS, e.plano) ? e.plano : 'avulso'
   };
 }
 
@@ -71,6 +78,12 @@ export function limparChamado(c) {
     nota: Math.round(numero(c.nota, 0, 5, 0)),
     tags: Array.isArray(c.tags) ? [...new Set(c.tags.filter(t => TAGS.has(t)))] : [],
     tentativas: Math.round(numero(c.tentativas, 0, 99, 0)),
+    kmReal: numero(c.kmReal, 0, 500, 0),
+    lojaGeo: geo(c.lojaGeo), clienteGeo: geo(c.clienteGeo),
+    chegadaGps: c.chegadaGps === true,
+    preferidos: nomes(c.preferidos, 30),
+    prioridadeAte: instante(c.prioridadeAte),
+    taxa: numero(c.taxa, 0, 10, TABELA.taxaPlataforma),
     bloqueadoAte: instante(c.bloqueadoAte)
   };
 }
@@ -88,6 +101,10 @@ export function limparEstado(d) {
     empresa: limparEmpresa(o.empresa),
     online: o.online === true,
     onlineDesde: instante(o.onlineDesde),
-    pausaAte: instante(o.pausaAte)
+    pausaAte: instante(o.pausaAte),
+    posicao: o.posicao && geo(o.posicao) ? { ...geo(o.posicao), precisao: Math.round(numero(o.posicao.precisao, 0, 5000, 0)), em: instante(o.posicao.em) || 0 } : null,
+    checklist: o.checklist && typeof o.checklist.dia === 'string'
+      ? { dia: texto(o.checklist.dia, 10), itens: Array.isArray(o.checklist.itens) ? o.checklist.itens.filter(i => Number.isInteger(i) && i >= 0 && i < 10).slice(0, 10) : [] }
+      : { dia: '', itens: [] }
   };
 }

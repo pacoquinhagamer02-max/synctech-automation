@@ -327,6 +327,26 @@ main h1.vh:focus{outline:none}
 .pular:focus{top:10px}
 
 
+/* ============ GPS, rastreio, planos ============ */
+.gps{display:flex;align-items:center;gap:6px;margin-top:2px}
+.gps::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--mudo)}
+.gps-ligado::before{background:var(--verde);box-shadow:0 0 0 3px rgba(47,191,113,.25)}
+.gps-pedindo::before{background:var(--sinal)}
+.gps-negado,.gps-sem-gps{color:var(--erro-texto)}
+.gps-negado::before,.gps-sem-gps::before{background:var(--freio)}
+.rastreio{display:flex;gap:10px;align-items:flex-start;background:rgba(30,79,163,.18);border-radius:12px;padding:10px 12px;margin:10px 0;font-size:15px}
+.rastreio svg{width:20px;height:20px;flex:none;color:var(--info-texto);margin-top:2px}
+.dica{display:block;font-size:13px;margin:-6px 0 14px}
+.campo .btn + .dica{margin-top:8px}
+.tag.mt6{display:inline-block}
+.mapa-real{display:block;width:100%;height:340px;border:0;border-radius:var(--r-m);background:var(--asfalto3);margin-top:8px}
+.plano{background:var(--asfalto3);border-radius:var(--r-m);padding:14px;margin-bottom:10px;box-shadow:0 4px 0 var(--fantasma-borda);border:2px solid transparent}
+.plano.atual{border-color:var(--sinal);box-shadow:0 4px 0 var(--sinal-borda)}
+.plano-cab{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:18px}
+.plano-preco{display:flex;align-items:baseline;gap:8px;margin:4px 0 2px}
+.plano-preco b{font-family:"Saira Condensed";font-size:34px;color:var(--sinal-texto)}
+.plano-preco small{color:var(--mudo)}
+
 /* ============ Botão de tema, informe e horários ============ */
 .top .acoes-topo{display:flex;align-items:center;gap:10px}
 .tema{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:var(--asfalto3);color:var(--sinal-texto);box-shadow:0 3px 0 var(--fantasma-borda)}
