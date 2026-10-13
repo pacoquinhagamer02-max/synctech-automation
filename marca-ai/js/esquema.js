@@ -1,7 +1,7 @@
 // Validação de tudo que entra no app (armazenamento, outras abas, formulários).
 // Nada é confiado: tipos conferidos, textos cortados, números limitados e o valor
 // da corrida sempre recalculado pela tabela, nunca lido do dado salvo.
-import { LIMITES, STATUS, TABELA, TAGS_BOAS, TAGS_RUINS, PLANOS, frete } from './regras.js';
+import { LIMITES, STATUS, TABELA, TAGS_BOAS, TAGS_RUINS, PLANOS, RAIOS_MOTOBOY, RAIOS_BUSCA, RAIO_MOTOBOY_PADRAO, RAIO_BUSCA_PADRAO, frete } from './regras.js';
 
 const TAGS = new Set([...TAGS_BOAS, ...TAGS_RUINS]);
 
@@ -18,9 +18,9 @@ const nomes = (v, max) => (Array.isArray(v) ? [...new Set(v.map(x => texto(x, LI
 
 export const PERFIL_PADRAO = Object.freeze({
   nome: '', moto: '', placa: '', pix: '', contato: '',
-  consumo: 35, gasolina: 6.29, meta: 150, oleoCada: 1000, oleoDesde: 0
+  consumo: 35, gasolina: 6.29, meta: 150, oleoCada: 1000, oleoDesde: 0, raio: RAIO_MOTOBOY_PADRAO
 });
-export const EMPRESA_PADRAO = Object.freeze({ nome: '', endereco: '', tel: '', geo: null, favoritos: [], favoritosUid: [], plano: 'avulso' });
+export const EMPRESA_PADRAO = Object.freeze({ nome: '', endereco: '', tel: '', geo: null, favoritos: [], favoritosUid: [], plano: 'avulso', raioBusca: RAIO_BUSCA_PADRAO });
 // Identificador de conta do servidor (letras, números, - e _).
 const uid = v => typeof v === 'string' && /^[A-Za-z0-9_-]{1,128}$/.test(v);
 
@@ -36,7 +36,8 @@ export function limparPerfil(p = {}) {
     gasolina: numero(p.gasolina, 0.5, 30, d.gasolina),
     meta: numero(p.meta, 0, 5000, d.meta),
     oleoCada: numero(p.oleoCada, 100, 20000, d.oleoCada),
-    oleoDesde: instante(p.oleoDesde) || 0
+    oleoDesde: instante(p.oleoDesde) || 0,
+    raio: RAIOS_MOTOBOY.includes(+p.raio) ? +p.raio : d.raio
   };
 }
 
@@ -48,7 +49,8 @@ export function limparEmpresa(e = {}) {
     geo: geo(e.geo),
     favoritos: nomes(e.favoritos, 30),
     favoritosUid: Array.isArray(e.favoritosUid) ? [...new Set(e.favoritosUid.filter(uid))].slice(0, 30) : [],
-    plano: Object.hasOwn(PLANOS, e.plano) ? e.plano : 'avulso'
+    plano: Object.hasOwn(PLANOS, e.plano) ? e.plano : 'avulso',
+    raioBusca: RAIOS_BUSCA.includes(+e.raioBusca) ? +e.raioBusca : RAIO_BUSCA_PADRAO
   };
 }
 
@@ -86,6 +88,7 @@ export function limparChamado(c) {
     chegadaGps: c.chegadaGps === true,
     preferidos: nomes(c.preferidos, 30),
     prioridadeAte: instante(c.prioridadeAte),
+    raioKm: RAIOS_BUSCA.includes(c.raioKm) ? c.raioKm : RAIO_BUSCA_PADRAO,
     taxa: numero(c.taxa, 0, 10, TABELA.taxaPlataforma),
     nuvem: c.nuvem === true,
     empresaUid: uid(c.empresaUid) ? c.empresaUid : '',

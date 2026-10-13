@@ -4,7 +4,8 @@
 //   chamar(dados)            empresa cria o chamado (frete e código calculados aqui)
 //   aceitar(id, perfil)      motoboy aceita
 //   avancar(id, { codigo })  próxima etapa: chegou na loja → pegou o pedido → entregou (pede o código)
-//   noGps(ponto, kmAndado)   cada leitura do GPS: soma km da corrida e registra a chegada na loja sozinho
+//   noGps(ponto, kmAndado)   cada leitura do GPS: soma km da corrida, registra a chegada na loja sozinho
+//                            e avisa uma vez quando o motoboy está chegando no cliente ({ chegandoCliente })
 //   cancelar(id)             empresa cancela (paga deslocamento se o motoboy já aceitou)
 //   gorjeta(id, valor)       empresa dá gorjeta, uma vez
 //   avaliar(id, nota, tags)  motoboy avalia a empresa (nota 0 = pulou)
@@ -15,7 +16,7 @@
 // Quem guarda os dados é o "armazém" (adaptador): no aparelho (modo demonstração) ou no servidor.
 // Porta do armazém: lista() → corridas conhecidas; criar(corrida) → id; aplicar(id, mudanca) → grava
 // ou lança { motivo }; publicarPosicao(ponto, corrida|null).
-import { TABELA, LIMITES, ATIVOS, RAIO_CHEGADA_M, podeIr, frete, taxaEspera, distanciaKm, novoCodigo, r2 } from './regras.js';
+import { TABELA, LIMITES, ATIVOS, RAIO_CHEGADA_M, RAIO_CLIENTE_M, RAIOS_BUSCA, RAIO_BUSCA_PADRAO, podeIr, frete, taxaEspera, distanciaKm, perto, novoCodigo, r2 } from './regras.js';
 
 const GRAVAR_KM_A_CADA_MS = 60000;
 
@@ -28,6 +29,7 @@ export function criarCorridas(armazem, { agora = Date.now } = {}) {
   const tentativas = new Map(); // id -> { n, ate }
   const km = new Map();         // id -> km medido pelo GPS nesta sessão
   const kmGravadoEm = new Map();
+  const avisadoCliente = new Set(); // corridas em que o aviso de "chegando no cliente" já saiu
 
   const ler = id => armazem.lista().find(c => c.id === id) || null;
   const minhaAtiva = () => armazem.lista().find(c => c.motoboy && ATIVOS.includes(c.status)) || null;
@@ -48,7 +50,8 @@ export function criarCorridas(armazem, { agora = Date.now } = {}) {
         km, obs: d.obs || '', chuva: !!d.chuva, valor: frete(km, !!d.chuva), taxa: d.taxa ?? TABELA.taxaPlataforma,
         codigo: novoCodigo(), status: 'aberto', criadoEm: agora(), lojaGeo: d.lojaGeo || null, clienteGeo: d.clienteGeo || null,
         preferidos: d.preferidos || [], preferidosUid: d.preferidosUid || [],
-        prioridadeAte: (d.preferidos?.length || d.preferidosUid?.length) ? agora() + 30000 : null, teste: !!d.teste
+        prioridadeAte: (d.preferidos?.length || d.preferidosUid?.length) ? agora() + 30000 : null, teste: !!d.teste,
+        raioKm: RAIOS_BUSCA.includes(+d.raioKm) ? +d.raioKm : RAIO_BUSCA_PADRAO
       };
       try { return { ok: true, id: await armazem.criar(corrida) }; }
       catch (e) { return falha(e?.motivo === 'recusado' ? 'recusado' : 'sem-conexao'); }
@@ -100,11 +103,17 @@ export function criarCorridas(armazem, { agora = Date.now } = {}) {
         const r = await api.avancar(c.id, { porGps: true });
         return r.ok ? { ok: true, chegouNa: c.empresa } : r;
       }
+      // Cerca no cliente: avisa uma vez pra já ir pedindo o código.
+      let chegandoCliente = false;
+      if (c.status === 'coletado' && !avisadoCliente.has(c.id) && perto(ponto, c.clienteGeo, RAIO_CLIENTE_M)) {
+        avisadoCliente.add(c.id); chegandoCliente = true;
+      }
       if (kmAndado && agora() - (kmGravadoEm.get(c.id) || 0) > GRAVAR_KM_A_CADA_MS) {
         kmGravadoEm.set(c.id, agora());
-        return gravar(c.id, { kmReal: total });
+        const r = await gravar(c.id, { kmReal: total });
+        return chegandoCliente ? { ...r, chegandoCliente } : r;
       }
-      return { ok: true };
+      return { ok: true, chegandoCliente };
     },
 
     async cancelar(id) {

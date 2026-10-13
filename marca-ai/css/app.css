@@ -388,3 +388,18 @@ main h1.vh:focus{outline:none}
 }
 
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.vitrine .placa{transform:none}}
+
+/* Raio de atuação (motoboy) e raio de busca (empresa): pílulas 3D, a escolhida em amarelo de placa. */
+.raio{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:-4px 0 12px}
+.status + .raio{background:var(--asfalto2);border-radius:var(--r-m);padding:10px 12px;margin-top:-6px;box-shadow:var(--elev)}
+.raio > span{font-size:14px;font-weight:500;color:var(--mudo);margin-right:2px}
+.campo .raio{margin:0 0 6px}
+.raio button{min-height:44px;min-width:58px;padding:8px 12px;border-radius:22px;background:var(--asfalto3);font-size:15px;font-weight:600;box-shadow:0 3px 0 var(--fantasma-borda);transition:transform .08s}
+.raio button:active{transform:translateY(2px);box-shadow:0 1px 0 var(--fantasma-borda)}
+.raio button[aria-pressed="true"],.raio button[aria-checked="true"]{background:var(--sinal);color:var(--sinal-tinta);box-shadow:0 3px 0 var(--sinal-borda)}
+.perto{display:flex;gap:10px;align-items:center;background:var(--asfalto3);border-radius:12px;padding:12px;margin:0 0 14px;font-size:15px;box-shadow:0 3px 0 var(--fantasma-borda)}
+.perto svg{width:22px;height:22px;flex:none;color:var(--mudo)}
+.perto.tem svg{color:var(--verde)}
+.rastreio.chegando{background:rgba(47,191,113,.18)}
+.rastreio.chegando svg{color:var(--ok-texto)}
+@media (hover:hover){.raio button:hover{background:var(--asfalto4)}.raio button[aria-pressed="true"]:hover,.raio button[aria-checked="true"]:hover{background:var(--sinal-claro)}}

@@ -6,7 +6,7 @@
 let F = null;
 import { FIREBASE, NUVEM_ATIVA } from './config.js';
 import { S, transacao, usarConta } from './store.js';
-import { ATIVOS } from './regras.js';
+import { ATIVOS, gradeAproximada } from './regras.js';
 
 const params = new URLSearchParams(location.search);
 // ?demo = modo antigo, só no aparelho. ?aba = cada aba é uma conta (pra testar empresa e motoboy no mesmo navegador).
@@ -21,6 +21,8 @@ const vistos = new Map();       // id -> dados públicos do chamado
 const extras = new Map();       // id -> { cliente, codigo } (dados restritos já lidos)
 const posicoes = new Map();     // motoboyUid -> posição
 const ouvindoPos = new Map();   // motoboyUid -> função pra parar
+let disponiveis = [];           // motoboys livres perto (grade de ~1 km, sem nome), visto pela empresa
+const DISPONIVEL_VALE_MS = 5 * 60000;
 
 export const meuUid = () => uid;
 export const estadoNuvem = () => ({ estado, detalheErro });
@@ -68,6 +70,13 @@ function ouvir() {
     : [F.query(ch, F.where('status', '==', 'aberto'), F.orderBy('criadoEm', 'asc'), F.limit(30)),
        F.query(ch, F.where('motoboyUid', '==', uid), F.orderBy('criadoEm', 'desc'), F.limit(60))];
   const grupos = consultas.map(() => new Map());
+  // Empresa conta os motoboys livres perto da loja (como os carrinhos no mapa da Uber/Lalamove).
+  if (papel === 'empresa') {
+    parar.push(F.onSnapshot(F.query(F.collection(db, 'disponiveis'), F.orderBy('em', 'desc'), F.limit(300)), snap => {
+      disponiveis = snap.docs.map(d => d.data());
+      avisar();
+    }, () => { disponiveis = []; }));
+  }
   consultas.forEach((q, i) => parar.push(F.onSnapshot(q, snap => {
     grupos[i].clear();
     snap.forEach(d => grupos[i].set(d.id, d.data()));
@@ -144,6 +153,25 @@ export const erroRecusado = e => /permission|insufficient/i.test(String(e?.code 
 const traduzir = e => Object.assign(new Error(e?.message || 'erro'), { motivo: erroRecusado(e) ? 'recusado' : 'sem-conexao' });
 const precisa = () => { if (!db || !uid) throw Object.assign(new Error('sem-servidor'), { motivo: 'sem-conexao' }); };
 
+/** Motoboys livres vistos há menos de 5 min (posição aproximada, sem nome). */
+export const disponiveisAgora = () => disponiveis.filter(d => Date.now() - d.em < DISPONIVEL_VALE_MS);
+
+// Motoboy livre avisa que está disponível, com posição aproximada (~1 km). Regrava se mudar de quadra ou a cada 2 min.
+let ultimoDisponivel = null;
+export function publicarDisponivel(ponto) {
+  if (!db || !uid || !ponto) return;
+  const g = gradeAproximada(ponto);
+  const u = ultimoDisponivel;
+  if (u && u.latC === g.latC && u.lonC === g.lonC && Date.now() - u.em < 120000) return;
+  ultimoDisponivel = { ...g, em: Date.now() };
+  F.setDoc(F.doc(db, 'disponiveis', uid), ultimoDisponivel).catch(() => { ultimoDisponivel = null; });
+}
+export function esquecerDisponivel() {
+  if (!db || !uid || !ultimoDisponivel) return;
+  ultimoDisponivel = null;
+  F.deleteDoc(F.doc(db, 'disponiveis', uid)).catch(() => {});
+}
+
 export const armazemNuvem = {
   lista: () => S().calls,
 
@@ -155,7 +183,7 @@ export const armazemNuvem = {
     b.set(ref, {
       empresaUid: uid, empresa: c.empresa, coleta: c.coleta, tel: c.tel || '', lojaGeo: c.lojaGeo || null, bairro: bairroDe(c.entrega),
       km: c.km, chuva: !!c.chuva, valor: c.valor, taxa: c.taxa, obs: c.obs || '', status: 'aberto', criadoEm: c.criadoEm,
-      motoboyUid: null, preferidosUid: c.preferidosUid || [], prioridadeAte: c.preferidosUid?.length ? c.prioridadeAte : null, temGeoCliente: !!c.clienteGeo
+      motoboyUid: null, preferidosUid: c.preferidosUid || [], prioridadeAte: c.preferidosUid?.length ? c.prioridadeAte : null, temGeoCliente: !!c.clienteGeo, raioKm: c.raioKm
     });
     b.set(F.doc(db, 'chamados', ref.id, 'restrito', 'codigo'), { valor: c.codigo });
     b.set(F.doc(db, 'chamados', ref.id, 'restrito', 'cliente'), cliente);

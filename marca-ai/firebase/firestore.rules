@@ -51,7 +51,7 @@ service cloud.firestore {
 
       allow create: if logado()
         && novo().keys().hasOnly(['empresaUid', 'empresa', 'coleta', 'tel', 'lojaGeo', 'bairro', 'km', 'chuva', 'valor', 'taxa', 'obs',
-             'status', 'criadoEm', 'motoboyUid', 'preferidosUid', 'prioridadeAte', 'temGeoCliente'])
+             'status', 'criadoEm', 'motoboyUid', 'preferidosUid', 'prioridadeAte', 'temGeoCliente', 'raioKm'])
         && novo().empresaUid == eu() && novo().status == 'aberto' && novo().motoboyUid == null
         && texto(novo().empresa, 60) && novo().empresa.size() > 0 && texto(novo().coleta, 160) && texto(novo().tel, 20)
         && texto(novo().bairro, 60) && texto(novo().obs, 300) && geoOk(novo().lojaGeo)
@@ -59,6 +59,7 @@ service cloud.firestore {
         && freteCerto(novo().km, novo().chuva, novo().valor)
         && novo().taxa is number && novo().taxa >= 0 && novo().taxa <= 10
         && horaCerta(novo().criadoEm) && novo().temGeoCliente is bool
+        && novo().get('raioKm', 5) in [3, 5, 8, 15]
         && novo().preferidosUid is list && novo().preferidosUid.size() <= 30
         && (novo().prioridadeAte == null || (novo().prioridadeAte is int && novo().prioridadeAte <= agora() + 60000));
 
@@ -121,6 +122,18 @@ service cloud.firestore {
           || (doc == 'cliente' && chamado(id).motoboyUid == eu() && chamado(id).status in ['aceito', 'coleta', 'coletado']));
         allow update, delete: if false;
       }
+    }
+
+    // Motoboy livre e online: posição APROXIMADA (inteiro em centésimos de grau = grade de ~1 km), sem nome.
+    // Serve só pra loja ver quantos motoboys estão perto. Ele mesmo apaga ao ficar offline ou aceitar corrida.
+    match /disponiveis/{uid} {
+      allow read: if logado();
+      allow create, update: if logado() && uid == eu()
+        && novo().keys().hasOnly(['latC', 'lonC', 'em'])
+        && novo().latC is int && novo().latC >= -9000 && novo().latC <= 9000
+        && novo().lonC is int && novo().lonC >= -18000 && novo().lonC <= 18000
+        && horaCerta(novo().em);
+      allow delete: if logado() && uid == eu();
     }
 
     // Posição do motoboy: ele grava a dele; só a empresa da corrida em andamento lê.

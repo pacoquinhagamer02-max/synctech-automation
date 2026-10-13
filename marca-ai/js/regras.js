@@ -215,6 +215,61 @@ export function etaMin(km, kmh = 22) {
 
 /** Raio (em metros) em que o motoboy é considerado "na loja" pelo GPS. */
 export const RAIO_CHEGADA_M = 120;
+/** "Cheguei" apertado a mais que isso da loja (com GPS ligado) pede confirmação. */
+export const RAIO_CONFERE_CHEGADA_M = 400;
+/** Abaixo disso do ponto do cliente, o motoboy está "chegando". */
+export const RAIO_CLIENTE_M = 300;
+
+/* ============ Raio de atuação e despacho em ondas ============
+   Como Uber Flash, 99Entrega e iFood: o chamado toca primeiro pra quem está perto da loja
+   e o raio cresce se ninguém aceitar. O motoboy escolhe até onde topa ir buscar. */
+export const RAIOS_MOTOBOY = Object.freeze([2, 5, 10, 20]);
+export const RAIOS_BUSCA = Object.freeze([3, 5, 8, 15]);
+export const ONDAS_KM = Object.freeze([2, 4, 8, 15]);
+export const ONDA_MS = 30000;
+export const RAIO_MOTOBOY_PADRAO = 5;
+export const RAIO_BUSCA_PADRAO = 5;
+
+/** true se as duas posições estão a até `metros` uma da outra. */
+export const perto = (a, b, metros) => !!(a && b) && distanciaKm(a, b) * 1000 <= metros;
+
+/**
+ * Raio atual de um chamado aberto: começa em 2 km e cresce a cada 30 s até o raio que a loja escolheu.
+ * Enquanto vale a janela dos favoritos, as ondas ainda não começaram.
+ * @param {{criadoEm: number, prioridadeAte?: number|null, raioKm?: number}} c
+ * @param {number} [agora]
+ */
+export function raioOnda(c, agora = Date.now()) {
+  const max = RAIOS_BUSCA.includes(c.raioKm) ? c.raioKm : RAIO_BUSCA_PADRAO;
+  const inicio = Math.max(c.criadoEm || 0, c.prioridadeAte || 0);
+  const i = Math.max(0, Math.floor((agora - inicio) / ONDA_MS));
+  return Math.min(max, ONDAS_KM[Math.min(i, ONDAS_KM.length - 1)]);
+}
+
+/**
+ * Esse chamado chega pra esse motoboy? Distância pelas ruas até a loja, comparada com o
+ * raio dele e com a onda atual do chamado. Sem GPS do motoboy ou sem localização da loja,
+ * não dá pra filtrar: o chamado aparece (e `km` vem null).
+ * @returns {{ ok: boolean, km: number|null }}
+ */
+export function alcance(c, pos, raioMotoboy = RAIO_MOTOBOY_PADRAO, agora = Date.now()) {
+  if (!pos || !c.lojaGeo) return { ok: true, km: null };
+  const d = kmEstimado(pos, c.lojaGeo);
+  return { ok: d <= raioMotoboy && d <= raioOnda(c, agora), km: d };
+}
+
+/**
+ * Posição aproximada (grade de ~1 km) pra contar motoboys disponíveis sem revelar onde cada um está.
+ * Vai como inteiro (centésimos de grau), então o servidor consegue exigir a aproximação.
+ */
+export const gradeAproximada = p => ({ latC: Math.round(p.lat * 100), lonC: Math.round(p.lon * 100) });
+export const deGrade = g => ({ lat: g.latC / 100, lon: g.lonC / 100 });
+
+/** Quantos motoboys disponíveis estão a até `raio` km (linha reta, com folga de ~1 km da grade). */
+export function disponiveisNoRaio(lista, loja, raio) {
+  if (!loja) return null;
+  return lista.filter(g => distanciaKm(loja, deGrade(g)) <= raio + 0.8).length;
+}
 
 /**
  * Lê coordenadas de um link de localização (WhatsApp, Google Maps, Waze, OpenStreetMap)

@@ -19,9 +19,10 @@ Revisão feita em 07/10/2026 com as skills security-audit, security-and-hardenin
 | Localização do motoboy virar rastreamento | GPS liga só com o motoboy online e desliga ao ficar offline, apagando a última posição. Leituras imprecisas (>80 m) são descartadas. O mapa real (OpenStreetMap) só abre quando o motoboy pede | `js/gps.js`, `js/app.js` |
 | Coordenada falsa ou link malicioso no campo de localização | Só números dentro do globo entram (`geo()`); o link nunca é aberto nem vira HTML, só é lido como texto | `js/esquema.js`, `js/regras.js` |
 | Mapa embutido abrir brecha | `frame-src` libera só `www.openstreetmap.org`, e o mapa abre em `<iframe sandbox>` sem referrer | `index.html`, `_headers` |
+| Loja ver onde cada motoboy livre está | A contagem de motoboys perto usa posição **aproximada** (grade de ~1 km, inteiro exigido pelo servidor), sem nome; some ao ficar offline, pausar ou aceitar corrida | `firebase/firestore.rules` (`disponiveis`), `js/nuvem.js` |
 | Memória do aparelho lotar | Histórico limitado a 500 chamados, sem apagar corrida em andamento | `js/store.js` |
 
-Testes automáticos: `node --test tests/*.test.mjs` (29 testes, incluindo valor adulterado, lixo no armazenamento e `__proto__`).
+Testes automáticos: `node --test tests/*.test.mjs` (36 testes, incluindo valor adulterado, lixo no armazenamento e `__proto__`).
 
 ## Servidor (Firebase, projeto marcaai-mariana) — ligado em 08/10/2026
 
@@ -66,6 +67,7 @@ Nota antes: **2 de 5** (controle de entrega furável). Nota depois das correçõ
 - **Observação do chamado é pública pros motoboys antes do aceite:** a loja não deve escrever dados da cliente ali.
 
 **Limitações conhecidas do servidor:**
+- Raio de atuação e ondas de despacho são organização, não trava: a posição vem do celular, então o servidor não confere se o motoboy estava no raio ao aceitar. O documento `disponiveis/{uid}` usa o id da conta; uma loja que já trabalhou com o motoboy conseguiria ver a quadra aproximada (~1 km) dele enquanto ele está livre e online.
 - Login anônimo: se a pessoa limpar os dados do navegador ou trocar de celular, perde a conta e o histórico. Próximo passo: login por telefone (SMS) ou Google.
 
 ## O que ainda falta antes de dinheiro de verdade

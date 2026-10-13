@@ -1,7 +1,8 @@
 // Telas e ações do Marca aí.
 import { TABELA, LIMITES, ATIVOS, TAGS_BOAS, TAGS_RUINS, podeIr, frete, taxaEspera, ganho, quandoGanhou, mesmoDia,
   custoKm, resumoDia, saldo, reputacao, novoCodigo, r2, ticketMedio, mensagemCliente, resumoMes, informeMes, faixasHorario,
-  kmEstimado, etaMin, extrairGeo, PLANOS, taxaChamado, custoPlanos, kmCorrida } from './regras.js';
+  kmEstimado, etaMin, extrairGeo, PLANOS, taxaChamado, custoPlanos, kmCorrida,
+  alcance, raioOnda, perto, disponiveisNoRaio, RAIOS_MOTOBOY, RAIOS_BUSCA, RAIO_CONFERE_CHEGADA_M, RAIO_CLIENTE_M } from './regras.js';
 import { ligarGps, desligarGps, estadoGps, aoMudarGps, pegarPosicao, urlMapaReal } from './gps.js';
 import * as nuvem from './nuvem.js';
 import { criarCorridas } from './corridas.js';
@@ -28,9 +29,20 @@ const aAvaliar = () => S().calls.find(c => c.motoboy && c.status === 'entregue' 
 let escolhida = null;
 // Chamado com prioridade pros favoritos da loja só aparece pros outros depois que a janela acaba.
 const visivelPraMim = c => !c.preferidos.length || c.preferidos.includes(S().profile.nome) || !c.prioridadeAte || c.prioridadeAte <= Date.now();
-const ofertasAbertas = () => S().calls.filter(c => c.status === 'aberto' && !S().recusados.includes(c.id) && visivelPraMim(c)).sort((a, b) => a.criadoEm - b.criadoEm);
 // Posição do motoboy só vale se for recente (2 min).
 const posicaoAtual = () => (S().posicao && Date.now() - S().posicao.em < 120000 ? S().posicao : null);
+// Como Uber Flash/99/iFood: só toca o que está dentro do raio dele e da onda atual do chamado,
+// da loja mais perto pra mais longe (sem GPS, não dá pra filtrar: vem tudo, do mais antigo pro mais novo).
+const ofertasAbertas = () => {
+  const pos = posicaoAtual(), raio = S().profile.raio, agora = Date.now();
+  return S().calls
+    .filter(c => c.status === 'aberto' && !S().recusados.includes(c.id) && visivelPraMim(c))
+    .map(c => ({ c, a: alcance(c, pos, raio, agora) }))
+    .filter(x => x.a.ok)
+    .sort((x, y) => (x.a.km ?? Infinity) - (y.a.km ?? Infinity) || x.c.criadoEm - y.c.criadoEm)
+    .map(x => x.c);
+};
+const ateLoja = c => (posicaoAtual() && c.lojaGeo ? kmEstimado(posicaoAtual(), c.lojaGeo) : null);
 const coordTxt = g => `${g.lat.toFixed(6)},${g.lon.toFixed(6)}`;
 const hojeTxt = () => new Date().toLocaleDateString('sv');
 const CHECKLIST = ['Pneus calibrados', 'Freio da frente e de trás', 'Farol, lanterna e seta', 'Capacete e viseira', 'Celular carregado e suporte firme'];
@@ -257,6 +269,12 @@ const VIEWS = {
         ${S().empresa.favoritos.length ? (PLANOS[S().empresa.plano].favoritos
           ? `<label class="check"><input type="checkbox" name="soFavoritos" checked> Oferecer primeiro ${S().empresa.favoritos.length === 1 ? 'ao meu motoboy favorito' : `aos meus ${S().empresa.favoritos.length} motoboys favoritos`} (30 segundos)</label>`
           : `<p class="aviso">Chamar primeiro os seus motoboys favoritos é dos planos Loja e Pro. <button type="button" class="link" data-act="aba" data-aba="loja">Ver planos</button></p>`) : ''}
+        <div class="campo"><span id="raio-rot">Buscar motoboy a até</span>
+          <div class="raio" role="radiogroup" aria-labelledby="raio-rot">${RAIOS_BUSCA.map(n =>
+            `<button type="button" role="radio" data-act="raioBusca" data-r="${n}" aria-checked="${S().empresa.raioBusca === n}">${n} km</button>`).join('')}</div>
+          <small class="mudo dica">O chamado toca primeiro pra quem está a 2 km da loja, e o raio cresce a cada 30 s até esse limite.</small>
+        </div>
+        <div data-live="em-perto"></div>
         <div data-live="em-preco"></div>
         <p class="erro" data-erro role="alert"></p>
         <button class="btn btn-sinal" type="submit" data-cta>Chamar motoboy</button>
@@ -303,7 +321,9 @@ const LIVE = {
           const g = estadoGps(), pos = posicaoAtual();
           const t = { ligado: `GPS ligado${pos ? `, precisão de ${pos.precisao} m` : ''}`, pedindo: 'Ligando o GPS…', negado: 'GPS bloqueado. Libere a localização pro app no navegador.', 'sem-gps': 'GPS indisponível agora.', desligado: 'GPS desligado.' }[g];
           return `<small class="gps gps-${g}">${t}</small>`;
-        })() : ''}</div></div>`);
+        })() : ''}</div></div>
+      ${s.online ? `<div class="raio" role="group" aria-label="Raio de atuação: até quantos km você vai buscar">
+        <span>Buscar até</span>${RAIOS_MOTOBOY.map(n => `<button type="button" data-act="raio" data-r="${n}" aria-pressed="${s.profile.raio === n}">${n} km</button>`).join('')}</div>` : ''}`);
   },
   'mb-meta': el => {
     // Durante oferta ou corrida, a tela é só dela: a meta volta quando o motoboy estiver livre.
@@ -341,7 +361,9 @@ const LIVE = {
     oferta = { id: null, ate: 0 };
     html(el, `<div class="radar ${livre ? '' : 'parado'}"><div class="onda">${ic('moto')}</div></div>
       <div class="vazio colado">${livre
-        ? `<b>Procurando chamados perto de você</b>Quando uma empresa chamar, o valor aparece aqui antes de você decidir.`
+        ? `<b>Procurando chamados a até ${S().profile.raio} km de você</b>${posicaoAtual()
+            ? 'Quando uma loja perto chamar, o valor aparece aqui antes de você decidir.'
+            : 'Sem GPS agora: você vê os chamados da cidade toda. Com o GPS ligado, só os do seu raio.'}`
         : `<b>Você está offline</b>Fica online quando quiser rodar. Ninguém te cobra horário.`}</div>
       ${!S().online ? (S().profile.nome
         ? `<button class="btn btn-sinal btn-online" data-act="online">${ic('moto')}Ficar online</button>`
@@ -413,6 +435,16 @@ const LIVE = {
     </div>`);
     const cta = $('[data-cta]'); if (cta) cta.textContent = `Chamar motoboy por ${brl(v + taxa)}`;
   },
+  'em-perto': el => {
+    if (!el) return;
+    const loja = S().empresa.geo, raio = S().empresa.raioBusca;
+    if (!nuvem.nuvemLigada()) { html(el, ''); return; }
+    if (!loja) { html(el, `<div class="perto">${ic('nav')}<span>Salve a localização da loja na aba Empresa pra ver quantos motoboys estão perto.</span></div>`); return; }
+    const n = disponiveisNoRaio(nuvem.disponiveisAgora(), loja, raio);
+    html(el, `<div class="perto ${n ? 'tem' : ''}">${ic('moto')}<span>${n
+      ? `<b>${n} ${n === 1 ? 'motoboy livre' : 'motoboys livres'}</b> a até ${raio} km da loja agora.`
+      : `Nenhum motoboy livre a até ${raio} km agora. Pode chamar assim mesmo: quem ficar online recebe.`}</span></div>`);
+  },
   'em-planos': el => {
     const atual = S().empresa.plano, n = feitosNoMes(), custos = custoPlanos(Math.max(n, 1));
     const melhor = Object.entries(custos).sort((a, b) => a[1] - b[1])[0][0];
@@ -451,6 +483,7 @@ const LIVE = {
         <div class="cab"><b>${esc(c.cliente || 'Entrega')}, ${hora(c.criadoEm)}</b><span class="pill ${cls}">${rot}</span></div>
         <div class="mudo pq">${esc(c.entrega)} (${km(c.km)} km)</div>
         ${c.motoboy ? `<div class="mt6">Motoboy: <b>${esc(c.motoboy)}</b>${c.moto ? `, ${esc(c.moto)}` : ''}${c.placa ? `, placa ${esc(c.placa)}` : ''}</div>` : ''}
+        ${c.status === 'aberto' && c.lojaGeo ? `<div class="rastreio">${ic('moto')}<span>Procurando motoboy a até <b class="num" data-onda="${c.criadoEm}|${c.prioridadeAte || 0}|${c.raioKm}">${raioOnda(c)}</b> km da loja</span></div>` : ''}
         ${rastreio(c)}
         ${c.status === 'coletado' && c.tentativas ? `<div class="aviso ${c.tentativas >= LIMITES.tentativasCodigo ? 'freio' : ''}">${c.tentativas >= LIMITES.tentativasCodigo
           ? `O motoboy errou o código ${c.tentativas} vezes e a entrega travou. Ligue pra ele ou pro cliente, confira o código e libere.`
@@ -477,6 +510,7 @@ function rastreio(c) {
   const alvo = c.status === 'aceito' ? c.lojaGeo : c.clienteGeo;
   if (!alvo) return `<div class="rastreio">${ic('nav')}<span>${esc(c.motoboy)} está com o GPS ligado. Salve a localização ${c.status === 'aceito' ? 'da loja' : 'do cliente'} pra ver a distância.</span></div>`;
   const d = kmEstimado(pos, alvo);
+  if (c.status === 'coletado' && perto(pos, alvo, RAIO_CLIENTE_M)) return `<div class="rastreio chegando">${ic('nav')}<span><b>${esc(c.motoboy)}</b> está chegando no cliente.</span></div>`;
   return `<div class="rastreio">${ic('nav')}<span><b>${esc(c.motoboy)}</b> está a ${km(d)} km ${c.status === 'aceito' ? 'da loja' : 'do cliente'}, chega em ${etaMin(d) === 1 ? '1 minuto' : `uns ${etaMin(d)} min`}.</span></div>`;
 }
 
@@ -496,7 +530,7 @@ function telaOferta(c) {
     <div class="bloco mt14">
       ${mapa(c, 'oferta')}
       <ul class="rota">
-        <li><b>${esc(c.empresa)}</b><small>${esc(c.coleta)}${posicaoAtual() && c.lojaGeo ? `. Você está a ${km(kmEstimado(posicaoAtual(), c.lojaGeo))} km, uns ${etaMin(kmEstimado(posicaoAtual(), c.lojaGeo))} min` : ''}</small></li>
+        <li><b>${esc(c.empresa)}</b><small>${esc(c.coleta)}${ateLoja(c) != null ? `. Você está a ${km(ateLoja(c))} km, uns ${etaMin(ateLoja(c))} min` : ''}</small></li>
         <li><b>${esc(c.entrega)}</b><small>${km(c.km)} km da loja até o cliente${c.clienteGeo ? ', ponto exato no mapa' : ''}</small></li>
       </ul>
       <div class="rep">
@@ -516,7 +550,7 @@ function telaOferta(c) {
       <p class="semPunicao">Recusar não te prejudica em nada.</p>
     </div>
     ${outras.length ? `<div class="outras"><h3>Outros chamados abertos (${outras.length})</h3>${outras.map(o =>
-      `<button class="item-oferta" data-act="escolher" data-id="${esc(o.id)}"><span>${esc(o.empresa)}<small>${km(o.km)} km, ${brl(o.valor / o.km)} por km</small></span><b>${brl(o.valor)}</b></button>`).join('')}</div>` : ''}
+      `<button class="item-oferta" data-act="escolher" data-id="${esc(o.id)}"><span>${esc(o.empresa)}<small>${ateLoja(o) != null ? `Loja a ${km(ateLoja(o))} km de você. ` : ''}Entrega de ${km(o.km)} km, ${brl(o.valor / o.km)} por km</small></span><b>${brl(o.valor)}</b></button>`).join('')}</div>` : ''}
   </section>`;
 }
 
@@ -592,7 +626,10 @@ function aoPontoGps(ponto, andou) {
   if (arrasto) return;
   corridas.noGps(ponto, andou).then(r => {
     if (r.chegouNa) { vibrar([60, 40, 60]); toast(`Chegada na ${r.chegouNa} registrada pelo GPS. A espera começou a contar.`); }
+    if (r.chegandoCliente) { vibrar([60, 40, 60]); bipe(); toast('Você está chegando no cliente. Já peça o código de entrega.'); }
   });
+  // Livre e online: a loja vê que tem motoboy perto (posição aproximada, ~1 km, sem nome).
+  if (S().online && !emPausa() && !corridaAtiva()) nuvem.publicarDisponivel(ponto); else nuvem.esquecerDisponivel();
 }
 function sincronizarGps() {
   if (papel === 'moto' && S().online) ligarGps(aoPontoGps);
@@ -620,6 +657,10 @@ function tick() {
     const c = S().calls.find(x => x.id === el.dataset.espera); if (!c) return;
     const v = taxaEspera(c, agora);
     html(el, v > 0 ? `Taxa de espera rodando: <b class="lucro">+${brl(v)}</b>` : `A partir de ${TABELA.esperaGratisMin} min, a espera passa a valer ${brl(TABELA.esperaPorMin)}/min pra você.`);
+  });
+  document.querySelectorAll('[data-onda]').forEach(el => {
+    const [criadoEm, prioridadeAte, raioKm] = el.dataset.onda.split('|').map(Number);
+    el.textContent = String(raioOnda({ criadoEm, prioridadeAte, raioKm }, agora));
   });
   const barra = document.querySelector('[data-oferta]');
   if (barra && oferta.id) {
@@ -658,7 +699,7 @@ const avisoFalha = r => toast(MOTIVOS[r.motivo] || MOTIVOS.indisponivel);
 async function aceitarChamado(id) {
   oferta = { id: null, ate: 0 }; armado = null; escolhida = null;
   const r = await corridas.aceitar(id, S().profile);
-  if (r.ok) { vibrar(30); scrollTo(0, 0); toast('Corrida aceita. Bora!'); return; }
+  if (r.ok) { nuvem.esquecerDisponivel(); vibrar(30); scrollTo(0, 0); toast('Corrida aceita. Bora!'); return; }
   toast(r.motivo === 'indisponivel' ? 'Outro motoboy aceitou primeiro. Sem problema, o próximo chamado aparece aqui.' : MOTIVOS[r.motivo]);
 }
 
@@ -733,11 +774,25 @@ const ACTS = {
     if (!S().profile.nome) { toast('Preencha seu nome no Perfil antes de ficar online.'); irAba('perfil'); return; }
     const ligar = !S().online;
     // Offline apaga a última posição: o app não guarda onde o motoboy está quando ele não está trabalhando.
-    if (!ligar) nuvem.armazemNuvem.esquecerPosicao();
+    if (!ligar) { nuvem.armazemNuvem.esquecerPosicao(); nuvem.esquecerDisponivel(); }
     mudar(s => { s.online = ligar; s.onlineDesde = ligar ? Date.now() : null; s.pausaAte = null; if (ligar) s.recusados = []; else s.posicao = null; });
     toast(ligar ? 'Você está online. O GPS liga só enquanto você estiver online.' : 'Você está offline. GPS desligado. Bom descanso.');
   },
+  raio: el => {
+    const n = +el.dataset.r;
+    if (!RAIOS_MOTOBOY.includes(n)) return;
+    mudar(s => { s.profile.raio = n; });
+    anunciar(`Raio de ${n} quilômetros.`);
+  },
+  raioBusca: el => {
+    const n = +el.dataset.r;
+    if (!RAIOS_BUSCA.includes(n)) return;
+    mudar(s => { s.empresa.raioBusca = n; });
+    el.closest('[role="radiogroup"]')?.querySelectorAll('button').forEach(b => b.setAttribute('aria-checked', String(+b.dataset.r === n)));
+    LIVE['em-perto']($('[data-live="em-perto"]'));
+  },
   pausa: () => {
+    nuvem.esquecerDisponivel();
     mudar(s => { s.pausaAte = Date.now() + 15 * 60000; });
     toast('Pausa de 15 min. Nenhum chamado vai tocar.');
     if (aba !== 'corridas') irAba('corridas');
@@ -821,7 +876,15 @@ const ACTS = {
   },
   escolher: el => { escolhida = el.dataset.id; oferta = { id: escolhida, ate: Date.now() + TABELA.tempoOferta * 1000 }; armado = null; refresh(); scrollTo(0, 0); },
   recusar: el => { oferta = { id: null, ate: 0 }; mudar(s => { s.recusados.push(el.dataset.id); }); toast('Recusado. Nada muda pra você.'); },
-  cheguei: async el => { const r = await corridas.avancar(el.dataset.id); if (!r.ok) avisoFalha(r); },
+  cheguei: async el => {
+    const c = S().calls.find(x => x.id === el.dataset.id), pos = posicaoAtual();
+    // Como Uber/99: "cheguei" longe da loja pede confirmação (a espera só deve contar no balcão).
+    if (c?.lojaGeo && pos && !perto(pos, c.lojaGeo, RAIO_CONFERE_CHEGADA_M)) {
+      const sim = await confirmar('Você já está na loja?', `O GPS mostra você a uns ${km(kmEstimado(pos, c.lojaGeo))} km da ${c.empresa}. A espera só deve contar quando você estiver no balcão.`, 'Estou na loja', 'Ainda não');
+      if (!sim) return;
+    }
+    const r = await corridas.avancar(el.dataset.id); if (!r.ok) avisoFalha(r);
+  },
   coletei: async el => {
     const r = await corridas.avancar(el.dataset.id);
     if (!r.ok) avisoFalha(r);
@@ -987,7 +1050,7 @@ document.addEventListener('submit', e => {
     if (nuvem.nuvemLigada() && nuvem.estadoNuvem().estado !== 'conectado') return erroForm(f, nuvem.estadoNuvem().detalheErro || 'Ainda conectando ao servidor. Espere um instante e tente de novo.');
     const botao = f.querySelector('[type="submit"]'); botao.disabled = true;
     corridas.chamar({ empresa: S().empresa.nome, coleta, tel: S().empresa.tel, entrega, cliente: texto(d.cliente, LIMITES.nome), telCliente: texto(d.telCliente, LIMITES.tel),
-      km: dist, obs: texto(d.obs, LIMITES.obs), chuva: d.chuva === 'on', taxa: taxaAgora(), lojaGeo: S().empresa.geo, clienteGeo,
+      km: dist, obs: texto(d.obs, LIMITES.obs), chuva: d.chuva === 'on', taxa: taxaAgora(), lojaGeo: S().empresa.geo, clienteGeo, raioKm: S().empresa.raioBusca,
       preferidos: usarFav ? S().empresa.favoritos : [], preferidosUid: usarFav ? S().empresa.favoritosUid : [] })
       .then(r => {
         botao.disabled = false;
