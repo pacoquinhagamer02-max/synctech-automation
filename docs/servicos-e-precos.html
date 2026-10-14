@@ -359,15 +359,15 @@
     <div class="band">
       <p class="eyebrow">Comparando</p>
       <h2>Quanto o plano economiza</h2>
-      <p>A coluna "avulso daria" é a soma das mensalidades desta mesma página para os serviços do plano. No plano, a entrada cai de R$ 2.297 para R$ 1.000: o Link na Bio (R$ 297) sai de graça e o Site (R$ 2.000) sai pela metade.</p>
+      <p>A coluna "avulso daria" é a soma das mensalidades desta mesma página para os serviços do plano. No plano, a entrada cai de R$ 2.297 para R$ 1.000: o Link na Bio (R$ 297) sai de graça e o Site (R$ 2.000) sai pela metade. No Pro, a construção do aplicativo (R$ 850, uma vez) se paga à parte, igual no avulso.</p>
     </div>
     <div class="tablewrap">
       <table>
         <thead><tr><th>Plano</th><th>Avulso daria</th><th>No plano</th></tr></thead>
         <tbody>
           <tr><td class="v">Starter</td><td class="m">R$ 908/mês<br><span class="ent">+ R$ 2.297 de entrada</span></td><td class="v">R$ 597/mês<span class="save">economiza R$ 311/mês e R$ 1.297 da entrada</span></td></tr>
-          <tr><td class="v">Negócio</td><td class="m">R$ 2.443/mês<br><span class="ent">+ R$ 2.297 de entrada</span></td><td class="v">R$ 1.497/mês<span class="save">economiza R$ 946/mês e R$ 1.297 da entrada</span></td></tr>
-          <tr><td class="v">Pro</td><td class="m">R$ 4.290/mês<br><span class="ent">+ R$ 2.297 de entrada</span></td><td class="v">R$ 2.697/mês<span class="save">economiza R$ 1.593/mês e R$ 1.297 da entrada</span></td></tr>
+          <tr><td class="v">Negócio</td><td class="m">R$ 2.346/mês<br><span class="ent">+ R$ 2.297 de entrada</span></td><td class="v">R$ 1.497/mês<span class="save">economiza R$ 849/mês e R$ 1.297 da entrada</span></td></tr>
+          <tr><td class="v">Pro</td><td class="m">R$ 3.943/mês<br><span class="ent">+ R$ 2.297 de entrada</span></td><td class="v">R$ 2.697/mês<span class="save">economiza R$ 1.246/mês e R$ 1.297 da entrada</span></td></tr>
         </tbody>
       </table>
     </div>
@@ -448,11 +448,11 @@
       fora:['Instagram Automático','CRM com pipeline','Tráfego Pago'] },
     { nome:'Negócio', mensal:1497, anual:1197, dest:true,
       desc:'Tudo do Starter mais o que faz o cliente achar você, voltar e indicar.',
-      inc:['Tudo do Starter','Instagram Automático (DM + comentários)','CRM com pipeline de vendas','SEO Local no Google e no Maps','Gestão de Reputação no Google','Controle de Estoque','Relatório de Resultados mensal','Suporte prioritário'],
+      inc:['Tudo do Starter','Instagram Automático (DM + comentários)','CRM com pipeline de vendas','SEO Local no Google e no Maps','Gestão de Reputação no Google','Relatório de Resultados mensal','Suporte prioritário'],
       fora:['Aplicativo próprio','Tráfego Pago'] },
     { nome:'Pro', mensal:2697, anual:2157,
-      desc:'Os 15 serviços, inclusive anúncio e aplicativo próprio.',
-      inc:['Tudo do Negócio','Aplicativo Personalizado','Gestão de Tráfego Pago (verba à parte)','Nota Fiscal no pedido (NFC-e)','Suporte 7 dias por semana','Reunião mensal de resultados'],
+      desc:'Os 14 serviços, inclusive anúncio e aplicativo próprio.',
+      inc:['Tudo do Negócio','Aplicativo Personalizado (construção de R$ 850 à parte)','Gestão de Tráfego Pago (verba à parte)','Nota Fiscal no pedido (NFC-e)','Suporte 7 dias por semana','Reunião mensal de resultados'],
       fora:['E-mail Marketing (em desenvolvimento)','Chat ao Vivo (em desenvolvimento)'] }
   ];
 
@@ -490,13 +490,13 @@
 
   /* ═════════ SERVIÇOS ═════════ */
   var AVULSOS = [
-    { id:'trafego', nome:'Gestão de Tráfego Pago', preco:800, obs:'+ verba, paga por você',
+    { id:'trafego', nome:'Gestão de Tráfego Pago', preco:1000, obs:'+ verba, paga por você',
       icone:g('<path d="M2 13l4.5-5 3 3L16 4"/><path d="M12 4h4v4"/>'),
       what:'Anúncio no Instagram e no Facebook para trazer cliente novo toda semana, com alguém cuidando e ajustando.',
       itens:['Campanha montada do zero, com público por região e perfil','Produção do criativo do anúncio inclusa','Acompanhamento e ajuste semanal, não é "liga e esquece"','Teto de custo por cliente calculado com o seu ticket e a sua margem','Relatório mensal do que foi gasto e do que voltou'],
       need:'A <b>verba do anúncio é separada</b> e paga por você direto para a Meta. Ela não passa pelo nosso caixa e não cobramos percentual sobre ela.' },
 
-    { id:'app', nome:'Aplicativo Personalizado', preco:850, obs:'sem valor de entrada',
+    { id:'app', nome:'Aplicativo Personalizado', preco:400, obs:'+ R$ 850 para construir, uma vez',
       icone:g('<rect x="5" y="1.5" width="8" height="15" rx="2"/><path d="M7.8 3.6h2.4"/><path d="M7.5 14.3h3"/>'),
       what:'O seu negócio virando um aplicativo de verdade na tela do celular do cliente, sem passar por loja de aplicativo.',
       itens:['O cliente instala pelo link e o ícone fica na tela dele','Pedido, carrinho e checkout com o fluxo do seu negócio','Histórico com "pedir de novo" em um toque','Pagamento por Pix com QR Code e valor já preenchido','Funciona com internet ruim e abre rápido'] },
@@ -551,10 +551,6 @@
       what:'Seu cardápio ou catálogo online, com foto e preço. O cliente monta o pedido e ele chega pronto no seu WhatsApp.',
       itens:['O cliente vê a foto, escolhe a quantidade e fecha o pedido','A mensagem chega organizada: itens, total, nome e endereço','Sem aplicativo para baixar e sem taxa por pedido','Preço e item atualizados sempre que você pedir'] },
 
-    { id:'estoque', nome:'Controle de Estoque', preco:97,
-      icone:g('<path d="M2.5 5.5L9 2.2l6.5 3.3v7L9 15.8l-6.5-3.3z"/><path d="M2.5 5.5L9 8.8l6.5-3.3M9 8.8v7"/>'),
-      what:'Conta o que tem, avisa o que está acabando e monta a lista de compras pronta para mandar no WhatsApp.',
-      itens:['Cada item com a quantidade mínima que você define','Separa na hora o que acabou, o que está acabando e o que tem de sobra','Filtro "só o que falta" para a contagem render','Lista de compras formatada, pronta para enviar ao fornecedor'] },
 
     { id:'dashboard', nome:'Dashboard de Métricas', preco:97,
       icone:g('<path d="M3 15V9M9 15V4M15 15V8"/><path d="M2 15.5h14"/>'),
@@ -581,8 +577,8 @@
   var PERFIS = [
     { id:'alimentacao', nome:'Padaria, restaurante ou delivery',
       icone:g('<path d="M6 2v6a2 2 0 004 0V2M8 10v6"/><path d="M14 2c-1.3 1.3-1.8 3-1.8 4.7S13.1 10 14 10v6"/>', 18),
-      rec:['catalogo','whatsapp','estoque','dashboard','nfce','seolocal'],
-      frase:'O que mais muda o caixa aqui é o pedido chegando pronto no WhatsApp, o estoque parando de furar e a nota saindo sozinha no fim do pedido.' },
+      rec:['catalogo','whatsapp','dashboard','nfce','seolocal'],
+      frase:'O que mais muda o caixa aqui é o pedido chegando pronto no WhatsApp, o cliente achando você no Google e a nota saindo sozinha no fim do pedido.' },
 
     { id:'beleza', nome:'Barbearia, salão ou estética',
       icone:g('<path d="M6 4l8 9M6 13l8-9"/><circle cx="4.3" cy="3.2" r="1.7"/><circle cx="4.3" cy="14" r="1.7"/>', 18),
@@ -591,7 +587,7 @@
 
     { id:'loja', nome:'Loja ou comércio',
       icone:g('<path d="M4 6h10l-.8 8.2a2 2 0 01-2 1.8H6.8a2 2 0 01-2-1.8z"/><path d="M6.5 6V4.5a2.5 2.5 0 015 0V6"/>', 18),
-      rec:['catalogo','whatsapp','instagram','crm','estoque','trafego','seolocal'],
+      rec:['catalogo','whatsapp','instagram','crm','trafego','seolocal'],
       frase:'Catálogo com foto e preço faz o cliente escolher antes de chegar, e o CRM garante que ninguém que perguntou preço suma sem resposta.' },
 
     { id:'saude', nome:'Clínica ou consultório',
@@ -606,14 +602,14 @@
   ];
 
   var VALOR_PLANO = { Starter:597, 'Negócio':1497, Pro:2697 };
-  /* Desde out/2026 o Pro cobre os 13 serviços mensais; Starter e Negócio
+  /* Desde out/2026 o Pro cobre os 12 serviços mensais; Starter e Negócio
      cobrem os subconjuntos abaixo. Site e Link na Bio não aparecem aqui
      porque são pagamento único, não mensalidade — os planos simplesmente
      tiram R$1.297 da entrada (Bio de graça, site pela metade). */
   var COBERTURA = {
     Starter:  ['catalogo','agendamento','whatsapp','dashboard'],
-    'Negócio':['catalogo','agendamento','whatsapp','dashboard','instagram','crm','reputacao','seolocal','estoque','relatorio'],
-    Pro:      ['catalogo','agendamento','whatsapp','dashboard','instagram','crm','reputacao','seolocal','estoque','relatorio','app','trafego','nfce']
+    'Negócio':['catalogo','agendamento','whatsapp','dashboard','instagram','crm','reputacao','seolocal','relatorio'],
+    Pro:      ['catalogo','agendamento','whatsapp','dashboard','instagram','crm','reputacao','seolocal','relatorio','app','trafego','nfce']
   };
   var ORDEM_PLANO = ['Starter','Negócio','Pro'];
 

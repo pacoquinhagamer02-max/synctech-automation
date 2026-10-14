@@ -533,7 +533,7 @@ function Hero() {
     </section>`;
 }
 
-/* ═══════════════ Serviços — os 15 serviços + 2 em desenvolvimento ═══════════════ */
+/* ═══════════════ Serviços — os 14 serviços + 2 em desenvolvimento ═══════════════ */
 const SERVICOS = [
   { ico: ICONES.whats, nome: 'WhatsApp Bot 24/7', tag: 'Mais popular', grande: true,
     txt: 'Atende clientes, responde perguntas, agenda horários e fecha vendas automaticamente enquanto você dorme.',
@@ -562,8 +562,6 @@ const SERVICOS = [
     txt: 'Seu negócio vira aplicativo na tela do cliente, sem loja de aplicativo. Pedido, carrinho, Pix com QR Code e "pedir de novo" num toque.' },
   { ico: ICONES.mapa, nome: 'SEO Local no Google', tag: 'Novo',
     txt: 'Aparecer quando alguém da sua cidade procura o que você vende. Perfil escrito, palavras locais e 8 publicações por mês.' },
-  { ico: ICONES.caixa, nome: 'Controle de Estoque',
-    txt: 'Conta o que tem, avisa o que está acabando e monta a lista de compras pronta pra mandar no WhatsApp do fornecedor.' },
   { ico: ICONES.folha, nome: 'Relatório de Resultados',
     txt: 'Todo mês, uma página com o que foi feito e o que saiu disso em número — sem você abrir planilha.' },
   { ico: ICONES.nota, nome: 'Nota Fiscal no pedido',
@@ -578,7 +576,7 @@ function Servicos() {
       <div className="mx-auto max-w-6xl">
         <${Reveal}>
           <${TituloSecao} tag="O hub completo"
-            titulo=${html`15 serviços em uma <span className="texto-gradiente">única mensalidade</span>`}
+            titulo=${html`14 serviços em uma <span className="texto-gradiente">única mensalidade</span>`}
             sub="Tudo que seu negócio precisa pra automatizar, atender melhor e vender mais — sem equipe técnica." />
         <//>
         <div className="grid gap-4 md:grid-cols-3">
@@ -917,8 +915,8 @@ function Segmentos() {
    Mesmos valores de docs/tabela-precos-2026.html e do Hub. Mudou aqui,
    muda nos três. */
 const AVULSOS_MES = [
-  ['Gestão de Tráfego Pago',     800, 'Anúncio no Instagram e no Facebook pra trazer cliente novo toda semana.', 'verba à parte'],
-  ['Aplicativo Personalizado',   850, 'Seu negócio vira um app na tela do cliente, com pedido, carrinho e Pix.', ''],
+  ['Gestão de Tráfego Pago',    1000, 'Anúncio no Instagram e no Facebook pra trazer cliente novo toda semana.', 'verba à parte'],
+  ['Aplicativo Personalizado',   400, 'Seu negócio vira um app na tela do cliente, com pedido, carrinho e Pix.', 'mais R$ 850 para construir, uma vez'],
   ['SEO Local no Google',        500, 'Aparecer quando alguém da sua cidade procura o que você vende.', ''],
   ['Gestão de Reputação',        297, 'Cliente satisfeito vira avaliação. Insatisfeito vira conversa privada.', ''],
   ['WhatsApp Bot 24 horas',      397, 'Responde, agenda e confirma sozinho, inclusive domingo e de madrugada.', 'requer Z-API'],
@@ -928,7 +926,6 @@ const AVULSOS_MES = [
   ['CRM com Pipeline',           147, 'Nenhum cliente se perde: cada pessoa vira um cartão até fechar.', ''],
   ['Nota Fiscal no pedido',      197, 'Cada venda feita pelo aplicativo sai com nota fiscal autorizada.', 'requer emissora'],
   ['Catálogo Digital',           147, 'Seu cardápio online. O pedido chega pronto no seu WhatsApp.', ''],
-  ['Controle de Estoque',         97, 'Avisa o que está acabando e monta a lista de compras pronta.', ''],
   ['Dashboard de Métricas',       97, 'Quanto entrou, quantos clientes novos e o que mais vendeu.', ''],
 ];
 
@@ -942,8 +939,8 @@ const AVULSOS_UNICO = [
    = R$2.297; no plano ela cai pra R$1.000, então o plano tira R$1.297. */
 const ECONOMIA = [
   { plano: 'Starter', avulso:  908, mensal:  597, guarda:  311 },
-  { plano: 'Negócio', avulso: 2443, mensal: 1497, guarda:  946 },
-  { plano: 'Pro',     avulso: 4290, mensal: 2697, guarda: 1593 },
+  { plano: 'Negócio', avulso: 2346, mensal: 1497, guarda:  849 },
+  { plano: 'Pro',     avulso: 3943, mensal: 2697, guarda: 1246 },
 ];
 const ENTRADA_DISPENSADA = 1297;
 
@@ -976,12 +973,12 @@ const PLANOS = [
     desc: 'Tudo do Starter mais o que faz o cliente achar você, voltar e indicar.',
     inclui: ['Tudo do Starter', 'Instagram Automático (DM + comentários)',
              'CRM com pipeline de vendas', 'SEO Local no Google e no Maps',
-             'Gestão de Reputação no Google', 'Controle de Estoque',
+             'Gestão de Reputação no Google',
              'Relatório de Resultados mensal', 'Suporte prioritário'],
     emBreve: [], fora: ['Aplicativo próprio', 'Tráfego Pago'] },
   { chave: 'pro', nome: 'Pro', mensal: 2697, anual: 2157, dest: false,
-    desc: 'Os 15 serviços, inclusive anúncio e aplicativo próprio.',
-    inclui: ['Tudo do Negócio', 'Aplicativo Personalizado',
+    desc: 'Os 14 serviços, inclusive anúncio e aplicativo próprio.',
+    inclui: ['Tudo do Negócio', 'Aplicativo Personalizado (construção de R$ 850 à parte)',
              'Gestão de Tráfego Pago (verba à parte)', 'Nota Fiscal no pedido (NFC-e)',
              'Suporte 7 dias por semana', 'Reunião mensal de resultados'],
     emBreve: ['Email Marketing', 'Chat ao Vivo no Site'], fora: [] }
@@ -1054,7 +1051,7 @@ function Planos() {
                   </div>
                 </div>`)}
               <p className="px-6 py-4 text-xs leading-relaxed text-txt3">
-                No plano, a entrada cai de R$ 2.297 para R$ 1.000: o Link na Bio (R$ 297) sai de graça e o Site (R$ 2.000) sai pela metade.
+                No plano, a entrada cai de R$ 2.297 para R$ 1.000: o Link na Bio (R$ 297) sai de graça e o Site (R$ 2.000) sai pela metade. No Pro, a construção do aplicativo (R$ 850, uma vez) se paga à parte, igual no avulso.
                 Nenhum serviço promete faturamento: o que garantimos é a operação rodando todo dia — o resultado depende do seu negócio.
               </p>
             </div>
