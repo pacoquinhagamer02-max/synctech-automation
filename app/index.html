@@ -1440,6 +1440,72 @@ function avancarLead(id) {
   }
 }
 
+// ═══════════════ PROSPECÇÃO: sites de R$2.000 em Mariana (14/10/2026) ═══════════════
+// Pesquisa no Google Maps, ficha de cada um conferida (sem site próprio no perfil).
+// Lista completa e motivo de cada um: docs/expansao/prospects-site-mariana-2026-10.md
+// val = manutenção mensal (R$120); o site em si é R$2.000 de entrada.
+const LEADS_PROSPECCAO_OUT26 = [
+  ['p26_laclinic',  'La Clinic by Gislaine Freitas',            'Estética · 5,0 (307) no Google · sem site', '31981219624', 'Prioridade 1'],
+  ['p26_cocp',      'Dr. Yuri Cruz – COCP Odontológica',        'Odontologia · 5,0 (310) · só link do WhatsApp', '31981215756', 'Prioridade 1'],
+  ['p26_bemestar',  'Clínica Bem Estar – Dr. Paulo Macieira',   'Dermatologia/estética · 4,9 (191) · sem site', '3135574250', 'Prioridade 1'],
+  ['p26_luacheia',  'Lua Cheia Restaurante',                    'Restaurante · 4,6 (1.918) · sem site', '3135573232', 'Prioridade 1'],
+  ['p26_chafariz',  'Pousada do Chafariz',                      'Pousada · 4,5 (173) · sem site', '3135571492', 'Prioridade 1'],
+  ['p26_mayara',    'Studio Mayara Galdino',                    'Salão de beleza · 5,0 (291) · sem site', '31985229160', 'Prioridade 2'],
+  ['p26_andrade',   'Dr. Vitor e Dr. Leandro Andrade',          'Odontologia · 5,0 (29) · sem site', '31986208962', 'Prioridade 2'],
+  ['p26_douglas',   'Dentista Dr. Douglas Brandão',             'Odontologia · 5,0 (36) · sem site', '3135584354', 'Prioridade 2'],
+  ['p26_carvalho',  'Carvalho Advocacia',                       'Advocacia · 5,0 (98) · sem site', '31984728512', 'Prioridade 2'],
+  ['p26_rancho',    'Rancho da Praça',                          'Restaurante · 4,3 (1.272) · sem site', '3135581060', 'Prioridade 2'],
+  ['p26_quintal',   'Quintal Mariana',                          'Restaurante · 4,3 (1.257) · sem site', '3135571610', 'Prioridade 2'],
+  ['p26_ourorreal', 'Pousada Ouro Real',                        'Pousada · 4,4 (121) · sem site', '3135571767', 'Prioridade 2'],
+  ['p26_habitat',   'Clinica Vet – Instituto Habitat',          'Veterinária · 4,6 (90) · sem site', '3131916152', 'Prioridade 2'],
+  ['p26_luciane',   'Centro de Beleza Luciane Carneiro',        'Salão de beleza · 4,6 (103) · sem site', '3135582405', 'Prioridade 2'],
+  ['p26_ative',     'Ative Fitness Academia',                   'Academia · 4,4 (240) · só link de bio', '3135585404', 'Prioridade 2'],
+];
+
+/* Entra uma vez por aparelho, só o que ainda não está no funil (por id), e vai
+   pra planilha pelo mesmo caminho do cadastro manual — senão a sincronização,
+   que substitui o local pelo da nuvem, apagaria os leads. */
+function importarProspeccao() {
+  const FLAG = 'synctech_prospeccao_out26';
+  if (localStorage.getItem(FLAG)) return;
+  let leads = getStoredLeads();
+  let ids = leads.map(function (l) { return l.id; });
+  let novos = LEADS_PROSPECCAO_OUT26.filter(function (p) { return ids.indexOf(p[0]) === -1; }).map(function (p) {
+    return { id: p[0], name: p[1], biz: 'Site R$2.000 — ' + p[2], val: 120, time: p[4] + ' · prospecção 14/10', src: 'google', phone: p[3], stage: 'Novo Lead', city: 'Mariana' };
+  });
+  if (novos.length) {
+    saveStoredLeads(leads.concat(novos));
+    novos.forEach(function (lead) { pushLeadToCloud('add', { lead: lead }); });
+    showToast(novos.length + ' leads da prospecção de sites entraram no funil', 'success');
+  }
+  localStorage.setItem(FLAG, '1');
+}
+
+/* Telefone fixo (DDD + 8 dígitos começando em 2–5) não costuma ter WhatsApp:
+   o cartão mostra "Ligar" no lugar do botão do WhatsApp. */
+function ehTelefoneFixo(tel) {
+  let d = String(tel || '').replace(/\D/g, '');
+  if (d.length === 12 || d.length === 13) d = d.slice(2);
+  return d.length === 10 && /[2-5]/.test(d.charAt(2));
+}
+
+/* Mensagem de abordagem conforme o ramo, lido do texto do próprio lead. */
+const EXEMPLO_SITE = 'https://depilartbeautystudio.netlify.app';
+function mensagemAbordagem(l) {
+  let nome = String(l.name || '').trim();
+  let t = (String(l.biz || '') + ' ' + nome).toLowerCase();
+  let oi = 'Oi, tudo bem? Aqui é o Rafael, da SyncTech, de Mariana. ';
+  if (/odonto|dentista/.test(t)) return oi + 'Vi que o ' + nome + ' é muito bem avaliado no Google, mas ainda não tem um site próprio. Quem procura implante, lente ou clareamento pesquisa antes de ligar — um site com os tratamentos, a equipe e o botão de agendar transforma essa busca em consulta. Olha um que fiz aqui em Mariana: ' + EXEMPLO_SITE + ' . Posso montar uma prévia do de vocês, sem compromisso?';
+  if (/estética|estetica|dermat|salão|salao|beleza/.test(t)) return oi + 'Vi que o ' + nome + ' tem ótimas avaliações no Google, mas ainda não tem site — quem pesquisa no Google acaba caindo na concorrência. Faço sites com os serviços, fotos, resultados e botão de agendar no WhatsApp. Olha um que fiz aqui em Mariana: ' + EXEMPLO_SITE + ' . Posso te mostrar como ficaria o de vocês?';
+  if (/restaurante|bar|choperia/.test(t)) return oi + 'O ' + nome + ' tem muitas avaliações no Google, mas não tem site. O turista que vem a Mariana pesquisa onde comer antes de sair — um site com cardápio, fotos, horário e reserva pelo WhatsApp faz ele escolher vocês. Exemplo de site que fiz aqui: ' + EXEMPLO_SITE + ' . Posso mostrar uma prévia?';
+  if (/pousada|hotel|hostel/.test(t)) return oi + 'A ' + nome + ' ainda não tem site próprio. Hoje, quem reserva pelas plataformas faz vocês pagarem comissão; com um site com fotos, quartos e reserva direta pelo WhatsApp, o hóspede fecha direto com vocês. Exemplo de site que fiz aqui em Mariana: ' + EXEMPLO_SITE + ' . Posso te mostrar como ficaria?';
+  if (/advoca/.test(t)) return oi + 'Vi que o escritório é muito bem avaliado no Google, mas não tem site — e quem procura advogado em Mariana compara pelo Google. Faço um site sóbrio, dentro das regras da OAB, com as áreas de atuação e contato direto. Exemplo de site que fiz aqui: ' + EXEMPLO_SITE + ' . Posso te mostrar uma prévia?';
+  if (/veterin|pet/.test(t)) return oi + 'A ' + nome + ' é bem avaliada no Google, mas não tem site. Um site com os serviços, o atendimento de emergência e o WhatsApp à vista ajuda o tutor a decidir rápido. Exemplo de site que fiz aqui em Mariana: ' + EXEMPLO_SITE + ' . Posso montar uma prévia?';
+  if (/academia|fitness|pilates/.test(t)) return oi + 'A ' + nome + ' tem muitas avaliações no Google, mas o link do perfil leva só para uma página de bio. Um site com planos, modalidades, horários e botão de matrícula no WhatsApp converte muito mais. Exemplo de site que fiz aqui em Mariana: ' + EXEMPLO_SITE + ' . Posso te mostrar como ficaria?';
+  let cidadeTxt = l.city ? ' aqui em ' + String(l.city) : '';
+  return 'Oi! Vi o ' + nome + cidadeTxt + '. Ajudei uma barbearia em Mariana a crescer 18% em agendamentos sem gastar mais com anúncio — usando automação de WhatsApp e Instagram. Posso te mostrar como funcionaria pro seu negócio? Leva 5 minutos.';
+}
+
 // ═══════════════ RENDER: PIPELINE ═══════════════
 function renderPipeline() {
   let storedLeads = getStoredLeads();
@@ -1449,9 +1515,9 @@ function renderPipeline() {
     let cards = colLeads.map(function(l, li) {
       let srcCls = l.src==='wa' ? 'lc-wa' : l.src==='ig' ? 'lc-ig' : 'lc-google';
       let srcLabel = l.src==='wa' ? 'WhatsApp' : l.src==='ig' ? 'Instagram' : 'Google';
-      let cidadeTxt = l.city ? ' aqui em '+String(l.city).replace(/[<>&"']/g, '') : '';
-      let wppMsg = encodeURIComponent('Oi! Vi o '+String(l.name||'')+cidadeTxt+'. Ajudei uma barbearia em Mariana a crescer 18% em agendamentos sem gastar mais com anúncio — usando automação de WhatsApp e Instagram. Posso te mostrar como funcionaria pro seu negócio? Leva 5 minutos.');
+      let wppMsg = encodeURIComponent(mensagemAbordagem(l));
       let wppNum = l.phone ? obTelefone(l.phone) : '';
+      let fixo = l.phone && ehTelefoneFixo(l.phone);
       let isStored = !!l.id;
       let nextStage = isStored ? STAGE_ORDER[STAGE_ORDER.indexOf(l.stage)+1] : null;
       let valNum = Number(l.val) || 0;
@@ -1460,7 +1526,8 @@ function renderPipeline() {
         '<div class="lc-biz">'+escapeHtml(l.biz)+'</div>' +
         '<div class="lc-row"><span class="lc-val">R$'+valNum+'/mês</span><span class="lc-source '+srcCls+'">'+srcLabel+'</span></div>' +
         '<div class="lc-time">'+escapeHtml(l.time)+'</div>' +
-        (wppNum ? '<a href="https://wa.me/'+encodeURIComponent(wppNum)+'?text='+wppMsg+'" target="_blank" style="display:block;text-align:center;margin-top:10px;background:rgba(37,211,102,0.12);border:1px solid rgba(37,211,102,0.25);color:#25D366;border-radius:7px;padding:7px;font-size:0.7rem;font-weight:700;text-decoration:none">💬 WhatsApp</a>' : '') +
+        (wppNum && fixo ? '<a href="tel:+'+encodeURIComponent(wppNum)+'" style="display:block;text-align:center;margin-top:10px;background:rgba(155,92,255,0.12);border:1px solid rgba(155,92,255,0.3);color:var(--pl);border-radius:7px;padding:7px;font-size:0.7rem;font-weight:700;text-decoration:none">📞 Ligar (telefone fixo)</a>' : '') +
+        (wppNum && !fixo ? '<a href="https://wa.me/'+encodeURIComponent(wppNum)+'?text='+wppMsg+'" target="_blank" style="display:block;text-align:center;margin-top:10px;background:rgba(37,211,102,0.12);border:1px solid rgba(37,211,102,0.25);color:#25D366;border-radius:7px;padding:7px;font-size:0.7rem;font-weight:700;text-decoration:none">💬 WhatsApp</a>' : '') +
         (nextStage ? '<button onclick="avancarLead(\''+escapeHtml(l.id)+'\')" style="width:100%;margin-top:7px;background:var(--s3);border:1px solid var(--border-s);color:var(--pl);border-radius:7px;padding:7px;font-size:0.68rem;font-weight:700;cursor:pointer;font-family:var(--font-head),sans-serif;text-transform:uppercase;letter-spacing:0.03em">→ '+escapeHtml(nextStage)+'</button>' : '') +
       '</div>';
     }).join('');
@@ -2926,8 +2993,13 @@ document.getElementById('pl-sync-secret').value = PIPELINE_SYNC_SECRET;
 updateSyncStatusUI();
 atualizarAvisoFila();
 reenviarFilaSync();
+if (PIPELINE_SYNC_URL) {
+  syncPipelineFromCloud(function () { importarProspeccao(); renderPipeline(); });
+  syncClientsFromCloud(); syncAvulsosFromCloud();
+} else {
+  importarProspeccao();
+}
 renderPipeline();
-if (PIPELINE_SYNC_URL) { syncPipelineFromCloud(renderPipeline); syncClientsFromCloud(); syncAvulsosFromCloud(); }
 renderServicesGrid();
 renderClients();
 renderAvulsos();
