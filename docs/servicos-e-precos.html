@@ -359,15 +359,15 @@
     <div class="band">
       <p class="eyebrow">Comparando</p>
       <h2>Quanto o plano economiza</h2>
-      <p>A coluna "avulso daria" é a soma das mensalidades desta mesma página para os serviços do plano. No plano, a entrada cai de R$ 2.297 para R$ 1.000: o Link na Bio (R$ 297) sai de graça e o Site (R$ 2.000) sai pela metade. No Pro, a construção do aplicativo (R$ 850, uma vez) se paga à parte, igual no avulso.</p>
+      <p>A coluna "avulso daria" é a soma das mensalidades desta mesma página para os serviços do plano. No plano, o site é pago inteiro (R$ 2.000 no Pix ou R$ 2.200 no cartão) e o Link na Bio (R$ 297) sai de graça. No Pro, a construção do aplicativo (R$ 850, uma vez) se paga à parte, igual no avulso.</p>
     </div>
     <div class="tablewrap">
       <table>
         <thead><tr><th>Plano</th><th>Avulso daria</th><th>No plano</th></tr></thead>
         <tbody>
-          <tr><td class="v">Starter</td><td class="m">R$ 908/mês<br><span class="ent">+ R$ 2.297 de entrada</span></td><td class="v">R$ 727/mês<span class="save">economiza R$ 181/mês e R$ 1.297 da entrada</span></td></tr>
-          <tr><td class="v">Negócio</td><td class="m">R$ 2.346/mês<br><span class="ent">+ R$ 2.297 de entrada</span></td><td class="v">R$ 1.747/mês<span class="save">economiza R$ 599/mês e R$ 1.297 da entrada</span></td></tr>
-          <tr><td class="v">Pro</td><td class="m">R$ 3.943/mês<br><span class="ent">+ R$ 2.297 de entrada</span></td><td class="v">R$ 2.747/mês<span class="save">economiza R$ 1.196/mês e R$ 1.297 da entrada</span></td></tr>
+          <tr><td class="v">Starter</td><td class="m">R$ 811/mês<br><span class="ent">+ R$ 2.297 de entrada</span></td><td class="v">R$ 697/mês<span class="save">economiza R$ 114/mês e o Link na Bio (R$ 297)</span></td></tr>
+          <tr><td class="v">Negócio</td><td class="m">R$ 2.346/mês<br><span class="ent">+ R$ 2.297 de entrada</span></td><td class="v">R$ 1.797/mês<span class="save">economiza R$ 549/mês e o Link na Bio (R$ 297)</span></td></tr>
+          <tr><td class="v">Pro</td><td class="m">R$ 3.943/mês<br><span class="ent">+ R$ 2.297 de entrada</span></td><td class="v">R$ 2.797/mês<span class="save">economiza R$ 1.146/mês e o Link na Bio (R$ 297)</span></td></tr>
         </tbody>
       </table>
     </div>
@@ -442,15 +442,15 @@
 
   /* ═════════ PLANOS ═════════ */
   var PLANOS = [
-    { nome:'Starter', mensal:727, anual:581,
-      desc:'A presença completa do seu negócio, no ar em até 7 dias.',
-      inc:['Site personalizado, com a entrada pela metade','Link na Bio profissional','Catálogo Digital','Agendamento Online','WhatsApp Bot 24/7','Dashboard de Métricas','Suporte via WhatsApp'],
-      fora:['Instagram Automático','CRM com pipeline','Tráfego Pago'] },
-    { nome:'Negócio', mensal:1747, anual:1397, dest:true,
+    { nome:'Starter', mensal:697, anual:557,
+      desc:'Atender e vender: site, cardápio, agenda e WhatsApp 24h, no ar em até 7 dias.',
+      inc:['Site personalizado (manutenção inclusa)','Link na Bio profissional (de graça)','Catálogo Digital ou Cardápio Online','Agendamento Online','WhatsApp Bot 24/7','Suporte via WhatsApp'],
+      fora:['SEO Local e Reputação','Instagram Automático','Tráfego Pago'] },
+    { nome:'Negócio', mensal:1797, anual:1437, dest:true,
       desc:'Tudo do Starter mais o que faz o cliente achar você, voltar e indicar.',
-      inc:['Tudo do Starter','Instagram Automático (DM + comentários)','CRM com pipeline de vendas','SEO Local no Google e no Maps','Gestão de Reputação no Google','Relatório de Resultados mensal','Suporte prioritário'],
+      inc:['Tudo do Starter','SEO Local no Google e no Maps','Gestão de Reputação no Google','Instagram Automático (DM + comentários)','CRM com pipeline de vendas','Relatório mensal + Dashboard de Métricas','Suporte prioritário'],
       fora:['Aplicativo próprio','Tráfego Pago'] },
-    { nome:'Pro', mensal:2747, anual:2197,
+    { nome:'Pro', mensal:2797, anual:2237,
       desc:'Os 14 serviços, inclusive anúncio e aplicativo próprio.',
       inc:['Tudo do Negócio','Aplicativo Personalizado (construção de R$ 850 à parte)','Gestão de Tráfego Pago (verba à parte)','Nota Fiscal no pedido (NFC-e)','Suporte 7 dias por semana','Reunião mensal de resultados'],
       fora:['E-mail Marketing (em desenvolvimento)','Chat ao Vivo (em desenvolvimento)'] }
@@ -601,13 +601,13 @@
       frase:'Começar leve faz sentido: atendimento automático, agenda e um lugar onde nenhum orçamento se perde. Quando o movimento firmar, o anúncio entra para trazer gente nova.' }
   ];
 
-  var VALOR_PLANO = { Starter:727, 'Negócio':1747, Pro:2747 };
+  var VALOR_PLANO = { Starter:697, 'Negócio':1797, Pro:2797 };
   /* Desde out/2026 o Pro cobre os 12 serviços mensais; Starter e Negócio
      cobrem os subconjuntos abaixo. Site e Link na Bio não aparecem aqui
      porque são pagamento único, não mensalidade — os planos simplesmente
-     tiram R$1.297 da entrada (Bio de graça, site pela metade). */
+     tiram R$297 da entrada (Link na Bio de graça; o site é pago inteiro). */
   var COBERTURA = {
-    Starter:  ['catalogo','agendamento','whatsapp','dashboard'],
+    Starter:  ['catalogo','agendamento','whatsapp'],
     'Negócio':['catalogo','agendamento','whatsapp','dashboard','instagram','crm','reputacao','seolocal','relatorio'],
     Pro:      ['catalogo','agendamento','whatsapp','dashboard','instagram','crm','reputacao','seolocal','relatorio','app','trafego','nfce']
   };
@@ -645,7 +645,7 @@
 
   /* Site e Link na Bio sao pagamento unico; nenhum plano cobra entrada
      por eles. Vale dinheiro e some de qualquer conta so mensal. */
-  var ENTRADA_DISPENSADA = 1297;
+  var ENTRADA_DISPENSADA = 297;
 
   function fraseRota(r){
     var nome = esc(r.rota.plano);
@@ -737,7 +737,7 @@
       hint.className = 'hint';
       hint.innerHTML = 'Melhor caminho: ' + fraseRota(r) + '. Tudo avulso daria ' + brl(r.avulso) +
         ' \u2014 <b>economia de ' + brl(r.avulso - r.rota.custo) + ' por m\u00eas</b>, mais os ' +
-        brl(ENTRADA_DISPENSADA) + ' da entrada (o Link na Bio sai de graça e o site pela metade).' + fraseBrinde(r);
+        brl(ENTRADA_DISPENSADA) + ' da entrada (o Link na Bio sai de graça).' + fraseBrinde(r);
       return;
     }
 
@@ -755,7 +755,7 @@
     hint.className = 'hint flat';
     hint.innerHTML = 'Avulso \u00e9 o mais barato aqui. Mas por <b>' + brl(r.rota.custo - r.avulso) +
       ' a mais por m\u00eas</b> voc\u00ea tem o ' + fraseRota(r) + ', sem os ' + brl(ENTRADA_DISPENSADA) +
-      ' da entrada (Link na Bio de graça e site pela metade).' + fraseBrinde(r);
+      ' da entrada (Link na Bio de graça).' + fraseBrinde(r);
   }
 
   document.getElementById('chips').addEventListener('click', function(ev){
@@ -812,7 +812,7 @@
       titulo = 'Avulso ' + brl(r.avulso) + ', ou plano ' + esc(r.rota.plano) + ' por ' + brl(r.rota.custo - r.avulso) + ' a mais';
       detalhe = 'Esses servi\u00e7os separados somam ' + brl(r.avulso) + ' por m\u00eas. O ' + fraseRota(r) +
         ' custa ' + brl(r.rota.custo) + ' \u2014 ' + brl(r.rota.custo - r.avulso) + ' a mais, sem os ' +
-        brl(ENTRADA_DISPENSADA) + ' da entrada (Link na Bio de graça e site pela metade).' + fraseBrinde(r);
+        brl(ENTRADA_DISPENSADA) + ' da entrada (Link na Bio de graça).' + fraseBrinde(r);
     } else {
       total = r.avulso;
       titulo = 'Avulso, sem plano';

@@ -5,14 +5,14 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%239B5CFF'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='Georgia,serif' font-weight='700' font-size='18' fill='%23ffffff'%3ES%3C/text%3E%3C/svg%3E">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>SyncTech Automation | Atendimento no automático 24h</title>
-<meta name="description" content="WhatsApp Bot, agendamento automático, Instagram e CRM para pequenos negócios. Setup em 7 dias, com site incluído, a partir de R$727/mês.">
+<meta name="description" content="WhatsApp Bot, agendamento automático, Instagram e CRM para pequenos negócios. Setup em 7 dias, com site incluído, a partir de R$697/mês.">
 <meta name="theme-color" content="#0A0714">
 <link rel="canonical" href="https://pacoquinhagamer02-max.github.io/synctech-automation/">
 
 <meta property="og:type" content="website">
 <meta property="og:locale" content="pt_BR">
 <meta property="og:title" content="SyncTech Automation | Atendimento no automático 24h">
-<meta property="og:description" content="WhatsApp Bot, agendamento automático, Instagram e CRM para pequenos negócios. Setup em 7 dias, com site incluído, a partir de R$727/mês.">
+<meta property="og:description" content="WhatsApp Bot, agendamento automático, Instagram e CRM para pequenos negócios. Setup em 7 dias, com site incluído, a partir de R$697/mês.">
 <meta property="og:url" content="https://pacoquinhagamer02-max.github.io/synctech-automation/">
 <meta name="twitter:card" content="summary_large_image">
 
@@ -229,7 +229,7 @@ const PROVA = {
   stats: [
     ['+18%',   'Crescimento real em 23 dias'],
     ['24h',    'Atendimento contínuo'],
-    ['R$727',  'A partir de, por mês'],
+    ['R$697',  'A partir de, por mês'],
     ['7 dias', 'Para estar no ar']
   ],
   caso: {
@@ -593,7 +593,7 @@ const SERVICOS = [
   { ico: ICONES.grafico, nome: 'Dashboard de Métricas',
     txt: 'Agendamentos, receita, clientes novos e performance do bot — em tempo real.' },
   { ico: ICONES.site, nome: 'Site personalizado', tag: 'Novo',
-    txt: 'Página própria do negócio: serviços com preço, endereço, horário e botão de WhatsApp sempre à vista. Nos planos, a entrada do site sai pela metade.' },
+    txt: 'Página própria do negócio: serviços com preço, endereço, horário e botão de WhatsApp sempre à vista. Nos planos, o Link na Bio sai de graça.' },
   { ico: ICONES.celular, nome: 'Aplicativo Personalizado',
     txt: 'Seu negócio vira aplicativo na tela do cliente, sem loja de aplicativo. Pedido, carrinho, Pix com QR Code e "pedir de novo" num toque.' },
   { ico: ICONES.mapa, nome: 'SEO Local no Google', tag: 'Novo',
@@ -648,7 +648,7 @@ function Servicos() {
 }
 
 /* ═══════════════ Calculadora de ROI ═══════════════ */
-const CUSTO_MES = 727; // plano Starter, o de entrada. Tem de acompanhar PLANOS[0].mensal.
+const CUSTO_MES = 697; // plano Starter, o de entrada. Tem de acompanhar PLANOS[0].mensal.
 
 function Slider({ rotulo, valor, min, max, passo, onChange, formata, dica }) {
   const pct = ((valor - min) / (max - min)) * 100;
@@ -816,7 +816,7 @@ function Processo() {
 
 /* ═══════════════ Comparativo ═══════════════ */
 const COLUNAS = [
-  ['SyncTech', 'R$727/mês · site e serviço inclusos'],
+  ['SyncTech', 'R$697/mês · site e serviço inclusos'],
   ['Trinks / Booksy', 'R$150/mês · ferramenta, você opera'],
   ['WhatsApp manual', 'R$0/mês · o custo é o seu tempo']
 ];
@@ -972,13 +972,13 @@ const AVULSOS_UNICO = [
 
 /* Soma dos mesmos avulsos que cada plano cobre (com os R$120 de
    manutenção do site). Entrada avulsa: Site R$2.000 + Link na Bio R$297
-   = R$2.297; no plano ela cai pra R$1.000, então o plano tira R$1.297. */
+   = R$2.297; no plano o site é pago inteiro e só o Link na Bio sai de graça (R$297). */
 const ECONOMIA = [
-  { plano: 'Starter', avulso:  908, mensal:  727, guarda:  181 },
-  { plano: 'Negócio', avulso: 2346, mensal: 1747, guarda:  599 },
-  { plano: 'Pro',     avulso: 3943, mensal: 2747, guarda: 1196 },
+  { plano: 'Starter', avulso:  811, mensal:  697, guarda:  114 },
+  { plano: 'Negócio', avulso: 2346, mensal: 1797, guarda:  549 },
+  { plano: 'Pro',     avulso: 3943, mensal: 2797, guarda: 1146 },
 ];
-const ENTRADA_DISPENSADA = 1297;
+const ENTRADA_DISPENSADA = 297;
 
 /* Mecanismo, não promessa de faturamento: cada linha diz o que passa a
    acontecer na operação, não quanto o cliente vai ganhar. */
@@ -999,20 +999,20 @@ const PORQUE = [
 
 /* ═══════════════ Planos ═══════════════ */
 const PLANOS = [
-  { chave: 'starter', nome: 'Starter', mensal: 727, anual: 581, dest: false,
-    desc: 'A presença completa do seu negócio, no ar em até 7 dias.',
-    inclui: ['Site personalizado, com a entrada pela metade', 'Link na Bio profissional',
-             'Catálogo Digital', 'Agendamento Online', 'WhatsApp Bot 24/7',
-             'Dashboard de Métricas', 'Suporte via WhatsApp'],
-    emBreve: [], fora: ['Instagram Automático', 'CRM com pipeline', 'Tráfego Pago'] },
-  { chave: 'negocio', nome: 'Negócio', mensal: 1747, anual: 1397, dest: true,
+  { chave: 'starter', nome: 'Starter', mensal: 697, anual: 557, dest: false,
+    desc: 'Atender e vender: site, cardápio, agenda e WhatsApp 24h, no ar em até 7 dias.',
+    inclui: ['Site personalizado (manutenção inclusa)', 'Link na Bio profissional (de graça)',
+             'Catálogo Digital ou Cardápio Online', 'Agendamento Online', 'WhatsApp Bot 24/7',
+             'Suporte via WhatsApp'],
+    emBreve: [], fora: ['SEO Local e Reputação', 'Instagram Automático', 'Tráfego Pago'] },
+  { chave: 'negocio', nome: 'Negócio', mensal: 1797, anual: 1437, dest: true,
     desc: 'Tudo do Starter mais o que faz o cliente achar você, voltar e indicar.',
-    inclui: ['Tudo do Starter', 'Instagram Automático (DM + comentários)',
-             'CRM com pipeline de vendas', 'SEO Local no Google e no Maps',
-             'Gestão de Reputação no Google',
-             'Relatório de Resultados mensal', 'Suporte prioritário'],
+    inclui: ['Tudo do Starter', 'SEO Local no Google e no Maps',
+             'Gestão de Reputação no Google', 'Instagram Automático (DM + comentários)',
+             'CRM com pipeline de vendas',
+             'Relatório mensal + Dashboard de Métricas', 'Suporte prioritário'],
     emBreve: [], fora: ['Aplicativo próprio', 'Tráfego Pago'] },
-  { chave: 'pro', nome: 'Pro', mensal: 2747, anual: 2197, dest: false,
+  { chave: 'pro', nome: 'Pro', mensal: 2797, anual: 2237, dest: false,
     desc: 'Os 14 serviços, inclusive anúncio e aplicativo próprio.',
     inclui: ['Tudo do Negócio', 'Aplicativo Personalizado (construção de R$ 850 à parte)',
              'Gestão de Tráfego Pago (verba à parte)', 'Nota Fiscal no pedido (NFC-e)',
@@ -1087,7 +1087,7 @@ function Planos() {
                   </div>
                 </div>`)}
               <p className="px-6 py-4 text-xs leading-relaxed text-txt3">
-                No plano, a entrada cai de R$ 2.297 para R$ 1.000: o Link na Bio (R$ 297) sai de graça e o Site (R$ 2.000) sai pela metade. No Pro, a construção do aplicativo (R$ 850, uma vez) se paga à parte, igual no avulso.
+                No plano, o site é pago inteiro (R$ 2.000 no Pix ou R$ 2.200 no cartão) e o Link na Bio (R$ 297) sai de graça. No Pro, a construção do aplicativo (R$ 850, uma vez) se paga à parte, igual no avulso.
                 Nenhum serviço promete faturamento: o que garantimos é a operação rodando todo dia — o resultado depende do seu negócio.
               </p>
             </div>
@@ -1115,7 +1115,7 @@ function Planos() {
                 <p className="mt-2 text-xs text-txt3">
                   ${anual
                     ? 'Preço final · economia de ' + brl((p.mensal - p.anual) * 12) + ' no ano'
-                    : 'Preço final · configuração inclusa · entrada do site pela metade'}
+                    : 'Preço final · configuração inclusa · Link na Bio de graça'}
                 </p>
 
                 <div className="my-7 h-px bg-linha"></div>
