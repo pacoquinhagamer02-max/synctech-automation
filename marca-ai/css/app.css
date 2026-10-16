@@ -174,10 +174,7 @@ textarea.inp{min-height:84px;resize:vertical}
 .semPunicao{font-size:13px;color:var(--mudo);text-align:center;margin-top:6px}
 
 /* ============ Mapa ilustrativo ============ */
-.mapa{display:block;width:100%;height:auto;border-radius:var(--r-m);background:#2C2F33;box-shadow:inset 0 0 0 1px rgba(255,255,255,.05),0 10px 22px -12px rgba(0,0,0,.7)}
 .mapa-legenda{font-size:12px;color:var(--mudo);margin:6px 2px 12px}
-.mapa .rota-anim{stroke-dasharray:6 8;animation:anda 1.2s linear infinite}
-@keyframes anda{to{stroke-dashoffset:-28}}
 
 /* Outros chamados (escolha do motoboy) */
 .outras{margin-top:14px}
@@ -597,7 +594,6 @@ dialog#dialogo[open] .folha{animation:sobe .5s var(--mola)}
 }
 .inp{background:#000;border-color:var(--linha)}
 :root[data-tema="sol"] .inp{background:#fff;border-color:#0A0A0A;box-shadow:inset 0 2px 0 rgba(0,0,0,.08)}
-.mapa{background:#0A0A0A}
 .mapa-vivo{background:#0A0A0A}
 .rastreio{background:rgba(255,194,26,.12);box-shadow:inset 3px 0 0 var(--sinal)}
 .rastreio svg{color:var(--sinal-texto)}
@@ -622,3 +618,4 @@ dialog#dialogo[open] .folha{animation:sobe .5s var(--mola)}
 .placa .porkm{color:#1C1C1C}
 .placa{background:repeating-linear-gradient(135deg,rgba(30,79,163,.035) 0 2px,transparent 2px 9px),linear-gradient(180deg,#fff,#F5F3EA);color:#0A0A0A}
 :root[data-tema="sol"] .chave[aria-checked="true"]{background:var(--verde-borda)}
+.mapa-aviso{display:flex;gap:8px;align-items:flex-start;font-size:14px;font-weight:500;margin:-6px 0 12px;padding:10px 12px;border-radius:12px;background:rgba(255,194,26,.12);box-shadow:inset 3px 0 0 var(--sinal)}

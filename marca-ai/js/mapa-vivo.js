@@ -80,7 +80,7 @@ function atualizar(m, d) {
   m.origemMoto = !!naRua;
 
   // Moto: anima do ponto mostrado até a leitura nova, no tempo entre as leituras (fica sempre andando, como no Uber).
-  if (d.moto && d.fase !== 'oferta') {
+  if (d.moto) {
     if (!m.moto) m.moto = { de: d.moto, para: d.moto, t0: 0, dur: 1, em: d.moto.em };
     else if (d.moto.em !== m.moto.em) {
       let alvo = d.moto;
@@ -98,6 +98,8 @@ function atualizar(m, d) {
   const chave = `${naRua ? 'moto' : 'loja'}|${geoTxt(destino)}`;
   const agora = Date.now();
   let pedir = chave !== m.chaveRota && !m.pedindo;
+  // Busca falhou (sem internet, servidor fora): tenta de novo a cada 10 s até conseguir.
+  if (!pedir && !m.rota && !m.pedindo && agora - m.ultimoPedido >= 10000) pedir = true;
   if (!pedir && m.rota && naRua) {
     const p = projetarNaRota(m.rota.pontos, d.moto);
     m.foraSeguidas = p && p.desvioM > DESVIO_RECALCULA_M ? m.foraSeguidas + 1 : 0;
@@ -105,11 +107,19 @@ function atualizar(m, d) {
   }
   if (!pedir) return;
   if (chave !== m.chaveRota) m.rota = null; // rota de outra etapa não vale mais (recálculo mantém a antiga até chegar a nova)
-  m.chaveRota = chave; m.pedindo = true; m.ultimoPedido = agora; m.foraSeguidas = 0;
+  // Aviso no mapa, como no Waze/Uber: "Buscando rota" na primeira vez, "Recalculando rota" quando saiu do caminho.
+  m.aviso = m.rota ? 'recalculando' : 'buscando';
+  m.chaveRota = chave; m.pedindo = true; m.ultimoPedido = agora; m.foraSeguidas = 0; m.sujo = true;
   buscarRota(origem, destino).then(r => {
-    m.pedindo = false;
-    if (!r || m.chaveRota !== chave) return;
-    m.rota = r; m.sujo = true;
+    m.pedindo = false; m.sujo = true;
+    if (m.chaveRota !== chave) return;
+    if (!r) {
+      if (!m.rota) m.aviso = 'sem-rota'; else m.aviso = '';
+      // Mesmo com o motoboy parado (sem leitura nova), o mapa volta a tentar em 10 s.
+      setTimeout(() => ouvintes.forEach(fn => fn()), 10000);
+      return;
+    }
+    m.rota = r; m.aviso = '';
     ouvintes.forEach(fn => fn());
   });
 }
@@ -177,7 +187,17 @@ function desenhar(m, t) {
   const moto = posMoto(m, t);
   const andando = m.moto && t - m.moto.t0 < m.moto.dur;
   const alvo = enquadrar(m, w, h, moto);
-  if (!alvo) return;
+  if (!alvo) {
+    // Nada pra mostrar ainda (sem GPS e sem endereço salvo no mapa).
+    if (!m.sujo) return;
+    m.sujo = false;
+    const ctx = m.ctx; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.fillStyle = document.documentElement.dataset.tema === 'sol' ? '#FFFFFF' : '#0A0A0A'; ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = document.documentElement.dataset.tema === 'sol' ? '#0A0A0A' : '#FFFFFF';
+    ctx.font = '600 15px Saira, system-ui, sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('Esperando o GPS…', w / 2, h / 2); ctx.textAlign = 'start';
+    return;
+  }
   if (!m.cam) m.cam = { ...alvo };
   const mov = Math.abs(m.cam.x - alvo.x) * 2 ** m.cam.z + Math.abs(m.cam.y - alvo.y) * 2 ** m.cam.z + Math.abs(m.cam.z - alvo.z) * 100;
   const virando = Math.abs(((m.rumo - m.rumoMostrado + 540) % 360) - 180) > 0.5;
@@ -233,11 +253,26 @@ function desenhar(m, t) {
   if (m.cliente && m.fase !== 'loja') pino(ctx, tela(m.cliente), 'cliente');
   if (moto) motoIcone(ctx, tela(moto), m.rumoMostrado, t);
 
+  if (m.aviso) selo(ctx, { buscando: 'Buscando rota…', recalculando: 'Recalculando rota…', 'sem-rota': 'Sem rota agora. Tentando de novo…' }[m.aviso]);
+
   ctx.font = '600 10px system-ui, sans-serif';
   const credito = '© OpenStreetMap';
   const lw = ctx.measureText(credito).width + 10;
   ctx.fillStyle = 'rgba(255,255,255,.8)'; ctx.fillRect(w - lw, h - 16, lw, 16);
   ctx.fillStyle = '#333'; ctx.fillText(credito, w - lw + 5, h - 4);
+}
+
+// Selo amarelo no alto do mapa (aviso de rota).
+function selo(ctx, texto) {
+  ctx.save();
+  ctx.font = '700 13px "Saira Condensed", Saira, system-ui, sans-serif';
+  const lw = ctx.measureText(texto).width + 44, x = 10, y = 10, h = 28;
+  ctx.shadowColor = 'rgba(0,0,0,.45)'; ctx.shadowBlur = 8; ctx.shadowOffsetY = 2;
+  ctx.beginPath(); ctx.roundRect(x, y, lw, h, 14); ctx.fillStyle = '#FFC21A'; ctx.fill();
+  ctx.shadowColor = 'transparent'; ctx.lineWidth = 2; ctx.strokeStyle = '#0A0A0A'; ctx.stroke();
+  ctx.beginPath(); ctx.arc(x + 15, y + h / 2, 4, 0, Math.PI * 2); ctx.fillStyle = '#0A0A0A'; ctx.fill();
+  ctx.fillStyle = '#0A0A0A'; ctx.fillText(texto, x + 25, y + 19);
+  ctx.restore();
 }
 
 function pino(ctx, p, tipo) {

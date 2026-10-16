@@ -52,40 +52,14 @@ const feitosNoMes = () => resumoMes(S().calls, S().empresa.nome).total;
 const taxaAgora = () => taxaChamado(S().empresa.plano, feitosNoMes());
 const ofertaAtual = () => { const l = ofertasAbertas(); return l.find(c => c.id === escolhida) || l[0]; };
 
-// Mapa ilustrativo (SVG gerado pelo id do chamado, sem serviço externo).
-// A rota de verdade abre no Google Maps ou no Waze.
-function mapa(c, fase) {
-  let h = 0;
-  for (const ch of c.id) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
-  const rnd = () => { h = (Math.imul(h, 1103515245) + 12345) >>> 0; return h / 4294967296; };
-  const W = 340, H = 150;
-  const vs = [0, 1, 2, 3, 4, 5, 6, 7].map(i => Math.round(20 + i * 44 + rnd() * 10));
-  const hs = [0, 1, 2, 3].map(i => Math.round(18 + i * 38 + rnd() * 8));
-  const loja = { x: vs[1], y: hs[2] }, cli = { x: vs[5 + Math.floor(rnd() * 2)], y: hs[Math.floor(rnd() * 2)] };
-  const meioX = vs[3];
-  const rota = `M${loja.x} ${loja.y}H${meioX}V${cli.y}H${cli.x}`;
-  const moto = fase === 'loja' ? { x: vs[0], y: hs[3] } : fase === 'cliente' ? { x: meioX, y: Math.round((loja.y + cli.y) / 2) } : null;
-  const ruas = vs.map(x => `M${x} 0V${H}`).join('') + hs.map(y => `M0 ${y}H${W}`).join('');
-  const quadras = [0, 1, 2].map(() => { const i = Math.floor(rnd() * 6), j = Math.floor(rnd() * 3); return `<rect x="${vs[i] + 7}" y="${hs[j] + 7}" width="${vs[i + 1] - vs[i] - 14}" height="${hs[j + 1] - hs[j] - 14}" rx="4" fill="#161616"/>`; }).join('');
-  return `<svg class="mapa" viewBox="0 0 ${W} ${H}" role="img" aria-label="Mapa ilustrativo: da loja até o cliente, ${km(c.km)} quilômetros">
-    <rect width="${W}" height="${H}" fill="#0A0A0A"/>${quadras}
-    <path d="${ruas}" stroke="#000" stroke-width="9" fill="none"/>
-    <path d="${ruas}" stroke="#FFC21A" stroke-opacity=".3" stroke-width="1" stroke-dasharray="4 6" fill="none"/>
-    <path d="${rota}" stroke="#B98A00" stroke-width="8" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
-    <path d="${rota}" class="rota-anim" stroke="#FFC21A" stroke-width="5" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
-    ${moto ? `<path d="M${moto.x} ${moto.y}H${fase === 'loja' ? loja.x : cli.x}" stroke="#F5F3EA" stroke-width="2" stroke-dasharray="3 5" opacity=".6"/>` : ''}
-    <g transform="translate(${loja.x} ${loja.y})"><circle r="13" fill="#FFC21A" stroke="#231A00" stroke-width="3"/><path d="M-6 -1h12v7h-12zM-7 -1l2-5h10l2 5" fill="none" stroke="#231A00" stroke-width="2" stroke-linejoin="round"/></g>
-    <g transform="translate(${cli.x} ${cli.y})"><rect x="-12" y="-12" width="24" height="24" rx="5" fill="#F5F3EA" stroke="#15171A" stroke-width="3"/><path d="M-5 5V-6M-5 -6h9l-2 3 2 3h-9" fill="none" stroke="#15171A" stroke-width="2" stroke-linejoin="round"/></g>
-    ${moto ? `<g transform="translate(${moto.x} ${moto.y})"><circle r="15" fill="#2FBF71" opacity=".25"/><circle r="9" fill="#2FBF71" stroke="#F5F3EA" stroke-width="3"/></g>` : ''}
-  </svg><p class="mapa-legenda">Mapa ilustrativo. A rota de verdade abre no Google Maps ou no Waze.</p>`;
-}
-// Mapa ao vivo (modelo Uber/iFood) quando a loja e o destino têm localização; senão, o ilustrativo.
+// Mapa do GPS (modelo Uber/iFood) em toda corrida: rota pelas ruas, recalculada quando o motoboy sai do caminho.
+// Sem localização salva da loja ou do cliente, o mapa mostra o que tiver (a moto, a loja) e avisa o que falta.
 const FASE_MAPA = { aceito: 'loja', coleta: 'naloja', coletado: 'cliente' };
 function mapaCorrida(c, fase, moto) {
-  const precisa = fase === 'oferta' ? c.lojaGeo && c.clienteGeo : fase === 'loja' ? c.lojaGeo : c.clienteGeo;
-  if (!precisa) return mapa(c, fase === 'oferta' ? 'oferta' : fase);
   const rotulo = fase === 'oferta' ? `Mapa: rota da ${c.empresa} até o cliente` : fase === 'loja' ? `Mapa: caminho até a ${c.empresa}` : fase === 'naloja' ? `Mapa: ${c.empresa} e o ponto de entrega` : 'Mapa: caminho até o cliente';
-  return mapaVivo(c.id, { loja: c.lojaGeo, cliente: c.clienteGeo, moto, fase, rotulo });
+  const falta = fase === 'loja' ? !c.lojaGeo : fase === 'oferta' ? !(c.lojaGeo && c.clienteGeo) : !c.clienteGeo;
+  const aviso = !falta ? '' : `<p class="mapa-aviso">${fase === 'loja' || (fase === 'oferta' && !c.lojaGeo) ? 'A loja não salvou a localização no GPS. Use o endereço no Google Maps ou no Waze.' : 'O cliente ainda não tem o ponto exato no mapa. Use o endereço no Google Maps ou no Waze.'}</p>`;
+  return mapaVivo(c.id, { loja: c.lojaGeo, cliente: c.clienteGeo, moto, fase, rotulo }) + aviso;
 }
 // Quanto falta: pela rota das ruas quando ela já chegou; senão, estimativa em linha reta.
 function faltaAte(c, pos, alvo) {
@@ -551,7 +525,7 @@ function telaOferta(c) {
       <div class="porkm">${brl(porKm)} por km, sobra ${brl(lucro)} depois da gasolina</div>
     </div>
     <div class="bloco mt14">
-      ${mapaCorrida(c, 'oferta', null)}
+      ${mapaCorrida(c, 'oferta', posicaoAtual())}
       <ul class="rota">
         <li><b>${esc(c.empresa)}</b><small>${esc(c.coleta)}${ateLoja(c) != null ? `. Você está a ${km(ateLoja(c))} km, uns ${etaMin(ateLoja(c))} min` : ''}</small></li>
         <li><b>${esc(c.entrega)}</b><small>${km(c.km)} km da loja até o cliente${(() => { const r = c.lojaGeo && c.clienteGeo && infoRota(c.id); return r ? `. Pelas ruas: ${km(r.km)} km, ${minTxt(r.min)}` : c.clienteGeo ? ', ponto exato no mapa' : ''; })()}</small></li>
