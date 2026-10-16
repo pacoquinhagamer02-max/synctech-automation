@@ -6,6 +6,7 @@ import { TABELA, LIMITES, ATIVOS, TAGS_BOAS, TAGS_RUINS, podeIr, frete, taxaEspe
 import { ligarGps, desligarGps, estadoGps, aoMudarGps, pegarPosicao } from './gps.js';
 import { mapaVivo, montarMapas, infoRota, aoMudarRota } from './mapa-vivo.js';
 import * as nuvem from './nuvem.js';
+import { ligarEfeitos } from './efeitos.js';
 import { criarCorridas } from './corridas.js';
 import { armazemLocal, armazemMisto } from './armazens.js';
 import { limparPerfil, limparEmpresa, texto, numero, geo } from './esquema.js';
@@ -165,7 +166,7 @@ function montar() {
         <span class="top-status" data-live="nuvem-status"></span>
       </div>
     </header>
-    <main id="view"><h1 class="vh" tabindex="-1">${TITULOS[aba]}</h1>${VIEWS[papel][aba]()}</main>
+    <main id="view" class="cascata" data-tela="${papel}-${aba}"><h1 class="vh" tabindex="-1">${TITULOS[aba]}</h1>${VIEWS[papel][aba]()}</main>
     <nav class="tabs" aria-label="Seções">${ABAS[papel].map(([id, nome, i]) =>
       `<button data-act="aba" data-aba="${id}" ${id === aba ? 'aria-current="page"' : ''}>${ic(i)}${nome}<span data-badge="${id}"></span></button>`).join('')}</nav>`);
   refresh();
@@ -173,29 +174,31 @@ function montar() {
 
 /* ============ Boas-vindas ============ */
 function telaBoasVindas() {
-  const p = t => `<li>${ic('check')}<span>${t}</span></li>`;
-  return `<main class="welcome">
+  const porKm = brl(frete(5) / 5);
+  return `<main class="welcome cascata" data-tela="boas-vindas">
     <div class="logo">${ic('pin', 'class="pin"')}</div>
     <h1 class="marca" translate="no">Marca<br><em>aí</em></h1>
     <p class="lead">O app de entrega que trabalha pro motoboy.</p>
-    <figure class="vitrine" aria-label="Exemplo de chamado: R$ 12,00 por 5 km">
-      <div class="placa" aria-hidden="true">
+    <figure class="vitrine" aria-label="Exemplo de chamado: ${brl(frete(5))} por 5 km">
+      <div class="placa" data-3d="14" data-giro aria-hidden="true">
         <div class="faixa-azul"><span>Novo chamado</span><span>5 km</span></div>
         <div class="valor num">${brl(frete(5))}</div>
         <div class="porkm">Você vê o valor antes de aceitar</div>
       </div>
+      <div class="chao" aria-hidden="true"></div>
     </figure>
     <div class="escolha">
       <button class="btn btn-sinal" data-act="entrar" data-papel="moto">${ic('moto', 'width="26" height="26"')}Sou motoboy</button>
       <button class="btn btn-fantasma" data-act="entrar" data-papel="empresa">${ic('loja', 'width="24" height="24"')}Sou empresa, quero chamar motoboy</button>
     </div>
-    <div class="faixas" aria-hidden="true"></div>
-    <ul class="promessas">
-      ${p('O valor da corrida aparece antes de você aceitar, com o R$ por km.')}
-      ${p('100% do frete é seu. A empresa paga a taxa do app, não você.')}
-      ${p('Recusou? Sem punição, sem bloqueio, sem perder prioridade.')}
-      ${p(`Ficou esperando no balcão mais de ${TABELA.esperaGratisMin} min? A espera é paga.`)}
-      ${p('Saque via Pix na hora, sem taxa.')}
+    <div class="faixas" aria-hidden="true"><i></i></div>
+    <h2 class="olho">O combinado com quem pilota</h2>
+    <ul class="painel">
+      <li class="destaque"><b class="num">${porKm}<small>/km</small></b><span>O valor e o R$ por km aparecem antes de você aceitar.</span></li>
+      <li><b class="num">100%</b><span>do frete é seu. A taxa do app quem paga é a empresa.</span></li>
+      <li><b class="num">0</b><span>punição por recusar. Sem bloqueio, sem perder vez.</span></li>
+      <li><b class="num">${TABELA.esperaGratisMin}<small> min</small></b><span>de balcão. Passou disso, a espera é paga.</span></li>
+      <li><b class="num">Pix</b><span>Saque na hora, sem taxa.</span></li>
     </ul>
     <p class="demo">${nuvem.nuvemLigada() ? 'Funciona entre celulares: abra num celular como empresa e em outro como motoboy.' : 'Modo demonstração: os dados ficam neste aparelho.'}</p>
   </main>`;
@@ -222,8 +225,8 @@ function formEmpresa(titulo, texto, rotulo) {
 
 const VIEWS = {
   moto: {
-    corridas: () => `<div data-live="mb-status"></div><div data-live="mb-meta"></div><div data-live="mb-main"></div>`,
-    ganhos: () => `<div data-live="mb-ganhos"></div>`,
+    corridas: () => `<div data-live="mb-status"></div><div data-live="mb-meta"></div><div data-live="mb-main" class="cascata"></div>`,
+    ganhos: () => `<div data-live="mb-ganhos" class="cascata"></div>`,
     apoio: () => `
       <button class="sos" data-act="sos">${ic('alerta')}<span><b>SOS</b>Emergência, acidente ou assalto. Liga pra polícia, SAMU ou manda sua localização pro seu contato.</span></button>
       <div data-live="mb-apoio"></div>
@@ -377,7 +380,7 @@ const LIVE = {
       html(el, telaOferta(of)); return;
     }
     oferta = { id: null, ate: 0 };
-    html(el, `<div class="radar ${livre ? '' : 'parado'}"><div class="onda">${ic('moto')}</div></div>
+    html(el, `<div class="radar ${livre ? '' : 'parado'}" data-tela="radar-${livre}"><div class="onda">${ic('moto')}</div></div>
       <div class="vazio colado">${livre
         ? `<b>Procurando chamados a até ${S().profile.raio} km de você</b>${posicaoAtual()
             ? 'Quando uma loja perto chamar, o valor aparece aqui antes de você decidir.'
@@ -399,7 +402,7 @@ const LIVE = {
       ...todos.map(c => ({ t: quandoGanhou(c), html: `<li><div>${esc(c.empresa)}<small>${c.status === 'cancelado' ? 'Cancelada pela empresa, deslocamento pago' : `${km(c.km)} km${c.espera ? `, espera ${brl(c.espera)}` : ''}${c.gorjeta ? `, gorjeta ${brl(c.gorjeta)}` : ''}`}, ${dia(quandoGanhou(c))} ${hora(quandoGanhou(c))}</small></div><b>${brl(ganho(c))}</b></li>` })),
       ...s.saques.map(q => ({ t: q.em, html: `<li><div>Saque Pix<small>${esc(q.pix)}, ${dia(q.em)} ${hora(q.em)}</small></div><b class="mudo">− ${brl(q.valor)}</b></li>` }))
     ].sort((a, b) => b.t - a.t).slice(0, 40);
-    html(el, `<section class="saldo">
+    html(el, `<section class="saldo" data-3d="7" data-tela="ganhos">
         <small>Disponível pra sacar</small><b>${brl(sd)}</b>
         <button class="btn" data-act="sacar" ${sd <= 0 ? 'disabled' : ''}>Sacar agora via Pix, sem taxa</button>
       </section>
@@ -540,9 +543,9 @@ function telaOferta(c) {
   const lucro = c.valor - c.km * custoKm(S().profile);
   const resta = Math.max(0, oferta.ate - Date.now());
   const outras = ofertasAbertas().filter(x => x.id !== c.id).slice(0, 4);
-  return `<section class="oferta">
+  return `<section class="oferta cascata" data-tela="oferta-${esc(c.id)}">
     <h2 class="vh">Novo chamado</h2>
-    <div class="placa">
+    <div class="placa" data-3d="8" data-giro>
       <div class="faixa-azul"><span>Novo chamado</span><span>${esc(c.empresa)}</span></div>
       <div class="valor num">${brl(c.valor)}</div>
       <div class="porkm">${brl(porKm)} por km, sobra ${brl(lucro)} depois da gasolina</div>
@@ -584,7 +587,7 @@ function telaCorrida(c) {
   const alvoGeo = naLoja ? c.lojaGeo : c.clienteGeo, pos = posicaoAtual();
   const destinoNav = alvoGeo ? coordTxt(alvoGeo) : alvo;
   const falta = c.status !== 'coleta' ? faltaAte(c, pos, alvoGeo) : null;
-  return `<ol class="passos" aria-label="Etapa ${passo + 1} de 4: ${etapas[passo]}">${etapas.map((n, i) =>
+  return `<ol class="passos" data-tela="corrida-${esc(c.id)}-${c.status}" aria-label="Etapa ${passo + 1} de 4: ${etapas[passo]}">${etapas.map((n, i) =>
       `<li class="${i < passo ? 'feito' : i === passo ? 'agora' : ''}" ${i === passo ? 'aria-current="step"' : ''}>${n}</li>`).join('')}</ol>
     ${mapaCorrida(c, FASE_MAPA[c.status], pos)}
     <section class="bloco">
@@ -618,7 +621,7 @@ function telaAvaliar(c) {
   if (avaliacao.id !== c.id) avaliacao = { id: c.id, nota: 0, tags: [] };
   const chip = t => `<button type="button" data-act="tag" data-t="${esc(t)}" aria-pressed="${avaliacao.tags.includes(t)}">${esc(t)}</button>`;
   const minutos = c.aceitoEm && c.entregueEm ? Math.max(1, Math.round((c.entregueEm - c.aceitoEm) / 60000)) : null;
-  return `<section class="bloco centro resumo">
+  return `<section class="bloco centro resumo" data-tela="avaliar-${esc(c.id)}">
     <h2 class="sub">Entrega feita</h2>
     <p class="relogio ganho">+${brl(ganho(c))}</p>
     <p class="sub mb14">${c.espera ? `Inclui ${brl(c.espera)} de espera. ` : ''}Já está no seu saldo.</p>
@@ -668,6 +671,7 @@ function refresh() {
 }
 aoMudar(refresh);
 aoMudarRota(refresh);
+ligarEfeitos();
 
 /* ============ Relógio (1s) ============ */
 function tick() {
@@ -693,7 +697,9 @@ function tick() {
       mudar(s => { s.recusados.push(id); });
     }
   }
-  if (papel === 'moto' && !oferta.id && S().online && !emPausa() && !corridaAtiva() && !aAvaliar() && ofertaAtual()) refresh();
+  // Só redesenha se a tela de corridas está aberta: é ela que marca a oferta (oferta.id).
+  // Em outra aba, chamar refresh aqui voltava pro tick e travava o app (laço infinito).
+  if (papel === 'moto' && !oferta.id && document.querySelector('[data-live="mb-main"]') && S().online && !emPausa() && !corridaAtiva() && !aAvaliar() && ofertaAtual()) refresh();
   if (S().pausaAte && S().pausaAte <= agora) {
     mudar(s => { s.pausaAte = null; });
     if (papel === 'moto') toast('Pausa encerrada. Você está online de novo.');

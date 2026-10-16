@@ -1,4 +1,5 @@
 // Ferramentas de tela: formatação, escape de HTML, avisos e diálogos.
+import { marcarEntrada } from './efeitos.js';
 
 // Escapa tudo que veio de usuário antes de entrar num template HTML.
 export const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -28,6 +29,7 @@ export function html(el, conteudo) {
   // CSP não permite style="" inline; larguras e alturas dinâmicas entram pelo CSSOM.
   el.querySelectorAll('[data-w]').forEach(n => { n.style.width = Math.max(0, Math.min(100, +n.dataset.w)) + '%'; });
   el.querySelectorAll('[data-h]').forEach(n => { n.style.height = Math.max(0, Math.min(100, +n.dataset.h)) + '%'; });
+  marcarEntrada(el, conteudo);
 }
 
 // Avisos curtos, lidos também por leitor de tela (região viva fixa no HTML).

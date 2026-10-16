@@ -117,7 +117,9 @@ textarea.inp{min-height:84px;resize:vertical}
 .welcome .marca{font-family:"Saira Condensed";font-weight:800;font-size:clamp(72px,24vw,116px);line-height:.84;letter-spacing:-2px;margin:18px 0 14px}
 .welcome .marca em{font-style:normal;display:inline-block;background:var(--sinal);color:var(--sinal-tinta);padding:0 .12em;transform:skewX(-8deg);border-radius:6px;box-shadow:0 6px 0 var(--sinal-borda)}
 .welcome .lead{font-size:20px;max-width:24ch;margin-bottom:18px}
-.faixas{height:12px;margin:4px -20px 24px;background:repeating-linear-gradient(90deg,var(--faixa) 0 42px,transparent 42px 70px);opacity:.85}
+.faixas{height:12px;margin:4px -20px 26px;overflow:hidden;opacity:.85}
+.faixas i{display:block;height:100%;width:calc(100% + 70px);background:repeating-linear-gradient(90deg,var(--faixa) 0 42px,transparent 42px 70px);animation:pista 1.1s linear infinite}
+@keyframes pista{to{transform:translateX(-70px)}}
 .vitrine{perspective:900px;margin:0 0 30px;display:flex;justify-content:center}
 .vitrine .placa{width:86%;transform:rotateX(16deg) rotateY(-14deg) rotateZ(-3deg);transform-origin:center;animation:entra-placa .9s cubic-bezier(.2,.8,.2,1) both}
 .vitrine figcaption{display:none}
@@ -152,7 +154,7 @@ textarea.inp{min-height:84px;resize:vertical}
 .placa .faixa-azul span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .placa .valor{font-family:"Saira Condensed";font-weight:800;font-size:70px;line-height:1;text-align:center;padding:12px 8px 2px;letter-spacing:1px;text-shadow:0 2px 0 rgba(0,0,0,.08)}
 .placa .porkm{text-align:center;font-size:14px;color:#4a4d52;padding-bottom:12px}
-.oferta{animation:chega .4s cubic-bezier(.2,.9,.3,1.15)}
+
 @keyframes chega{from{transform:translateY(30px) scale(.96);opacity:0}to{transform:none;opacity:1}}
 .rota{list-style:none;margin:4px 0 2px;position:relative}
 .rota li{position:relative;padding:0 0 14px 32px}
@@ -393,7 +395,7 @@ main h1.vh:focus{outline:none}
 
 /* Raio de atuação (motoboy) e raio de busca (empresa): pílulas 3D, a escolhida em amarelo de placa. */
 .raio{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:-4px 0 12px}
-.status + .raio{background:var(--asfalto2);border-radius:var(--r-m);padding:10px 12px;margin-top:-6px;box-shadow:var(--elev)}
+.status + .raio{background:var(--asfalto2);border-radius:var(--r-m);padding:10px 12px;margin-top:0;box-shadow:var(--elev)}
 .raio > span{font-size:14px;font-weight:500;color:var(--mudo);margin-right:2px}
 .campo .raio{margin:0 0 6px}
 .raio button{min-height:44px;min-width:58px;padding:8px 12px;border-radius:22px;background:var(--asfalto3);font-size:15px;font-weight:600;box-shadow:0 3px 0 var(--fantasma-borda);transition:transform .08s}
@@ -405,3 +407,126 @@ main h1.vh:focus{outline:none}
 .rastreio.chegando{background:rgba(47,191,113,.18)}
 .rastreio.chegando svg{color:var(--ok-texto)}
 @media (hover:hover){.raio button:hover{background:var(--asfalto4)}.raio button[aria-pressed="true"]:hover,.raio button[aria-checked="true"]:hover{background:var(--sinal-claro)}}
+
+
+/* ============ Camada premium (16/10/2026) ============
+   Direção: painel de moto à noite. Peças de metal usinado (moldura dupla: trilho + núcleo),
+   textura de asfalto, luz de farol, sombras tingidas, mola ao soltar e 3D que responde ao dedo
+   e ao giroscópio (js/efeitos.js). Usabilidade na rua vem primeiro: alvos grandes e alto contraste. */
+:root{
+  --mola:cubic-bezier(.32,.72,0,1);
+  --salto:cubic-bezier(.34,1.56,.64,1);
+  --hairline:rgba(255,255,255,.065);
+  --bandeja:#1E2023;
+  --sombra-t:10,10,6;
+  --farol:rgba(255,194,26,.11);
+  --grao:.045;
+  --moldura:0 0 0 1px var(--hairline),0 0 0 5px var(--bandeja),0 0 0 6px var(--hairline),inset 0 1px 0 rgba(255,255,255,.07),0 24px 34px -22px rgba(var(--sombra-t),.95);
+}
+:root[data-tema="sol"]{--hairline:rgba(21,23,26,.08);--bandeja:#E4E0D3;--sombra-t:70,60,30;--farol:rgba(255,194,26,.22);--grao:.05}
+
+/* Luz de farol no alto e grão de asfalto por cima de tudo (fixo, não pega toque). */
+body{background:radial-gradient(130% 55% at 50% -12%,var(--farol),transparent 62%) no-repeat,var(--asfalto)}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:70;opacity:var(--grao);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+:root[data-tema="sol"] body::after{filter:invert(1)}
+
+/* Moldura dupla nas peças principais (trilho escuro + núcleo com brilho no topo). */
+.bloco,.chamado,.status,.status + .raio,.mapa-vivo,.plano{border-radius:18px;margin-bottom:18px;box-shadow:var(--moldura);
+  background:linear-gradient(180deg,color-mix(in srgb,var(--asfalto2) 93%,#fff) 0%,var(--asfalto2) 38%)}
+.mapa-vivo{background:#1d1f22}
+.plano{border:0}
+.plano.atual{box-shadow:0 0 0 2px var(--sinal),0 0 0 5px var(--bandeja),0 0 0 6px var(--hairline),0 24px 34px -22px rgba(var(--sombra-t),.95)}
+.bloco h2,.destino{letter-spacing:-.25px}
+
+/* Topo de vidro e barra de abas em ilha flutuante. */
+.top{background:color-mix(in srgb,var(--asfalto) 80%,transparent);-webkit-backdrop-filter:blur(14px) saturate(1.3);backdrop-filter:blur(14px) saturate(1.3);box-shadow:0 1px 0 var(--hairline)}
+.tabs{bottom:calc(10px + var(--safe-b));width:calc(100% - 24px);max-width:496px;border:0;border-radius:26px;padding:7px;gap:6px;
+  background:color-mix(in srgb,var(--asfalto2) 76%,transparent);-webkit-backdrop-filter:blur(12px) saturate(1.3);backdrop-filter:blur(12px) saturate(1.3);
+  box-shadow:0 0 0 1px var(--hairline),inset 0 1px 0 rgba(255,255,255,.08),0 22px 40px -14px rgba(var(--sombra-t),.95)}
+.tabs button{border-radius:20px;transition:background .3s var(--mola),color .3s var(--mola),transform .4s var(--salto)}
+.tabs button[aria-current="page"]{background:var(--sinal);color:var(--sinal-tinta);font-weight:700;box-shadow:0 3px 0 var(--sinal-borda),inset 0 1px 0 rgba(255,255,255,.4);animation:aba .55s var(--salto)}
+@keyframes aba{from{transform:scale(.82)}}
+
+/* Botões: afundam rápido e voltam com mola; reflexo corre por cima; ícone em cápsula própria. */
+.btn{position:relative;overflow:hidden;isolation:isolate;transition:transform .5s var(--salto),box-shadow .5s var(--salto),filter .2s}
+.btn:active:not(:disabled){transition-duration:.06s}
+.btn::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.32) 46%,transparent 62%);transform:translateX(-130%);transition:transform 1s var(--mola)}
+.btn:active:not(:disabled)::after{transform:translateX(130%);transition-duration:.5s}
+.btn-sinal > svg:first-child,.btn-ok > svg:first-child{width:36px;height:36px;padding:6px;border-radius:50%;background:rgba(0,0,0,.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.35),inset 0 -1px 0 rgba(0,0,0,.12);transition:transform .5s var(--salto)}
+.btn-sm.btn-sinal > svg:first-child,.btn-sm.btn-ok > svg:first-child{width:28px;height:28px;padding:4px}
+@media (hover:hover){
+  .btn:hover:not(:disabled){transform:translateY(-2px)}
+  .btn:hover:not(:disabled)::after{transform:translateX(130%)}
+  .btn:hover > svg:first-child{transform:translateX(2px) rotate(-6deg) scale(1.06)}
+}
+
+/* Entrada em cascata: só quando a tela muda (classe .entra posta por js/efeitos.js). */
+.entra.cascata > *,.entra .cascata > *{animation:cascata .75s var(--mola) both}
+.entra.cascata > :nth-child(2),.entra .cascata > :nth-child(2){animation-delay:.05s}
+.entra.cascata > :nth-child(3),.entra .cascata > :nth-child(3){animation-delay:.1s}
+.entra.cascata > :nth-child(4),.entra .cascata > :nth-child(4){animation-delay:.15s}
+.entra.cascata > :nth-child(5),.entra .cascata > :nth-child(5){animation-delay:.2s}
+.entra.cascata > :nth-child(6),.entra .cascata > :nth-child(6){animation-delay:.25s}
+.entra.cascata > :nth-child(n+7),.entra .cascata > :nth-child(n+7){animation-delay:.3s}
+@keyframes cascata{from{opacity:0;transform:translateY(18px) scale(.985)}}
+
+/* Placa 3D: inclina com o dedo/giroscópio, reflexo de luz acompanha, letras estampadas. */
+.placa{position:relative;background:repeating-linear-gradient(135deg,rgba(30,79,163,.035) 0 2px,transparent 2px 9px),linear-gradient(180deg,#fff,var(--faixa))}
+.placa .valor{text-shadow:0 1px 0 #fff,0 -1px 0 rgba(0,0,0,.28),0 3px 6px rgba(0,0,0,.08)}
+.placa[data-3d]{transform-style:preserve-3d;transition:transform .8s var(--mola)}
+.placa[data-3d].mexendo,.saldo[data-3d].mexendo{transition:transform .14s cubic-bezier(.2,.8,.2,1)}
+.placa[data-3d]::after{content:"";position:absolute;inset:0;pointer-events:none;mix-blend-mode:soft-light;opacity:.95;
+  background:radial-gradient(circle at var(--gx,25%) var(--gy,0%),rgba(255,255,255,.95),rgba(255,255,255,0) 58%)}
+.oferta .placa{transform:perspective(800px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg))}
+.entra .oferta .placa,.entra.cascata .oferta .placa{animation:vira .9s var(--salto) both .05s}
+@keyframes vira{from{transform:perspective(800px) rotateX(-75deg) translateY(-20px);opacity:0}}
+
+/* Vitrine da entrada: placa flutuando sobre a própria sombra. */
+.vitrine{position:relative}
+.vitrine .placa{transform:rotateX(calc(16deg + var(--rx,0deg))) rotateY(calc(-14deg + var(--ry,0deg))) rotateZ(-3deg);
+  animation:entra-placa .9s cubic-bezier(.2,.8,.2,1) both,flutua 6s cubic-bezier(.45,0,.55,1) .9s infinite}
+.vitrine .chao{position:absolute;left:16%;right:16%;bottom:-22px;height:26px;border-radius:50%;background:radial-gradient(closest-side,rgba(var(--sombra-t),.7),transparent);filter:blur(5px);animation:sombra 6s cubic-bezier(.45,0,.55,1) .9s infinite}
+@keyframes flutua{50%{translate:0 -9px}}
+@keyframes sombra{50%{transform:scale(.86);opacity:.65}}
+
+/* Painel da entrada (no lugar da lista de checks): números grandes que dizem o combinado. */
+.olho{display:flex;align-items:center;gap:10px;font-family:"Saira Condensed";font-weight:700;font-size:13px;letter-spacing:.18em;text-transform:uppercase;color:var(--mudo);margin:0 0 14px}
+.olho::after{content:"";flex:1;height:1px;background:var(--hairline)}
+.painel{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:16px 14px;margin:0 6px 26px}
+.painel li{border-radius:18px;padding:14px 14px 16px;box-shadow:var(--moldura);background:linear-gradient(180deg,color-mix(in srgb,var(--asfalto2) 93%,#fff) 0%,var(--asfalto2) 45%)}
+.painel b{display:block;font-family:"Saira Condensed";font-weight:800;font-size:40px;line-height:1;letter-spacing:-.5px;color:var(--sinal-texto);margin-bottom:6px}
+.painel b small{font-size:.48em;font-weight:700;letter-spacing:0;color:var(--mudo)}
+.painel span{display:block;font-size:14px;line-height:1.35;color:var(--mudo)}
+.painel .destaque{grid-column:1/-1;color:var(--sinal-tinta);transform:rotate(-1.2deg);padding-top:22px;
+  background:repeating-linear-gradient(-45deg,var(--sinal-tinta) 0 9px,transparent 9px 18px) top/100% 8px no-repeat,linear-gradient(160deg,var(--sinal-claro),var(--sinal) 60%);
+  box-shadow:0 0 0 1px rgba(0,0,0,.25),0 0 0 5px var(--bandeja),0 0 0 6px var(--hairline),0 26px 34px -18px rgba(var(--sombra-t),.95)}
+.painel .destaque b{font-size:58px;color:var(--sinal-tinta)}
+.painel .destaque b small,.painel .destaque span{color:#4a3a00}
+.painel .destaque span{font-size:15px;font-weight:500}
+
+/* Radar sobre uma pista em perspectiva: as bordas ficam paradas e só a faixa do meio corre,
+   animada por transform (a placa de vídeo move sem redesenhar; leve pra celular simples). */
+.radar{position:relative;perspective:380px;padding-bottom:30px}
+.radar::before,.radar::after{content:"";position:absolute;bottom:10px;transform-origin:50% 100%;pointer-events:none;
+  -webkit-mask-image:linear-gradient(transparent,#000 45%);mask-image:linear-gradient(transparent,#000 45%)}
+.radar::before{left:-16px;right:-16px;height:240px;transform:rotateX(68deg);opacity:.9;
+  background:linear-gradient(90deg,transparent 14%,var(--linha) 14% 15%,transparent 15% 85%,var(--linha) 85% 86%,transparent 86%),
+    radial-gradient(70% 100% at 50% 100%,var(--asfalto3),transparent 72%)}
+.radar::after{left:calc(50% - 4px);width:8px;height:286px;opacity:.85;-webkit-mask-image:linear-gradient(transparent,#000 40%,#000 80%,transparent);mask-image:linear-gradient(transparent,#000 40%,#000 80%,transparent);background:repeating-linear-gradient(180deg,var(--faixa) 0 22px,transparent 22px 46px);
+  transform:rotateX(68deg);animation:estrada .9s linear infinite}
+.radar.parado::after{animation:none;opacity:.35}
+.radar .onda{z-index:1}
+@keyframes estrada{from{transform:rotateX(68deg) translateY(-46px)}to{transform:rotateX(68deg) translateY(0)}}
+
+/* Cartão de saldo inclina como cartão de verdade, com reflexo. */
+.saldo{transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:transform .8s var(--mola)}
+.saldo::before{content:"";position:absolute;inset:0;pointer-events:none;mix-blend-mode:soft-light;background:radial-gradient(circle at var(--gx,20%) var(--gy,0%),rgba(255,255,255,.9),transparent 55%)}
+
+/* Toast e folha com acabamento de vidro. */
+.toast{background:color-mix(in srgb,var(--faixa) 90%,transparent);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-radius:16px;animation:sobe .45s var(--salto)}
+.folha{box-shadow:0 0 0 1px var(--hairline),inset 0 1px 0 rgba(255,255,255,.08),0 -18px 40px rgba(var(--sombra-t),.6)}
+dialog#dialogo[open] .folha{animation:sobe .5s var(--mola)}
+
+/* Controles pequenos também ganham mola. */
+.raio button,.chips button,.item-oferta,.tema,.estrelas button{transition:transform .45s var(--salto),background .2s,box-shadow .2s}
+.raio button:active,.chips button:active,.item-oferta:active,.tema:active{transition-duration:.06s}
