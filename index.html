@@ -396,7 +396,7 @@ function BarraProgresso() {
 
 /* ═══════════════ Navbar ═══════════════ */
 const LINKS = [
-  ['Serviços', '#servicos'], ['Calculadora', '#calculadora'], ['Processo', '#processo'],
+  ['Serviços', '#servicos'], ['Calculadora', '#calculadora'], ['iFood x Você', '#ifood'], ['Processo', '#processo'],
   ['Planos', '#planos'], ['FAQ', '#faq'], ['Contato', '#contato']
 ];
 
@@ -755,6 +755,148 @@ function Calculadora() {
                 <div className="sm:col-span-2">
                   <${BtnPrimario} href="#contato" className="w-full">
                     Quero validar esses números <${Ico} d=${ICONES.seta} className="h-4 w-4" />
+                  <//>
+                </div>
+              </div>
+            </div>
+          </div>
+        <//>
+      </div>
+    </section>`;
+}
+
+/* ═══════════════ Calculadora "quanto o iFood te custa" ═══════════════
+   Compara o que a loja paga ao iFood com levar os clientes que já são dela
+   pro canal próprio: Cardápio Online da SyncTech + motoboy pelo Marca aí.
+   Taxas públicas do iFood em 2026 (guias de mercado; a loja deve conferir no painel dela):
+   - iFood entrega: 23% de comissão + 3,2% de pagamento online, R$ 150/mês;
+   - loja entrega:  12% de comissão + 3,2% de pagamento online, R$ 110/mês;
+   a mensalidade só vale acima de R$ 1.800/mês vendidos no iFood.
+   Premissa honesta: a taxa de entrega que o cliente paga cobre o motoboy nos dois casos,
+   então o frete não entra como custo da loja. O motoboy fica com 100% do frete no Marca aí. */
+const IFOOD = {
+  entrega: { rot: 'O iFood entrega', nota: 'com entrega do iFood', taxa: 0.23,  pagto: 0.032, mensal: 150 },
+  propria: { rot: 'Eu entrego',      nota: 'com entrega própria',  taxa: 0.12,  pagto: 0.032, mensal: 110 }
+};
+const IFOOD_PISO_MENSAL = 1800;
+const CARDAPIO_MES = 147;          // Catálogo Digital / Cardápio Online avulso (já incluso no Starter)
+const MARCAAI_PCT = 0.15;          // taxa do Marca aí: 15% do frete, paga pela loja
+const MARCAAI_MIN = 1, MARCAAI_MAX = 3;
+const freteMarcaAi = (km) => 8 + Math.max(0, km - 3) * 2;  // mesma tabela do app Marca aí
+const brl2 = (n) => Number(n).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+function calcularEconomia({ pedidos, ticket, plano, pct, km }) {
+  const p = IFOOD[plano];
+  const porPedidoIfood = ticket * (p.taxa + p.pagto);
+  const mensalidade = (vendas) => (vendas > IFOOD_PISO_MENSAL ? p.mensal : 0);
+  const hoje = pedidos * porPedidoIfood + mensalidade(pedidos * ticket);
+  const levados = Math.round(pedidos * pct / 100);
+  const ficam = pedidos - levados;
+  const frete = freteMarcaAi(km);
+  const porPedidoMarcaAi = Math.min(MARCAAI_MAX, Math.max(MARCAAI_MIN, frete * MARCAAI_PCT));
+  const depoisIfood = ficam * porPedidoIfood + mensalidade(ficam * ticket);
+  const depoisProprio = levados * porPedidoMarcaAi + CARDAPIO_MES;
+  const depois = depoisIfood + depoisProprio;
+  return { hoje, depois, economiaMes: hoje - depois, economiaAno: (hoje - depois) * 12,
+           porPedidoIfood, porPedidoMarcaAi, levados, frete };
+}
+
+function Alternador({ rotulo, opcoes, valor, onChange }) {
+  return html`
+    <fieldset>
+      <legend className="mb-3 text-sm font-semibold text-txt2">${rotulo}</legend>
+      <div className="grid grid-cols-2 gap-2">
+        ${opcoes.map(([v, t]) => html`
+          <button key=${v} type="button" aria-pressed=${valor === v} onClick=${() => onChange(v)}
+                  className=${'rounded-xl border px-4 py-3 text-sm font-bold transition ' +
+                    (valor === v ? 'border-violeta bg-violeta/20 text-txt' : 'border-linha bg-surf/60 text-txt2 hover:border-violeta/60')}>
+            ${t}</button>`)}
+      </div>
+    </fieldset>`;
+}
+
+function CalculadoraIfood() {
+  const [pedidos, setPedidos] = useState(400);
+  const [ticket, setTicket] = useState(55);
+  const [plano, setPlano] = useState('entrega');
+  const [pct, setPct] = useState(40);
+  const [km, setKm] = useState(3);
+  const [ativo, setAtivo] = useState(semMovimento);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    if (semMovimento) return;
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) { setAtivo(true); obs.disconnect(); }
+    }, { threshold: 0.25 });
+    obs.observe(el);
+    const rede = setTimeout(() => setAtivo(true), 2500);
+    return () => { obs.disconnect(); clearTimeout(rede); };
+  }, []);
+
+  const r = useMemo(() => calcularEconomia({ pedidos, ticket, plano, pct, km }), [pedidos, ticket, plano, pct, km]);
+  const p = IFOOD[plano];
+  const compensa = r.economiaMes > 0;
+
+  return html`
+    <section id="ifood" className="relative px-5 py-24 lg:py-32">
+      <div className="mx-auto max-w-6xl">
+        <${Reveal}>
+          <${TituloSecao} tag="Delivery próprio"
+            titulo=${html`Quanto o iFood <span className="text-red-400">te custa</span> — e quanto <span className="texto-gradiente">sobra no seu bolso</span>`}
+            sub="Continue no iFood pra ganhar cliente novo. Quem já pede de você, traga pro seu Cardápio Online com motoboy pelo Marca aí." />
+        <//>
+        <${Reveal} delay=${90}>
+          <div ref=${ref} className="card overflow-hidden rounded-3xl p-7 sm:p-10">
+            <div className="grid gap-10 lg:grid-cols-[1fr_1.05fr] lg:gap-14">
+              <div className="grid content-start gap-8">
+                <${Slider} rotulo="Pedidos de delivery por mês no iFood" valor=${pedidos} min=${50} max=${3000} passo=${10}
+                           onChange=${setPedidos} formata=${num} />
+                <${Slider} rotulo="Ticket médio do pedido" valor=${ticket} min=${20} max=${200} passo=${5}
+                           onChange=${setTicket} formata=${brl} />
+                <${Alternador} rotulo="Quem faz a entrega no iFood hoje?" valor=${plano} onChange=${setPlano}
+                               opcoes=${[['entrega', 'O iFood entrega'], ['propria', 'Eu entrego']]} />
+                <${Slider} rotulo="Pedidos que vão pro seu canal próprio" valor=${pct} min=${10} max=${100} passo=${5}
+                           onChange=${setPct} formata=${(v) => v + '%'}
+                           dica="Os clientes que já pedem de você de novo. O iFood continua trazendo os novos." />
+                <${Slider} rotulo="Distância média da entrega" valor=${km} min=${1} max=${8} passo=${0.5}
+                           onChange=${setKm} formata=${(v) => String(v).replace('.', ',') + ' km'}
+                           dica=${'Frete do motoboy no Marca aí: ' + brl2(r.frete) + ' (100% dele, pago com a taxa de entrega do cliente).'} />
+              </div>
+
+              <div className="grid content-start gap-4 sm:grid-cols-2">
+                <div className="sm:col-span-2">
+                  <${CartaoResultado} rotulo=${compensa ? 'Economia por mês' : 'Diferença por mês'} valor=${r.economiaMes}
+                                      destaque=${true} ativo=${ativo} formata=${brl} />
+                </div>
+                <${CartaoResultado} rotulo="Hoje você paga ao iFood" valor=${r.hoje} ativo=${ativo} formata=${brl} />
+                <${CartaoResultado} rotulo="Com Cardápio + Marca aí" valor=${r.depois} ativo=${ativo} formata=${brl} />
+                <div className="sm:col-span-2">
+                  <${CartaoResultado} rotulo="Economia em 12 meses" valor=${r.economiaAno} ativo=${ativo} formata=${brl} />
+                </div>
+                <div className="card rounded-2xl p-5 sm:col-span-2">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-txt3">Em cada pedido levado pro seu canal</p>
+                  <div className="mt-3 grid grid-cols-2 gap-4">
+                    <div><p className="text-sm text-txt2">iFood fica com</p>
+                      <p className="font-disp text-2xl font-extrabold text-red-400">${brl2(r.porPedidoIfood)}</p></div>
+                    <div><p className="text-sm text-txt2">Marca aí cobra</p>
+                      <p className="font-disp text-2xl font-extrabold text-lilas">${brl2(r.porPedidoMarcaAi)}</p></div>
+                  </div>
+                </div>
+                ${!compensa && html`<p className="text-sm font-semibold text-txt2 sm:col-span-2">
+                  Com poucos pedidos no seu canal, o cardápio ainda não se paga. Aumente os pedidos levados pro canal próprio ou fale com a gente.</p>`}
+                <p className="text-xs leading-relaxed text-txt3 sm:col-span-2">
+                  Estimativa com as taxas públicas do iFood em 2026 (${p.nota}: ${String(Math.round(p.taxa * 1000) / 10).replace('.', ',')}% de comissão
+                  + 3,2% de pagamento online, mensalidade de ${brl(p.mensal)} acima de ${brl(IFOOD_PISO_MENSAL)}/mês). Confira as suas no painel do iFood.
+                  Do lado da SyncTech: Cardápio Online ${brl(CARDAPIO_MES)}/mês e Marca aí 15% do frete (mínimo ${brl2(MARCAAI_MIN)}, máximo ${brl2(MARCAAI_MAX)} por pedido).
+                  Não é promessa de resultado.
+                </p>
+                <div className="grid gap-3 sm:col-span-2 sm:grid-cols-2">
+                  <${BtnSecundario} href="#contato" className="w-full">Quero economizar<//>
+                  <${BtnPrimario} href="https://marcaai-app.netlify.app/" className="w-full">
+                    Conhecer o Marca aí <${Ico} d=${ICONES.seta} className="h-4 w-4" />
                   <//>
                 </div>
               </div>
@@ -1483,6 +1625,7 @@ function App() {
         <${Marquee} />
         <${Servicos} />
         <${Calculadora} />
+        <${CalculadoraIfood} />
         <${Processo} />
         <${Comparativo} />
         <${Segmentos} />
