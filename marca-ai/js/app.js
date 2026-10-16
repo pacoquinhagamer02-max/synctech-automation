@@ -66,11 +66,11 @@ function mapa(c, fase) {
   const rota = `M${loja.x} ${loja.y}H${meioX}V${cli.y}H${cli.x}`;
   const moto = fase === 'loja' ? { x: vs[0], y: hs[3] } : fase === 'cliente' ? { x: meioX, y: Math.round((loja.y + cli.y) / 2) } : null;
   const ruas = vs.map(x => `M${x} 0V${H}`).join('') + hs.map(y => `M0 ${y}H${W}`).join('');
-  const quadras = [0, 1, 2].map(() => { const i = Math.floor(rnd() * 6), j = Math.floor(rnd() * 3); return `<rect x="${vs[i] + 7}" y="${hs[j] + 7}" width="${vs[i + 1] - vs[i] - 14}" height="${hs[j + 1] - hs[j] - 14}" rx="4" fill="#2E3B33"/>`; }).join('');
+  const quadras = [0, 1, 2].map(() => { const i = Math.floor(rnd() * 6), j = Math.floor(rnd() * 3); return `<rect x="${vs[i] + 7}" y="${hs[j] + 7}" width="${vs[i + 1] - vs[i] - 14}" height="${hs[j + 1] - hs[j] - 14}" rx="4" fill="#161616"/>`; }).join('');
   return `<svg class="mapa" viewBox="0 0 ${W} ${H}" role="img" aria-label="Mapa ilustrativo: da loja até o cliente, ${km(c.km)} quilômetros">
-    <rect width="${W}" height="${H}" fill="#2C2F33"/>${quadras}
-    <path d="${ruas}" stroke="#3D4248" stroke-width="9" fill="none"/>
-    <path d="${ruas}" stroke="#474C53" stroke-width="1" stroke-dasharray="4 6" fill="none"/>
+    <rect width="${W}" height="${H}" fill="#0A0A0A"/>${quadras}
+    <path d="${ruas}" stroke="#000" stroke-width="9" fill="none"/>
+    <path d="${ruas}" stroke="#FFC21A" stroke-opacity=".3" stroke-width="1" stroke-dasharray="4 6" fill="none"/>
     <path d="${rota}" stroke="#B98A00" stroke-width="8" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
     <path d="${rota}" class="rota-anim" stroke="#FFC21A" stroke-width="5" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
     ${moto ? `<path d="M${moto.x} ${moto.y}H${fase === 'loja' ? loja.x : cli.x}" stroke="#F5F3EA" stroke-width="2" stroke-dasharray="3 5" opacity=".6"/>` : ''}
@@ -127,7 +127,7 @@ const TITULOS = { corridas: 'Corridas', ganhos: 'Seus ganhos', apoio: 'Apoio e s
 let tema = (() => { try { return localStorage.getItem('marcaai:tema') === 'sol' ? 'sol' : 'noite'; } catch { return 'noite'; } })();
 function aplicarTema() {
   document.documentElement.dataset.tema = tema;
-  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', tema === 'sol' ? '#F3F1E9' : '#26282B');
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', tema === 'sol' ? '#FFFFFF' : '#0A0A0A');
 }
 aplicarTema();
 

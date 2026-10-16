@@ -189,7 +189,7 @@ function desenhar(m, t) {
   const ctx = m.ctx;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   const escuro = document.documentElement.dataset.tema !== 'sol';
-  ctx.fillStyle = escuro ? '#1d1f22' : '#e9e6dc';
+  ctx.fillStyle = escuro ? '#0A0A0A' : '#FFFFFF';
   ctx.fillRect(0, 0, w, h);
 
   // Blocos do mapa no zoom inteiro mais perto, esticados pro zoom fracionado da câmera.
@@ -199,7 +199,8 @@ function desenhar(m, t) {
   const x0 = Math.floor((-ox) / lado), y0 = Math.floor((-oy) / lado);
   const x1 = Math.floor((w - ox) / lado), y1 = Math.floor((h - oy) / lado);
   ctx.save();
-  if (escuro) ctx.filter = 'invert(1) hue-rotate(180deg) brightness(.85) contrast(.9) saturate(.6)';
+  // Mapa preto e branco nos dois temas: a rota amarela salta.
+  ctx.filter = escuro ? 'invert(1) grayscale(1) brightness(.8) contrast(1.25)' : 'grayscale(1) contrast(1.1)';
   for (let x = x0; x <= x1; x++) for (let y = y0; y <= y1; y++) {
     const img = bloco(tz, x, y, m);
     if (img) ctx.drawImage(img, Math.round(ox + x * lado), Math.round(oy + y * lado), Math.ceil(lado) + 1, Math.ceil(lado) + 1);
