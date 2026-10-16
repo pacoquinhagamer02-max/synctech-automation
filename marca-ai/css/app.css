@@ -447,19 +447,6 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:70;opa
 .tabs button[aria-current="page"]{background:var(--sinal);color:var(--sinal-tinta);font-weight:700;box-shadow:0 3px 0 var(--sinal-borda),inset 0 1px 0 rgba(255,255,255,.4);animation:aba .55s var(--salto)}
 @keyframes aba{from{transform:scale(.82)}}
 
-/* Botões: afundam rápido e voltam com mola; reflexo corre por cima; ícone em cápsula própria. */
-.btn{position:relative;overflow:hidden;isolation:isolate;transition:transform .5s var(--salto),box-shadow .5s var(--salto),filter .2s}
-.btn:active:not(:disabled){transition-duration:.06s}
-.btn::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.32) 46%,transparent 62%);transform:translateX(-130%);transition:transform 1s var(--mola)}
-.btn:active:not(:disabled)::after{transform:translateX(130%);transition-duration:.5s}
-.btn-sinal > svg:first-child,.btn-ok > svg:first-child{width:36px;height:36px;padding:6px;border-radius:50%;background:rgba(0,0,0,.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.35),inset 0 -1px 0 rgba(0,0,0,.12);transition:transform .5s var(--salto)}
-.btn-sm.btn-sinal > svg:first-child,.btn-sm.btn-ok > svg:first-child{width:28px;height:28px;padding:4px}
-@media (hover:hover){
-  .btn:hover:not(:disabled){transform:translateY(-2px)}
-  .btn:hover:not(:disabled)::after{transform:translateX(130%)}
-  .btn:hover > svg:first-child{transform:translateX(2px) rotate(-6deg) scale(1.06)}
-}
-
 /* Entrada em cascata: só quando a tela muda (classe .entra posta por js/efeitos.js). */
 .entra.cascata > *,.entra .cascata > *{animation:cascata .75s var(--mola) both}
 .entra.cascata > :nth-child(2),.entra .cascata > :nth-child(2){animation-delay:.05s}
@@ -530,3 +517,64 @@ dialog#dialogo[open] .folha{animation:sobe .5s var(--mola)}
 /* Controles pequenos também ganham mola. */
 .raio button,.chips button,.item-oferta,.tema,.estrelas button{transition:transform .45s var(--salto),background .2s,box-shadow .2s}
 .raio button:active,.chips button:active,.item-oferta:active,.tema:active{transition-duration:.06s}
+
+
+/* ============ Botões: tecla de punho de moto ============
+   Referências: teclas da Work Louder (toque firme, material) e o cubo de comandos da KTM
+   desenhado pela KISKA (teclas firmes e retroiluminadas, feitas pra usar de luva).
+   O botão é um ENCAIXE escuro (o próprio .btn) com a TECLA por cima (::before). Ao tocar,
+   a tecla afunda dentro do encaixe e o texto desce junto; o encaixe fica parado.
+   O ícone vira uma janelinha retroiluminada. Texto na fonte condensada do painel. */
+.btn{--alto:5px;--folga:4px;--poco:#141517;--legenda:var(--tinta);
+  position:relative;isolation:isolate;overflow:visible;margin-bottom:0;transform:none;filter:none;
+  min-height:64px;border-radius:20px;padding:12px 20px calc(12px + var(--alto));
+  font-family:"Saira Condensed",Saira,sans-serif;font-weight:700;font-size:21px;letter-spacing:.015em;line-height:1.1;
+  color:var(--tinta);background:var(--poco);
+  box-shadow:inset 0 2px 6px rgba(0,0,0,.7),inset 0 0 0 1px rgba(0,0,0,.55),0 1px 0 var(--hairline);
+  transition:padding .06s,filter .2s}
+/* a tecla */
+.btn::before{content:"";position:absolute;z-index:-1;inset:var(--folga) var(--folga) calc(var(--folga) + var(--alto));border-radius:16px;
+  background:radial-gradient(130% 120% at 50% -30%,color-mix(in srgb,var(--cor) 72%,#fff) 0%,var(--cor) 58%,color-mix(in srgb,var(--cor) 88%,#000) 100%);
+  box-shadow:0 var(--alto) 0 var(--borda),0 calc(var(--alto) + 3px) 6px -2px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 0 rgba(0,0,0,.1),inset 0 0 0 1px rgba(0,0,0,.08);
+  transition:transform .45s var(--salto),box-shadow .45s var(--salto)}
+/* reflexo que passa pela tecla (pinta só no toque/hover) */
+.btn::after{content:"";position:absolute;z-index:-1;inset:var(--folga) var(--folga) calc(var(--folga) + var(--alto));border-radius:16px;pointer-events:none;
+  background:linear-gradient(110deg,transparent 38%,rgba(255,255,255,.38) 50%,transparent 62%) 160% 0/260% 100% no-repeat;
+  transition:background-position 1s var(--mola),transform .45s var(--salto)}
+.btn:active:not(:disabled){padding-top:calc(12px + var(--alto) - 1px);padding-bottom:13px}
+.btn:active:not(:disabled)::before{transform:translateY(calc(var(--alto) - 1px));box-shadow:0 1px 0 var(--borda),0 1px 2px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.35),inset 0 -1px 0 rgba(0,0,0,.1),inset 0 0 0 1px rgba(0,0,0,.08);transition-duration:.06s}
+.btn:active:not(:disabled)::after{transform:translateY(calc(var(--alto) - 1px));background-position:-60% 0;transition-duration:.5s,.06s}
+.btn:disabled{filter:grayscale(.7) brightness(.7)}
+/* janelinha retroiluminada do ícone */
+.btn > svg:first-child{width:34px;height:34px;padding:6px;border-radius:11px;flex:none;
+  background:rgba(0,0,0,.14);box-shadow:inset 0 1px 2px rgba(0,0,0,.35),0 1px 0 rgba(255,255,255,.35);transition:transform .45s var(--salto)}
+.btn-sinal > svg:first-child{background:var(--sinal-tinta);color:var(--sinal-claro);filter:drop-shadow(0 0 5px rgba(255,212,92,.55));box-shadow:inset 0 1px 2px rgba(0,0,0,.6),0 1px 0 rgba(255,255,255,.5)}
+.btn-ok > svg:first-child{background:#04200F;color:#8EF0B8;filter:drop-shadow(0 0 5px rgba(142,240,184,.5))}
+.btn-fantasma > svg:first-child{color:var(--sinal-texto);background:rgba(0,0,0,.25)}
+.btn-sm{--alto:4px;--folga:3px;min-height:50px;border-radius:15px;padding:8px 14px calc(8px + var(--alto));font-size:17px}
+.btn-sm::before,.btn-sm::after{border-radius:12px}
+.btn-sm:active:not(:disabled){padding-top:calc(8px + var(--alto) - 1px);padding-bottom:9px}
+.btn-sm > svg:first-child{width:28px;height:28px;padding:5px;border-radius:9px}
+.btn-online{--alto:7px;--folga:5px;min-height:84px;border-radius:26px;font-size:26px}
+.btn-online::before,.btn-online::after{border-radius:21px}
+.btn-online > svg:first-child{width:42px;height:42px;padding:8px;border-radius:13px}
+.passo-km .btn{font-size:28px;padding:0 0 var(--alto)}
+.passo-km .btn:active:not(:disabled){padding:calc(var(--alto) - 1px) 0 1px}
+.saldo .btn{--cor:#2a2416;--borda:#000;--tinta:var(--sinal);--poco:rgba(35,26,0,.55)}
+:root[data-tema="sol"] .btn{--poco:#CEC9BA;box-shadow:inset 0 2px 5px rgba(60,50,20,.45),inset 0 0 0 1px rgba(60,50,20,.25),0 1px 0 rgba(255,255,255,.8)}
+:root[data-tema="sol"] .btn-fantasma{--cor:#F7F5EE;--borda:#B3AE9E}
+@media (hover:hover){
+  .btn:hover:not(:disabled){filter:brightness(1.05)}
+  .btn:hover:not(:disabled)::after{background-position:-60% 0}
+  .btn:hover:not(:disabled) > svg:first-child{transform:translateY(-1px) scale(1.05)}
+}
+
+/* Teclas pequenas de escolha (raio, chips): a escolhida ganha LED aceso, como chave de painel. */
+.raio button[aria-pressed="true"]::before,.raio button[aria-checked="true"]::before,.chips button[aria-pressed="true"]::before{
+  content:"";display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:7px;vertical-align:1px;
+  background:#FFF6CF;box-shadow:0 0 0 1.5px rgba(35,26,0,.55),0 0 7px 2px rgba(255,236,150,.95)}
+
+/* SOS com guarda de emergência: moldura zebrada amarelo/preto em volta da tecla vermelha. */
+.sos{border:6px solid transparent;
+  background:linear-gradient(180deg,#f04a3e,var(--freio)) padding-box,repeating-linear-gradient(-45deg,#15171A 0 9px,var(--sinal) 9px 18px) border-box;
+  box-shadow:0 7px 0 var(--freio-borda),0 18px 26px -12px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.3)}
