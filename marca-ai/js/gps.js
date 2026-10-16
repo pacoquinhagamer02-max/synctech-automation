@@ -2,10 +2,12 @@
 // e avisa quando chega na loja. A posição fica no aparelho (e, quando existir
 // servidor, vai só pra empresa da corrida em andamento).
 import { distanciaKm, r2 } from './regras.js';
+import { criarFiltroGps } from './rota.js';
 
 let vigia = null;
 let ultimo = null;          // último ponto aceito, pra somar o km rodado
 let ultimaGravacao = 0;
+let filtro = criarFiltroGps(); // tira a tremida do GPS (Kalman), como Uber e Google
 let estado = 'desligado';   // desligado | pedindo | ligado | negado | sem-gps
 const ouvintes = new Set();
 
@@ -30,7 +32,7 @@ export function ligarGps(aoPonto) {
     if (estado !== 'ligado') { estado = 'ligado'; avisar(); }
     const precisao = Math.round(p.coords.accuracy);
     if (precisao > PRECISAO_MAX_M) return;
-    const ponto = { lat: p.coords.latitude, lon: p.coords.longitude, precisao, em: Date.now() };
+    const ponto = filtro({ lat: p.coords.latitude, lon: p.coords.longitude, precisao, em: Date.now() });
     let andou = 0;
     if (ultimo) {
       const d = distanciaKm(ultimo, ponto);
@@ -49,7 +51,7 @@ export function ligarGps(aoPonto) {
 
 export function desligarGps(manterEstado = false) {
   if (vigia != null) navigator.geolocation.clearWatch(vigia);
-  vigia = null; ultimo = null;
+  vigia = null; ultimo = null; filtro = criarFiltroGps();
   if (!manterEstado) { estado = 'desligado'; avisar(); }
 }
 
@@ -62,13 +64,4 @@ export function pegarPosicao() {
       e => falha(new Error(e.code === 1 ? 'negado' : 'sem-gps')),
       { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
   });
-}
-
-/** Mapa real (OpenStreetMap) só sob demanda: a posição sai do aparelho apenas quando o motoboy pede o mapa. */
-export function urlMapaReal(alvo, eu) {
-  const pts = [alvo, eu].filter(Boolean);
-  const lat = pts.map(p => p.lat), lon = pts.map(p => p.lon);
-  const folga = 0.004;
-  const bbox = [Math.min(...lon) - folga, Math.min(...lat) - folga, Math.max(...lon) + folga, Math.max(...lat) + folga].map(n => n.toFixed(5)).join(',');
-  return `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${alvo.lat.toFixed(5)},${alvo.lon.toFixed(5)}`;
 }

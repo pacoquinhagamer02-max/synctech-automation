@@ -3,7 +3,8 @@ import { TABELA, LIMITES, ATIVOS, TAGS_BOAS, TAGS_RUINS, podeIr, frete, taxaEspe
   custoKm, resumoDia, saldo, reputacao, novoCodigo, r2, ticketMedio, mensagemCliente, resumoMes, informeMes, faixasHorario,
   kmEstimado, etaMin, extrairGeo, PLANOS, taxaChamado, custoPlanos, kmCorrida,
   alcance, raioOnda, perto, disponiveisNoRaio, RAIOS_MOTOBOY, RAIOS_BUSCA, RAIO_CONFERE_CHEGADA_M, RAIO_CLIENTE_M } from './regras.js';
-import { ligarGps, desligarGps, estadoGps, aoMudarGps, pegarPosicao, urlMapaReal } from './gps.js';
+import { ligarGps, desligarGps, estadoGps, aoMudarGps, pegarPosicao } from './gps.js';
+import { mapaVivo, montarMapas, infoRota, aoMudarRota } from './mapa-vivo.js';
 import * as nuvem from './nuvem.js';
 import { criarCorridas } from './corridas.js';
 import { armazemLocal, armazemMisto } from './armazens.js';
@@ -77,6 +78,23 @@ function mapa(c, fase) {
     ${moto ? `<g transform="translate(${moto.x} ${moto.y})"><circle r="15" fill="#2FBF71" opacity=".25"/><circle r="9" fill="#2FBF71" stroke="#F5F3EA" stroke-width="3"/></g>` : ''}
   </svg><p class="mapa-legenda">Mapa ilustrativo. A rota de verdade abre no Google Maps ou no Waze.</p>`;
 }
+// Mapa ao vivo (modelo Uber/iFood) quando a loja e o destino têm localização; senão, o ilustrativo.
+const FASE_MAPA = { aceito: 'loja', coleta: 'naloja', coletado: 'cliente' };
+function mapaCorrida(c, fase, moto) {
+  const precisa = fase === 'oferta' ? c.lojaGeo && c.clienteGeo : fase === 'loja' ? c.lojaGeo : c.clienteGeo;
+  if (!precisa) return mapa(c, fase === 'oferta' ? 'oferta' : fase);
+  const rotulo = fase === 'oferta' ? `Mapa: rota da ${c.empresa} até o cliente` : fase === 'loja' ? `Mapa: caminho até a ${c.empresa}` : fase === 'naloja' ? `Mapa: ${c.empresa} e o ponto de entrega` : 'Mapa: caminho até o cliente';
+  return mapaVivo(c.id, { loja: c.lojaGeo, cliente: c.clienteGeo, moto, fase, rotulo });
+}
+// Quanto falta: pela rota das ruas quando ela já chegou; senão, estimativa em linha reta.
+function faltaAte(c, pos, alvo) {
+  const r = infoRota(c.id);
+  if (r?.min != null && pos) return { km: r.km, min: r.min };
+  if (!pos || !alvo) return null;
+  const d = kmEstimado(pos, alvo);
+  return { km: d, min: etaMin(d) };
+}
+const minTxt = n => (n === 1 ? '1 minuto' : `uns ${n} min`);
 const emPausa = () => S().pausaAte && S().pausaAte > Date.now();
 const meusGanhos = () => S().calls.filter(c => c.motoboy && ganho(c) > 0);
 
@@ -484,6 +502,7 @@ const LIVE = {
         <div class="mudo pq">${esc(c.entrega)} (${km(c.km)} km)</div>
         ${c.motoboy ? `<div class="mt6">Motoboy: <b>${esc(c.motoboy)}</b>${c.moto ? `, ${esc(c.moto)}` : ''}${c.placa ? `, placa ${esc(c.placa)}` : ''}</div>` : ''}
         ${c.status === 'aberto' && c.lojaGeo ? `<div class="rastreio">${ic('moto')}<span>Procurando motoboy a até <b class="num" data-onda="${c.criadoEm}|${c.prioridadeAte || 0}|${c.raioKm}">${raioOnda(c)}</b> km da loja</span></div>` : ''}
+        ${ATIVOS.includes(c.status) && c.motoboy ? mapaCorrida(c, FASE_MAPA[c.status], posDoMotoboy(c)) : ''}
         ${rastreio(c)}
         ${c.status === 'coletado' && c.tentativas ? `<div class="aviso ${c.tentativas >= LIMITES.tentativasCodigo ? 'freio' : ''}">${c.tentativas >= LIMITES.tentativasCodigo
           ? `O motoboy errou o código ${c.tentativas} vezes e a entrega travou. Ligue pra ele ou pro cliente, confira o código e libere.`
@@ -504,14 +523,15 @@ const LIVE = {
 };
 
 // Onde está o motoboy agora, visto pela empresa (nesta versão, entre abas do mesmo aparelho).
+const posDoMotoboy = c => (c.posMotoboy && Date.now() - c.posMotoboy.em < 120000 ? c.posMotoboy : (c.nuvem ? null : posicaoAtual()));
 function rastreio(c) {
-  const pos = c.posMotoboy && Date.now() - c.posMotoboy.em < 120000 ? c.posMotoboy : (c.nuvem ? null : posicaoAtual());
+  const pos = posDoMotoboy(c);
   if (!pos || !['aceito', 'coletado'].includes(c.status)) return '';
   const alvo = c.status === 'aceito' ? c.lojaGeo : c.clienteGeo;
   if (!alvo) return `<div class="rastreio">${ic('nav')}<span>${esc(c.motoboy)} está com o GPS ligado. Salve a localização ${c.status === 'aceito' ? 'da loja' : 'do cliente'} pra ver a distância.</span></div>`;
-  const d = kmEstimado(pos, alvo);
   if (c.status === 'coletado' && perto(pos, alvo, RAIO_CLIENTE_M)) return `<div class="rastreio chegando">${ic('nav')}<span><b>${esc(c.motoboy)}</b> está chegando no cliente.</span></div>`;
-  return `<div class="rastreio">${ic('nav')}<span><b>${esc(c.motoboy)}</b> está a ${km(d)} km ${c.status === 'aceito' ? 'da loja' : 'do cliente'}, chega em ${etaMin(d) === 1 ? '1 minuto' : `uns ${etaMin(d)} min`}.</span></div>`;
+  const f = faltaAte(c, pos, alvo);
+  return `<div class="rastreio">${ic('nav')}<span><b>${esc(c.motoboy)}</b> está a ${km(f.km)} km ${c.status === 'aceito' ? 'da loja' : 'do cliente'}, chega em ${minTxt(f.min)}.</span></div>`;
 }
 
 function telaOferta(c) {
@@ -528,10 +548,10 @@ function telaOferta(c) {
       <div class="porkm">${brl(porKm)} por km, sobra ${brl(lucro)} depois da gasolina</div>
     </div>
     <div class="bloco mt14">
-      ${mapa(c, 'oferta')}
+      ${mapaCorrida(c, 'oferta', null)}
       <ul class="rota">
         <li><b>${esc(c.empresa)}</b><small>${esc(c.coleta)}${ateLoja(c) != null ? `. Você está a ${km(ateLoja(c))} km, uns ${etaMin(ateLoja(c))} min` : ''}</small></li>
-        <li><b>${esc(c.entrega)}</b><small>${km(c.km)} km da loja até o cliente${c.clienteGeo ? ', ponto exato no mapa' : ''}</small></li>
+        <li><b>${esc(c.entrega)}</b><small>${km(c.km)} km da loja até o cliente${(() => { const r = c.lojaGeo && c.clienteGeo && infoRota(c.id); return r ? `. Pelas ruas: ${km(r.km)} km, ${minTxt(r.min)}` : c.clienteGeo ? ', ponto exato no mapa' : ''; })()}</small></li>
       </ul>
       <div class="rep">
         ${r ? `<span class="tag ${r.nota >= 4 ? 'boa' : r.nota < 3 ? 'ruim' : ''}">★ ${r.nota.toFixed(1).replace('.', ',')} pelos motoboys</span>${r.espera != null ? `<span class="tag ${r.espera > TABELA.esperaGratisMin ? 'ruim' : 'boa'}">espera média ${Math.round(r.espera)} min</span>` : ''}` : '<span class="tag">Empresa ainda sem avaliação</span>'}
@@ -563,15 +583,15 @@ function telaCorrida(c) {
   const etapas = ['Indo à loja', 'Na loja', 'Entregando', 'Entregue'];
   const alvoGeo = naLoja ? c.lojaGeo : c.clienteGeo, pos = posicaoAtual();
   const destinoNav = alvoGeo ? coordTxt(alvoGeo) : alvo;
-  const falta = pos && alvoGeo && c.status !== 'coleta' ? kmEstimado(pos, alvoGeo) : null;
+  const falta = c.status !== 'coleta' ? faltaAte(c, pos, alvoGeo) : null;
   return `<ol class="passos" aria-label="Etapa ${passo + 1} de 4: ${etapas[passo]}">${etapas.map((n, i) =>
       `<li class="${i < passo ? 'feito' : i === passo ? 'agora' : ''}" ${i === passo ? 'aria-current="step"' : ''}>${n}</li>`).join('')}</ol>
-    ${mapa(c, { aceito: 'loja', coleta: 'naloja', coletado: 'cliente' }[c.status])}
+    ${mapaCorrida(c, FASE_MAPA[c.status], pos)}
     <section class="bloco">
       <h2 class="sub">${titulo}</h2>
       <p class="destino">${esc(naLoja ? c.empresa : (c.cliente || 'Cliente'))}</p>
       <p class="mudo">${esc(alvo)}</p>
-      ${falta != null ? `<div class="rastreio">${ic('nav')}<span>Faltam uns <b>${km(falta)} km</b>, ${etaMin(falta) === 1 ? '1 minuto' : `${etaMin(falta)} min`}.</span></div>` : ''}
+      ${falta ? `<div class="rastreio">${ic('nav')}<span>Faltam uns <b>${km(falta.km)} km</b>, ${falta.min === 1 ? '1 minuto' : `${falta.min} min`}.</span></div>` : ''}
       ${c.status === 'aceito' && c.lojaGeo ? '<p class="sub mt6">Quando você chegar perto da loja, o GPS registra a chegada sozinho e a espera começa a contar.</p>' : ''}
       ${c.status === 'coleta' && c.chegadaGps ? `<span class="tag boa mt6">Chegada registrada pelo GPS às ${hora(c.chegouEm)}</span>` : ''}
       ${c.status === 'coleta' ? `<div class="espera-box"><div class="relogio" data-desde="${c.chegouEm}" role="timer" aria-label="Tempo de espera">--:--</div>
@@ -581,7 +601,6 @@ function telaCorrida(c) {
         <a class="btn btn-azul btn-sm" href="${esc(mapsUrl(destinoNav))}" target="_blank" rel="noopener noreferrer">${ic('nav')}Google Maps</a>
         <a class="btn btn-azul btn-sm" href="${esc(wazeUrl(destinoNav))}" target="_blank" rel="noopener noreferrer">${ic('nav')}Waze</a>
       </div>
-      ${alvoGeo ? `<button class="btn btn-fantasma btn-sm mt10" data-act="mapaReal" data-id="${esc(c.id)}">${ic('mapa')}Ver no mapa de verdade</button>` : ''}
       ${tel ? `<div class="acoes"><a class="btn btn-fantasma btn-sm" href="tel:+${tel}">${ic('fone')}Ligar pra loja</a><a class="btn btn-fantasma btn-sm" href="https://wa.me/${tel}" target="_blank" rel="noopener noreferrer">${ic('balao')}WhatsApp</a></div>` : ''}
     </section>
     <div class="grade2 mb12">
@@ -645,8 +664,10 @@ function refresh() {
   const e = document.querySelector('[data-badge="chamados"]');
   if (e) e.className = aba !== 'chamados' && S().calls.some(c => c.empresa === S().empresa.nome && ATIVOS.includes(c.status)) ? 'dot' : '';
   tick();
+  montarMapas();
 }
 aoMudar(refresh);
+aoMudarRota(refresh);
 
 /* ============ Relógio (1s) ============ */
 function tick() {
@@ -835,15 +856,6 @@ const ACTS = {
       const itens = s.checklist.dia === hoje ? s.checklist.itens : [];
       s.checklist = { dia: hoje, itens: itens.includes(i) ? itens.filter(x => x !== i) : [...itens, i] };
     });
-  },
-  mapaReal: el => {
-    const c = S().calls.find(x => x.id === el.dataset.id); if (!c) return;
-    const alvo = c.status === 'coletado' ? c.clienteGeo : c.lojaGeo;
-    if (!alvo) return;
-    dialogo(`<h3 id="dlg-titulo">${c.status === 'coletado' ? 'Ponto de entrega' : 'Loja'} no mapa</h3>
-      <iframe class="mapa-real" title="Mapa do OpenStreetMap" src="${esc(urlMapaReal(alvo, posicaoAtual()))}" loading="lazy" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin"></iframe>
-      <p class="sub mt8">Mapa do OpenStreetMap. Pra seguir a rota com voz, use o Google Maps ou o Waze.</p>
-      <button class="btn btn-fantasma btn-sm mt10" data-act="fechar">Fechar</button>`);
   },
   cartao: () => {
     const p = S().profile, n = S().calls.filter(c => c.motoboy && c.status === 'entregue').length;
