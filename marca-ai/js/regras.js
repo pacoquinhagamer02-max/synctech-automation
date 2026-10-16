@@ -4,7 +4,7 @@
 export const TABELA = Object.freeze({
   base: 8, kmInclusos: 3, porKm: 2, chuva: 2,
   esperaGratisMin: 10, esperaPorMin: 0.5,
-  taxaPlataforma: 1.99, deslocamentoCancelado: 5,
+  taxaPlataforma: 1.99, deslocamentoCancelado: 5, voltaPct: 0.5,
   tempoOferta: 30, maisTempoOferta: 30
 });
 
@@ -32,9 +32,59 @@ export const TAGS_RUINS = Object.freeze(['Demorou pra liberar', 'Endereço confu
 
 export const r2 = v => Math.round(v * 100) / 100;
 
-export function frete(km, chuva) {
+/**
+ * Frete do motoboy. `volta` = ele precisa voltar à loja depois de entregar (maquininha, troco,
+ * devolução): paga metade do trajeto de novo, como o "retorno" dos apps de entrega.
+ * A chuva não entra na conta da volta.
+ */
+export function frete(km, chuva, volta = false) {
   const extra = Math.max(0, (+km || 0) - TABELA.kmInclusos);
-  return r2(TABELA.base + extra * TABELA.porKm + (chuva ? TABELA.chuva : 0));
+  const ida = TABELA.base + extra * TABELA.porKm;
+  return r2(ida * (volta ? 1 + TABELA.voltaPct : 1) + (chuva ? TABELA.chuva : 0));
+}
+
+/* ============ Cobrança na entrega (pedido de WhatsApp/telefone) ============
+   Como no "Sob Demanda" do iFood e na cobrança na entrega da Borzo/Lalamove: a loja diz se o
+   cliente já pagou ou se o motoboy cobra na porta, em dinheiro (com troco) ou na maquininha. */
+export const COBRANCAS = Object.freeze(['pago', 'dinheiro', 'maquininha']);
+
+/** Troco que o motoboy precisa levar (dinheiro): "troco pra R$ 50" num pedido de R$ 37 → R$ 13. */
+export function trocoLevar(c) {
+  if (c.cobranca !== 'dinheiro' || !(c.troco > 0) || !(c.cobrar > 0)) return 0;
+  return r2(Math.max(0, c.troco - c.cobrar));
+}
+
+/** Linha curta que o motoboy lê antes de aceitar (sem valor do pedido: isso só depois do aceite). */
+export function avisoCobranca(c) {
+  if (c.cobranca === 'maquininha') return 'Levar maquininha: o cliente paga na entrega';
+  if (c.cobranca === 'dinheiro') return 'Cobrar em dinheiro na entrega';
+  return '';
+}
+
+/* ============ Tempo e ganho por hora na oferta (como Uber e 99 mostram) ============ */
+export const MIN_BALCAO = 5; // minutos médios entre chegar na loja e sair com o pedido
+/**
+ * Minutos estimados da corrida inteira e quanto ela rende por hora.
+ * @param {{ km: number, valor: number, volta?: boolean }} c
+ * @param {number|null} kmAteLoja distância do motoboy até a loja (null se sem GPS)
+ */
+export function estimativaCorrida(c, kmAteLoja) {
+  const min = (kmAteLoja != null ? etaMin(kmAteLoja) : 0) + MIN_BALCAO + etaMin(c.km) + (c.volta ? etaMin(c.km) : 0);
+  return { min, porHora: r2(c.valor / (min / 60)) };
+}
+
+/* ============ Link de rastreio pro cliente (como iFood Sob Demanda e Lalamove) ============ */
+const ALFABETO = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
+export const TOKEN_RASTREIO = /^[A-Za-z0-9_-]{22}$/;
+/** Segredo de 22 caracteres (132 bits): quem não recebeu o link não consegue adivinhar. */
+export function tokenRastreio(rng = globalThis.crypto) {
+  const b = new Uint8Array(22);
+  rng.getRandomValues(b);
+  return [...b].map(x => ALFABETO[x & 63]).join('');
+}
+/** O segredo vai depois do # : não sai em log de servidor nem em referrer. */
+export function linkRastreio(base, token) {
+  return TOKEN_RASTREIO.test(token || '') ? `${String(base).replace(/[#?].*$/, '').replace(/[^/]*$/, '')}rastreio.html#${token}` : '';
 }
 
 export function taxaEspera(c, agora = Date.now()) {
@@ -110,10 +160,13 @@ export function ticketMedio(calls) {
  * @param {{cliente?: string, empresa: string, motoboy?: string, placa?: string, codigo: string}} c
  * @returns {string}
  */
-export function mensagemCliente(c) {
+export function mensagemCliente(c, link = '') {
   const quem = c.motoboy ? `com o motoboy ${c.motoboy}${c.placa ? ` (placa ${c.placa})` : ''}` : 'aguardando o motoboy';
-  return `Oi${c.cliente ? `, ${c.cliente}` : ''}! Seu pedido da ${c.empresa} está ${quem}. Na entrega, informe o código ${c.codigo}.`;
+  const pagar = c.cobranca === 'dinheiro' && c.cobrar > 0 ? ` O motoboy vai cobrar ${brlTexto(c.cobrar)} em dinheiro${c.troco > c.cobrar ? ` e leva troco pra ${brlTexto(c.troco)}` : ''}.`
+    : c.cobranca === 'maquininha' && c.cobrar > 0 ? ` O motoboy leva a maquininha pra cobrar ${brlTexto(c.cobrar)}.` : '';
+  return `Oi${c.cliente ? `, ${c.cliente}` : ''}! Seu pedido da ${c.empresa} está ${quem}.${pagar} Na entrega, informe o código ${c.codigo}.${link ? ` Acompanhe no mapa: ${link}` : ''}`;
 }
+const brlTexto = v => (+v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
 /**
  * Números do mês de uma empresa: entregas, gasto total (frete, espera, gorjeta,

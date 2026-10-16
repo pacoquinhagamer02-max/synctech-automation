@@ -2,11 +2,13 @@
 import { TABELA, LIMITES, ATIVOS, TAGS_BOAS, TAGS_RUINS, podeIr, frete, taxaEspera, ganho, quandoGanhou, mesmoDia,
   custoKm, resumoDia, saldo, reputacao, novoCodigo, r2, ticketMedio, mensagemCliente, resumoMes, informeMes, faixasHorario,
   kmEstimado, etaMin, extrairGeo, PLANOS, taxaChamado, custoPlanos, kmCorrida,
+  COBRANCAS, trocoLevar, avisoCobranca, estimativaCorrida, linkRastreio,
   alcance, raioOnda, perto, disponiveisNoRaio, RAIOS_MOTOBOY, RAIOS_BUSCA, RAIO_CONFERE_CHEGADA_M, RAIO_CLIENTE_M } from './regras.js';
 import { ligarGps, desligarGps, estadoGps, aoMudarGps, pegarPosicao } from './gps.js';
 import { mapaVivo, montarMapas, infoRota, aoMudarRota } from './mapa-vivo.js';
 import * as nuvem from './nuvem.js';
 import { ligarEfeitos } from './efeitos.js';
+import { instalar, jaInstalado, ehIphone, aoMudarInstalar } from './instalar.js';
 import { criarCorridas } from './corridas.js';
 import { armazemLocal, armazemMisto } from './armazens.js';
 import { limparPerfil, limparEmpresa, texto, numero, geo } from './esquema.js';
@@ -58,7 +60,10 @@ const FASE_MAPA = { aceito: 'loja', coleta: 'naloja', coletado: 'cliente' };
 function mapaCorrida(c, fase, moto) {
   const rotulo = fase === 'oferta' ? `Mapa: rota da ${c.empresa} até o cliente` : fase === 'loja' ? `Mapa: caminho até a ${c.empresa}` : fase === 'naloja' ? `Mapa: ${c.empresa} e o ponto de entrega` : 'Mapa: caminho até o cliente';
   const falta = fase === 'loja' ? !c.lojaGeo : fase === 'oferta' ? !(c.lojaGeo && c.clienteGeo) : !c.clienteGeo;
-  const aviso = !falta ? '' : `<p class="mapa-aviso">${fase === 'loja' || (fase === 'oferta' && !c.lojaGeo) ? 'A loja não salvou a localização no GPS. Use o endereço no Google Maps ou no Waze.' : 'O cliente ainda não tem o ponto exato no mapa. Use o endereço no Google Maps ou no Waze.'}</p>`;
+  // Antes do aceite, o servidor esconde o ponto do cliente (privacidade): ele existe, só aparece depois.
+  const escondido = !c.clienteGeo && c.temGeoCliente;
+  const aviso = !falta ? '' : `<p class="mapa-aviso">${fase === 'loja' || (fase === 'oferta' && !c.lojaGeo) ? 'A loja não salvou a localização no GPS. Use o endereço no Google Maps ou no Waze.'
+    : escondido ? 'O ponto exato do cliente aparece no mapa depois que você aceitar.' : 'O cliente ainda não tem o ponto exato no mapa. Use o endereço no Google Maps ou no Waze.'}</p>`;
   return mapaVivo(c.id, { loja: c.lojaGeo, cliente: c.clienteGeo, moto, fase, rotulo }) + aviso;
 }
 // Quanto falta: pela rota das ruas quando ela já chegou; senão, estimativa em linha reta.
@@ -73,8 +78,19 @@ const minTxt = n => (n === 1 ? '1 minuto' : `uns ${n} min`);
 const emPausa = () => S().pausaAte && S().pausaAte > Date.now();
 const meusGanhos = () => S().calls.filter(c => c.motoboy && ganho(c) > 0);
 
+// Link do mapa ao vivo pro cliente (como o do iFood Sob Demanda e da Lalamove).
+const linkMapaCliente = c => linkRastreio(location.href, c.rastreio);
 function linkCliente(c) {
-  return `https://wa.me/${fone(c.telCliente)}?text=${encodeURIComponent(mensagemCliente(c))}`;
+  return `https://wa.me/${fone(c.telCliente)}?text=${encodeURIComponent(mensagemCliente(c, linkMapaCliente(c)))}`;
+}
+// Resumo da cobrança na porta do cliente, pro motoboy e pra loja.
+function textoCobranca(c, paraMotoboy) {
+  if (c.cobranca === 'maquininha') return `Cobrar ${c.cobrar ? brl(c.cobrar) : 'o pedido'} na maquininha${paraMotoboy ? '. Pegue a maquininha na loja.' : '.'}`;
+  if (c.cobranca === 'dinheiro') {
+    const t = trocoLevar(c);
+    return `Cobrar ${c.cobrar ? brl(c.cobrar) : 'o pedido'} em dinheiro${c.troco > 0 ? ` (troco pra ${brl(c.troco)})` : ''}.${paraMotoboy && t ? ` Leve ${brl(t)} de troco.` : ''}`;
+  }
+  return '';
 }
 
 // Resumo do mês da empresa: o que ela gastou e como os motoboys a veem.
@@ -137,6 +153,7 @@ function montar() {
       <div class="top-sub">
         <span class="quem">${esc(quem)}</span>
         <button class="link pq" data-act="trocar">Trocar perfil</button>
+        ${jaInstalado() ? '' : `<button class="link pq atalho-instalar" data-act="instalar" data-instalar>${ic('baixar')}Instalar</button>`}
         <span class="top-status" data-live="nuvem-status"></span>
       </div>
     </header>
@@ -145,6 +162,28 @@ function montar() {
       `<button data-act="aba" data-aba="${id}" ${id === aba ? 'aria-current="page"' : ''}>${ic(i)}${nome}<span data-badge="${id}"></span></button>`).join('')}</nav>`);
   refresh();
 }
+
+/* ============ Instalar na tela inicial ============ */
+const cartaoInstalar = () => (jaInstalado() ? '' : `<section class="bloco instalar" data-instalar>
+    <div class="instalar-icone" aria-hidden="true"><img src="icons/icon-192.png" alt="" width="52" height="52"></div>
+    <div><h2>Marca aí na tela inicial</h2><p class="sub">Abre com um toque, em tela cheia, igual app de loja.</p></div>
+    <button class="btn btn-sinal btn-sm" data-act="instalar">${ic('baixar')}Instalar</button>
+  </section>`);
+function passoAPasso() {
+  const iphone = ehIphone();
+  return `<h3 id="dlg-titulo">Pôr o Marca aí na tela inicial</h3>
+    <ol class="passo-a-passo">${(iphone
+      ? [`Toque no botão <b>Compartilhar</b> ${ic('compartilhar', 'class="em-linha"')} (embaixo no Safari, em cima no Chrome).`,
+         'Role a lista e toque em <b>Adicionar à Tela de Início</b>.',
+         'Toque em <b>Adicionar</b>. O ícone amarelo aparece na sua tela inicial.']
+      : ['Toque no menu <b>⋮</b> do navegador (canto de cima).',
+         'Toque em <b>Instalar app</b> ou <b>Adicionar à tela inicial</b>.',
+         'Confirme. O ícone amarelo aparece na sua tela inicial.']).map(t => `<li>${t}</li>`).join('')}</ol>
+    ${iphone ? '<p class="sub mt8">No iPhone, a Apple só deixa fazer isso pelo menu Compartilhar.</p>'
+      : matchMedia('(pointer: coarse)').matches ? '' : '<p class="sub mt8">No computador, procure o ícone de instalar na barra de endereço.</p>'}
+    <button class="btn btn-sinal btn-sm mt14" data-act="fechar">Entendi</button>`;
+}
+aoMudarInstalar(() => document.querySelectorAll('[data-instalar]').forEach(el => { el.hidden = jaInstalado(); }));
 
 /* ============ Boas-vindas ============ */
 function telaBoasVindas() {
@@ -164,7 +203,17 @@ function telaBoasVindas() {
     <div class="escolha">
       <button class="btn btn-sinal" data-act="entrar" data-papel="moto">${ic('moto', 'width="26" height="26"')}Sou motoboy</button>
       <button class="btn btn-fantasma" data-act="entrar" data-papel="empresa">${ic('loja', 'width="24" height="24"')}Sou empresa, quero chamar motoboy</button>
+      ${jaInstalado() ? '' : `<button class="link-instalar" data-act="instalar" data-instalar>${ic('baixar')}Pôr o app na tela inicial do celular</button>`}
     </div>
+    <section class="simulador" aria-labelledby="sim-rot">
+      <h2 class="olho" id="sim-rot">Quanto custa uma entrega</h2>
+      <div class="sim-linha">
+        <div class="raio" role="radiogroup" aria-label="Distância da entrega">${[2, 4, 6, 8].map(k =>
+          `<button type="button" role="radio" data-act="simKm" data-k="${k}" aria-checked="${k === 4}">${k} km</button>`).join('')}</div>
+        <div class="sim-valor"><b class="num" data-sim-valor aria-live="polite">${brl(frete(4))}</b><small>vai inteiro pro motoboy</small></div>
+      </div>
+      <p class="sub">Precisa que ele volte com a maquininha? <b data-sim-volta>${brl(frete(4, false, true))}</b> com a volta. Sem mensalidade obrigatória.</p>
+    </section>
     <div class="faixas" aria-hidden="true"><i></i></div>
     <h2 class="olho">O combinado com quem pilota</h2>
     <ul class="painel">
@@ -216,7 +265,7 @@ const VIEWS = {
       </section>`,
     perfil: () => {
       const p = S().profile;
-      return `<form class="bloco" data-form="perfil" novalidate>
+      return `${cartaoInstalar()}<form class="bloco" data-form="perfil" novalidate>
         <h2>Seus dados</h2>
         ${campo('nome', 'Seu nome', p.nome, 'text', `autocomplete="name" maxlength="${LIMITES.nome}" required`)}
         <div class="grade2">${campo('moto', 'Moto', p.moto, 'text', 'placeholder="Ex.: CG 160" maxlength="40"')}${campo('placa', 'Placa', p.placa, 'text', `placeholder="ABC1D23" spellcheck="false" autocomplete="off" maxlength="${LIMITES.placa}" autocapitalize="characters"`)}</div>
@@ -260,6 +309,16 @@ const VIEWS = {
         </div>
         <label class="campo"><span>Observação pro motoboy</span><textarea class="inp" name="obs" maxlength="${LIMITES.obs}" placeholder="Ex.: pedido grande, levar bag térmica, troco pra R$ 50…" aria-describedby="obs-dica">${esc(rs.obs || '')}</textarea></label>
         <small id="obs-dica" class="mudo dica">Os motoboys leem isso antes de aceitar. Não coloque nome, telefone ou endereço do cliente aqui.</small>
+        <div class="campo"><span id="pg-rot">Pagamento do cliente</span>
+          <div class="raio" role="radiogroup" aria-labelledby="pg-rot">${[['pago', 'Já pago'], ['dinheiro', 'Dinheiro'], ['maquininha', 'Maquininha']].map(([v, n]) =>
+            `<button type="button" role="radio" data-act="cobranca" data-v="${v}" aria-checked="${(rs.cobranca || 'pago') === v}">${n}</button>`).join('')}</div>
+          <input type="hidden" name="cobranca" value="${esc(rs.cobranca || 'pago')}">
+        </div>
+        <div class="grade2" data-cobrar ${(rs.cobranca || 'pago') === 'pago' ? 'hidden' : ''}>
+          ${campo('cobrar', 'Valor a cobrar (R$)', rs.cobrar || '', 'number', 'step="0.01" min="0" max="5000" inputmode="decimal" placeholder="Ex.: 37,50"')}
+          <div data-troco ${(rs.cobranca || 'pago') !== 'dinheiro' ? 'hidden' : ''}>${campo('troco', 'Troco pra (R$)', rs.troco || '', 'number', 'step="1" min="0" max="5000" inputmode="decimal" placeholder="Ex.: 50"')}</div>
+        </div>
+        <label class="check"><input type="checkbox" name="volta" ${rs.volta ? 'checked' : ''}> O motoboy volta pra loja depois (maquininha, troco ou devolução). Ele recebe +50% do frete.</label>
         <label class="check"><input type="checkbox" name="chuva"> Está chovendo (+${brl(TABELA.chuva)} pro motoboy)</label>
         ${S().empresa.favoritos.length ? (PLANOS[S().empresa.plano].favoritos
           ? `<label class="check"><input type="checkbox" name="soFavoritos" checked> Oferecer primeiro ${S().empresa.favoritos.length === 1 ? 'ao meu motoboy favorito' : `aos meus ${S().empresa.favoritos.length} motoboys favoritos`} (30 segundos)</label>`
@@ -277,7 +336,7 @@ const VIEWS = {
       <div data-live="em-rep"></div>`;
     },
     chamados: () => `<div data-live="em-lista"></div>`,
-    loja: () => `${formEmpresa('Dados da empresa', '', 'Salvar dados')}
+    loja: () => `${cartaoInstalar()}${formEmpresa('Dados da empresa', '', 'Salvar dados')}
       <section class="bloco"><h2>Como funciona o preço</h2>
         <div class="linha"><span>Até ${TABELA.kmInclusos} km</span><b>${brl(TABELA.base)}</b></div>
         <div class="linha"><span>Cada km a mais</span><b>${brl(TABELA.porKm)}</b></div>
@@ -422,9 +481,11 @@ const LIVE = {
   },
   'em-preco': el => {
     const f = $('[data-form="chamado"]'); if (!f) return;
-    const v = frete(numero(f.km.value, LIMITES.kmMin, LIMITES.kmMax, 0), f.chuva.checked), taxa = taxaAgora();
+    const kmV = numero(f.km.value, LIMITES.kmMin, LIMITES.kmMax, 0);
+    const v = frete(kmV, f.chuva.checked, f.volta.checked), taxa = taxaAgora();
     html(el, `<div class="preco">
       <div class="linha"><span>Frete (vai inteiro pro motoboy)</span><b>${brl(v)}</b></div>
+      ${f.volta.checked ? `<div class="linha"><span>Já inclui a volta à loja</span><b>+${brl(v - frete(kmV, f.chuva.checked))}</b></div>` : ''}
       <div class="linha"><span>Taxa do app (plano ${PLANOS[S().empresa.plano].nome})</span><b>${taxa ? brl(taxa) : 'incluída'}</b></div>
       <div class="total"><span>Você paga</span><b>${brl(v + taxa)}</b></div>
     </div>`);
@@ -486,8 +547,10 @@ const LIVE = {
           : `O motoboy digitou um código errado ${c.tentativas === 1 ? '1 vez' : `${c.tentativas} vezes`}.`}</div>
           ${c.tentativas >= LIMITES.tentativasCodigo ? `<button class="btn btn-sinal btn-sm mt8" data-act="liberarCodigo" data-id="${esc(c.id)}">Liberar novas tentativas</button>` : ''}` : ''}
         ${c.status === 'coleta' ? `<div class="aviso">${c.chegadaGps ? 'Chegada confirmada pelo GPS. ' : ''}Esperando há <b class="num" data-desde="${c.chegouEm}">--:--</b>. Depois de ${TABELA.esperaGratisMin} min, a espera custa ${brl(TABELA.esperaPorMin)}/min.</div>` : ''}
+        ${textoCobranca(c, false) || c.volta ? `<div class="mudo pq mt6">${[textoCobranca(c, false), c.volta ? 'Motoboy volta pra loja.' : ''].filter(Boolean).join(' ')}</div>` : ''}
         ${emAndamento ? `<div class="mt8"><small class="mudo">Código de entrega (passe só pro cliente)</small><div class="codigo">${c.codigo}</div></div>
-          <a class="btn btn-ok btn-sm mt10" href="${esc(linkCliente(c))}" target="_blank" rel="noopener noreferrer">${ic('balao')}Avisar cliente no WhatsApp</a>` : ''}
+          <a class="btn btn-ok btn-sm mt10" href="${esc(linkCliente(c))}" target="_blank" rel="noopener noreferrer">${ic('balao')}Mandar código e mapa pro cliente</a>
+          ${linkMapaCliente(c) ? `<button class="btn btn-fantasma btn-sm mt8" data-act="copiarRastreio" data-id="${esc(c.id)}">${ic('mapa')}Copiar link do mapa</button>` : ''}` : ''}
         ${c.status === 'entregue' ? `<div class="mudo pq mt6">Frete ${brl(c.valor)}${c.espera ? ` + espera ${brl(c.espera)}` : ''}${c.gorjeta ? ` + gorjeta ${brl(c.gorjeta)}` : ''}${c.kmReal ? `. Rodou ${km(c.kmReal)} km (GPS)` : ''}</div>
           ${c.motoboy ? (() => { const fav = S().empresa.favoritos.includes(c.motoboy); return `<button class="btn btn-sm ${fav ? 'btn-sinal' : 'btn-fantasma'} mt10" data-act="favoritar" data-nome="${esc(c.motoboy)}" data-uid="${esc(c.motoboyUid)}" aria-pressed="${fav}">${ic('estrela')}${fav ? `${esc(c.motoboy)} é seu favorito` : `Favoritar ${esc(c.motoboy)}`}</button>`; })() : ''}
           ${c.gorjeta ? '' : `<div class="acoes acoes3">${LIMITES.gorjetas.map(v => `<button class="btn btn-fantasma btn-sm" data-act="gorjeta" data-id="${esc(c.id)}" data-v="${v}">+${brl(v)}</button>`).join('')}</div><small class="mudo">Mandar gorjeta pro motoboy</small>`}` : ''}
@@ -517,12 +580,15 @@ function telaOferta(c) {
   const lucro = c.valor - c.km * custoKm(S().profile);
   const resta = Math.max(0, oferta.ate - Date.now());
   const outras = ofertasAbertas().filter(x => x.id !== c.id).slice(0, 4);
+  // Como Uber e 99: o tempo da corrida inteira e quanto ela rende por hora, antes de aceitar.
+  const est = estimativaCorrida(c, ateLoja(c));
   return `<section class="oferta cascata" data-tela="oferta-${esc(c.id)}">
     <h2 class="vh">Novo chamado</h2>
     <div class="placa" data-3d="8" data-giro>
       <div class="faixa-azul"><span>Novo chamado</span><span>${esc(c.empresa)}</span></div>
       <div class="valor num">${brl(c.valor)}</div>
       <div class="porkm">${brl(porKm)} por km, sobra ${brl(lucro)} depois da gasolina</div>
+      <div class="porhora">≈ ${est.min} min no total · <b>${brl(est.porHora)}/hora</b></div>
     </div>
     <div class="bloco mt14">
       ${mapaCorrida(c, 'oferta', posicaoAtual())}
@@ -533,6 +599,8 @@ function telaOferta(c) {
       <div class="rep">
         ${r ? `<span class="tag ${r.nota >= 4 ? 'boa' : r.nota < 3 ? 'ruim' : ''}">★ ${r.nota.toFixed(1).replace('.', ',')} pelos motoboys</span>${r.espera != null ? `<span class="tag ${r.espera > TABELA.esperaGratisMin ? 'ruim' : 'boa'}">espera média ${Math.round(r.espera)} min</span>` : ''}` : '<span class="tag">Empresa ainda sem avaliação</span>'}
         ${c.chuva ? `<span class="tag info">+${brl(TABELA.chuva)} de chuva incluso</span>` : ''}
+        ${c.volta ? '<span class="tag info">Volta pra loja (já incluso no valor)</span>' : ''}
+        ${avisoCobranca(c) ? `<span class="tag info">${avisoCobranca(c)}</span>` : ''}
         ${c.preferidos.includes(S().profile.nome) ? '<span class="tag boa">Esta loja te favoritou</span>' : ''}
       </div>
       ${c.obs ? `<div class="aviso">${esc(c.obs)}</div>` : ''}
@@ -574,6 +642,8 @@ function telaCorrida(c) {
       ${c.status === 'coleta' ? `<div class="espera-box"><div class="relogio" data-desde="${c.chegouEm}" role="timer" aria-label="Tempo de espera">--:--</div>
         <p class="sub" data-espera="${esc(c.id)}"></p></div>` : ''}
       ${c.obs && c.status !== 'coleta' ? `<div class="aviso">${esc(c.obs)}</div>` : ''}
+      ${textoCobranca(c, true) ? `<div class="aviso cobranca">${ic('carteira')}<span>${textoCobranca(c, true)}</span></div>` : ''}
+      ${c.volta ? `<div class="aviso">Depois de entregar, volte à ${esc(c.empresa)}${c.cobranca === 'maquininha' ? ' com a maquininha' : c.cobranca === 'dinheiro' ? ' com o dinheiro' : ''}. A volta já está no seu frete.</div>` : ''}
       <div class="acoes">
         <a class="btn btn-azul btn-sm" href="${esc(mapsUrl(destinoNav))}" target="_blank" rel="noopener noreferrer">${ic('nav')}Google Maps</a>
         <a class="btn btn-azul btn-sm" href="${esc(wazeUrl(destinoNav))}" target="_blank" rel="noopener noreferrer">${ic('nav')}Waze</a>
@@ -784,6 +854,36 @@ const ACTS = {
     if (!RAIOS_MOTOBOY.includes(n)) return;
     mudar(s => { s.profile.raio = n; });
     anunciar(`Raio de ${n} quilômetros.`);
+  },
+  instalar: async () => {
+    const r = await instalar();
+    if (r === 'aceitou') toast('Pronto. O Marca aí está na sua tela inicial.');
+    else if (r === 'manual') dialogo(passoAPasso());
+  },
+  simKm: el => {
+    const k = +el.dataset.k; if (![2, 4, 6, 8].includes(k)) return;
+    el.closest('[role="radiogroup"]')?.querySelectorAll('button').forEach(b => b.setAttribute('aria-checked', String(+b.dataset.k === k)));
+    const v = $('[data-sim-valor]'), vt = $('[data-sim-volta]');
+    if (v) v.textContent = brl(frete(k));
+    if (vt) vt.textContent = brl(frete(k, false, true));
+  },
+  cobranca: el => {
+    const v = el.dataset.v; if (!COBRANCAS.includes(v)) return;
+    const f = el.closest('form'); if (!f) return;
+    f.cobranca.value = v;
+    el.closest('[role="radiogroup"]')?.querySelectorAll('button').forEach(b => b.setAttribute('aria-checked', String(b.dataset.v === v)));
+    f.querySelector('[data-cobrar]').hidden = v === 'pago';
+    f.querySelector('[data-troco]').hidden = v !== 'dinheiro';
+    // Cobrou na maquininha ou em dinheiro: quase sempre o motoboy volta com a maquininha/o dinheiro.
+    if (v !== 'pago' && !f.volta.dataset.mexeu) f.volta.checked = true;
+    if (v === 'pago' && !f.volta.dataset.mexeu) f.volta.checked = false;
+    LIVE['em-preco']($('[data-live="em-preco"]'));
+  },
+  copiarRastreio: async el => {
+    const c = S().calls.find(x => x.id === el.dataset.id); const link = c && linkMapaCliente(c);
+    if (!link) return;
+    try { await navigator.clipboard.writeText(link); toast('Link do mapa copiado. Cole na conversa com o cliente.'); }
+    catch { toast(link); }
   },
   raioBusca: el => {
     const n = +el.dataset.r;
@@ -998,6 +1098,7 @@ function lerLocalCliente(f) {
 const atualizaPreco = e => {
   const f = e.target.closest('[data-form="chamado"]');
   if (!f) return;
+  if (e.target.name === 'volta' && e.isTrusted) e.target.dataset.mexeu = '1';
   if (e.target.name === 'localCliente') lerLocalCliente(f);
   LIVE['em-preco']($('[data-live="em-preco"]'));
 };
@@ -1038,11 +1139,15 @@ document.addEventListener('submit', e => {
     if (!entrega) return erroForm(f, 'Informe o endereço de entrega.', 'entrega');
     if (!(dist >= LIMITES.kmMin && dist <= LIMITES.kmMax)) return erroForm(f, `A distância precisa ficar entre ${km(LIMITES.kmMin)} e ${LIMITES.kmMax} km.`, 'km');
     const clienteGeo = extrairGeo(d.localCliente);
+    const cobranca = COBRANCAS.includes(d.cobranca) ? d.cobranca : 'pago';
+    const cobrar = numero(d.cobrar, 0, 5000, 0), troco = numero(d.troco, 0, 5000, 0);
+    if (cobranca !== 'pago' && !(cobrar > 0)) return erroForm(f, 'Informe quanto o motoboy deve cobrar do cliente.', 'cobrar');
+    if (cobranca === 'dinheiro' && troco > 0 && troco < cobrar) return erroForm(f, 'O "troco pra" precisa ser maior que o valor a cobrar.', 'troco');
     const usarFav = d.soFavoritos === 'on' && PLANOS[S().empresa.plano].favoritos;
     if (nuvem.nuvemLigada() && nuvem.estadoNuvem().estado !== 'conectado') return erroForm(f, nuvem.estadoNuvem().detalheErro || 'Ainda conectando ao servidor. Espere um instante e tente de novo.');
     const botao = f.querySelector('[type="submit"]'); botao.disabled = true;
     corridas.chamar({ empresa: S().empresa.nome, coleta, tel: S().empresa.tel, entrega, cliente: texto(d.cliente, LIMITES.nome), telCliente: texto(d.telCliente, LIMITES.tel),
-      km: dist, obs: texto(d.obs, LIMITES.obs), chuva: d.chuva === 'on', taxa: taxaAgora(), lojaGeo: S().empresa.geo, clienteGeo, raioKm: S().empresa.raioBusca,
+      km: dist, obs: texto(d.obs, LIMITES.obs), chuva: d.chuva === 'on', volta: d.volta === 'on', cobranca, cobrar, troco, taxa: taxaAgora(), lojaGeo: S().empresa.geo, clienteGeo, raioKm: S().empresa.raioBusca,
       preferidos: usarFav ? S().empresa.favoritos : [], preferidosUid: usarFav ? S().empresa.favoritosUid : [] })
       .then(r => {
         botao.disabled = false;

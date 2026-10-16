@@ -1,7 +1,7 @@
 // Ciclo da corrida: o único lugar que sabe como um chamado anda de "aberto" até "entregue".
 //
 // Interface (tudo devolve Promise<{ ok: true, ... } | { ok: false, motivo, ... }>):
-//   chamar(dados)            empresa cria o chamado (frete e código calculados aqui)
+//   chamar(dados)            empresa cria o chamado (frete, código e link de rastreio do cliente calculados aqui)
 //   aceitar(id, perfil)      motoboy aceita
 //   avancar(id, { codigo })  próxima etapa: chegou na loja → pegou o pedido → entregou (pede o código)
 //   noGps(ponto, kmAndado)   cada leitura do GPS: soma km da corrida, registra a chegada na loja sozinho
@@ -16,7 +16,7 @@
 // Quem guarda os dados é o "armazém" (adaptador): no aparelho (modo demonstração) ou no servidor.
 // Porta do armazém: lista() → corridas conhecidas; criar(corrida) → id; aplicar(id, mudanca) → grava
 // ou lança { motivo }; publicarPosicao(ponto, corrida|null).
-import { TABELA, LIMITES, ATIVOS, RAIO_CHEGADA_M, RAIO_CLIENTE_M, RAIOS_BUSCA, RAIO_BUSCA_PADRAO, podeIr, frete, taxaEspera, distanciaKm, perto, novoCodigo, r2 } from './regras.js';
+import { TABELA, LIMITES, ATIVOS, RAIO_CHEGADA_M, RAIO_CLIENTE_M, RAIOS_BUSCA, RAIO_BUSCA_PADRAO, COBRANCAS, podeIr, frete, taxaEspera, distanciaKm, perto, novoCodigo, tokenRastreio, r2 } from './regras.js';
 
 const GRAVAR_KM_A_CADA_MS = 60000;
 
@@ -47,7 +47,11 @@ export function criarCorridas(armazem, { agora = Date.now } = {}) {
       if (!d.empresa || !d.coleta || !d.entrega || !(km >= LIMITES.kmMin && km <= LIMITES.kmMax)) return falha('invalido');
       const corrida = {
         empresa: d.empresa, coleta: d.coleta, tel: d.tel || '', entrega: d.entrega, cliente: d.cliente || '', telCliente: d.telCliente || '',
-        km, obs: d.obs || '', chuva: !!d.chuva, valor: frete(km, !!d.chuva), taxa: d.taxa ?? TABELA.taxaPlataforma,
+        km, obs: d.obs || '', chuva: !!d.chuva, volta: !!d.volta, valor: frete(km, !!d.chuva, !!d.volta), taxa: d.taxa ?? TABELA.taxaPlataforma,
+        cobranca: COBRANCAS.includes(d.cobranca) ? d.cobranca : 'pago',
+        cobrar: COBRANCAS.includes(d.cobranca) && d.cobranca !== 'pago' ? Math.max(0, r2(+d.cobrar || 0)) : 0,
+        troco: d.cobranca === 'dinheiro' ? Math.max(0, r2(+d.troco || 0)) : 0,
+        rastreio: tokenRastreio(),
         codigo: novoCodigo(), status: 'aberto', criadoEm: agora(), lojaGeo: d.lojaGeo || null, clienteGeo: d.clienteGeo || null,
         preferidos: d.preferidos || [], preferidosUid: d.preferidosUid || [],
         prioridadeAte: (d.preferidos?.length || d.preferidosUid?.length) ? agora() + 30000 : null, teste: !!d.teste,

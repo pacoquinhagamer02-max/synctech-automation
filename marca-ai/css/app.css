@@ -619,3 +619,42 @@ dialog#dialogo[open] .folha{animation:sobe .5s var(--mola)}
 .placa{background:repeating-linear-gradient(135deg,rgba(30,79,163,.035) 0 2px,transparent 2px 9px),linear-gradient(180deg,#fff,#F5F3EA);color:#0A0A0A}
 :root[data-tema="sol"] .chave[aria-checked="true"]{background:var(--verde-borda)}
 .mapa-aviso{display:flex;gap:8px;align-items:flex-start;font-size:14px;font-weight:500;margin:-6px 0 12px;padding:10px 12px;border-radius:12px;background:rgba(255,194,26,.12);box-shadow:inset 3px 0 0 var(--sinal)}
+
+/* ============ Melhorias dos concorrentes (16/10/2026) ============ */
+[hidden]{display:none!important}
+/* Oferta: tempo da corrida inteira e ganho por hora (como Uber e 99) */
+.placa .porhora{text-align:center;font-size:14px;color:#0A0A0A;background:#FFC21A;margin:0 10px 10px;padding:5px 10px;border-radius:8px;font-weight:600}
+.placa .porhora b{font-family:"Saira Condensed";font-size:16px}
+/* Cobrança na porta do cliente */
+.aviso.cobranca{display:flex;gap:10px;align-items:flex-start;border-color:var(--verde);font-weight:600}
+.aviso.cobranca svg{width:22px;height:22px;flex:none;color:var(--ok-texto)}
+/* Simulador de frete na entrada (como Lalamove e Borzo: preço antes do cadastro) */
+.simulador{margin:0 0 22px}
+.sim-linha{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
+.sim-linha .raio{margin:0}
+.sim-valor{text-align:right}
+.sim-valor b{display:block;font-family:"Saira Condensed";font-weight:800;font-size:44px;line-height:1;color:var(--sinal-texto)}
+.sim-valor small{font-size:12px;color:var(--mudo)}
+.simulador .sub b{color:var(--sinal-texto)}
+/* Página de rastreio do cliente */
+.pg-rastreio main{padding-bottom:24px}
+.rastreio-titulo{font-family:"Saira Condensed";font-weight:800;font-size:clamp(34px,10vw,48px);line-height:.95;letter-spacing:-.5px;margin:2px 0 8px}
+.rastreio-sub{font-size:17px;color:var(--mudo);margin-bottom:16px;max-width:36ch}
+.motoboy-card{display:flex;align-items:center;gap:14px}
+.motoboy-card .avatar{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;flex:none;background:var(--sinal);color:#0A0A0A;font-family:"Saira Condensed";font-weight:800;font-size:26px;box-shadow:0 3px 0 var(--sinal-borda)}
+.motoboy-card b{display:block;font-size:18px}
+.motoboy-card small{color:var(--mudo);font-size:14px}
+.rodape-rastreio{padding:0 16px 24px}
+
+/* ============ Instalar na tela inicial (16/10/2026) ============ */
+.instalar{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:center}
+.instalar h2{margin:0 0 2px;font-size:17px}
+.instalar .sub{margin:0}
+.instalar .btn{grid-column:1/-1;margin-top:8px}
+.instalar-icone img{display:block;width:52px;height:52px;border-radius:13px;box-shadow:0 0 0 1px var(--hairline),0 6px 14px -6px rgba(0,0,0,.6)}
+.link-instalar{display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;width:100%;color:var(--sinal-texto);font-weight:600;font-size:16px;text-decoration:underline;text-underline-offset:4px}
+.link-instalar svg{width:22px;height:22px}
+.atalho-instalar{display:inline-flex;align-items:center;gap:4px}
+.atalho-instalar svg{width:16px;height:16px}
+.passo-a-passo{margin:10px 0 0 20px;display:grid;gap:10px;font-size:16px}
+.passo-a-passo .em-linha{width:20px;height:20px;vertical-align:-4px;color:var(--sinal-texto)}

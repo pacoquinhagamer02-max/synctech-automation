@@ -1,7 +1,7 @@
 // Validação de tudo que entra no app (armazenamento, outras abas, formulários).
 // Nada é confiado: tipos conferidos, textos cortados, números limitados e o valor
 // da corrida sempre recalculado pela tabela, nunca lido do dado salvo.
-import { LIMITES, STATUS, TABELA, TAGS_BOAS, TAGS_RUINS, PLANOS, RAIOS_MOTOBOY, RAIOS_BUSCA, RAIO_MOTOBOY_PADRAO, RAIO_BUSCA_PADRAO, frete } from './regras.js';
+import { LIMITES, STATUS, TABELA, TAGS_BOAS, TAGS_RUINS, PLANOS, RAIOS_MOTOBOY, RAIOS_BUSCA, RAIO_MOTOBOY_PADRAO, RAIO_BUSCA_PADRAO, frete, COBRANCAS, TOKEN_RASTREIO } from './regras.js';
 
 const TAGS = new Set([...TAGS_BOAS, ...TAGS_RUINS]);
 
@@ -58,6 +58,8 @@ export function limparChamado(c) {
   if (!c || typeof c !== 'object' || typeof c.id !== 'string' || !STATUS.includes(c.status)) return null;
   const km = numero(c.km, LIMITES.kmMin, LIMITES.kmMax, 1);
   const chuva = c.chuva === true;
+  const volta = c.volta === true;
+  const cobranca = COBRANCAS.includes(c.cobranca) ? c.cobranca : 'pago';
   return {
     id: texto(c.id, 64),
     empresa: texto(c.empresa, LIMITES.nome),
@@ -68,7 +70,11 @@ export function limparChamado(c) {
     tel: texto(c.tel, LIMITES.tel).replace(/[^\d()+ -]/g, ''),
     obs: texto(c.obs, LIMITES.obs),
     km, chuva,
-    valor: frete(km, chuva),
+    valor: frete(km, chuva, volta),
+    volta, cobranca,
+    cobrar: cobranca === 'pago' ? 0 : numero(c.cobrar, 0, 5000, 0),
+    troco: cobranca === 'dinheiro' ? numero(c.troco, 0, 5000, 0) : 0,
+    rastreio: TOKEN_RASTREIO.test(c.rastreio || '') ? c.rastreio : '',
     teste: c.teste === true,
     codigo: /^\d{4}$/.test(c.codigo) ? c.codigo : '0000',
     status: c.status,

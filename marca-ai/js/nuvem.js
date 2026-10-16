@@ -96,7 +96,12 @@ function buscarExtras() {
     const ex = extras.get(id) || {};
     if (!ex.cliente && (souEmpresa || souMotoboy) && !ex.pedindoCliente) {
       ex.pedindoCliente = true;
-      F.getDoc(F.doc(db, 'chamados', id, 'restrito', 'cliente')).then(s => { ex.cliente = s.data() || null; if (!ex.cliente) ex.pedindoCliente = false; espelhar(); }).catch(() => { ex.pedindoCliente = false; });
+      F.getDoc(F.doc(db, 'chamados', id, 'restrito', 'cliente')).then(s => {
+        ex.cliente = s.data() || null; if (!ex.cliente) ex.pedindoCliente = false;
+        espelhar();
+        // Motoboy acabou de aceitar: o link do cliente já mostra o nome dele e a etapa.
+        if (souMotoboy && ATIVOS.includes(c.status)) atualizarRastreio(id, {});
+      }).catch(() => { ex.pedindoCliente = false; });
     }
     if (!ex.codigo && souEmpresa && !ex.pedindoCodigo) {
       ex.pedindoCodigo = true;
@@ -133,6 +138,7 @@ function paraLocal(id, c) {
     motoboyUid: c.motoboyUid || '',
     entrega: cli?.entrega || `Entrega no bairro ${c.bairro || 'informado após o aceite'}`,
     cliente: cli?.cliente || '', telCliente: cli?.telCliente || '', clienteGeo: cli?.clienteGeo || null,
+    cobrar: cli?.cobrar || 0, troco: cli?.troco || 0, rastreio: cli?.rastreio || '',
     codigo: ex.codigo || '0000',
     // As telas checam favoritos pelo nome; aqui só importa se EU sou favorito.
     preferidos: (c.preferidosUid || []).includes(uid) ? [S().profile.nome] : ((c.preferidosUid || []).length ? ['outros'] : []),
@@ -172,21 +178,43 @@ export function esquecerDisponivel() {
   F.deleteDoc(F.doc(db, 'disponiveis', uid)).catch(() => {});
 }
 
+/* ============ Link de rastreio do cliente ============
+   Motoboy da corrida grava etapa, nome/moto/placa e posição; empresa só marca "cancelado".
+   O servidor confere que a etapa é a mesma do chamado. Falha aqui nunca atrapalha a corrida. */
+const rastreioGravadoEm = new Map();
+function atualizarRastreio(id, { status, pos, empresa = false }) {
+  if (!db || !uid) return;
+  const c = S().calls.find(x => x.id === id);
+  const token = c?.rastreio || extras.get(id)?.cliente?.rastreio;
+  if (!c || !token) return;
+  const etapa = status || c.status;
+  const dados = empresa ? { status: etapa, pos: null, em: Date.now() }
+    : { status: etapa, motoboy: S().profile.nome || '', moto: S().profile.moto || '', placa: S().profile.placa || '', em: Date.now(),
+        ...(pos !== undefined ? { pos } : {}), ...(ATIVOS.includes(etapa) ? {} : { pos: null }) };
+  rastreioGravadoEm.set(id, Date.now());
+  F.updateDoc(F.doc(db, 'rastreios', token), dados).catch(() => {});
+}
+
 export const armazemNuvem = {
   lista: () => S().calls,
 
   async criar(c) {
     precisa();
     const ref = F.doc(F.collection(db, 'chamados'));
-    const cliente = { entrega: c.entrega, cliente: c.cliente || '', telCliente: c.telCliente || '', clienteGeo: c.clienteGeo || null };
+    const cliente = { entrega: c.entrega, cliente: c.cliente || '', telCliente: c.telCliente || '', clienteGeo: c.clienteGeo || null,
+      cobrar: c.cobrar || 0, troco: c.troco || 0, rastreio: c.rastreio || '' };
     const b = F.writeBatch(db);
     b.set(ref, {
       empresaUid: uid, empresa: c.empresa, coleta: c.coleta, tel: c.tel || '', lojaGeo: c.lojaGeo || null, bairro: bairroDe(c.entrega),
       km: c.km, chuva: !!c.chuva, valor: c.valor, taxa: c.taxa, obs: c.obs || '', status: 'aberto', criadoEm: c.criadoEm,
-      motoboyUid: null, preferidosUid: c.preferidosUid || [], prioridadeAte: c.preferidosUid?.length ? c.prioridadeAte : null, temGeoCliente: !!c.clienteGeo, raioKm: c.raioKm
+      motoboyUid: null, preferidosUid: c.preferidosUid || [], prioridadeAte: c.preferidosUid?.length ? c.prioridadeAte : null, temGeoCliente: !!c.clienteGeo, raioKm: c.raioKm,
+      cobranca: c.cobranca || 'pago', volta: !!c.volta
     });
     b.set(F.doc(db, 'chamados', ref.id, 'restrito', 'codigo'), { valor: c.codigo });
     b.set(F.doc(db, 'chamados', ref.id, 'restrito', 'cliente'), cliente);
+    // Página pública do cliente (sem nome nem telefone dele): só quem recebe o link acha.
+    if (c.rastreio) b.set(F.doc(db, 'rastreios', c.rastreio), { chamadoId: ref.id, empresa: c.empresa, lojaGeo: c.lojaGeo || null, destinoGeo: c.clienteGeo || null,
+      status: 'aberto', motoboy: '', moto: '', placa: '', pos: null, em: Date.now() });
     try { await b.commit(); } catch (e) { throw traduzir(e); }
     // A empresa já sabe o código e os dados do cliente: guarda e redesenha (sem esperar uma nova leitura).
     extras.set(ref.id, { ...(extras.get(ref.id) || {}), codigo: c.codigo, cliente });
@@ -204,17 +232,22 @@ export const armazemNuvem = {
       if (feitas >= 5) throw Object.assign(new Error('bloqueado'), { motivo: 'bloqueado' });
       try { await F.updateDoc(ref, { codigoInformado: m.codigoInformado, tentativas: feitas + 1 }); } catch (e) { throw traduzir(e); }
       try { await F.updateDoc(ref, { status: 'entregue', entregueEm: m.entregueEm, kmReal: m.kmReal }); } catch (e) { throw traduzir(e); }
+      atualizarRastreio(id, { status: 'entregue', pos: null });
       return;
     }
     // Quem aceita é sempre esta conta: o servidor confere que motoboyUid é de quem está pedindo.
     const dados = m.status === 'aceito' ? { ...m, motoboyUid: uid } : m;
     try { await F.updateDoc(ref, dados); } catch (e) { throw traduzir(e); }
+    if (m.status === 'cancelado') atualizarRastreio(id, { status: 'cancelado', pos: null, empresa: true });
+    else if (m.status) atualizarRastreio(id, { status: m.status });
   },
 
   // Posição do motoboy: só sobe com corrida em andamento, e some quando ela acaba.
   publicarPosicao(ponto, corrida) {
     if (!db || !uid || !corrida) return;
     F.setDoc(F.doc(db, 'posicoes', uid), { lat: ponto.lat, lon: ponto.lon, precisao: Math.round(ponto.precisao || 0), em: Date.now(), chamadoId: corrida.id }).catch(() => {});
+    // O cliente vê a moto andando no link dele (no máximo uma gravação a cada 5 s).
+    if (Date.now() - (rastreioGravadoEm.get(corrida.id) || 0) >= 5000) atualizarRastreio(corrida.id, { pos: { lat: ponto.lat, lon: ponto.lon } });
   },
   esquecerPosicao() {
     if (!db || !uid) return;
