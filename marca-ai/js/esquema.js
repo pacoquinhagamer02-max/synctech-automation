@@ -82,6 +82,10 @@ export function limparChamado(c) {
   const entregues = Math.round(numero(c.entregues, 0, paradas.length, 0));
   // Os campos de cima (entrega, cliente, código…) mostram a parada em que o motoboy está.
   const atual = paradas[Math.min(entregues, paradas.length - 1)];
+  const valor = frete(km, chuva, volta, paradas.length);
+  // Cancelamento paga o deslocamento (R$ 5) ou, depois de o motoboy sair com o pedido, o frete inteiro.
+  const compensacao = c.compensacao === TABELA.deslocamentoCancelado ? TABELA.deslocamentoCancelado
+    : (c.compensacao > 0 && Math.abs(c.compensacao - valor) < 0.011 ? valor : 0);
   return {
     id: texto(c.id, 64),
     empresa: texto(c.empresa, LIMITES.nome),
@@ -91,7 +95,7 @@ export function limparChamado(c) {
     tel: texto(c.tel, LIMITES.tel).replace(/[^\d()+ -]/g, ''),
     obs: texto(c.obs, LIMITES.obs),
     km, chuva,
-    valor: frete(km, chuva, volta, paradas.length),
+    valor,
     volta,
     teste: c.teste === true,
     status: c.status,
@@ -101,7 +105,7 @@ export function limparChamado(c) {
     motoboy: texto(c.motoboy, LIMITES.nome), moto: texto(c.moto, 40), placa: texto(c.placa, LIMITES.placa),
     espera: numero(c.espera, 0, 500, 0),
     gorjeta: LIMITES.gorjetas.includes(c.gorjeta) ? c.gorjeta : 0,
-    compensacao: c.compensacao === TABELA.deslocamentoCancelado ? TABELA.deslocamentoCancelado : 0,
+    compensacao, naoEntregue: c.naoEntregue === true,
     avaliado: c.avaliado === true,
     nota: Math.round(numero(c.nota, 0, 5, 0)),
     tags: Array.isArray(c.tags) ? [...new Set(c.tags.filter(t => TAGS.has(t)))] : [],
@@ -135,7 +139,7 @@ export function limparTurno(t) {
     lojaGeo: geo(t.lojaGeo), obs: texto(t.obs, LIMITES.obs),
     valorHora: numero(t.valorHora, TURNO.valorHoraMin, TURNO.valorHoraMax, TURNO.valorHoraMin),
     motoboy: texto(t.motoboy, LIMITES.nome), moto: texto(t.moto, 40), placa: texto(t.placa, LIMITES.placa),
-    compensacao: numero(t.compensacao, 0, TURNO.valorHoraMax, 0),
+    compensacao: numero(t.compensacao, 0, TURNO.valorHoraMax * TURNO.horasMax, 0), faltou: t.faltou === true,
     criadoEm: instante(t.criadoEm) || Date.now(), aceitoEm: instante(t.aceitoEm),
     nuvem: t.nuvem === true, teste: t.teste === true,
     empresaUid: uid(t.empresaUid) ? t.empresaUid : '', motoboyUid: uid(t.motoboyUid) ? t.motoboyUid : ''

@@ -4,7 +4,7 @@ import { TABELA, LIMITES, ATIVOS, TAGS_BOAS, TAGS_RUINS, podeIr, frete, taxaEspe
   kmEstimado, etaMin, extrairGeo, PLANOS, taxaChamado, custoPlanos, kmCorrida,
   COBRANCAS, trocoLevar, avisoCobranca, estimativaCorrida, linkRastreio,
   alcance, raioOnda, perto, disponiveisNoRaio, RAIOS_MOTOBOY, RAIOS_BUSCA, RAIO_CONFERE_CHEGADA_M, RAIO_CLIENTE_M,
-  MAX_PARADAS, ordenarParadas, kmRota, TURNO, valorTurno, ganhoTurno, turnoAgora, relatorioEmpresa, csvEmpresa } from './regras.js';
+  MAX_PARADAS, ABERTO_VALE_MS, FALTA_TURNO_MS, TENTAR_ENTREGA_MS, compensacaoTurno, distanciaKm, ordenarParadas, kmRota, TURNO, valorTurno, ganhoTurno, turnoAgora, relatorioEmpresa, csvEmpresa } from './regras.js';
 import { ligarGps, desligarGps, estadoGps, aoMudarGps, pegarPosicao } from './gps.js';
 import { mapaVivo, montarMapas, infoRota, aoMudarRota } from './mapa-vivo.js';
 import * as nuvem from './nuvem.js';
@@ -46,7 +46,7 @@ const posicaoAtual = () => (S().posicao && Date.now() - S().posicao.em < 120000 
 const ofertasAbertas = () => {
   const pos = posicaoAtual(), raio = S().profile.raio, agora = Date.now();
   return S().calls
-    .filter(c => c.status === 'aberto' && !S().recusados.includes(c.id) && visivelPraMim(c))
+    .filter(c => c.status === 'aberto' && agora - c.criadoEm < ABERTO_VALE_MS && !S().recusados.includes(c.id) && visivelPraMim(c))
     .map(c => ({ c, a: alcance(c, pos, raio, agora) }))
     .filter(x => x.a.ok)
     .sort((x, y) => (x.a.km ?? Infinity) - (y.a.km ?? Infinity) || x.c.criadoEm - y.c.criadoEm)
@@ -291,12 +291,13 @@ function linhaTurno(t, quem) {
   const quemTxt = quem === 'empresa' ? (t.motoboy ? `${esc(t.motoboy)}${t.placa ? `, placa ${esc(t.placa)}` : ''}` : 'Ainda sem motoboy') : `${esc(t.empresa)}, ${esc(t.coleta)}`;
   const acao = quem === 'empresa'
     ? (acabou ? `<button class="btn btn-sinal btn-sm" data-act="concluirTurno" data-id="${esc(t.id)}">Fechar turno e pagar ${brl(valorTurno(t))}</button>`
-      : ['aberto', 'aceito'].includes(t.status) ? `<button class="btn btn-fantasma btn-sm" data-act="cancelarTurno" data-id="${esc(t.id)}">Desmarcar</button>` : '')
+      : ['aberto', 'aceito'].includes(t.status) ? `<button class="btn btn-fantasma btn-sm" data-act="cancelarTurno" data-id="${esc(t.id)}">Desmarcar</button>${rodando && agora >= t.inicio + FALTA_TURNO_MS
+        ? ` <button class="btn btn-fantasma btn-sm" data-act="faltouTurno" data-id="${esc(t.id)}">Motoboy não apareceu</button>` : ''}` : '')
     : (t.status === 'aberto' ? `<button class="btn btn-sinal btn-sm" data-act="aceitarTurno" data-id="${esc(t.id)}">Pegar este turno</button>`
       : acabou ? `<button class="btn btn-sinal btn-sm" data-act="concluirTurno" data-id="${esc(t.id)}">Fechar turno e receber</button>` : '');
   return `<li class="turno"><div class="turno-cab"><b>${diaCurto(t.inicio)}, ${hora(t.inicio)} às ${hora(t.fim)}</b><span class="pill ${cls}">${rot}</span></div>
     <small>${quemTxt}</small>
-    <small>${brl(t.valorHora)} por hora, ${brl(valorTurno(t))} garantidos${t.status === 'cancelado' && t.compensacao ? `. Desmarcado depois do aceite: ${brl(t.compensacao)} pro motoboy` : ''}</small>
+    <small>${brl(t.valorHora)} por hora, ${brl(valorTurno(t))} garantidos${t.status === 'cancelado' && t.compensacao ? `. Desmarcado depois do aceite: ${brl(t.compensacao)} pro motoboy` : ''}${t.faltou ? '. Marcado como falta do motoboy' : ''}</small>
     ${acao ? `<div class="mt8">${acao}</div>` : ''}</li>`;
 }
 
@@ -488,7 +489,7 @@ const LIVE = {
     const ativa = corridaAtiva();
     if (ultimaAtiva && !ativa) {
       const c = S().calls.find(x => x.id === ultimaAtiva);
-      if (c && c.status === 'cancelado') toast(`A empresa cancelou. Você recebe ${brl(c.compensacao)} pelo deslocamento.`);
+      if (c && c.status === 'cancelado' && !c.naoEntregue) toast(`A empresa cancelou. Você recebe ${brl(c.compensacao)}${c.compensacao === c.valor ? ' (o frete inteiro)' : ' pelo deslocamento'}.`);
     }
     ultimaAtiva = ativa ? ativa.id : null;
 
@@ -660,6 +661,7 @@ const LIVE = {
       ${r.cancelados ? `<p class="aviso">${r.cancelados} ${r.cancelados === 1 ? 'chamado cancelado' : 'chamados cancelados'}${r.semMotoboy ? `, ${r.semMotoboy} sem nenhum motoboy aceitar` : ''}.</p>` : ''}
       <div class="acoes"><button class="btn btn-fantasma btn-sm" data-act="baixarPlanilha">${ic('baixar')}Planilha</button><button class="btn btn-fantasma btn-sm" data-act="imprimirRelatorio">${ic('doc')}PDF</button></div>`
       : '<p class="sub">Nenhum chamado nesse período.</p>'}
+      ${S().calls.filter(c => c.nuvem && c.empresa === nome).length >= 200 ? '<p class="sub">O relatório conta os últimos 200 chamados guardados neste aparelho.</p>' : ''}
     </section>`);
   },
   'em-rep': el => {
@@ -832,7 +834,8 @@ function telaCorrida(c) {
     <div class="cta-fixa">
     ${c.status === 'aceito' ? `<button class="btn btn-sinal" data-act="cheguei" data-id="${esc(c.id)}">${ic('loja')}Cheguei na loja</button>` : ''}
     ${c.status === 'coleta' ? `<button class="btn btn-sinal" data-act="coletei" data-id="${esc(c.id)}">${ic('caixa')}Peguei o pedido</button>` : ''}
-    ${c.status === 'coletado' ? `<button class="btn btn-ok" data-act="entregar" data-id="${esc(c.id)}">${ic('check')}${n > 1 && feitas < n - 1 ? `Entreguei pra ${esc(c.cliente || `cliente ${feitas + 1}`)}` : 'Finalizar entrega'}</button>` : ''}
+    ${c.status === 'coletado' ? `<button class="btn btn-ok" data-act="entregar" data-id="${esc(c.id)}">${ic('check')}${n > 1 && feitas < n - 1 ? `Entreguei pra ${esc(c.cliente || `cliente ${feitas + 1}`)}` : 'Finalizar entrega'}</button>
+      <button class="btn btn-fantasma btn-sm mt8" data-act="naoEntregue" data-id="${esc(c.id)}">Não consegui entregar</button>` : ''}
     </div>`;
 }
 
@@ -954,17 +957,24 @@ async function aceitarChamado(id) {
 /* ============ Foto da entrega ============
    JPEG pequeno (até ~300 KB, em geral 60 KB): cabe no banco grátis e abre rápido no celular da loja. */
 const FOTO_OK = /^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/;
+// iPhone antigo não tem createImageBitmap com opções: cai pro <img> comum (que já respeita a rotação da foto).
+async function abrirImagem(arquivo) {
+  try { return await createImageBitmap(arquivo, { imageOrientation: 'from-image' }); } catch {}
+  const url = URL.createObjectURL(arquivo), img = new Image();
+  try { img.src = url; await img.decode(); return { width: img.naturalWidth, height: img.naturalHeight, desenhar: img }; }
+  finally { URL.revokeObjectURL(url); }
+}
 async function comprimirFoto(arquivo) {
-  const img = await createImageBitmap(arquivo, { imageOrientation: 'from-image' });
+  const aberta = await abrirImagem(arquivo), img = aberta.desenhar ? { width: aberta.width, height: aberta.height } : aberta, fonte = aberta.desenhar || aberta;
   for (const [lado, q] of [[960, 0.6], [720, 0.55], [540, 0.5]]) {
     const k = Math.min(1, lado / Math.max(img.width, img.height));
     const cv = document.createElement('canvas');
     cv.width = Math.round(img.width * k); cv.height = Math.round(img.height * k);
-    cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+    cv.getContext('2d').drawImage(fonte, 0, 0, cv.width, cv.height);
     const url = cv.toDataURL('image/jpeg', q);
-    if (url.length < 300000) { img.close?.(); return url; }
+    if (url.length < 300000) { fonte.close?.(); return url; }
   }
-  img.close?.();
+  fonte.close?.();
   throw new Error('foto-grande');
 }
 async function guardarFoto(c, parada, arquivo) {
@@ -1164,11 +1174,29 @@ const ACTS = {
   },
   cancelarTurno: async el => {
     const t = S().turnos.find(x => x.id === el.dataset.id); if (!t) return;
-    const paga = t.status === 'aceito';
-    const sim = await confirmar('Desmarcar o turno?', paga ? `${t.motoboy} já confirmou e recebe ${brl(t.valorHora)} (1 hora) por ter reservado o horário.` : 'Nenhum motoboy pegou ainda, então não há custo.', 'Desmarcar turno', 'Manter turno');
+    const paga = t.status === 'aceito', valor = compensacaoTurno(t, Date.now() + 120000);
+    const sim = await confirmar('Desmarcar o turno?', !paga ? 'Nenhum motoboy pegou ainda, então não há custo.'
+      : Date.now() < t.inicio ? `${t.motoboy} já confirmou e recebe ${brl(valor)} (1 hora) por ter reservado o horário.`
+      : `O turno já começou: ${t.motoboy} recebe ${brl(valor)} (as horas até agora + 1 hora).`, 'Desmarcar turno', 'Manter turno');
     if (!sim) return;
     const r = await escala.cancelar(t.id);
     toast(r.ok ? 'Turno desmarcado.' : r.motivo === 'indisponivel' ? 'Esse turno já terminou: feche e pague na lista.' : MOTIVOS[r.motivo]);
+  },
+  faltouTurno: async el => {
+    const t = S().turnos.find(x => x.id === el.dataset.id); if (!t) return;
+    const sim = await confirmar('O motoboy não apareceu?', `O turno é encerrado sem pagamento pra ${t.motoboy}. Use só se ele realmente não veio: isso fica registrado.`, 'Ele não apareceu', 'Voltar');
+    if (!sim) return;
+    const r = await escala.faltou(t.id);
+    toast(r.ok ? 'Turno encerrado como falta.' : r.motivo === 'cedo' ? 'Espere 20 minutos depois do início pra marcar falta.' : MOTIVOS[r.motivo]);
+  },
+  naoEntregue: async el => {
+    const c = S().calls.find(x => x.id === el.dataset.id); if (!c) return;
+    const falta = (c.coletouEm || 0) + TENTAR_ENTREGA_MS - Date.now();
+    if (falta > 0) { toast(`Tente mais um pouco e ligue pra loja. Dá pra desistir depois de ${Math.ceil(falta / 60000)} min tentando.`); return; }
+    const sim = await confirmar('Não conseguiu entregar?', `A corrida é encerrada e você recebe ${brl(TABELA.deslocamentoCancelado)} pelo deslocamento. Combine com a ${c.empresa} a devolução do pedido.`, 'Encerrar corrida', 'Continuar tentando');
+    if (!sim) return;
+    const r = await corridas.naoEntregue(c.id);
+    toast(r.ok ? 'Corrida encerrada. Devolva o pedido na loja.' : MOTIVOS[r.motivo] || MOTIVOS.indisponivel);
   },
   concluirTurno: async el => {
     const t = S().turnos.find(x => x.id === el.dataset.id); if (!t) return;
@@ -1373,13 +1401,12 @@ const ACTS = {
   cancelar: async el => {
     const id = el.dataset.id;
     const c = S().calls.find(x => x.id === id); if (!c) return;
-    const paga = c.status !== 'aberto';
-    const sim = await confirmar('Cancelar chamado?', paga
-      ? `O motoboy já está a caminho e recebe ${brl(TABELA.deslocamentoCancelado)} pelo deslocamento.`
-      : 'Nenhum motoboy aceitou ainda, então não há custo.', 'Cancelar chamado', 'Manter chamado');
+    const sim = await confirmar('Cancelar chamado?', c.status === 'aberto' ? 'Nenhum motoboy aceitou ainda, então não há custo.'
+      : c.status === 'coletado' ? `O motoboy já saiu com o pedido e recebe o frete inteiro (${brl(c.valor)}). Combine com ele a devolução.`
+      : `O motoboy já está a caminho e recebe ${brl(TABELA.deslocamentoCancelado)} pelo deslocamento.`, 'Cancelar chamado', 'Manter chamado');
     if (!sim) return;
     const r = await corridas.cancelar(id);
-    toast(r.ok ? 'Chamado cancelado.' : r.motivo === 'indisponivel' ? 'O motoboy já saiu com o pedido, então não dá mais pra cancelar. Ligue pra ele se precisar.' : MOTIVOS[r.motivo]);
+    toast(r.ok ? 'Chamado cancelado.' : MOTIVOS[r.motivo]);
   },
   liberarCodigo: async el => {
     const r = await corridas.liberarCodigo(el.dataset.id);
@@ -1478,6 +1505,9 @@ document.addEventListener('submit', e => {
     if (!entrega) return erroForm(f, 'Informe o endereço de entrega.', 'entrega');
     if (!(dist >= LIMITES.kmMin && dist <= LIMITES.kmMax)) return erroForm(f, `A distância precisa ficar entre ${km(LIMITES.kmMin)} e ${LIMITES.kmMax} km.`, 'km');
     const clienteGeo = extrairGeo(d.localCliente);
+    // O frete sai do km: não pode ser menor que a distância em linha reta até o cliente (o servidor confere também).
+    if (S().empresa.geo && clienteGeo && dist < distanciaKm(S().empresa.geo, clienteGeo) * 0.8)
+      return erroForm(f, `O cliente fica a pelo menos ${km(distanciaKm(S().empresa.geo, clienteGeo))} km da loja em linha reta. Ajuste a distância.`, 'km');
     const cobranca = COBRANCAS.includes(d.cobranca) ? d.cobranca : 'pago';
     const cobrar = numero(d.cobrar, 0, 5000, 0), troco = numero(d.troco, 0, 5000, 0);
     if (cobranca !== 'pago' && !(cobrar > 0)) return erroForm(f, 'Informe quanto o motoboy deve cobrar do cliente.', 'cobrar');

@@ -1,6 +1,6 @@
 // Rede primeiro: com internet, sempre a versão nova; sem internet, a última cópia boa.
 // Mude VERSAO a cada publicação pra limpar o cache antigo.
-const VERSAO = 'marcaai-v21';
+const VERSAO = 'marcaai-v22';
 const ARQUIVOS = [
   './', 'index.html', 'rastreio.html', 'manifest.json', 'icon.svg', 'css/app.css',
   'js/app.js', 'js/gps.js', 'js/rota.js', 'js/mapa-vivo.js', 'js/efeitos.js', 'js/rastreio.js', 'js/instalar.js', 'icons/icon-192.png', 'icons/apple-touch-icon.png', 'js/nuvem.js', 'js/config.js', 'js/corridas.js', 'js/turnos.js', 'js/armazens.js', 'js/regras.js', 'js/esquema.js', 'js/store.js', 'js/ui.js',

@@ -70,7 +70,7 @@ test('GPS soma o km e registra a chegada sozinho perto da loja', async () => {
   assert.deepEqual([c.status, c.chegadaGps, c.kmReal], ['coleta', true, 0.9]);
 });
 
-test('cancelar paga deslocamento só se o motoboy já aceitou; depois de pegar o pedido não cancela', async () => {
+test('cancelar paga deslocamento depois do aceite e o frete inteiro depois de pegar o pedido', async () => {
   const { corridas } = montar();
   const a = await corridas.chamar(pedido());
   assert.equal((await corridas.cancelar(a.id)).compensacao, 0);
@@ -79,7 +79,22 @@ test('cancelar paga deslocamento só se o motoboy já aceitou; depois de pegar o
   assert.equal((await corridas.cancelar(b.id)).compensacao, 5);
   const c = await corridas.chamar(pedido());
   await corridas.aceitar(c.id, joao); await corridas.avancar(c.id); await corridas.avancar(c.id);
-  assert.equal((await corridas.cancelar(c.id)).motivo, 'indisponivel');
+  assert.equal((await corridas.cancelar(c.id)).compensacao, 12, 'motoboy já saiu com o pedido: frete inteiro');
+});
+
+test('motoboy desiste de entrega impossível só depois de 20 min tentando, e recebe o deslocamento', async () => {
+  const { corridas, estado, relogio } = montar();
+  const { id } = await corridas.chamar(pedido());
+  await corridas.aceitar(id, joao); await corridas.avancar(id); await corridas.avancar(id);
+  const cedo = await corridas.naoEntregue(id);
+  assert.equal(cedo.motivo, 'cedo');
+  assert.equal(cedo.minutos, 20);
+  relogio.passar(21);
+  assert.equal((await corridas.naoEntregue(id)).compensacao, 5);
+  assert.equal(estado().calls[0].status, 'cancelado');
+  assert.equal(estado().calls[0].naoEntregue, true);
+  const outro = await corridas.chamar(pedido());
+  assert.deepEqual(await corridas.aceitar(outro.id, joao), { ok: true }, 'motoboy fica livre pra outra corrida');
 });
 
 test('gorjeta e avaliação: só depois da entrega, uma vez, com valores válidos', async () => {

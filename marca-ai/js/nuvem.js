@@ -6,7 +6,7 @@
 let F = null;
 import { FIREBASE, NUVEM_ATIVA } from './config.js';
 import { S, transacao, usarConta } from './store.js';
-import { ATIVOS, gradeAproximada } from './regras.js';
+import { ATIVOS, ABERTO_VALE_MS, gradeAproximada } from './regras.js';
 
 const params = new URLSearchParams(location.search);
 // ?demo = modo antigo, só no aparelho. ?aba = cada aba é uma conta (pra testar empresa e motoboy no mesmo navegador).
@@ -24,6 +24,7 @@ const posicoes = new Map();     // motoboyUid -> posição
 const ouvindoPos = new Map();   // motoboyUid -> função pra parar
 let disponiveis = [];           // motoboys livres perto (grade de ~1 km, sem nome), visto pela empresa
 const DISPONIVEL_VALE_MS = 5 * 60000;
+let renovar = null;
 
 export const meuUid = () => uid;
 export const estadoNuvem = () => ({ estado, detalheErro });
@@ -69,14 +70,16 @@ function ouvir() {
   const consultas = papel === 'empresa'
     // 200 últimos: dá pro relatório do mês da loja sem ler o histórico inteiro.
     ? [F.query(ch, F.where('empresaUid', '==', uid), F.orderBy('criadoEm', 'desc'), F.limit(200))]
-    : [F.query(ch, F.where('status', '==', 'aberto'), F.orderBy('criadoEm', 'asc'), F.limit(30)),
+    // Só chamados abertos das últimas 2 horas: chamado esquecido não ocupa a fila dos motoboys pra sempre.
+    : [F.query(ch, F.where('status', '==', 'aberto'), F.where('criadoEm', '>', Date.now() - ABERTO_VALE_MS), F.orderBy('criadoEm', 'asc'), F.limit(30)),
        F.query(ch, F.where('motoboyUid', '==', uid), F.orderBy('criadoEm', 'desc'), F.limit(60))];
   const grupos = consultas.map(() => new Map());
   // Turnos: a loja vê os dela; o motoboy vê os abertos e os que pegou.
   const tu = F.collection(db, 'turnos');
   const consultasTurno = papel === 'empresa'
     ? [F.query(tu, F.where('empresaUid', '==', uid), F.orderBy('inicio', 'desc'), F.limit(60))]
-    : [F.query(tu, F.where('status', '==', 'aberto'), F.orderBy('inicio', 'asc'), F.limit(30)),
+    // Turnos abertos que ainda não passaram (o mais longo tem 12 h).
+    : [F.query(tu, F.where('status', '==', 'aberto'), F.where('inicio', '>', Date.now() - 12 * 3600000), F.orderBy('inicio', 'asc'), F.limit(30)),
        F.query(tu, F.where('motoboyUid', '==', uid), F.orderBy('inicio', 'desc'), F.limit(60))];
   const gruposTurno = consultasTurno.map(() => new Map());
   turnosVistos.clear();
@@ -89,11 +92,15 @@ function ouvir() {
   }, () => {})));
   // Empresa conta os motoboys livres perto da loja (como os carrinhos no mapa da Uber/Lalamove).
   if (papel === 'empresa') {
-    parar.push(F.onSnapshot(F.query(F.collection(db, 'disponiveis'), F.orderBy('em', 'desc'), F.limit(300)), snap => {
+    // Só quem deu sinal nos últimos 5 min (motoboy que fechou o app sem ficar offline não entra).
+    parar.push(F.onSnapshot(F.query(F.collection(db, 'disponiveis'), F.where('em', '>', Date.now() - DISPONIVEL_VALE_MS), F.orderBy('em', 'desc'), F.limit(100)), snap => {
       disponiveis = snap.docs.map(d => d.data());
       avisar();
     }, () => { disponiveis = []; }));
   }
+  // Os filtros de tempo acima valem a partir de agora: reabre as escutas a cada 30 min pra janela andar junto.
+  clearTimeout(renovar);
+  renovar = setTimeout(ouvir, 30 * 60000);
   consultas.forEach((q, i) => parar.push(F.onSnapshot(q, snap => {
     grupos[i].clear();
     snap.forEach(d => grupos[i].set(d.id, d.data()));
@@ -208,18 +215,20 @@ export function esquecerDisponivel() {
    Motoboy da corrida grava etapa, nome/moto/placa e posição; empresa só marca "cancelado".
    O servidor confere que a etapa é a mesma do chamado. Falha aqui nunca atrapalha a corrida. */
 const rastreioGravadoEm = new Map();
+let posicaoGravadaEm = 0;
 // Cada cliente tem o seu link. Parada já entregue mostra "entregue"; as que faltam seguem a etapa da corrida.
-function atualizarRastreio(id, { status, pos, empresa = false }) {
+// `feitas` vem de quem acabou de gravar a entrega: o estado local ainda pode estar com o número antigo.
+function atualizarRastreio(id, { status, pos, empresa = false, feitas: feitasAgora }) {
   if (!db || !uid) return;
   const c = S().calls.find(x => x.id === id);
   if (!c) return;
   const etapaCorrida = status || c.status;
-  const feitas = etapaCorrida === 'entregue' ? c.paradas.length : (c.entregues || 0);
+  const feitas = etapaCorrida === 'entregue' ? c.paradas.length : (feitasAgora ?? c.entregues ?? 0);
   c.paradas.forEach((p, i) => {
     const token = p.rastreio;
     if (!token) return;
-    // Parada já entregue não é regravada a cada leitura do GPS.
-    if (i < (c.entregues || 0) && pos !== undefined && etapaCorrida !== 'entregue') return;
+    // Leitura do GPS só regrava o link do cliente da vez (os outros mudam quando muda a etapa): poupa a cota grátis.
+    if (pos !== undefined && pos !== null && i !== feitas) return;
     const etapa = i < feitas ? 'entregue' : etapaCorrida;
     // Entrega terminada: some a posição e também os pontos da loja e do cliente (o link deixa de guardar endereço).
     const fim = ['entregue', 'cancelado'].includes(etapa) ? { pos: null, lojaGeo: null, destinoGeo: null } : {};
@@ -371,7 +380,7 @@ export const armazemNuvem = {
         ? { status: 'entregue', entregueEm: m.entregueEm, kmReal: m.kmReal, entregues: m.entregues }
         : { entregues: m.entregues, tentativas: 0, kmReal: m.kmReal, paradaEm: [...(vistos.get(id)?.paradaEm || []), m.paradaEm] };
       try { await F.updateDoc(ref, passo); } catch (e) { throw traduzir(e); }
-      atualizarRastreio(id, m.status === 'entregue' ? { status: 'entregue', pos: null } : {});
+      atualizarRastreio(id, m.status === 'entregue' ? { status: 'entregue', pos: null } : { feitas: m.entregues });
       return;
     }
     // Quem aceita é sempre esta conta: o servidor confere que motoboyUid é de quem está pedindo.
@@ -384,6 +393,9 @@ export const armazemNuvem = {
   // Posição do motoboy: só sobe com corrida em andamento, e some quando ela acaba.
   publicarPosicao(ponto, corrida) {
     if (!db || !uid || !corrida) return;
+    // No máximo uma gravação a cada 5 s: o GPS lê a cada ~15 m andados e estouraria a cota grátis do servidor.
+    if (Date.now() - posicaoGravadaEm < 5000) return;
+    posicaoGravadaEm = Date.now();
     F.setDoc(F.doc(db, 'posicoes', uid), { lat: ponto.lat, lon: ponto.lon, precisao: Math.round(ponto.precisao || 0), em: Date.now(), chamadoId: corrida.id }).catch(() => {});
     // O cliente vê a moto andando no link dele (no máximo uma gravação a cada 5 s).
     if (Date.now() - (rastreioGravadoEm.get(corrida.id) || 0) >= 5000) atualizarRastreio(corrida.id, { pos: { lat: ponto.lat, lon: ponto.lon } });

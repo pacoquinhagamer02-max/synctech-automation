@@ -128,3 +128,14 @@ loja desmarcando turno aceito sem pagar a 1 hora.
   motoboy da corrida leem, e o app escapa tudo (esc + Trusted Types).
 - Login por SMS: o reCAPTCHA do Google entra no CSP (script/frame/connect/img só nos caminhos /recaptcha/) e uma política Trusted Types
   "default" aceita apenas as URLs exatas do reCAPTCHA. **Ainda não ativado**: precisa ligar o provedor Telefone no Firebase (exige plano Blaze).
+
+## Auditoria 29/10/2026 (revisor independente + correções, v22)
+Corrigido e testado no servidor real: fila de chamados abertos só mostra as últimas 2 h (30 chamados esquecidos travavam a fila);
+posição do motoboy gravada no máximo a cada 5 s e só no link do cliente da vez (cota grátis); link do cliente mostra "entregue"
+na hora certa; corrida não fica presa depois da coleta (loja cancela pagando o frete inteiro; motoboy desiste após 20 min com R$ 5);
+km declarado não pode ser menor que 80% da linha reta até o cliente (recusado no servidor); chamado só nasce junto com código e
+dados do cliente; códigos com 4 números conferidos; foto só depois da entrega daquela parada e não pode ser trocada; turno
+desmarcado depois de começar paga as horas passadas + 1; loja marca falta do motoboy 20 min após o início; turnos e motoboys
+disponíveis vencidos saem das consultas; CSV neutraliza também tab/CR; rastreio.html aceita a política "default".
+Riscos que ficam: falta do motoboy no turno é palavra da loja (sem contestação); reCAPTCHA no CSP de todas as telas
+(host contornável segundo o CSP Evaluator, mitigado porque todo dado passa por esc); relatório usa os últimos 200 chamados.

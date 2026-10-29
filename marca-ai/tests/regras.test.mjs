@@ -29,7 +29,7 @@ test('ganho soma frete, espera e gorjeta; cancelado paga deslocamento', () => {
 test('máquina de estados não deixa pular etapa', () => {
   assert.ok(podeIr('aberto', 'aceito'));
   assert.ok(!podeIr('aberto', 'entregue'));
-  assert.ok(!podeIr('coletado', 'cancelado'));
+  assert.ok(podeIr('coletado', 'cancelado'), 'loja cancela ou motoboy desiste depois da coleta');
   assert.ok(!podeIr('entregue', 'aceito'));
   assert.ok(!podeIr('__proto__', 'aceito'));
 });

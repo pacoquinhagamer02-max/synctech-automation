@@ -8,7 +8,8 @@
 //                            só termina na última ({ etapa: 'parada', proxima } nas do meio)
 //   noGps(ponto, kmAndado)   cada leitura do GPS: soma km da corrida, registra a chegada na loja sozinho
 //                            e avisa uma vez quando o motoboy está chegando no cliente ({ chegandoCliente })
-//   cancelar(id)             empresa cancela (paga deslocamento se o motoboy já aceitou)
+//   cancelar(id)             empresa cancela (paga deslocamento se o motoboy já aceitou; frete inteiro se ele já saiu com o pedido)
+//   naoEntregue(id)          motoboy desiste de uma entrega impossível, depois de 20 min tentando (recebe o deslocamento)
 //   gorjeta(id, valor)       empresa dá gorjeta, uma vez
 //   avaliar(id, nota, tags)  motoboy avalia a empresa (nota 0 = pulou)
 //   liberarCodigo(id)        empresa libera novas tentativas do código (depois de conferir com o cliente)
@@ -18,7 +19,7 @@
 // Quem guarda os dados é o "armazém" (adaptador): no aparelho (modo demonstração) ou no servidor.
 // Porta do armazém: lista() → corridas conhecidas; criar(corrida) → id; aplicar(id, mudanca) → grava
 // ou lança { motivo }; publicarPosicao(ponto, corrida|null).
-import { TABELA, LIMITES, ATIVOS, RAIO_CHEGADA_M, RAIO_CLIENTE_M, RAIOS_BUSCA, RAIO_BUSCA_PADRAO, COBRANCAS, MAX_PARADAS, podeIr, frete, taxaEspera, distanciaKm, perto, novoCodigo, tokenRastreio, r2 } from './regras.js';
+import { TENTAR_ENTREGA_MS, TABELA, LIMITES, ATIVOS, RAIO_CHEGADA_M, RAIO_CLIENTE_M, RAIOS_BUSCA, RAIO_BUSCA_PADRAO, COBRANCAS, MAX_PARADAS, podeIr, frete, taxaEspera, distanciaKm, perto, novoCodigo, tokenRastreio, r2 } from './regras.js';
 
 // Uma entrega da corrida, com código e link de rastreio próprios.
 function novaParada(p) {
@@ -139,9 +140,20 @@ export function criarCorridas(armazem, { agora = Date.now } = {}) {
     async cancelar(id) {
       const c = ler(id);
       if (!c || !podeIr(c.status, 'cancelado')) return falha('indisponivel');
-      const compensacao = c.status === 'aberto' ? 0 : TABELA.deslocamentoCancelado;
+      const compensacao = c.status === 'aberto' ? 0 : c.status === 'coletado' ? c.valor : TABELA.deslocamentoCancelado;
       const r = await gravar(id, { status: 'cancelado', canceladoEm: agora(), compensacao }, { compensacao });
       return r.ok || r.motivo !== 'recusado' ? r : falha('indisponivel');
+    },
+
+    async naoEntregue(id) {
+      const c = ler(id);
+      if (!c || c.status !== 'coletado') return falha('indisponivel');
+      const falta = (c.coletouEm || 0) + TENTAR_ENTREGA_MS - agora();
+      if (falta > 0) return falha('cedo', { minutos: Math.ceil(falta / 60000) });
+      const compensacao = TABELA.deslocamentoCancelado;
+      const r = await gravar(id, { status: 'cancelado', canceladoEm: agora(), compensacao, naoEntregue: true }, { compensacao });
+      if (r.ok) km.delete(id);
+      return r;
     },
 
     async gorjeta(id, valor) {

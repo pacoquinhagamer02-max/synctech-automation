@@ -1,6 +1,11 @@
 // Regras de negócio do Marca aí. Funções puras, sem DOM nem armazenamento:
 // dá pra testar com `node --test` e reaproveitar no servidor quando ele existir.
 
+/** Chamado aberto há mais que isso some da fila dos motoboys (ninguém quis: a loja chama de novo). */
+export const ABERTO_VALE_MS = 2 * 3600000;
+/** Tempo tentando entregar antes de o motoboy poder desistir ("não consegui entregar"). */
+export const TENTAR_ENTREGA_MS = 20 * 60000;
+
 export const TABELA = Object.freeze({
   base: 8, kmInclusos: 3, porKm: 2, chuva: 2,
   esperaGratisMin: 10, esperaPorMin: 0.5,
@@ -24,7 +29,9 @@ const TRANSICOES = Object.freeze({
   aberto: ['aceito', 'cancelado'],
   aceito: ['coleta', 'cancelado'],
   coleta: ['coletado', 'cancelado'],
-  coletado: ['entregue'],
+  // Depois de pegar o pedido: a loja pode cancelar (paga o frete inteiro) e o motoboy pode desistir
+  // de uma entrega impossível depois de 20 min tentando (recebe o deslocamento). A corrida nunca fica presa.
+  coletado: ['entregue', 'cancelado'],
   entregue: [],
   cancelado: []
 });
@@ -423,6 +430,14 @@ export function kmRota(loja, paradas) {
 export const TURNO = Object.freeze({ valorHoraMin: 12, valorHoraMax: 60, horasMin: 2, horasMax: 12, antecedenciaDias: 14 });
 export const STATUS_TURNO = Object.freeze(['aberto', 'aceito', 'concluido', 'cancelado']);
 export const horasTurno = t => r2((t.fim - t.inicio) / 3600000);
+/** Loja desmarca turno aceito: antes do início paga 1 hora; depois, as horas já passadas + 1 (no máximo o turno inteiro). */
+export function compensacaoTurno(t, agora = Date.now()) {
+  if (t.status !== 'aceito') return 0;
+  const horas = agora <= t.inicio ? 1 : (agora - t.inicio) / 3600000 + 1;
+  return r2(Math.min(valorTurno(t), horas * t.valorHora));
+}
+/** Depois de 20 min do início sem o motoboy aparecer, a loja pode marcar falta (sem pagamento). */
+export const FALTA_TURNO_MS = 20 * 60000;
 /** Valor garantido do turno inteiro. */
 export const valorTurno = t => r2(horasTurno(t) * t.valorHora);
 
@@ -499,7 +514,7 @@ export function relatorioEmpresa(calls, empresa, de, ate, turnos = []) {
 
 /** Planilha (CSV com ; pro Excel em português) das corridas do período. Célula que começa com = + - @ vira texto. */
 export function csvEmpresa(calls, empresa, de, ate) {
-  const cel = v => '"' + String(v ?? '').replace(/"/g, '""').replace(/^([=+\-@])/, "'$1") + '"';
+  const cel = v => '"' + String(v ?? '').replace(/"/g, '""').replace(/^([=+\-@\t\r])/, "'$1") + '"';
   const num = v => (+v || 0).toFixed(2).replace('.', ',');
   const quando = t => (t ? new Date(t).toLocaleString('pt-BR') : '');
   const linhas = calls.filter(c => c.empresa === empresa && !c.teste && c.criadoEm >= de && c.criadoEm < ate)

@@ -36,6 +36,24 @@ service cloud.firestore {
       return novo().kmReal is number && novo().kmReal <= 500 && novo().kmReal >= resource.data.get('kmReal', 0);
     }
     function chamado(id) { return get(/databases/$(db)/documents/chamados/$(id)).data; }
+    // Distância em linha reta aproximada (km). O fator 0,83 no eixo leste-oeste subestima de propósito
+    // (cosseno da latitude no Brasil fica entre 0,84 e 1): o servidor nunca recusa um km honesto.
+    function distKm(a, b) {
+      let dy = (a.lat - b.lat) * 111.2;
+      let dx = (a.lon - b.lon) * 111.2 * 0.83;
+      return math.sqrt(dy * dy + dx * dx);
+    }
+    // O km (que define o frete) não pode ser menor que a distância até o primeiro cliente.
+    function kmPlausivel(id) {
+      let cli = getAfter(/databases/$(db)/documents/chamados/$(id)/restrito/cliente).data.get('clienteGeo', null);
+      return novo().lojaGeo == null || cli == null || novo().km >= distKm(novo().lojaGeo, cli) * 0.8;
+    }
+    // Cada código de entrega tem 4 números.
+    function codigosOk(vs) {
+      return vs is list && vs.size() >= 1 && vs.size() <= 5 && vs[0].matches('^[0-9]{4}$')
+        && (vs.size() < 2 || vs[1].matches('^[0-9]{4}$')) && (vs.size() < 3 || vs[2].matches('^[0-9]{4}$'))
+        && (vs.size() < 4 || vs[3].matches('^[0-9]{4}$')) && (vs.size() < 5 || vs[4].matches('^[0-9]{4}$'));
+    }
     // Código certo da parada i (chamado antigo, de uma entrega só, guarda só "valor").
     function codigoDa(id, i) {
       let r = get(/databases/$(db)/documents/chamados/$(id)/restrito/codigo).data;
@@ -77,6 +95,10 @@ service cloud.firestore {
         && novo().get('entregues', 0) == 0
         && novo().get('bairros', []) is list && novo().get('bairros', []).size() <= 5
         && freteCerto(novo().km, novo().chuva, novo().get('volta', false), novo().get('nParadas', 1), novo().valor)
+        // O chamado nasce junto com o código e os dados do cliente (sem eles, a entrega ficaria impossível).
+        && existsAfter(/databases/$(db)/documents/chamados/$(id)/restrito/codigo)
+        && existsAfter(/databases/$(db)/documents/chamados/$(id)/restrito/cliente)
+        && kmPlausivel(id)
         && novo().taxa is number && novo().taxa >= 0 && novo().taxa <= 10
         && horaCerta(novo().criadoEm) && novo().temGeoCliente is bool
         && novo().get('raioKm', 5) in [3, 5, 8, 15]
@@ -126,10 +148,14 @@ service cloud.firestore {
           && so(['avaliado', 'nota', 'tags']) && novo().avaliado == true && novo().nota is int && novo().nota >= 0 && novo().nota <= 5
           && novo().tags is list && novo().tags.size() <= 6
           && novo().tags.hasOnly(['Pedido estava pronto', 'Atendimento bom', 'Tem onde parar a moto', 'Demorou pra liberar', 'Endereço confuso', 'Me trataram mal']))
-        // Empresa cancela: se o motoboy já aceitou, ele recebe R$ 5 de deslocamento.
-        || (resource.data.empresaUid == eu() && resource.data.status in ['aberto', 'aceito', 'coleta'] && novo().status == 'cancelado'
+        // Empresa cancela: se o motoboy já aceitou, ele recebe R$ 5 de deslocamento; se já saiu com o pedido, o frete inteiro.
+        || (resource.data.empresaUid == eu() && resource.data.status in ['aberto', 'aceito', 'coleta', 'coletado'] && novo().status == 'cancelado'
           && so(['status', 'canceladoEm', 'compensacao']) && horaCerta(novo().canceladoEm)
-          && novo().compensacao == (resource.data.status == 'aberto' ? 0 : 5))
+          && novo().compensacao == (resource.data.status == 'aberto' ? 0 : resource.data.status == 'coletado' ? resource.data.valor : 5))
+        // Motoboy não conseguiu entregar (cliente sumiu, endereço não existe): depois de 20 min com o pedido, encerra e recebe R$ 5.
+        || (resource.data.motoboyUid == eu() && resource.data.status == 'coletado' && novo().status == 'cancelado'
+          && so(['status', 'canceladoEm', 'compensacao', 'naoEntregue']) && horaCerta(novo().canceladoEm)
+          && agora() >= resource.data.coletouEm + 20 * 60000 && novo().compensacao == 5 && novo().naoEntregue == true)
         // Empresa dá gorjeta, uma vez, nos valores do app.
         || (resource.data.empresaUid == eu() && resource.data.status == 'entregue' && resource.data.get('gorjeta', 0) == 0
           && so(['gorjeta']) && novo().gorjeta in [2, 5, 10])
@@ -141,7 +167,7 @@ service cloud.firestore {
         allow create: if logado() && chamadoDepois(id).empresaUid == eu() && (
           (doc == 'codigo' && request.resource.data.keys().hasOnly(['valor', 'valores']) && request.resource.data.valor is string
             && request.resource.data.valor.matches('^[0-9]{4}$')
-            && request.resource.data.get('valores', [request.resource.data.valor]) is list
+            && codigosOk(request.resource.data.get('valores', [request.resource.data.valor]))
             && request.resource.data.get('valores', [request.resource.data.valor]).size() == chamadoDepois(id).get('nParadas', 1)
             && request.resource.data.get('valores', [request.resource.data.valor])[0] == request.resource.data.valor)
           || (doc == 'cliente' && request.resource.data.keys().hasOnly(['entrega', 'cliente', 'telCliente', 'clienteGeo', 'cobrar', 'troco', 'rastreio', 'paradas', 'rastreios'])
@@ -162,12 +188,13 @@ service cloud.firestore {
       // Só o motoboy da corrida grava (depois de pegar o pedido); só ele e a loja leem.
       match /fotos/{n} {
         allow read: if logado() && (chamado(id).empresaUid == eu() || chamado(id).motoboyUid == eu());
-        allow create, update: if logado() && n in ['0', '1', '2', '3', '4']
+        // Só depois de entregar aquela parada, uma vez (o comprovante não pode ser trocado depois).
+        allow create: if logado() && n in ['0', '1', '2', '3', '4'] && int(n) < chamado(id).get('entregues', 0)
           && chamado(id).motoboyUid == eu() && chamado(id).status in ['coletado', 'entregue']
           && request.resource.data.keys().hasOnly(['img', 'em']) && horaCerta(request.resource.data.em)
           && request.resource.data.img is string && request.resource.data.img.size() < 350000
           && request.resource.data.img.matches('^data:image/jpeg;base64,[A-Za-z0-9+/=]+$');
-        allow delete: if false;
+        allow update, delete: if false;
       }
     }
 
@@ -202,6 +229,13 @@ service cloud.firestore {
 
     // Motoboy por turno: a loja reserva um motoboy por algumas horas, com valor por hora garantido.
     // Cancelar depois do aceite paga 1 hora ao motoboy; o valor inteiro sai quando o turno termina.
+    function compensacaoTurnoOk() {
+      let total = resource.data.valorHora * (resource.data.fim - resource.data.inicio) / 3600000;
+      let devido = agora() <= resource.data.inicio ? resource.data.valorHora
+        : resource.data.valorHora * ((agora() - resource.data.inicio) / 3600000 + 1);
+      return novo().compensacao is number && novo().compensacao >= (devido < total ? devido : total) - 0.011
+        && novo().compensacao <= total + 0.011;
+    }
     match /turnos/{id} {
       allow read: if logado() && (resource.data.status == 'aberto' || resource.data.empresaUid == eu() || resource.data.motoboyUid == eu());
       allow create: if logado()
@@ -218,11 +252,16 @@ service cloud.firestore {
         (resource.data.status == 'aberto' && novo().status == 'aceito' && novo().motoboyUid == eu() && agora() < resource.data.fim
           && so(['status', 'motoboyUid', 'motoboy', 'moto', 'placa', 'aceitoEm']) && horaCerta(novo().aceitoEm)
           && texto(novo().motoboy, 60) && novo().motoboy.size() > 0 && texto(novo().moto, 40) && texto(novo().placa, 10))
-        // Loja desmarca: aberto sai de graça; aceito (e ainda não acabou) paga 1 hora ao motoboy.
+        // Loja desmarca: aberto sai de graça; aceito paga 1 hora antes de começar, e as horas já passadas + 1 depois.
         || (resource.data.empresaUid == eu() && novo().status == 'cancelado'
           && (resource.data.status == 'aberto' || (resource.data.status == 'aceito' && agora() < resource.data.fim))
           && so(['status', 'compensacao', 'canceladoEm']) && horaCerta(novo().canceladoEm)
-          && novo().compensacao == (resource.data.status == 'aberto' ? 0 : resource.data.valorHora))
+          && (resource.data.status == 'aberto' ? novo().compensacao == 0 : compensacaoTurnoOk()))
+        // Motoboy não apareceu: 20 min depois do início, a loja encerra sem pagamento (fica marcado como falta).
+        || (resource.data.empresaUid == eu() && resource.data.status == 'aceito' && novo().status == 'cancelado'
+          && agora() >= resource.data.inicio + 20 * 60000 && agora() < resource.data.fim
+          && so(['status', 'compensacao', 'canceladoEm', 'faltou']) && horaCerta(novo().canceladoEm)
+          && novo().compensacao == 0 && novo().faltou == true)
         // Turno terminou: a loja ou o motoboy fecha, e o motoboy recebe o valor inteiro.
         || ((resource.data.empresaUid == eu() || resource.data.motoboyUid == eu()) && resource.data.status == 'aceito'
           && novo().status == 'concluido' && agora() >= resource.data.fim
