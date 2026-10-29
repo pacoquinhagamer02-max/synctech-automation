@@ -4,9 +4,12 @@
 export const TABELA = Object.freeze({
   base: 8, kmInclusos: 3, porKm: 2, chuva: 2,
   esperaGratisMin: 10, esperaPorMin: 0.5,
-  taxaPlataforma: 1.99, deslocamentoCancelado: 5, voltaPct: 0.5,
+  taxaPlataforma: 1.99, deslocamentoCancelado: 5, voltaPct: 0.5, paradaExtra: 3,
   tempoOferta: 30, maisTempoOferta: 30
 });
+
+/** Até quantas entregas cabem numa corrida só (Lalamove e Borzo fazem rota com várias paradas). */
+export const MAX_PARADAS = 5;
 
 export const LIMITES = Object.freeze({
   kmMin: 0.1, kmMax: 100, nome: 60, endereco: 160, obs: 300, tel: 20, pix: 100, placa: 10,
@@ -35,12 +38,14 @@ export const r2 = v => Math.round(v * 100) / 100;
 /**
  * Frete do motoboy. `volta` = ele precisa voltar à loja depois de entregar (maquininha, troco,
  * devolução): paga metade do trajeto de novo, como o "retorno" dos apps de entrega.
- * A chuva não entra na conta da volta.
+ * A chuva não entra na conta da volta. `paradas` = quantas entregas a corrida tem: cada parada
+ * além da primeira paga R$ 3 (o km da rota inteira já entra no `km`).
  */
-export function frete(km, chuva, volta = false) {
+export function frete(km, chuva, volta = false, paradas = 1) {
   const extra = Math.max(0, (+km || 0) - TABELA.kmInclusos);
   const ida = TABELA.base + extra * TABELA.porKm;
-  return r2(ida * (volta ? 1 + TABELA.voltaPct : 1) + (chuva ? TABELA.chuva : 0));
+  const n = Math.min(MAX_PARADAS, Math.max(1, Math.round(+paradas) || 1));
+  return r2(ida * (volta ? 1 + TABELA.voltaPct : 1) + (chuva ? TABELA.chuva : 0) + (n - 1) * TABELA.paradaExtra);
 }
 
 /* ============ Cobrança na entrega (pedido de WhatsApp/telefone) ============
@@ -115,8 +120,8 @@ export function resumoDia(calls, profile, dia = Date.now()) {
   return { n: entregues.length, bruto, km, comb: r2(km * custoKm(profile)) };
 }
 
-export function saldo(calls, saques) {
-  const total = calls.filter(c => c.motoboy).reduce((a, c) => a + ganho(c), 0);
+export function saldo(calls, saques, turnos = []) {
+  const total = calls.filter(c => c.motoboy).reduce((a, c) => a + ganho(c), 0) + turnos.filter(t => t.motoboy).reduce((a, t) => a + ganhoTurno(t), 0);
   return r2(total - saques.reduce((a, s) => a + s.valor, 0));
 }
 
@@ -373,4 +378,133 @@ export function taxaChamado(plano, feitosNoMes) {
 export function custoPlanos(n) {
   return Object.fromEntries(Object.entries(PLANOS).map(([k, p]) =>
     [k, r2(p.mensal + Math.max(0, n - p.incluidos) * p.extra + Math.min(n, p.incluidos === Infinity ? n : p.incluidos) * p.taxa)]));
+}
+
+/* ============ Várias paradas numa corrida (como Lalamove e Borzo) ============
+   A loja junta até 5 entregas numa saída só. Cada cliente tem o seu código e o seu link;
+   o motoboy entrega na ordem da rota e a corrida só termina na última parada. */
+
+/** Quantas entregas a corrida tem. */
+export const nParadas = c => Math.max(1, c.paradas?.length || c.nParadas || 1);
+/** Em que parada o motoboy está (0 = primeira). */
+export const paradaAtual = c => Math.min(Math.max(0, c.entregues || 0), nParadas(c) - 1);
+
+/**
+ * Ordem da rota: sempre a parada mais perto de onde o motoboy vai estar (vizinho mais próximo).
+ * Paradas sem ponto no mapa ficam no fim, na ordem em que a loja digitou.
+ * @param {{lat:number, lon:number}|null} loja
+ * @param {Array<{clienteGeo?: {lat:number, lon:number}|null}>} paradas
+ */
+export function ordenarParadas(loja, paradas) {
+  const comGeo = paradas.filter(p => p.clienteGeo), semGeo = paradas.filter(p => !p.clienteGeo);
+  if (!loja || comGeo.length < 2) return [...comGeo, ...semGeo];
+  const resto = [...comGeo], rota = [];
+  let aqui = loja;
+  while (resto.length) {
+    let i = 0;
+    resto.forEach((p, j) => { if (distanciaKm(aqui, p.clienteGeo) < distanciaKm(aqui, resto[i].clienteGeo)) i = j; });
+    const [p] = resto.splice(i, 1);
+    rota.push(p); aqui = p.clienteGeo;
+  }
+  return [...rota, ...semGeo];
+}
+
+/** Km pelas ruas da loja passando por todas as paradas, na ordem. null se faltar ponto no mapa. */
+export function kmRota(loja, paradas) {
+  if (!loja || !paradas.length || paradas.some(p => !p.clienteGeo)) return null;
+  let total = 0, aqui = loja;
+  paradas.forEach(p => { total += distanciaKm(aqui, p.clienteGeo) * FATOR_RUA; aqui = p.clienteGeo; });
+  return Math.max(0.5, Math.round(total * 10) / 10);
+}
+
+/* ============ Motoboy por turno (reserva por hora no horário de pico) ============
+   A loja reserva um motoboy por algumas horas pagando um valor por hora garantido. Durante o
+   turno, os chamados da loja tocam primeiro pra ele, e cada entrega continua pagando o frete. */
+export const TURNO = Object.freeze({ valorHoraMin: 12, valorHoraMax: 60, horasMin: 2, horasMax: 12, antecedenciaDias: 14 });
+export const STATUS_TURNO = Object.freeze(['aberto', 'aceito', 'concluido', 'cancelado']);
+export const horasTurno = t => r2((t.fim - t.inicio) / 3600000);
+/** Valor garantido do turno inteiro. */
+export const valorTurno = t => r2(horasTurno(t) * t.valorHora);
+
+/** Turno válido? Devolve o problema em texto, ou '' se estiver certo. */
+export function conferirTurno(t, agora = Date.now()) {
+  const h = horasTurno(t);
+  if (!(t.valorHora >= TURNO.valorHoraMin && t.valorHora <= TURNO.valorHoraMax)) return `O valor por hora fica entre R$ ${TURNO.valorHoraMin} e R$ ${TURNO.valorHoraMax}.`;
+  if (!(h >= TURNO.horasMin && h <= TURNO.horasMax)) return `O turno precisa ter de ${TURNO.horasMin} a ${TURNO.horasMax} horas.`;
+  if (t.inicio < agora - 5 * 60000) return 'O turno precisa começar daqui pra frente.';
+  if (t.inicio > agora + TURNO.antecedenciaDias * 86400000) return `Dá pra reservar com até ${TURNO.antecedenciaDias} dias de antecedência.`;
+  return '';
+}
+
+/** O que o motoboy recebe pelo turno: o valor inteiro quando termina; 1 hora se a loja desmarcar depois do aceite. */
+export function ganhoTurno(t) {
+  if (t.status === 'concluido') return valorTurno(t);
+  if (t.status === 'cancelado' && t.compensacao) return t.compensacao;
+  return 0;
+}
+
+/** Turno aceito valendo agora pra essa empresa (o motoboy dele recebe os chamados primeiro). */
+export function turnoAgora(turnos, empresa, agora = Date.now()) {
+  return turnos.find(t => t.empresa === empresa && t.status === 'aceito' && t.inicio <= agora && t.fim > agora) || null;
+}
+
+/* ============ Relatório da loja ============ */
+const media = l => (l.length ? l.reduce((a, b) => a + b, 0) / l.length : null);
+
+/**
+ * Números de um período pra loja: entregas, gastos, tempos e quem mais entregou.
+ * @param {Array} calls
+ * @param {string} empresa
+ * @param {number} de início do período (ms)
+ * @param {number} ate fim do período (ms, exclusivo)
+ * @param {Array} [turnos]
+ */
+export function relatorioEmpresa(calls, empresa, de, ate, turnos = []) {
+  const doPeriodo = calls.filter(c => c.empresa === empresa && !c.teste && c.criadoEm >= de && c.criadoEm < ate);
+  const entregues = doPeriodo.filter(c => c.status === 'entregue');
+  const cancelados = doPeriodo.filter(c => c.status === 'cancelado');
+  const soma = (l, f) => r2(l.reduce((a, c) => a + (f(c) || 0), 0));
+  const frete = soma(entregues, c => c.valor), espera = soma(entregues, c => c.espera), gorjeta = soma(entregues, c => c.gorjeta);
+  const taxa = soma(entregues, c => c.taxa ?? TABELA.taxaPlataforma), cancelamento = soma(cancelados, c => c.compensacao);
+  const turno = soma(turnos.filter(t => t.empresa === empresa && t.inicio >= de && t.inicio < ate), ganhoTurno);
+  const gasto = r2(frete + espera + gorjeta + taxa + cancelamento + turno);
+  const paradas = entregues.reduce((a, c) => a + nParadas(c), 0);
+  const min = (a, b) => (a != null && b != null && b >= a ? (b - a) / 60000 : null);
+  const tempo = f => { const m = media(entregues.map(f).filter(v => v != null)); return m == null ? null : Math.round(m); };
+  const porMotoboy = {};
+  entregues.forEach(c => {
+    const k = c.motoboy || 'Sem nome';
+    porMotoboy[k] = porMotoboy[k] || { nome: k, n: 0, valor: 0 };
+    porMotoboy[k].n += nParadas(c); porMotoboy[k].valor = r2(porMotoboy[k].valor + ganho(c));
+  });
+  const porDia = {};
+  entregues.forEach(c => { const k = new Date(c.criadoEm).toLocaleDateString('sv'); porDia[k] = (porDia[k] || 0) + nParadas(c); });
+  const porHora = Array(24).fill(0);
+  entregues.forEach(c => { porHora[new Date(c.criadoEm).getHours()] += nParadas(c); });
+  return {
+    chamados: doPeriodo.length, entregues: entregues.length, paradas, cancelados: cancelados.length,
+    semMotoboy: cancelados.filter(c => !c.motoboy).length,
+    gasto, frete, espera, gorjeta, taxa, cancelamento, turno,
+    custoPorEntrega: paradas ? r2(gasto / paradas) : null,
+    km: r2(entregues.reduce((a, c) => a + kmCorrida(c), 0)),
+    minAceite: tempo(c => min(c.criadoEm, c.aceitoEm)),
+    minBalcao: tempo(c => min(c.chegouEm, c.coletouEm)),
+    minEntrega: tempo(c => min(c.coletouEm, c.entregueEm)),
+    minTotal: tempo(c => min(c.criadoEm, c.entregueEm)),
+    motoboys: Object.values(porMotoboy).sort((a, b) => b.n - a.n),
+    porDia, porHora,
+    pico: porHora.some(Boolean) ? porHora.indexOf(Math.max(...porHora)) : null
+  };
+}
+
+/** Planilha (CSV com ; pro Excel em português) das corridas do período. Célula que começa com = + - @ vira texto. */
+export function csvEmpresa(calls, empresa, de, ate) {
+  const cel = v => '"' + String(v ?? '').replace(/"/g, '""').replace(/^([=+\-@])/, "'$1") + '"';
+  const num = v => (+v || 0).toFixed(2).replace('.', ',');
+  const quando = t => (t ? new Date(t).toLocaleString('pt-BR') : '');
+  const linhas = calls.filter(c => c.empresa === empresa && !c.teste && c.criadoEm >= de && c.criadoEm < ate)
+    .sort((a, b) => a.criadoEm - b.criadoEm)
+    .map(c => [quando(c.criadoEm), c.status, nParadas(c), (c.paradas?.length ? c.paradas.map(p => p.entrega) : [c.entrega]).join(' | '), c.motoboy, num(kmCorrida(c)),
+      num(c.valor), num(c.espera), num(c.gorjeta), num(c.status === 'entregue' ? (c.taxa ?? TABELA.taxaPlataforma) : 0), num(c.compensacao), quando(c.aceitoEm), quando(c.entregueEm)].map(cel).join(';'));
+  return ['Criado em;Situação;Paradas;Entregas;Motoboy;Km;Frete;Espera;Gorjeta;Taxa do app;Cancelamento;Aceito em;Entregue em', ...linhas].join('\r\n');
 }

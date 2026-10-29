@@ -30,3 +30,20 @@ Copiamos a **estrutura de funcionamento** (fluxos e regras de despacho). Não co
 - `chamados.raioKm` só aceita 3, 5, 8 ou 15.
 - Nova coleção `disponiveis/{uid}`: `latC`, `lonC` (inteiros, então a aproximação de ~1 km é garantida pelo servidor) e `em`. Só o próprio motoboy grava e apaga, e qualquer conta logada lê. Ela é apagada quando o motoboy fica offline ou aceita uma corrida.
 - Limite conhecido: o servidor não confere se o motoboy estava dentro do raio ao aceitar, porque a posição vem do celular. O filtro de raio é organização do despacho, não trava de segurança.
+
+## Mapa ao vivo e GPS no modelo Uber/iFood (16/10/2026)
+
+Engenharia reversa feita só pelo **comportamento público** dos apps (o que entregador e loja veem na tela) e pelas publicações técnicas do próprio Uber (blog de engenharia: map matching, motor de rotas, ETA). **Nenhum app foi descompilado**: código do Uber/iFood é fechado e protegido; tudo aqui foi escrito do zero.
+
+| O que o Uber/iFood fazem | Como ficou no Marca aí |
+|---|---|
+| Mapa de verdade na oferta e na corrida | `js/mapa-vivo.js`: blocos do OpenStreetMap num `<canvas>` (sem biblioteca, sem innerHTML; tema escuro por filtro) |
+| Rota pelas ruas, não linha reta | `buscarRota` (servidor público do OSRM). Sem internet: linha tracejada e estimativa antiga |
+| Ícone anda liso entre as leituras e aponta pra onde vai | Interpolação no tempo entre uma leitura e outra (até 10 s) + seta girando pelo rumo |
+| Ícone em cima da rua (map matching) | `projetarNaRota`: a menos de 35 m da rota, a moto "gruda" na rua |
+| Trecho já rodado some | A rota é desenhada só do ponto atual pra frente |
+| Rota refeita quando sai do caminho | Mais de 60 m fora, 2 leituras seguidas, no máximo a cada 15 s (`deveRecalcular`) |
+| Tempo de chegada pela rota | `etaRotaMin`: parte da duração do OSRM que falta. Aparece pro motoboy ("Faltam X km, N min"), pra loja ("chega em N min") e na oferta ("pelas ruas") |
+| GPS sem tremida | Filtro de Kalman (`criarFiltroGps`) antes de tudo: parado não "anda"; andando acompanha |
+
+Ficou de fora: grade hexagonal H3 do Uber no despacho (a grade de ~1 km atual resolve em Mariana), navegação por voz (continua no Google Maps/Waze).

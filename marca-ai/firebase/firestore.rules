@@ -18,10 +18,14 @@ service cloud.firestore {
         && g.lat >= -90 && g.lat <= 90 && g.lon >= -180 && g.lon <= 180);
     }
     // Tabela do Marca aí: R$ 8 até 3 km, R$ 2 por km a mais, R$ 2 de chuva.
-    function freteCerto(km, chuva, valor) {
-      let esperado = 8 + (km > 3 ? (km - 3) * 2 : 0) + (chuva ? 2 : 0);
+    // Volta à loja (maquininha, troco, devolução): a ida vale 1,5 (a chuva não entra na volta).
+    // Várias paradas: R$ 3 por entrega além da primeira (o km já é o da rota inteira).
+    function freteCerto(km, chuva, volta, paradas, valor) {
+      let ida = 8 + (km > 3 ? (km - 3) * 2 : 0);
+      let esperado = ida * (volta ? 1.5 : 1.0) + (chuva ? 2 : 0) + (paradas - 1) * 3;
       return valor is number && math.abs(valor - esperado) < 0.011;
     }
+    function tokenOk(t) { return t is string && t.matches('^[A-Za-z0-9_-]{22}$'); }
     // Espera paga: 10 min grátis, depois R$ 0,50 por minuto (as regras do Firebase não têm math.max).
     function esperaMaxima(coletou, chegou) {
       let minutos = math.floor((coletou - chegou) / 60000);
@@ -32,6 +36,17 @@ service cloud.firestore {
       return novo().kmReal is number && novo().kmReal <= 500 && novo().kmReal >= resource.data.get('kmReal', 0);
     }
     function chamado(id) { return get(/databases/$(db)/documents/chamados/$(id)).data; }
+    // Código certo da parada i (chamado antigo, de uma entrega só, guarda só "valor").
+    function codigoDa(id, i) {
+      let r = get(/databases/$(db)/documents/chamados/$(id)/restrito/codigo).data;
+      return r.get('valores', [r.valor])[i];
+    }
+    function paradas() { return resource.data.get('nParadas', 1); }
+    function feitas() { return resource.data.get('entregues', 0); }
+    // O palpite gravado é desta parada e confere com o código dela.
+    function palpiteCerto(id) {
+      return resource.data.get('codigoParada', 0) == feitas() && resource.data.get('codigoInformado', '') == codigoDa(id, feitas());
+    }
     function chamadoDepois(id) { return getAfter(/databases/$(db)/documents/chamados/$(id)).data; }
 
     match /perfis/{uid} {
@@ -51,12 +66,17 @@ service cloud.firestore {
 
       allow create: if logado()
         && novo().keys().hasOnly(['empresaUid', 'empresa', 'coleta', 'tel', 'lojaGeo', 'bairro', 'km', 'chuva', 'valor', 'taxa', 'obs',
-             'status', 'criadoEm', 'motoboyUid', 'preferidosUid', 'prioridadeAte', 'temGeoCliente', 'raioKm'])
+             'status', 'criadoEm', 'motoboyUid', 'preferidosUid', 'prioridadeAte', 'temGeoCliente', 'raioKm', 'cobranca', 'volta',
+             'nParadas', 'entregues', 'bairros'])
         && novo().empresaUid == eu() && novo().status == 'aberto' && novo().motoboyUid == null
         && texto(novo().empresa, 60) && novo().empresa.size() > 0 && texto(novo().coleta, 160) && texto(novo().tel, 20)
         && texto(novo().bairro, 60) && texto(novo().obs, 300) && geoOk(novo().lojaGeo)
         && novo().km is number && novo().km >= 0.1 && novo().km <= 100 && novo().chuva is bool
-        && freteCerto(novo().km, novo().chuva, novo().valor)
+        && novo().get('volta', false) is bool && novo().get('cobranca', 'pago') in ['pago', 'dinheiro', 'maquininha']
+        && novo().get('nParadas', 1) is int && novo().get('nParadas', 1) >= 1 && novo().get('nParadas', 1) <= 5
+        && novo().get('entregues', 0) == 0
+        && novo().get('bairros', []) is list && novo().get('bairros', []).size() <= 5
+        && freteCerto(novo().km, novo().chuva, novo().get('volta', false), novo().get('nParadas', 1), novo().valor)
         && novo().taxa is number && novo().taxa >= 0 && novo().taxa <= 10
         && horaCerta(novo().criadoEm) && novo().temGeoCliente is bool
         && novo().get('raioKm', 5) in [3, 5, 8, 15]
@@ -80,15 +100,22 @@ service cloud.firestore {
           && novo().espera is number && novo().espera >= 0
           && novo().espera <= esperaMaxima(novo().coletouEm, resource.data.chegouEm) + 0.011
           && kmCresce())
-        // Motoboy registra um palpite do código. Fica gravado, então o servidor conta: no máximo 5.
+        // Motoboy registra um palpite do código (da parada em que está). Fica gravado, então o servidor conta: no máximo 5.
         || (resource.data.motoboyUid == eu() && resource.data.status == 'coletado'
-          && so(['codigoInformado', 'tentativas']) && novo().tentativas == resource.data.get('tentativas', 0) + 1
+          && so(['codigoInformado', 'tentativas', 'codigoParada']) && novo().get('codigoParada', 0) == feitas()
+          && novo().tentativas == resource.data.get('tentativas', 0) + 1
           && novo().tentativas <= 5 && novo().codigoInformado is string && novo().codigoInformado.matches('^[0-9]{4}$'))
-        // Motoboy entrega: só se o último palpite gravado bater com o código guardado (que ele não consegue ler).
+        // Motoboy entrega numa parada do meio: só se o palpite gravado bater com o código daquele cliente.
+        // As tentativas zeram pra próxima parada.
+        || (resource.data.motoboyUid == eu() && resource.data.status == 'coletado' && novo().status == 'coletado'
+          && so(['entregues', 'tentativas', 'kmReal', 'paradaEm']) && novo().entregues == feitas() + 1 && novo().entregues < paradas()
+          && novo().tentativas == 0 && novo().paradaEm is list && novo().paradaEm.size() == novo().entregues
+          && palpiteCerto(id) && kmCresce())
+        // Motoboy entrega a última (ou única) parada: só se o último palpite bater com o código guardado (que ele não consegue ler).
         || (resource.data.motoboyUid == eu() && resource.data.status == 'coletado' && novo().status == 'entregue'
-          && so(['status', 'entregueEm', 'kmReal']) && horaCerta(novo().entregueEm)
-          && resource.data.get('codigoInformado', '') == get(/databases/$(db)/documents/chamados/$(id)/restrito/codigo).data.valor
-          && kmCresce())
+          && so(['status', 'entregueEm', 'kmReal', 'entregues']) && horaCerta(novo().entregueEm)
+          && feitas() == paradas() - 1 && novo().get('entregues', paradas()) == paradas()
+          && palpiteCerto(id) && kmCresce())
         // Empresa libera novas tentativas (depois de conferir o código com o cliente por telefone).
         || (resource.data.empresaUid == eu() && resource.data.status == 'coletado' && so(['tentativas']) && novo().tentativas == 0)
         // Motoboy atualiza o km medido pelo GPS durante a corrida (só pra mais).
@@ -112,16 +139,96 @@ service cloud.firestore {
       // Dados do cliente e código de entrega ficam separados do chamado.
       match /restrito/{doc} {
         allow create: if logado() && chamadoDepois(id).empresaUid == eu() && (
-          (doc == 'codigo' && request.resource.data.keys().hasOnly(['valor']) && request.resource.data.valor is string
-            && request.resource.data.valor.matches('^[0-9]{4}$'))
-          || (doc == 'cliente' && request.resource.data.keys().hasOnly(['entrega', 'cliente', 'telCliente', 'clienteGeo'])
+          (doc == 'codigo' && request.resource.data.keys().hasOnly(['valor', 'valores']) && request.resource.data.valor is string
+            && request.resource.data.valor.matches('^[0-9]{4}$')
+            && request.resource.data.get('valores', [request.resource.data.valor]) is list
+            && request.resource.data.get('valores', [request.resource.data.valor]).size() == chamadoDepois(id).get('nParadas', 1)
+            && request.resource.data.get('valores', [request.resource.data.valor])[0] == request.resource.data.valor)
+          || (doc == 'cliente' && request.resource.data.keys().hasOnly(['entrega', 'cliente', 'telCliente', 'clienteGeo', 'cobrar', 'troco', 'rastreio', 'paradas', 'rastreios'])
+            && request.resource.data.get('paradas', []) is list && request.resource.data.get('paradas', []).size() <= 5
+            && request.resource.data.get('rastreios', []) is list && request.resource.data.get('rastreios', []).size() <= 5
             && texto(request.resource.data.entrega, 160) && texto(request.resource.data.cliente, 60)
-            && texto(request.resource.data.telCliente, 20) && geoOk(request.resource.data.clienteGeo)));
+            && texto(request.resource.data.telCliente, 20) && geoOk(request.resource.data.clienteGeo)
+            && request.resource.data.get('cobrar', 0) is number && request.resource.data.get('cobrar', 0) >= 0 && request.resource.data.get('cobrar', 0) <= 5000
+            && request.resource.data.get('troco', 0) is number && request.resource.data.get('troco', 0) >= 0 && request.resource.data.get('troco', 0) <= 5000
+            && (request.resource.data.get('rastreio', '') == '' || tokenOk(request.resource.data.get('rastreio', '')))));
         // Código: só a empresa lê. Cliente: a empresa e o motoboy que aceitou.
         allow read: if logado() && (chamado(id).empresaUid == eu()
           || (doc == 'cliente' && chamado(id).motoboyUid == eu() && chamado(id).status in ['aceito', 'coleta', 'coletado']));
         allow update, delete: if false;
       }
+
+      // Foto da entrega (comprovante), uma por parada, em JPEG pequeno guardado no próprio banco.
+      // Só o motoboy da corrida grava (depois de pegar o pedido); só ele e a loja leem.
+      match /fotos/{n} {
+        allow read: if logado() && (chamado(id).empresaUid == eu() || chamado(id).motoboyUid == eu());
+        allow create, update: if logado() && n in ['0', '1', '2', '3', '4']
+          && chamado(id).motoboyUid == eu() && chamado(id).status in ['coletado', 'entregue']
+          && request.resource.data.keys().hasOnly(['img', 'em']) && horaCerta(request.resource.data.em)
+          && request.resource.data.img is string && request.resource.data.img.size() < 350000
+          && request.resource.data.img.matches('^data:image/jpeg;base64,[A-Za-z0-9+/=]+$');
+        allow delete: if false;
+      }
+    }
+
+    // Link de rastreio do cliente (como o do iFood Sob Demanda e da Lalamove). O id é um segredo de 132 bits
+    // que só vai no link mandado ao cliente: quem tem o link lê; ninguém lista. Sem nome nem telefone do cliente.
+    // A empresa cria junto com o chamado; o motoboy da corrida atualiza posição e etapa; a empresa marca cancelado.
+    // A etapa gravada aqui tem que ser a mesma do chamado: ninguém mostra "entregue" antes da hora.
+    match /rastreios/{token} {
+      allow get: if tokenOk(token);
+      allow list, delete: if false;
+      allow create: if logado() && tokenOk(token)
+        && novo().keys().hasOnly(['chamadoId', 'parada', 'empresa', 'lojaGeo', 'destinoGeo', 'status', 'motoboy', 'moto', 'placa', 'pos', 'em'])
+        && novo().chamadoId is string && chamadoDepois(novo().chamadoId).empresaUid == eu()
+        && novo().get('parada', 0) is int && novo().get('parada', 0) >= 0 && novo().get('parada', 0) < 5
+        && (getAfter(/databases/$(db)/documents/chamados/$(novo().chamadoId)/restrito/cliente).data.get('rastreio', '') == token
+          || token in getAfter(/databases/$(db)/documents/chamados/$(novo().chamadoId)/restrito/cliente).data.get('rastreios', []))
+        && novo().status == 'aberto' && texto(novo().empresa, 60) && geoOk(novo().lojaGeo) && geoOk(novo().destinoGeo)
+        && novo().motoboy == '' && novo().moto == '' && novo().placa == '' && novo().pos == null && horaCerta(novo().em);
+      // Ao terminar (entregue/cancelado), os pontos da loja e do cliente podem ser apagados (e só isso: nunca trocados).
+      allow update: if logado() && so(['status', 'motoboy', 'moto', 'placa', 'pos', 'em', 'lojaGeo', 'destinoGeo']) && horaCerta(novo().em)
+        // Etapa igual à da corrida; ou "entregue" pra parada que o motoboy já entregou (a corrida segue pras outras).
+        && (novo().status == chamado(resource.data.chamadoId).status
+          || (novo().status == 'entregue' && chamado(resource.data.chamadoId).status == 'coletado'
+            && chamado(resource.data.chamadoId).get('entregues', 0) > resource.data.get('parada', 0)))
+        && (novo().lojaGeo == resource.data.lojaGeo || (novo().lojaGeo == null && novo().status in ['entregue', 'cancelado']))
+        && (novo().destinoGeo == resource.data.destinoGeo || (novo().destinoGeo == null && novo().status in ['entregue', 'cancelado']))
+        && ((chamado(resource.data.chamadoId).motoboyUid == eu()
+              && texto(novo().motoboy, 60) && texto(novo().moto, 40) && texto(novo().placa, 10)
+              && (novo().pos == null || (geoOk(novo().pos) && novo().pos != null && novo().status in ['aceito', 'coleta', 'coletado'])))
+          || (chamado(resource.data.chamadoId).empresaUid == eu() && novo().status == 'cancelado' && novo().pos == null));
+    }
+
+    // Motoboy por turno: a loja reserva um motoboy por algumas horas, com valor por hora garantido.
+    // Cancelar depois do aceite paga 1 hora ao motoboy; o valor inteiro sai quando o turno termina.
+    match /turnos/{id} {
+      allow read: if logado() && (resource.data.status == 'aberto' || resource.data.empresaUid == eu() || resource.data.motoboyUid == eu());
+      allow create: if logado()
+        && novo().keys().hasOnly(['empresaUid', 'empresa', 'coleta', 'tel', 'lojaGeo', 'obs', 'inicio', 'fim', 'valorHora', 'status', 'criadoEm', 'motoboyUid'])
+        && novo().empresaUid == eu() && novo().status == 'aberto' && novo().motoboyUid == null
+        && texto(novo().empresa, 60) && novo().empresa.size() > 0 && texto(novo().coleta, 160) && texto(novo().tel, 20) && texto(novo().obs, 300)
+        && geoOk(novo().lojaGeo) && horaCerta(novo().criadoEm)
+        && novo().inicio is int && novo().fim is int
+        && novo().inicio >= agora() - 300000 && novo().inicio <= agora() + 14 * 86400000
+        && novo().fim - novo().inicio >= 2 * 3600000 && novo().fim - novo().inicio <= 12 * 3600000
+        && novo().valorHora is number && novo().valorHora >= 12 && novo().valorHora <= 60;
+      allow update: if logado() && (
+        // Motoboy pega o turno: só se ainda estiver aberto e não tiver acabado (o servidor garante que só um consegue).
+        (resource.data.status == 'aberto' && novo().status == 'aceito' && novo().motoboyUid == eu() && agora() < resource.data.fim
+          && so(['status', 'motoboyUid', 'motoboy', 'moto', 'placa', 'aceitoEm']) && horaCerta(novo().aceitoEm)
+          && texto(novo().motoboy, 60) && novo().motoboy.size() > 0 && texto(novo().moto, 40) && texto(novo().placa, 10))
+        // Loja desmarca: aberto sai de graça; aceito (e ainda não acabou) paga 1 hora ao motoboy.
+        || (resource.data.empresaUid == eu() && novo().status == 'cancelado'
+          && (resource.data.status == 'aberto' || (resource.data.status == 'aceito' && agora() < resource.data.fim))
+          && so(['status', 'compensacao', 'canceladoEm']) && horaCerta(novo().canceladoEm)
+          && novo().compensacao == (resource.data.status == 'aberto' ? 0 : resource.data.valorHora))
+        // Turno terminou: a loja ou o motoboy fecha, e o motoboy recebe o valor inteiro.
+        || ((resource.data.empresaUid == eu() || resource.data.motoboyUid == eu()) && resource.data.status == 'aceito'
+          && novo().status == 'concluido' && agora() >= resource.data.fim
+          && so(['status', 'concluidoEm']) && horaCerta(novo().concluidoEm))
+      );
+      allow delete: if false;
     }
 
     // Motoboy livre e online: posição APROXIMADA (inteiro em centésimos de grau = grade de ~1 km), sem nome.

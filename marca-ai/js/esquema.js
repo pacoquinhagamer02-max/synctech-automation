@@ -1,7 +1,7 @@
 // Validação de tudo que entra no app (armazenamento, outras abas, formulários).
 // Nada é confiado: tipos conferidos, textos cortados, números limitados e o valor
 // da corrida sempre recalculado pela tabela, nunca lido do dado salvo.
-import { LIMITES, STATUS, TABELA, TAGS_BOAS, TAGS_RUINS, PLANOS, RAIOS_MOTOBOY, RAIOS_BUSCA, RAIO_MOTOBOY_PADRAO, RAIO_BUSCA_PADRAO, frete, COBRANCAS, TOKEN_RASTREIO } from './regras.js';
+import { LIMITES, STATUS, TABELA, TAGS_BOAS, TAGS_RUINS, PLANOS, RAIOS_MOTOBOY, RAIOS_BUSCA, RAIO_MOTOBOY_PADRAO, RAIO_BUSCA_PADRAO, frete, COBRANCAS, TOKEN_RASTREIO, MAX_PARADAS, STATUS_TURNO, TURNO } from './regras.js';
 
 const TAGS = new Set([...TAGS_BOAS, ...TAGS_RUINS]);
 
@@ -54,29 +54,46 @@ export function limparEmpresa(e = {}) {
   };
 }
 
+// Uma entrega da corrida (a corrida pode ter até 5). Cada uma tem cliente, código e link próprios.
+function limparParada(p) {
+  const cobranca = COBRANCAS.includes(p?.cobranca) ? p.cobranca : 'pago';
+  return {
+    entrega: texto(p?.entrega, LIMITES.endereco),
+    cliente: texto(p?.cliente, LIMITES.nome),
+    telCliente: texto(p?.telCliente, LIMITES.tel).replace(/[^\d()+ -]/g, ''),
+    clienteGeo: geo(p?.clienteGeo),
+    cobranca,
+    cobrar: cobranca === 'pago' ? 0 : numero(p?.cobrar, 0, 5000, 0),
+    troco: cobranca === 'dinheiro' ? numero(p?.troco, 0, 5000, 0) : 0,
+    codigo: /^\d{4}$/.test(p?.codigo) ? p.codigo : '0000',
+    rastreio: TOKEN_RASTREIO.test(p?.rastreio || '') ? p.rastreio : '',
+    entregueEm: instante(p?.entregueEm),
+    foto: p?.foto === true
+  };
+}
+
 export function limparChamado(c) {
   if (!c || typeof c !== 'object' || typeof c.id !== 'string' || !STATUS.includes(c.status)) return null;
   const km = numero(c.km, LIMITES.kmMin, LIMITES.kmMax, 1);
   const chuva = c.chuva === true;
   const volta = c.volta === true;
-  const cobranca = COBRANCAS.includes(c.cobranca) ? c.cobranca : 'pago';
+  // Chamado antigo (uma entrega só) vira uma lista de uma parada.
+  const paradas = (Array.isArray(c.paradas) && c.paradas.length ? c.paradas : [c]).slice(0, MAX_PARADAS).map(limparParada);
+  const entregues = Math.round(numero(c.entregues, 0, paradas.length, 0));
+  // Os campos de cima (entrega, cliente, código…) mostram a parada em que o motoboy está.
+  const atual = paradas[Math.min(entregues, paradas.length - 1)];
   return {
     id: texto(c.id, 64),
     empresa: texto(c.empresa, LIMITES.nome),
     coleta: texto(c.coleta, LIMITES.endereco),
-    entrega: texto(c.entrega, LIMITES.endereco),
-    cliente: texto(c.cliente, LIMITES.nome),
-    telCliente: texto(c.telCliente, LIMITES.tel).replace(/[^\d()+ -]/g, ''),
+    ...atual,
+    paradas, entregues,
     tel: texto(c.tel, LIMITES.tel).replace(/[^\d()+ -]/g, ''),
     obs: texto(c.obs, LIMITES.obs),
     km, chuva,
-    valor: frete(km, chuva, volta),
-    volta, cobranca,
-    cobrar: cobranca === 'pago' ? 0 : numero(c.cobrar, 0, 5000, 0),
-    troco: cobranca === 'dinheiro' ? numero(c.troco, 0, 5000, 0) : 0,
-    rastreio: TOKEN_RASTREIO.test(c.rastreio || '') ? c.rastreio : '',
+    valor: frete(km, chuva, volta, paradas.length),
+    volta,
     teste: c.teste === true,
-    codigo: /^\d{4}$/.test(c.codigo) ? c.codigo : '0000',
     status: c.status,
     criadoEm: instante(c.criadoEm) || Date.now(),
     aceitoEm: instante(c.aceitoEm), chegouEm: instante(c.chegouEm), coletouEm: instante(c.coletouEm),
@@ -90,7 +107,7 @@ export function limparChamado(c) {
     tags: Array.isArray(c.tags) ? [...new Set(c.tags.filter(t => TAGS.has(t)))] : [],
     tentativas: Math.round(numero(c.tentativas, 0, 99, 0)),
     kmReal: numero(c.kmReal, 0, 500, 0),
-    lojaGeo: geo(c.lojaGeo), clienteGeo: geo(c.clienteGeo),
+    lojaGeo: geo(c.lojaGeo),
     chegadaGps: c.chegadaGps === true,
     preferidos: nomes(c.preferidos, 30),
     prioridadeAte: instante(c.prioridadeAte),
@@ -102,7 +119,26 @@ export function limparChamado(c) {
     bairro: texto(c.bairro, 60),
     temGeoCliente: c.temGeoCliente === true,
     posMotoboy: c.posMotoboy && geo(c.posMotoboy) ? { ...geo(c.posMotoboy), em: instante(c.posMotoboy.em) || 0 } : null,
+    turno: c.turno === true,
     bloqueadoAte: instante(c.bloqueadoAte)
+  };
+}
+
+// Reserva de motoboy por turno (horário de pico).
+export function limparTurno(t) {
+  if (!t || typeof t !== 'object' || typeof t.id !== 'string' || !STATUS_TURNO.includes(t.status)) return null;
+  const inicio = instante(t.inicio), fim = instante(t.fim);
+  if (!inicio || !fim || fim <= inicio) return null;
+  return {
+    id: texto(t.id, 64), status: t.status, inicio, fim,
+    empresa: texto(t.empresa, LIMITES.nome), coleta: texto(t.coleta, LIMITES.endereco), tel: texto(t.tel, LIMITES.tel).replace(/[^\d()+ -]/g, ''),
+    lojaGeo: geo(t.lojaGeo), obs: texto(t.obs, LIMITES.obs),
+    valorHora: numero(t.valorHora, TURNO.valorHoraMin, TURNO.valorHoraMax, TURNO.valorHoraMin),
+    motoboy: texto(t.motoboy, LIMITES.nome), moto: texto(t.moto, 40), placa: texto(t.placa, LIMITES.placa),
+    compensacao: numero(t.compensacao, 0, TURNO.valorHoraMax, 0),
+    criadoEm: instante(t.criadoEm) || Date.now(), aceitoEm: instante(t.aceitoEm),
+    nuvem: t.nuvem === true, teste: t.teste === true,
+    empresaUid: uid(t.empresaUid) ? t.empresaUid : '', motoboyUid: uid(t.motoboyUid) ? t.motoboyUid : ''
   };
 }
 
@@ -111,6 +147,7 @@ export function limparEstado(d) {
   const lista = v => (Array.isArray(v) ? v : []);
   return {
     calls: lista(o.calls).map(limparChamado).filter(Boolean),
+    turnos: lista(o.turnos).map(limparTurno).filter(Boolean).slice(-200),
     recusados: lista(o.recusados).filter(x => typeof x === 'string').slice(-200),
     saques: lista(o.saques)
       .filter(s => s && Number.isFinite(s.valor) && s.valor > 0 && Number.isFinite(s.em))

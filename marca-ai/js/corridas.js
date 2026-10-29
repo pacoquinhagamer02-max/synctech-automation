@@ -3,7 +3,9 @@
 // Interface (tudo devolve Promise<{ ok: true, ... } | { ok: false, motivo, ... }>):
 //   chamar(dados)            empresa cria o chamado (frete, código e link de rastreio do cliente calculados aqui)
 //   aceitar(id, perfil)      motoboy aceita
-//   avancar(id, { codigo })  próxima etapa: chegou na loja → pegou o pedido → entregou (pede o código)
+//   avancar(id, { codigo })  próxima etapa: chegou na loja → pegou o pedido → entregou (pede o código).
+//                            Com várias paradas, cada entrega pede o código daquele cliente e a corrida
+//                            só termina na última ({ etapa: 'parada', proxima } nas do meio)
 //   noGps(ponto, kmAndado)   cada leitura do GPS: soma km da corrida, registra a chegada na loja sozinho
 //                            e avisa uma vez quando o motoboy está chegando no cliente ({ chegandoCliente })
 //   cancelar(id)             empresa cancela (paga deslocamento se o motoboy já aceitou)
@@ -16,7 +18,18 @@
 // Quem guarda os dados é o "armazém" (adaptador): no aparelho (modo demonstração) ou no servidor.
 // Porta do armazém: lista() → corridas conhecidas; criar(corrida) → id; aplicar(id, mudanca) → grava
 // ou lança { motivo }; publicarPosicao(ponto, corrida|null).
-import { TABELA, LIMITES, ATIVOS, RAIO_CHEGADA_M, RAIO_CLIENTE_M, RAIOS_BUSCA, RAIO_BUSCA_PADRAO, COBRANCAS, podeIr, frete, taxaEspera, distanciaKm, perto, novoCodigo, tokenRastreio, r2 } from './regras.js';
+import { TABELA, LIMITES, ATIVOS, RAIO_CHEGADA_M, RAIO_CLIENTE_M, RAIOS_BUSCA, RAIO_BUSCA_PADRAO, COBRANCAS, MAX_PARADAS, podeIr, frete, taxaEspera, distanciaKm, perto, novoCodigo, tokenRastreio, r2 } from './regras.js';
+
+// Uma entrega da corrida, com código e link de rastreio próprios.
+function novaParada(p) {
+  const cobranca = COBRANCAS.includes(p.cobranca) ? p.cobranca : 'pago';
+  return {
+    entrega: p.entrega, cliente: p.cliente || '', telCliente: p.telCliente || '', clienteGeo: p.clienteGeo || null, cobranca,
+    cobrar: cobranca !== 'pago' ? Math.max(0, r2(+p.cobrar || 0)) : 0,
+    troco: cobranca === 'dinheiro' ? Math.max(0, r2(+p.troco || 0)) : 0,
+    codigo: novoCodigo(), rastreio: tokenRastreio(), entregueEm: null, foto: false
+  };
+}
 
 const GRAVAR_KM_A_CADA_MS = 60000;
 
@@ -44,17 +57,15 @@ export function criarCorridas(armazem, { agora = Date.now } = {}) {
   const api = {
     async chamar(d) {
       const km = r2(+d.km);
-      if (!d.empresa || !d.coleta || !d.entrega || !(km >= LIMITES.kmMin && km <= LIMITES.kmMax)) return falha('invalido');
+      const lista = Array.isArray(d.paradas) && d.paradas.length ? d.paradas : [d];
+      if (!d.empresa || !d.coleta || lista.length > MAX_PARADAS || lista.some(p => !p.entrega) || !(km >= LIMITES.kmMin && km <= LIMITES.kmMax)) return falha('invalido');
+      const paradas = lista.map(novaParada);
       const corrida = {
-        empresa: d.empresa, coleta: d.coleta, tel: d.tel || '', entrega: d.entrega, cliente: d.cliente || '', telCliente: d.telCliente || '',
-        km, obs: d.obs || '', chuva: !!d.chuva, volta: !!d.volta, valor: frete(km, !!d.chuva, !!d.volta), taxa: d.taxa ?? TABELA.taxaPlataforma,
-        cobranca: COBRANCAS.includes(d.cobranca) ? d.cobranca : 'pago',
-        cobrar: COBRANCAS.includes(d.cobranca) && d.cobranca !== 'pago' ? Math.max(0, r2(+d.cobrar || 0)) : 0,
-        troco: d.cobranca === 'dinheiro' ? Math.max(0, r2(+d.troco || 0)) : 0,
-        rastreio: tokenRastreio(),
-        codigo: novoCodigo(), status: 'aberto', criadoEm: agora(), lojaGeo: d.lojaGeo || null, clienteGeo: d.clienteGeo || null,
+        empresa: d.empresa, coleta: d.coleta, tel: d.tel || '', ...paradas[0], paradas, entregues: 0,
+        km, obs: d.obs || '', chuva: !!d.chuva, volta: !!d.volta, valor: frete(km, !!d.chuva, !!d.volta, paradas.length), taxa: d.taxa ?? TABELA.taxaPlataforma,
+        status: 'aberto', criadoEm: agora(), lojaGeo: d.lojaGeo || null,
         preferidos: d.preferidos || [], preferidosUid: d.preferidosUid || [],
-        prioridadeAte: (d.preferidos?.length || d.preferidosUid?.length) ? agora() + 30000 : null, teste: !!d.teste,
+        prioridadeAte: (d.preferidos?.length || d.preferidosUid?.length) ? agora() + 30000 : null, teste: !!d.teste, turno: !!d.turno,
         raioKm: RAIOS_BUSCA.includes(+d.raioKm) ? +d.raioKm : RAIO_BUSCA_PADRAO
       };
       try { return { ok: true, id: await armazem.criar(corrida) }; }
@@ -85,8 +96,12 @@ export function criarCorridas(armazem, { agora = Date.now } = {}) {
         const tt = tentativas.get(id) || { n: 0, ate: 0 };
         if (tt.ate > t) return falha('bloqueado');
         if (!/^\d{4}$/.test(String(codigo))) return falha('invalido');
-        const r = await gravar(id, { status: 'entregue', entregueEm: t, codigoInformado: String(codigo), kmReal: kmDe(c) }, { etapa: 'entregue' });
-        if (r.ok) { tentativas.delete(id); km.delete(id); return r; }
+        const n = c.paradas?.length || 1, i = c.entregues || 0, ultima = i >= n - 1;
+        const r = await gravar(id, ultima
+          ? { status: 'entregue', entregueEm: t, entregues: n, codigoInformado: String(codigo), kmReal: kmDe(c) }
+          : { entregues: i + 1, paradaEm: t, codigoInformado: String(codigo), kmReal: kmDe(c) },
+        ultima ? { etapa: 'entregue' } : { etapa: 'parada', feitas: i + 1, total: n });
+        if (r.ok) { tentativas.delete(id); if (ultima) km.delete(id); return r; }
         if (r.motivo !== 'recusado') return r;
         tt.n += 1;
         if (tt.n >= LIMITES.tentativasCodigo) { tentativas.set(id, { n: 0, ate: t + LIMITES.bloqueioCodigoMs }); return falha('bloqueado'); }
@@ -109,8 +124,9 @@ export function criarCorridas(armazem, { agora = Date.now } = {}) {
       }
       // Cerca no cliente: avisa uma vez pra já ir pedindo o código.
       let chegandoCliente = false;
-      if (c.status === 'coletado' && !avisadoCliente.has(c.id) && perto(ponto, c.clienteGeo, RAIO_CLIENTE_M)) {
-        avisadoCliente.add(c.id); chegandoCliente = true;
+      const parada = `${c.id}:${c.entregues || 0}`;
+      if (c.status === 'coletado' && !avisadoCliente.has(parada) && perto(ponto, c.clienteGeo, RAIO_CLIENTE_M)) {
+        avisadoCliente.add(parada); chegandoCliente = true;
       }
       if (kmAndado && agora() - (kmGravadoEm.get(c.id) || 0) > GRAVAR_KM_A_CADA_MS) {
         kmGravadoEm.set(c.id, agora());

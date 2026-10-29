@@ -3,19 +3,25 @@ import { TABELA, LIMITES, ATIVOS, TAGS_BOAS, TAGS_RUINS, podeIr, frete, taxaEspe
   custoKm, resumoDia, saldo, reputacao, novoCodigo, r2, ticketMedio, mensagemCliente, resumoMes, informeMes, faixasHorario,
   kmEstimado, etaMin, extrairGeo, PLANOS, taxaChamado, custoPlanos, kmCorrida,
   COBRANCAS, trocoLevar, avisoCobranca, estimativaCorrida, linkRastreio,
-  alcance, raioOnda, perto, disponiveisNoRaio, RAIOS_MOTOBOY, RAIOS_BUSCA, RAIO_CONFERE_CHEGADA_M, RAIO_CLIENTE_M } from './regras.js';
+  alcance, raioOnda, perto, disponiveisNoRaio, RAIOS_MOTOBOY, RAIOS_BUSCA, RAIO_CONFERE_CHEGADA_M, RAIO_CLIENTE_M,
+  MAX_PARADAS, ordenarParadas, kmRota, TURNO, valorTurno, ganhoTurno, turnoAgora, relatorioEmpresa, csvEmpresa } from './regras.js';
 import { ligarGps, desligarGps, estadoGps, aoMudarGps, pegarPosicao } from './gps.js';
 import { mapaVivo, montarMapas, infoRota, aoMudarRota } from './mapa-vivo.js';
 import * as nuvem from './nuvem.js';
 import { ligarEfeitos } from './efeitos.js';
 import { instalar, jaInstalado, ehIphone, aoMudarInstalar } from './instalar.js';
 import { criarCorridas } from './corridas.js';
+import { criarTurnos } from './turnos.js';
 import { armazemLocal, armazemMisto } from './armazens.js';
 import { limparPerfil, limparEmpresa, texto, numero, geo } from './esquema.js';
 import { S, transacao, aoMudar, sessao } from './store.js';
 import { esc, brl, km, mmss, hora, dia, ic, fone, mapsUrl, wazeUrl, html, toast, anunciar, dialogo, fecharDialogo, confirmar, bipe, urlScript } from './ui.js';
 
 const $ = s => document.querySelector(s);
+
+// Ninguém pode abrir o app escondido dentro de outro site (clique enganado). No Netlify o cabeçalho
+// frame-ancestors já barra; o espelho do GitHub Pages não manda cabeçalho, então o app se recusa aqui.
+if (window.top !== window.self) { document.documentElement.hidden = true; throw new Error('Marca aí não abre dentro de outro site.'); }
 
 /* ============ Escrita segura ============ */
 function mudar(fn) {
@@ -93,20 +99,6 @@ function textoCobranca(c, paraMotoboy) {
   return '';
 }
 
-// Resumo do mês da empresa: o que ela gastou e como os motoboys a veem.
-function resumoMesEmpresa(nome) {
-  const m = resumoMes(S().calls, nome);
-  if (!m.total) return '';
-  const r = reputacao(S().calls, nome);
-  const mes = new Date().toLocaleDateString('pt-BR', { month: 'long' });
-  return `<section class="bloco"><h2>Resumo de ${mes}</h2><div class="grade2">
-    <div class="mini"><b>${m.entregas}</b><small>${m.entregas === 1 ? 'entrega feita' : 'entregas feitas'}</small></div>
-    <div class="mini"><b>${brl(m.gasto)}</b><small>gasto com entregas</small></div>
-    <div class="mini"><b>${m.esperaMin != null ? m.esperaMin + ' min' : '–'}</b><small>espera média do motoboy</small></div>
-    <div class="mini"><b>${r ? '★ ' + r.nota.toFixed(1).replace('.', ',') : '–'}</b><small>sua nota com os motoboys</small></div>
-  </div></section>`;
-}
-
 /* ============ Navegação ============ */
 const ABAS = {
   moto: [['corridas', 'Corridas', 'moto'], ['ganhos', 'Ganhos', 'carteira'], ['apoio', 'Apoio', 'escudo'], ['perfil', 'Perfil', 'perfil']],
@@ -123,6 +115,10 @@ aplicarTema();
 
 // Rascunho pra "Chamar de novo": preenche o formulário uma vez e some.
 let rascunho = null;
+// Entregas a mais do chamado em montagem (a 1ª fica nos campos principais do formulário).
+let paradasExtra = [];
+// Período do relatório da loja.
+let periodo = 'mes';
 
 let papel = sessao.get('papel', ['moto', 'empresa']);
 let aba = papel ? sessao.get('aba', ABAS[papel].map(a => a[0])) || ABAS[papel][0][0] : null;
@@ -246,6 +242,89 @@ function formEmpresa(titulo, texto, rotulo) {
   </form>`;
 }
 
+/* ============ Várias paradas no mesmo chamado ============ */
+const PAGAMENTOS = [['pago', 'Já pago'], ['dinheiro', 'Dinheiro'], ['maquininha', 'Maquininha']];
+const campoParada = (p, i) => `<fieldset class="parada-extra" data-parada="${i}">
+    <legend>Entrega ${i + 2}</legend>
+    ${campo(`p${i}_entrega`, 'Endereço', p.entrega || '', 'text', `placeholder="Rua, número, bairro…" maxlength="${LIMITES.endereco}" list="enderecos" autocomplete="off"`)}
+    ${campo(`p${i}_local`, 'Localização do cliente (opcional)', p.local || '', 'text', 'placeholder="Cole o link da localização…" maxlength="300" autocomplete="off" spellcheck="false"')}
+    <div class="grade2">${campo(`p${i}_cliente`, 'Cliente', p.cliente || '', 'text', `maxlength="${LIMITES.nome}" autocomplete="off"`)}${campo(`p${i}_tel`, 'WhatsApp do cliente', p.tel || '', 'tel', `inputmode="tel" maxlength="${LIMITES.tel}" autocomplete="off"`)}</div>
+    <div class="grade3">
+      <label class="campo"><span>Pagamento</span><select class="inp" name="p${i}_cobranca">${PAGAMENTOS.map(([v, n]) => `<option value="${v}" ${(p.cobranca || 'pago') === v ? 'selected' : ''}>${n}</option>`).join('')}</select></label>
+      ${campo(`p${i}_cobrar`, 'Cobrar (R$)', p.cobrar || '', 'number', 'step="0.01" min="0" max="5000" inputmode="decimal"')}
+      ${campo(`p${i}_troco`, 'Troco pra', p.troco || '', 'number', 'step="1" min="0" max="5000" inputmode="decimal"')}
+    </div>
+    <button type="button" class="btn btn-fantasma btn-sm" data-act="tirarParada" data-i="${i}">Tirar a entrega ${i + 2}</button>
+  </fieldset>`;
+// Guarda o que já foi digitado nas entregas extras antes de redesenhar a lista.
+function lerParadasExtra(f) {
+  paradasExtra = paradasExtra.map((_, i) => ({
+    entrega: f[`p${i}_entrega`]?.value || '', local: f[`p${i}_local`]?.value || '', cliente: f[`p${i}_cliente`]?.value || '',
+    tel: f[`p${i}_tel`]?.value || '', cobranca: f[`p${i}_cobranca`]?.value || 'pago', cobrar: f[`p${i}_cobrar`]?.value || '', troco: f[`p${i}_troco`]?.value || ''
+  }));
+}
+function desenharParadasExtra(f) {
+  html(f.querySelector('[data-paradas]'), paradasExtra.map(campoParada).join(''));
+  const n = paradasExtra.length + 1;
+  f.querySelector('[data-act="maisParada"]').hidden = n >= MAX_PARADAS;
+  $('#km-rot').textContent = n > 1 ? `Distância total da rota: loja e as ${n} entregas (km)` : 'Distância da loja até o cliente (km)';
+  calcularRota(f);
+  LIVE['em-preco']($('[data-live="em-preco"]'));
+}
+// Com a loja e todos os clientes no mapa, o app monta a rota mais curta e calcula o km sozinho.
+function calcularRota(f) {
+  if (!paradasExtra.length) return;
+  const loja = S().empresa.geo, aviso = f.querySelector('[data-geo-cliente]');
+  const pontos = [{ clienteGeo: extrairGeo(f.localCliente.value) }, ...paradasExtra.map((_, i) => ({ clienteGeo: extrairGeo(f[`p${i}_local`]?.value) }))];
+  const total = kmRota(loja, ordenarParadas(loja, pontos));
+  if (total == null) { aviso.textContent = 'Com o link de localização de todos os clientes (e a da loja salva), o app monta a rota mais curta e calcula o km sozinho.'; return; }
+  f.km.value = String(Math.min(LIMITES.kmMax, total));
+  aviso.textContent = `Rota com ${pontos.length} entregas: ${km(total)} km pelas ruas (estimativa). O app manda o motoboy na ordem mais curta.`;
+}
+
+/* ============ Motoboy por turno ============ */
+const diaCurto = t => new Date(t).toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit' }).replace('.', '');
+function linhaTurno(t, quem) {
+  const agora = Date.now(), rodando = t.status === 'aceito' && t.inicio <= agora && t.fim > agora, acabou = t.status === 'aceito' && t.fim <= agora;
+  const [rot, cls] = { aberto: ['Procurando motoboy', 'aberto'], aceito: rodando ? ['Em andamento', 'andando'] : acabou ? ['Terminou', 'entregue'] : ['Confirmado', 'andando'],
+    concluido: ['Pago', 'entregue'], cancelado: ['Desmarcado', 'cancelado'] }[t.status];
+  const quemTxt = quem === 'empresa' ? (t.motoboy ? `${esc(t.motoboy)}${t.placa ? `, placa ${esc(t.placa)}` : ''}` : 'Ainda sem motoboy') : `${esc(t.empresa)}, ${esc(t.coleta)}`;
+  const acao = quem === 'empresa'
+    ? (acabou ? `<button class="btn btn-sinal btn-sm" data-act="concluirTurno" data-id="${esc(t.id)}">Fechar turno e pagar ${brl(valorTurno(t))}</button>`
+      : ['aberto', 'aceito'].includes(t.status) ? `<button class="btn btn-fantasma btn-sm" data-act="cancelarTurno" data-id="${esc(t.id)}">Desmarcar</button>` : '')
+    : (t.status === 'aberto' ? `<button class="btn btn-sinal btn-sm" data-act="aceitarTurno" data-id="${esc(t.id)}">Pegar este turno</button>`
+      : acabou ? `<button class="btn btn-sinal btn-sm" data-act="concluirTurno" data-id="${esc(t.id)}">Fechar turno e receber</button>` : '');
+  return `<li class="turno"><div class="turno-cab"><b>${diaCurto(t.inicio)}, ${hora(t.inicio)} às ${hora(t.fim)}</b><span class="pill ${cls}">${rot}</span></div>
+    <small>${quemTxt}</small>
+    <small>${brl(t.valorHora)} por hora, ${brl(valorTurno(t))} garantidos${t.status === 'cancelado' && t.compensacao ? `. Desmarcado depois do aceite: ${brl(t.compensacao)} pro motoboy` : ''}</small>
+    ${acao ? `<div class="mt8">${acao}</div>` : ''}</li>`;
+}
+
+/* ============ Relatório da loja ============ */
+function datasPeriodo(p) {
+  const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
+  if (p === '7d') { const de = new Date(hoje); de.setDate(de.getDate() - 6); return { de: +de, ate: Date.now() + 1, nome: 'últimos 7 dias' }; }
+  const mes = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+  if (p === 'passado') { const de = new Date(mes); de.setMonth(de.getMonth() - 1); return { de: +de, ate: +mes, nome: de.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }) }; }
+  return { de: +mes, ate: Date.now() + 1, nome: mes.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }) };
+}
+const minOuTraco = v => (v != null ? `${v} min` : '–');
+
+/* ============ Conta protegida pelo telefone ============ */
+const telBonito = t => String(t).replace(/^\+55(\d{2})(\d{4,5})(\d{4})$/, '+55 ($1) $2-$3');
+function cartaoConta() {
+  if (!nuvem.nuvemLigada()) return '';
+  return `<section class="bloco conta"><h2>Sua conta</h2>
+    <p class="sub" data-live="conta-status"></p>
+    <form data-form="sms" novalidate class="mt10">
+      ${campo('tel', 'Seu celular', '', 'tel', 'placeholder="(31) 99999-9999" inputmode="tel" maxlength="20" autocomplete="tel"')}
+      <div data-sms-codigo hidden>${campo('codigo', 'Código que chegou por SMS', '', 'text', 'inputmode="numeric" maxlength="6" autocomplete="one-time-code" spellcheck="false"')}</div>
+      <div id="recaptcha-sms"></div>
+      <p class="erro" data-erro role="alert"></p>
+      <button class="btn btn-azul" type="submit">${ic('fone')}Receber código por SMS</button>
+    </form></section>`;
+}
+
 const VIEWS = {
   moto: {
     corridas: () => `<div data-live="mb-status"></div><div data-live="mb-meta"></div><div data-live="mb-main" class="cascata"></div>`,
@@ -265,7 +344,7 @@ const VIEWS = {
       </section>`,
     perfil: () => {
       const p = S().profile;
-      return `${cartaoInstalar()}<form class="bloco" data-form="perfil" novalidate>
+      return `${cartaoInstalar()}${cartaoConta()}<form class="bloco" data-form="perfil" novalidate>
         <h2>Seus dados</h2>
         ${campo('nome', 'Seu nome', p.nome, 'text', `autocomplete="name" maxlength="${LIMITES.nome}" required`)}
         <div class="grade2">${campo('moto', 'Moto', p.moto, 'text', 'placeholder="Ex.: CG 160" maxlength="40"')}${campo('placa', 'Placa', p.placa, 'text', `placeholder="ABC1D23" spellcheck="false" autocomplete="off" maxlength="${LIMITES.placa}" autocapitalize="characters"`)}</div>
@@ -318,6 +397,8 @@ const VIEWS = {
           ${campo('cobrar', 'Valor a cobrar (R$)', rs.cobrar || '', 'number', 'step="0.01" min="0" max="5000" inputmode="decimal" placeholder="Ex.: 37,50"')}
           <div data-troco ${(rs.cobranca || 'pago') !== 'dinheiro' ? 'hidden' : ''}>${campo('troco', 'Troco pra (R$)', rs.troco || '', 'number', 'step="1" min="0" max="5000" inputmode="decimal" placeholder="Ex.: 50"')}</div>
         </div>
+        <div data-paradas>${paradasExtra.map(campoParada).join('')}</div>
+        <button type="button" class="btn btn-fantasma btn-sm mb14" data-act="maisParada" ${paradasExtra.length + 1 >= MAX_PARADAS ? 'hidden' : ''}>${ic('mais')}Adicionar outra entrega na mesma corrida</button>
         <label class="check"><input type="checkbox" name="volta" ${rs.volta ? 'checked' : ''}> O motoboy volta pra loja depois (maquininha, troco ou devolução). Ele recebe +50% do frete.</label>
         <label class="check"><input type="checkbox" name="chuva"> Está chovendo (+${brl(TABELA.chuva)} pro motoboy)</label>
         ${S().empresa.favoritos.length ? (PLANOS[S().empresa.plano].favoritos
@@ -333,10 +414,22 @@ const VIEWS = {
         <p class="erro" data-erro role="alert"></p>
         <button class="btn btn-sinal" type="submit" data-cta>Chamar motoboy</button>
       </form>
-      <div data-live="em-rep"></div>`;
+      <div data-live="em-rep"></div>
+      <section class="bloco"><h2>Motoboy por turno</h2>
+        <p class="sub mb14">Reserve um motoboy pro horário de pico. Ele recebe um valor por hora garantido, seus chamados tocam primeiro pra ele, e cada entrega continua pagando o frete normal.</p>
+        <form data-form="turno" novalidate>
+          <div class="grade2">${campo('dia', 'Dia', hojeTxt(), 'date', `min="${hojeTxt()}"`)}${campo('hora', 'Começa às', '18:00', 'time', 'step="900"')}</div>
+          <div class="grade2"><label class="campo"><span>Duração</span><select class="inp" name="horas">${[2, 3, 4, 5, 6, 8, 10, 12].map(h => `<option value="${h}" ${h === 4 ? 'selected' : ''}>${h} horas</option>`).join('')}</select></label>
+            ${campo('valorHora', 'Valor por hora (R$)', 15, 'number', `step="0.5" min="${TURNO.valorHoraMin}" max="${TURNO.valorHoraMax}" inputmode="decimal"`)}</div>
+          <p class="sub" data-turno-preco>4 horas a ${brl(15)}: ${brl(60)} garantidos pro motoboy.</p>
+          <p class="erro" data-erro role="alert"></p>
+          <button class="btn btn-azul" type="submit">Reservar motoboy</button>
+        </form>
+        <div data-live="em-turnos"></div>
+      </section>`;
     },
-    chamados: () => `<div data-live="em-lista"></div>`,
-    loja: () => `${cartaoInstalar()}${formEmpresa('Dados da empresa', '', 'Salvar dados')}
+    chamados: () => `<div data-live="em-relatorio"></div><div data-live="em-lista"></div>`,
+    loja: () => `${cartaoInstalar()}${cartaoConta()}${formEmpresa('Dados da empresa', '', 'Salvar dados')}
       <section class="bloco"><h2>Como funciona o preço</h2>
         <div class="linha"><span>Até ${TABELA.kmInclusos} km</span><b>${brl(TABELA.base)}</b></div>
         <div class="linha"><span>Cada km a mais</span><b>${brl(TABELA.porKm)}</b></div>
@@ -423,16 +516,18 @@ const LIVE = {
         ? `<button class="btn btn-sinal btn-online" data-act="online">${ic('moto')}Ficar online</button>`
         : `<button class="btn btn-sinal btn-online" data-act="aba" data-aba="perfil">${ic('perfil')}Cadastrar meus dados pra rodar</button>`) : ''}
       ${livre ? `<button class="btn btn-fantasma btn-sm" data-act="simular">Receber um chamado de teste</button>
-      <button class="btn btn-fantasma btn-sm mt8" data-act="pausa">Fazer uma pausa de 15 min</button>` : ''}`);
+      <button class="btn btn-fantasma btn-sm mt8" data-act="pausa">Fazer uma pausa de 15 min</button>` : ''}
+      ${turnosMotoboy()}`);
   },
   'mb-ganhos': el => {
-    const s = S(), sd = saldo(s.calls, s.saques), h = resumoDia(s.calls, s.profile);
+    const s = S(), sd = saldo(s.calls, s.saques, s.turnos), h = resumoDia(s.calls, s.profile);
     const todos = meusGanhos().sort((a, b) => quandoGanhou(b) - quandoGanhou(a));
     const dias = [...Array(7)].map((_, i) => { const d = new Date(); d.setHours(12, 0, 0, 0); d.setDate(d.getDate() - (6 - i)); return d; });
     const vals = dias.map(d => r2(todos.filter(c => mesmoDia(quandoGanhou(c), d)).reduce((a, c) => a + ganho(c), 0)));
     const max = Math.max(...vals, 1);
     const extrato = [
       ...todos.map(c => ({ t: quandoGanhou(c), html: `<li><div>${esc(c.empresa)}<small>${c.status === 'cancelado' ? 'Cancelada pela empresa, deslocamento pago' : `${km(c.km)} km${c.espera ? `, espera ${brl(c.espera)}` : ''}${c.gorjeta ? `, gorjeta ${brl(c.gorjeta)}` : ''}`}, ${dia(quandoGanhou(c))} ${hora(quandoGanhou(c))}</small></div><b>${brl(ganho(c))}</b></li>` })),
+      ...s.turnos.filter(t => t.motoboy && ganhoTurno(t) > 0).map(t => ({ t: t.fim, html: `<li><div>Turno na ${esc(t.empresa)}<small>${t.status === 'cancelado' ? 'Desmarcado pela loja, 1 hora paga' : `${diaCurto(t.inicio)}, ${hora(t.inicio)} às ${hora(t.fim)}`}</small></div><b>${brl(ganhoTurno(t))}</b></li>` })),
       ...s.saques.map(q => ({ t: q.em, html: `<li><div>Saque Pix<small>${esc(q.pix)}, ${dia(q.em)} ${hora(q.em)}</small></div><b class="mudo">− ${brl(q.valor)}</b></li>` }))
     ].sort((a, b) => b.t - a.t).slice(0, 40);
     html(el, `<section class="saldo" data-3d="7" data-tela="ganhos">
@@ -481,10 +576,13 @@ const LIVE = {
   },
   'em-preco': el => {
     const f = $('[data-form="chamado"]'); if (!f) return;
-    const kmV = numero(f.km.value, LIMITES.kmMin, LIMITES.kmMax, 0);
-    const v = frete(kmV, f.chuva.checked, f.volta.checked), taxa = taxaAgora();
+    const kmV = numero(f.km.value, LIMITES.kmMin, LIMITES.kmMax, 0), n = paradasExtra.length + 1;
+    const v = frete(kmV, f.chuva.checked, f.volta.checked, n), taxa = taxaAgora();
+    const t = turnoAgora(S().turnos, S().empresa.nome);
     html(el, `<div class="preco">
+      ${t ? `<p class="aviso">Turno de ${esc(t.motoboy)} até ${hora(t.fim)}: o chamado toca primeiro pra ele.</p>` : ''}
       <div class="linha"><span>Frete (vai inteiro pro motoboy)</span><b>${brl(v)}</b></div>
+      ${n > 1 ? `<div class="linha"><span>Já inclui ${n - 1} ${n === 2 ? 'entrega a mais' : 'entregas a mais'} na rota</span><b>+${brl((n - 1) * TABELA.paradaExtra)}</b></div>` : ''}
       ${f.volta.checked ? `<div class="linha"><span>Já inclui a volta à loja</span><b>+${brl(v - frete(kmV, f.chuva.checked))}</b></div>` : ''}
       <div class="linha"><span>Taxa do app (plano ${PLANOS[S().empresa.plano].nome})</span><b>${taxa ? brl(taxa) : 'incluída'}</b></div>
       <div class="total"><span>Você paga</span><b>${brl(v + taxa)}</b></div>
@@ -516,6 +614,54 @@ const LIVE = {
       <p class="sub">Por enquanto a escolha do plano só muda os valores mostrados. A cobrança entra quando o app tiver pagamento online.</p>
     </section>`);
   },
+  'conta-status': el => {
+    const tel = nuvem.telefoneDaConta(), f = el.parentElement?.querySelector('[data-form="sms"]');
+    if (f) f.hidden = !!tel;
+    html(el, tel ? `Protegida pelo telefone <b class="claro">${esc(telBonito(tel))}</b>. Trocou de celular? Abra o Marca aí no novo, vá em ${papel === 'moto' ? 'Perfil' : 'Empresa'} e entre com esse número: tudo continua lá.`
+      : `Hoje sua conta fica só neste aparelho: se limpar o navegador ou trocar de celular, ${papel === 'moto' ? 'o histórico e os ganhos somem' : 'os chamados e o relatório somem'}. Ligue seu celular à conta pra não perder nada. Já usa o app em outro aparelho? Coloque o mesmo número pra entrar na conta de lá.`);
+  },
+  'em-turnos': el => {
+    const nome = S().empresa.nome;
+    const ts = nome ? S().turnos.filter(t => t.empresa === nome && !t.teste).sort((a, b) => b.inicio - a.inicio).slice(0, 8) : [];
+    html(el, ts.length ? `<h3 class="mt14">Seus turnos</h3><ul class="turnos">${ts.map(t => linhaTurno(t, 'empresa')).join('')}</ul>` : '');
+  },
+  'em-relatorio': el => {
+    const nome = S().empresa.nome;
+    if (!nome || !S().calls.some(c => c.empresa === nome && !c.teste)) { html(el, ''); return; }
+    const { de, ate, nome: rotulo } = datasPeriodo(periodo);
+    const r = relatorioEmpresa(S().calls, nome, de, ate, S().turnos);
+    const dias = [];
+    for (let d = new Date(de); +d < Math.min(ate, Date.now() + 1) && dias.length < 31; d.setDate(d.getDate() + 1)) dias.push(new Date(d));
+    const vals = dias.map(d => r.porDia[d.toLocaleDateString('sv')] || 0), max = Math.max(...vals, 1);
+    html(el, `<section class="bloco relatorio"><h2>Relatório: ${esc(rotulo)}</h2>
+      <div class="raio mb14" role="radiogroup" aria-label="Período do relatório">${[['7d', '7 dias'], ['mes', 'Este mês'], ['passado', 'Mês passado']].map(([k, n]) =>
+        `<button type="button" role="radio" data-act="periodo" data-p="${k}" aria-checked="${periodo === k}">${n}</button>`).join('')}</div>
+      ${r.chamados ? `<div class="grade2">
+        <div class="mini"><b>${r.paradas}</b><small>${r.paradas === 1 ? 'entrega feita' : 'entregas feitas'}${r.paradas !== r.entregues ? ` em ${r.entregues} ${r.entregues === 1 ? 'corrida' : 'corridas'}` : ''}</small></div>
+        <div class="mini"><b>${brl(r.gasto)}</b><small>gasto total</small></div>
+        <div class="mini"><b>${r.custoPorEntrega != null ? brl(r.custoPorEntrega) : '–'}</b><small>custo por entrega</small></div>
+        <div class="mini"><b>${minOuTraco(r.minAceite)}</b><small>até um motoboy aceitar</small></div>
+        <div class="mini"><b>${minOuTraco(r.minBalcao)}</b><small>de espera no balcão</small></div>
+        <div class="mini"><b>${minOuTraco(r.minTotal)}</b><small>do chamado à entrega</small></div>
+      </div>
+      ${vals.some(Boolean) ? `<h3 class="mt14">Entregas por dia</h3><div class="barras" role="img" aria-label="Entregas por dia: ${dias.map((d, i) => `${dia(d)} ${vals[i]}`).join(', ')}">${dias.map((d, i) =>
+        `<div><i data-h="${vals[i] / max * 100}"></i><small>${dias.length > 10 ? d.getDate() : d.toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '')}</small></div>`).join('')}</div>` : ''}
+      <h3 class="mt14">Pra onde foi o dinheiro</h3>
+      <div class="linha"><span>Fretes (100% pros motoboys)</span><b>${brl(r.frete)}</b></div>
+      ${r.espera ? `<div class="linha"><span>Espera no balcão</span><b>${brl(r.espera)}</b></div>` : ''}
+      ${r.gorjeta ? `<div class="linha"><span>Gorjetas</span><b>${brl(r.gorjeta)}</b></div>` : ''}
+      ${r.turno ? `<div class="linha"><span>Turnos reservados</span><b>${brl(r.turno)}</b></div>` : ''}
+      ${r.cancelamento ? `<div class="linha"><span>Cancelamentos depois do aceite</span><b>${brl(r.cancelamento)}</b></div>` : ''}
+      <div class="linha"><span>Taxa do app</span><b>${brl(r.taxa)}</b></div>
+      ${r.pico != null ? `<p class="sub mt8">Horário com mais entregas: <b>${r.pico}h às ${r.pico + 1}h</b>. ${r.minAceite != null && r.minAceite > 5 ? 'Um motoboy por turno nesse horário deixa o aceite mais rápido.' : ''}</p>` : ''}
+      ${r.km ? `<p class="sub">${km(r.km)} km rodados pelos motoboys nas suas entregas.</p>` : ''}
+      ${r.motoboys.length ? `<h3 class="mt14">Quem mais entregou</h3><ul class="hist">${r.motoboys.slice(0, 5).map(m =>
+        `<li><div>${esc(m.nome)}<small>${m.n} ${m.n === 1 ? 'entrega' : 'entregas'}</small></div><b>${brl(m.valor)}</b></li>`).join('')}</ul>` : ''}
+      ${r.cancelados ? `<p class="aviso">${r.cancelados} ${r.cancelados === 1 ? 'chamado cancelado' : 'chamados cancelados'}${r.semMotoboy ? `, ${r.semMotoboy} sem nenhum motoboy aceitar` : ''}.</p>` : ''}
+      <div class="acoes"><button class="btn btn-fantasma btn-sm" data-act="baixarPlanilha">${ic('baixar')}Planilha</button><button class="btn btn-fantasma btn-sm" data-act="imprimirRelatorio">${ic('doc')}PDF</button></div>`
+      : '<p class="sub">Nenhum chamado nesse período.</p>'}
+    </section>`);
+  },
   'em-rep': el => {
     const nome = S().empresa.nome;
     if (!nome) { html(el, ''); return; }
@@ -530,14 +676,14 @@ const LIVE = {
     const nome = S().empresa.nome;
     const cs = nome ? S().calls.filter(c => c.empresa === nome && !c.teste).sort((a, b) => b.criadoEm - a.criadoEm) : [];
     if (!cs.length) { html(el, `<div class="vazio"><b>Nenhum chamado ainda</b>Chame um motoboy na aba Chamar.</div><button class="btn btn-sinal" data-act="aba" data-aba="novo">Chamar motoboy</button>`); return; }
-    const resumo = resumoMesEmpresa(nome);
     const ROT = { aberto: ['Procurando motoboy', 'aberto'], aceito: ['Motoboy a caminho da loja', 'andando'], coleta: ['Motoboy no balcão', 'andando'], coletado: ['Saiu pra entrega', 'andando'], entregue: ['Entregue', 'entregue'], cancelado: ['Cancelado', 'cancelado'] };
-    html(el, resumo + cs.slice(0, 30).map(c => {
+    html(el, cs.slice(0, 30).map(c => {
       const [rot, cls] = ROT[c.status];
       const emAndamento = c.status === 'aberto' || ATIVOS.includes(c.status);
+      const n = c.paradas.length, feitas = c.status === 'entregue' ? n : (c.entregues || 0);
       return `<article class="chamado">
-        <div class="cab"><b>${esc(c.cliente || 'Entrega')}, ${hora(c.criadoEm)}</b><span class="pill ${cls}">${rot}</span></div>
-        <div class="mudo pq">${esc(c.entrega)} (${km(c.km)} km)</div>
+        <div class="cab"><b>${n > 1 ? `${n} entregas` : esc(c.cliente || 'Entrega')}, ${hora(c.criadoEm)}</b><span class="pill ${cls}">${n > 1 && c.status === 'coletado' ? `Entregou ${feitas} de ${n}` : rot}</span></div>
+        <div class="mudo pq">${n > 1 ? `Rota de ${km(c.km)} km` : `${esc(c.entrega)} (${km(c.km)} km)`}</div>
         ${c.motoboy ? `<div class="mt6">Motoboy: <b>${esc(c.motoboy)}</b>${c.moto ? `, ${esc(c.moto)}` : ''}${c.placa ? `, placa ${esc(c.placa)}` : ''}</div>` : ''}
         ${c.status === 'aberto' && c.lojaGeo ? `<div class="rastreio">${ic('moto')}<span>Procurando motoboy a até <b class="num" data-onda="${c.criadoEm}|${c.prioridadeAte || 0}|${c.raioKm}">${raioOnda(c)}</b> km da loja</span></div>` : ''}
         ${ATIVOS.includes(c.status) && c.motoboy ? mapaCorrida(c, FASE_MAPA[c.status], posDoMotoboy(c)) : ''}
@@ -547,10 +693,21 @@ const LIVE = {
           : `O motoboy digitou um código errado ${c.tentativas === 1 ? '1 vez' : `${c.tentativas} vezes`}.`}</div>
           ${c.tentativas >= LIMITES.tentativasCodigo ? `<button class="btn btn-sinal btn-sm mt8" data-act="liberarCodigo" data-id="${esc(c.id)}">Liberar novas tentativas</button>` : ''}` : ''}
         ${c.status === 'coleta' ? `<div class="aviso">${c.chegadaGps ? 'Chegada confirmada pelo GPS. ' : ''}Esperando há <b class="num" data-desde="${c.chegouEm}">--:--</b>. Depois de ${TABELA.esperaGratisMin} min, a espera custa ${brl(TABELA.esperaPorMin)}/min.</div>` : ''}
-        ${textoCobranca(c, false) || c.volta ? `<div class="mudo pq mt6">${[textoCobranca(c, false), c.volta ? 'Motoboy volta pra loja.' : ''].filter(Boolean).join(' ')}</div>` : ''}
+        ${n > 1 ? `<ol class="paradas">${c.paradas.map((p, i) => {
+          const pc = { ...c, ...p }, feita = i < feitas;
+          return `<li class="${feita ? 'feita' : c.status === 'coletado' && i === feitas ? 'agora' : ''}">
+            <div class="parada-cab"><b>${i + 1}. ${esc(p.cliente || 'Cliente')}</b>${feita ? `<span class="pill entregue">Entregue${p.entregueEm ? ` ${hora(p.entregueEm)}` : ''}</span>` : ''}</div>
+            <small class="mudo">${esc(p.entrega)}${textoCobranca(pc, false) ? `. ${textoCobranca(pc, false)}` : ''}</small>
+            ${emAndamento && !feita ? `<div class="parada-codigo"><small class="mudo">Código</small><b class="codigo pq">${p.codigo}</b></div>
+              <div class="acoes"><a class="btn btn-ok btn-sm" href="${esc(linkCliente(pc))}" target="_blank" rel="noopener noreferrer">${ic('balao')}Mandar pro cliente</a>
+              ${linkMapaCliente(pc) ? `<button class="btn btn-fantasma btn-sm" data-act="copiarRastreio" data-id="${esc(c.id)}" data-i="${i}">${ic('mapa')}Link do mapa</button>` : ''}</div>` : ''}
+            ${feita ? `<button class="btn btn-fantasma btn-sm mt6" data-act="verFoto" data-id="${esc(c.id)}" data-i="${i}">${ic('camera')}Ver foto da entrega</button>` : ''}
+          </li>`; }).join('')}</ol>${c.volta ? '<div class="mudo pq mt6">Motoboy volta pra loja no fim.</div>' : ''}`
+        : `${textoCobranca(c, false) || c.volta ? `<div class="mudo pq mt6">${[textoCobranca(c, false), c.volta ? 'Motoboy volta pra loja.' : ''].filter(Boolean).join(' ')}</div>` : ''}
         ${emAndamento ? `<div class="mt8"><small class="mudo">Código de entrega (passe só pro cliente)</small><div class="codigo">${c.codigo}</div></div>
           <a class="btn btn-ok btn-sm mt10" href="${esc(linkCliente(c))}" target="_blank" rel="noopener noreferrer">${ic('balao')}Mandar código e mapa pro cliente</a>
-          ${linkMapaCliente(c) ? `<button class="btn btn-fantasma btn-sm mt8" data-act="copiarRastreio" data-id="${esc(c.id)}">${ic('mapa')}Copiar link do mapa</button>` : ''}` : ''}
+          ${linkMapaCliente(c) ? `<button class="btn btn-fantasma btn-sm mt8" data-act="copiarRastreio" data-id="${esc(c.id)}" data-i="0">${ic('mapa')}Copiar link do mapa</button>` : ''}` : ''}
+        ${c.status === 'entregue' ? `<button class="btn btn-fantasma btn-sm mt8" data-act="verFoto" data-id="${esc(c.id)}" data-i="0">${ic('camera')}Ver foto da entrega</button>` : ''}`}
         ${c.status === 'entregue' ? `<div class="mudo pq mt6">Frete ${brl(c.valor)}${c.espera ? ` + espera ${brl(c.espera)}` : ''}${c.gorjeta ? ` + gorjeta ${brl(c.gorjeta)}` : ''}${c.kmReal ? `. Rodou ${km(c.kmReal)} km (GPS)` : ''}</div>
           ${c.motoboy ? (() => { const fav = S().empresa.favoritos.includes(c.motoboy); return `<button class="btn btn-sm ${fav ? 'btn-sinal' : 'btn-fantasma'} mt10" data-act="favoritar" data-nome="${esc(c.motoboy)}" data-uid="${esc(c.motoboyUid)}" aria-pressed="${fav}">${ic('estrela')}${fav ? `${esc(c.motoboy)} é seu favorito` : `Favoritar ${esc(c.motoboy)}`}</button>`; })() : ''}
           ${c.gorjeta ? '' : `<div class="acoes acoes3">${LIMITES.gorjetas.map(v => `<button class="btn btn-fantasma btn-sm" data-act="gorjeta" data-id="${esc(c.id)}" data-v="${v}">+${brl(v)}</button>`).join('')}</div><small class="mudo">Mandar gorjeta pro motoboy</small>`}` : ''}
@@ -574,6 +731,19 @@ function rastreio(c) {
   return `<div class="rastreio">${ic('nav')}<span><b>${esc(c.motoboy)}</b> está a ${km(f.km)} km ${c.status === 'aceito' ? 'da loja' : 'do cliente'}, chega em ${minTxt(f.min)}.</span></div>`;
 }
 
+// Turnos: os que estão abertos pra pegar e os que ele já pegou (como a "escala" dos apps de entrega).
+function turnosMotoboy() {
+  const agora = Date.now(), ts = S().turnos.filter(t => t.fim > agora - 86400000);
+  const meus = ts.filter(t => t.motoboy && ['aceito'].includes(t.status)).sort((a, b) => a.inicio - b.inicio);
+  const abertos = ts.filter(t => t.status === 'aberto' && t.fim > agora).sort((a, b) => a.inicio - b.inicio).slice(0, 6);
+  if (!meus.length && !abertos.length) return '';
+  return `<section class="bloco mt14"><h2>Turnos</h2>
+    <p class="sub mb14">Lojas reservando motoboy por hora no pico. Valor por hora garantido, mais o frete de cada entrega.</p>
+    ${meus.length ? `<h3>Seus turnos</h3><ul class="turnos">${meus.map(t => linhaTurno(t, 'moto')).join('')}</ul>` : ''}
+    ${abertos.length ? `<h3 class="mt8">Abertos</h3><ul class="turnos">${abertos.map(t => linhaTurno(t, 'moto')).join('')}</ul>` : ''}
+  </section>`;
+}
+
 function telaOferta(c) {
   const r = reputacao(S().calls, c.empresa);
   const porKm = c.valor / c.km;
@@ -595,11 +765,13 @@ function telaOferta(c) {
       <ul class="rota">
         <li><b>${esc(c.empresa)}</b><small>${esc(c.coleta)}${ateLoja(c) != null ? `. Você está a ${km(ateLoja(c))} km, uns ${etaMin(ateLoja(c))} min` : ''}</small></li>
         <li><b>${esc(c.entrega)}</b><small>${km(c.km)} km da loja até o cliente${(() => { const r = c.lojaGeo && c.clienteGeo && infoRota(c.id); return r ? `. Pelas ruas: ${km(r.km)} km, ${minTxt(r.min)}` : c.clienteGeo ? ', ponto exato no mapa' : ''; })()}</small></li>
+        ${c.paradas.slice(1).map((p, i) => `<li><b>${esc(p.entrega)}</b><small>${i + 2}ª entrega da rota</small></li>`).join('')}
       </ul>
       <div class="rep">
         ${r ? `<span class="tag ${r.nota >= 4 ? 'boa' : r.nota < 3 ? 'ruim' : ''}">★ ${r.nota.toFixed(1).replace('.', ',')} pelos motoboys</span>${r.espera != null ? `<span class="tag ${r.espera > TABELA.esperaGratisMin ? 'ruim' : 'boa'}">espera média ${Math.round(r.espera)} min</span>` : ''}` : '<span class="tag">Empresa ainda sem avaliação</span>'}
         ${c.chuva ? `<span class="tag info">+${brl(TABELA.chuva)} de chuva incluso</span>` : ''}
         ${c.volta ? '<span class="tag info">Volta pra loja (já incluso no valor)</span>' : ''}
+        ${c.paradas.length > 1 ? `<span class="tag info">${c.paradas.length} entregas na rota (+${brl((c.paradas.length - 1) * TABELA.paradaExtra)} incluso)</span>` : ''}
         ${avisoCobranca(c) ? `<span class="tag info">${avisoCobranca(c)}</span>` : ''}
         ${c.preferidos.includes(S().profile.nome) ? '<span class="tag boa">Esta loja te favoritou</span>' : ''}
       </div>
@@ -624,7 +796,8 @@ function telaCorrida(c) {
   const naLoja = c.status !== 'coletado';
   const alvo = naLoja ? c.coleta : c.entrega;
   const tel = fone(c.tel);
-  const titulo = { aceito: 'Vai até a loja', coleta: 'Esperando o pedido', coletado: 'Leva até o cliente' }[c.status];
+  const n = c.paradas.length, feitas = c.entregues || 0;
+  const titulo = { aceito: 'Vai até a loja', coleta: 'Esperando o pedido', coletado: n > 1 ? `Entrega ${feitas + 1} de ${n}` : 'Leva até o cliente' }[c.status];
   const etapas = ['Indo à loja', 'Na loja', 'Entregando', 'Entregue'];
   const alvoGeo = naLoja ? c.lojaGeo : c.clienteGeo, pos = posicaoAtual();
   const destinoNav = alvoGeo ? coordTxt(alvoGeo) : alvo;
@@ -641,6 +814,8 @@ function telaCorrida(c) {
       ${c.status === 'coleta' && c.chegadaGps ? `<span class="tag boa mt6">Chegada registrada pelo GPS às ${hora(c.chegouEm)}</span>` : ''}
       ${c.status === 'coleta' ? `<div class="espera-box"><div class="relogio" data-desde="${c.chegouEm}" role="timer" aria-label="Tempo de espera">--:--</div>
         <p class="sub" data-espera="${esc(c.id)}"></p></div>` : ''}
+      ${n > 1 ? `<ol class="paradas mt8" aria-label="Rota com ${n} entregas">${c.paradas.map((p, i) =>
+        `<li class="${i < feitas ? 'feita' : c.status === 'coletado' && i === feitas ? 'agora' : ''}"><b>${i + 1}. ${esc(p.cliente || 'Cliente')}</b><small class="mudo">${esc(p.entrega)}</small></li>`).join('')}</ol>` : ''}
       ${c.obs && c.status !== 'coleta' ? `<div class="aviso">${esc(c.obs)}</div>` : ''}
       ${textoCobranca(c, true) ? `<div class="aviso cobranca">${ic('carteira')}<span>${textoCobranca(c, true)}</span></div>` : ''}
       ${c.volta ? `<div class="aviso">Depois de entregar, volte à ${esc(c.empresa)}${c.cobranca === 'maquininha' ? ' com a maquininha' : c.cobranca === 'dinheiro' ? ' com o dinheiro' : ''}. A volta já está no seu frete.</div>` : ''}
@@ -657,7 +832,7 @@ function telaCorrida(c) {
     <div class="cta-fixa">
     ${c.status === 'aceito' ? `<button class="btn btn-sinal" data-act="cheguei" data-id="${esc(c.id)}">${ic('loja')}Cheguei na loja</button>` : ''}
     ${c.status === 'coleta' ? `<button class="btn btn-sinal" data-act="coletei" data-id="${esc(c.id)}">${ic('caixa')}Peguei o pedido</button>` : ''}
-    ${c.status === 'coletado' ? `<button class="btn btn-ok" data-act="entregar" data-id="${esc(c.id)}">${ic('check')}Finalizar entrega</button>` : ''}
+    ${c.status === 'coletado' ? `<button class="btn btn-ok" data-act="entregar" data-id="${esc(c.id)}">${ic('check')}${n > 1 && feitas < n - 1 ? `Entreguei pra ${esc(c.cliente || `cliente ${feitas + 1}`)}` : 'Finalizar entrega'}</button>` : ''}
     </div>`;
 }
 
@@ -756,7 +931,9 @@ setInterval(tick, 1000);
 const vibrar = ms => { try { if (navigator.userActivation?.hasBeenActive) navigator.vibrate?.(ms); } catch {} };
 
 // O ciclo da corrida: chamado do servidor vai pro servidor; chamado de teste fica no aparelho.
-const corridas = criarCorridas(armazemMisto(armazemLocal({ S, transacao: mudar }), nuvem.armazemNuvem, nuvem.nuvemLigada));
+const armazem = armazemMisto(armazemLocal({ S, transacao: mudar }), nuvem.armazemNuvem, nuvem.nuvemLigada);
+const corridas = criarCorridas(armazem);
+const escala = criarTurnos(armazem);
 const MOTIVOS = {
   indisponivel: 'Esse chamado mudou de situação. A tela já mostra como ele está agora.',
   ocupado: 'Termine a corrida atual antes de aceitar outra.',
@@ -772,6 +949,31 @@ async function aceitarChamado(id) {
   const r = await corridas.aceitar(id, S().profile);
   if (r.ok) { nuvem.esquecerDisponivel(); vibrar(30); scrollTo(0, 0); toast('Corrida aceita. Bora!'); return; }
   toast(r.motivo === 'indisponivel' ? 'Outro motoboy aceitou primeiro. Sem problema, o próximo chamado aparece aqui.' : MOTIVOS[r.motivo]);
+}
+
+/* ============ Foto da entrega ============
+   JPEG pequeno (até ~300 KB, em geral 60 KB): cabe no banco grátis e abre rápido no celular da loja. */
+const FOTO_OK = /^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/;
+async function comprimirFoto(arquivo) {
+  const img = await createImageBitmap(arquivo, { imageOrientation: 'from-image' });
+  for (const [lado, q] of [[960, 0.6], [720, 0.55], [540, 0.5]]) {
+    const k = Math.min(1, lado / Math.max(img.width, img.height));
+    const cv = document.createElement('canvas');
+    cv.width = Math.round(img.width * k); cv.height = Math.round(img.height * k);
+    cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+    const url = cv.toDataURL('image/jpeg', q);
+    if (url.length < 300000) { img.close?.(); return url; }
+  }
+  img.close?.();
+  throw new Error('foto-grande');
+}
+async function guardarFoto(c, parada, arquivo) {
+  try {
+    const url = await comprimirFoto(arquivo);
+    if (c.nuvem) await nuvem.enviarFoto(c.id, parada, url);
+    else localStorage.setItem(`marcaai:foto:${c.id}:${parada}`, url);
+    toast('Foto da entrega guardada. A loja consegue ver.');
+  } catch { toast('A entrega valeu, mas a foto não foi enviada. Confira a internet.'); }
 }
 
 /* Arrastar a alça até o fim aceita. Soltar antes volta pro começo. */
@@ -818,7 +1020,10 @@ const ACTS = {
   },
   repetir: el => {
     const c = S().calls.find(x => x.id === el.dataset.id); if (!c) return;
-    rascunho = { entrega: c.entrega, km: c.km, cliente: c.cliente, telCliente: c.telCliente, obs: c.obs, localCliente: c.clienteGeo ? `${c.clienteGeo.lat},${c.clienteGeo.lon}` : '' };
+    const [p0, ...resto] = c.paradas;
+    const local = g => (g ? `${g.lat},${g.lon}` : '');
+    rascunho = { entrega: p0.entrega, km: c.km, cliente: p0.cliente, telCliente: p0.telCliente, obs: c.obs, localCliente: local(p0.clienteGeo) };
+    paradasExtra = resto.map(p => ({ entrega: p.entrega, local: local(p.clienteGeo), cliente: p.cliente, tel: p.telCliente, cobranca: 'pago' }));
     irAba('novo');
     toast('Dados da entrega copiados. Confira e chame o motoboy.');
   },
@@ -880,10 +1085,95 @@ const ACTS = {
     LIVE['em-preco']($('[data-live="em-preco"]'));
   },
   copiarRastreio: async el => {
-    const c = S().calls.find(x => x.id === el.dataset.id); const link = c && linkMapaCliente(c);
+    const c = S().calls.find(x => x.id === el.dataset.id); const p = c?.paradas[+el.dataset.i || 0];
+    const link = c && p && linkMapaCliente(p);
     if (!link) return;
     try { await navigator.clipboard.writeText(link); toast('Link do mapa copiado. Cole na conversa com o cliente.'); }
     catch { toast(link); }
+  },
+  maisParada: el => {
+    const f = el.closest('form'); if (!f) return;
+    lerParadasExtra(f);
+    if (paradasExtra.length + 1 >= MAX_PARADAS) return;
+    paradasExtra.push({ cobranca: 'pago' });
+    desenharParadasExtra(f);
+    f[`p${paradasExtra.length - 1}_entrega`]?.focus();
+  },
+  tirarParada: el => {
+    const f = el.closest('form'); if (!f) return;
+    lerParadasExtra(f);
+    paradasExtra.splice(+el.dataset.i, 1);
+    desenharParadasExtra(f);
+    if (!paradasExtra.length) lerLocalCliente(f);
+  },
+  verFoto: async el => {
+    const c = S().calls.find(x => x.id === el.dataset.id), i = +el.dataset.i || 0;
+    if (!c) return;
+    let img = null;
+    try { img = c.nuvem ? await nuvem.lerFoto(c.id, i) : localStorage.getItem(`marcaai:foto:${c.id}:${i}`); } catch { toast(MOTIVOS['sem-conexao']); return; }
+    if (!img || !FOTO_OK.test(img)) { toast('O motoboy não tirou foto nesta entrega.'); return; }
+    const p = c.paradas[i];
+    dialogo(`<h3 id="dlg-titulo">Foto da entrega${c.paradas.length > 1 ? ` ${i + 1}` : ''}</h3>
+      <p class="mudo mb14">${esc(p?.cliente || 'Cliente')}, ${esc(p?.entrega || '')}${p?.entregueEm ? `. Entregue às ${hora(p.entregueEm)}` : ''}${c.motoboy ? ` por ${esc(c.motoboy)}` : ''}.</p>
+      <img class="foto-entrega" src="${img}" alt="Foto tirada pelo motoboy na entrega">
+      <button class="btn btn-fantasma btn-sm mt10" data-act="fechar">Fechar</button>`);
+  },
+  periodo: el => {
+    if (!['7d', 'mes', 'passado'].includes(el.dataset.p)) return;
+    periodo = el.dataset.p;
+    LIVE['em-relatorio']($('[data-live="em-relatorio"]'));
+  },
+  baixarPlanilha: () => {
+    const { de, ate, nome } = datasPeriodo(periodo);
+    // \uFEFF faz o Excel abrir os acentos certinho.
+    const url = URL.createObjectURL(new Blob(['\uFEFF' + csvEmpresa(S().calls, S().empresa.nome, de, ate)], { type: 'text/csv;charset=utf-8' }));
+    const a = document.createElement('a');
+    a.href = url; a.download = `marca-ai-entregas-${nome.replace(/\W+/g, '-')}.csv`;
+    document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+  },
+  imprimirRelatorio: () => {
+    const { de, ate, nome } = datasPeriodo(periodo), emp = S().empresa;
+    const r = relatorioEmpresa(S().calls, emp.nome, de, ate, S().turnos);
+    html(document.getElementById('impressao'), `<h1>Relatório de entregas: ${esc(nome)}</h1>
+      <p>${esc(emp.nome)}${emp.endereco ? `, ${esc(emp.endereco)}` : ''}. Gerado pelo Marca aí em ${dia(Date.now())} às ${hora(Date.now())}.</p>
+      <table><tbody>
+        <tr><td>Chamados</td><td class="v">${r.chamados}</td></tr>
+        <tr><td>Entregas feitas</td><td class="v">${r.paradas}</td></tr>
+        <tr><td>Cancelados (sem motoboy)</td><td class="v">${r.cancelados} (${r.semMotoboy})</td></tr>
+        <tr><td>Fretes</td><td class="v">${brl(r.frete)}</td></tr>
+        <tr><td>Espera no balcão</td><td class="v">${brl(r.espera)}</td></tr>
+        <tr><td>Gorjetas</td><td class="v">${brl(r.gorjeta)}</td></tr>
+        <tr><td>Turnos reservados</td><td class="v">${brl(r.turno)}</td></tr>
+        <tr><td>Cancelamentos depois do aceite</td><td class="v">${brl(r.cancelamento)}</td></tr>
+        <tr><td>Taxa do app</td><td class="v">${brl(r.taxa)}</td></tr>
+        <tr class="tot"><td>Total gasto</td><td class="v">${brl(r.gasto)}</td></tr>
+        <tr><td>Custo por entrega</td><td class="v">${r.custoPorEntrega != null ? brl(r.custoPorEntrega) : '–'}</td></tr>
+        <tr><td>Tempo até o aceite / no balcão / total</td><td class="v">${minOuTraco(r.minAceite)} / ${minOuTraco(r.minBalcao)} / ${minOuTraco(r.minTotal)}</td></tr>
+      </tbody></table>
+      ${r.motoboys.length ? `<table><thead><tr><th>Motoboy</th><th class="v">Entregas</th><th class="v">Recebeu</th></tr></thead><tbody>${r.motoboys.map(m =>
+        `<tr><td>${esc(m.nome)}</td><td class="v">${m.n}</td><td class="v">${brl(m.valor)}</td></tr>`).join('')}</tbody></table>` : ''}
+      <p class="nota">Documento de controle da loja. Não substitui nota fiscal.</p>`);
+    print();
+  },
+  aceitarTurno: async el => {
+    if (!S().profile.nome) { toast('Preencha seu nome no Perfil antes de pegar um turno.'); irAba('perfil'); return; }
+    const r = await escala.aceitar(el.dataset.id, S().profile);
+    toast(r.ok ? 'Turno é seu. A loja já sabe. Chegue um pouco antes do horário.'
+      : r.motivo === 'ocupado' ? 'Você já tem um turno nesse horário.' : r.motivo === 'indisponivel' ? 'Outro motoboy pegou esse turno primeiro.' : MOTIVOS[r.motivo]);
+  },
+  cancelarTurno: async el => {
+    const t = S().turnos.find(x => x.id === el.dataset.id); if (!t) return;
+    const paga = t.status === 'aceito';
+    const sim = await confirmar('Desmarcar o turno?', paga ? `${t.motoboy} já confirmou e recebe ${brl(t.valorHora)} (1 hora) por ter reservado o horário.` : 'Nenhum motoboy pegou ainda, então não há custo.', 'Desmarcar turno', 'Manter turno');
+    if (!sim) return;
+    const r = await escala.cancelar(t.id);
+    toast(r.ok ? 'Turno desmarcado.' : r.motivo === 'indisponivel' ? 'Esse turno já terminou: feche e pague na lista.' : MOTIVOS[r.motivo]);
+  },
+  concluirTurno: async el => {
+    const t = S().turnos.find(x => x.id === el.dataset.id); if (!t) return;
+    const r = await escala.concluir(t.id);
+    toast(r.ok ? `Turno fechado: ${brl(valorTurno(t))} pro motoboy.` : MOTIVOS[r.motivo]);
   },
   raioBusca: el => {
     const n = +el.dataset.r;
@@ -986,23 +1276,49 @@ const ACTS = {
     const id = el.dataset.id;
     const c = S().calls.find(x => x.id === id);
     if (!c) return;
-    dialogo(`<h3 id="dlg-titulo">Código de entrega</h3><p class="mudo mb14">Peça ao cliente os 4 números que a loja passou pra ele.</p>
+    const n = c.paradas.length, i = c.entregues || 0;
+    dialogo(`<h3 id="dlg-titulo">Código de entrega${n > 1 ? ` ${i + 1} de ${n}` : ''}</h3><p class="mudo mb14">Peça ${c.cliente ? `a ${esc(c.cliente)}` : 'ao cliente'} os 4 números que a loja passou${n > 1 ? '. Cada cliente da rota tem o seu' : ''}.</p>
       <form data-form="codigo" novalidate><input class="inp codigo-inp" name="cod" inputmode="numeric" maxlength="4" autocomplete="one-time-code" spellcheck="false" aria-label="Código de 4 números" aria-describedby="cod-erro" autofocus>
+      <label class="foto-campo mt10"><input type="file" name="foto" accept="image/*" capture="environment" class="vh" data-foto>
+        <span class="btn btn-fantasma btn-sm">${ic('camera')}<span data-foto-rot>Tirar foto da entrega (opcional)</span></span></label>
+      <img class="foto-previa" alt="Prévia da foto da entrega" hidden data-foto-previa>
       <p id="cod-erro" class="erro" role="alert"></p>
       <button class="btn btn-ok" type="submit">Confirmar entrega</button></form>
       ${c.teste ? `<p class="sub mt10">Chamado de teste: o código é ${c.codigo}.</p>` : ''}`,
-      d => d.querySelector('form').addEventListener('submit', async e => {
+      d => {
+        // Foto: prévia na hora (blob local, não sai do aparelho até confirmar a entrega).
+        let previa = null;
+        d.querySelector('[data-foto]').addEventListener('change', ev => {
+          const arq = ev.target.files?.[0], img = d.querySelector('[data-foto-previa]');
+          if (previa) URL.revokeObjectURL(previa);
+          previa = arq ? URL.createObjectURL(arq) : null;
+          img.hidden = !previa; if (previa) img.src = previa;
+          d.querySelector('[data-foto-rot]').textContent = arq ? 'Trocar a foto' : 'Tirar foto da entrega (opcional)';
+        });
+        d.addEventListener('close', () => { if (previa) URL.revokeObjectURL(previa); }, { once: true });
+        d.querySelector('form').addEventListener('submit', async e => {
         e.preventDefault();
-        const erro = d.querySelector('#cod-erro'), botao = e.target.querySelector('button');
+        const erro = d.querySelector('#cod-erro'), botao = e.target.querySelector('button[type="submit"]');
+        const arquivo = e.target.foto.files?.[0];
         botao.disabled = true;
         const r = await corridas.avancar(id, { codigo: String(e.target.cod.value).replace(/\D/g, '') });
         botao.disabled = false;
-        if (r.ok) { fecharDialogo(); bipe(); vibrar([40, 60, 40]); scrollTo(0, 0); anunciar('Entrega confirmada.'); return; }
+        if (r.ok) {
+          fecharDialogo(); bipe(); vibrar([40, 60, 40]); scrollTo(0, 0);
+          if (arquivo) guardarFoto(c, i, arquivo);
+          if (r.etapa === 'parada') {
+            const prox = S().calls.find(x => x.id === id);
+            toast(`Entrega ${r.feitas} de ${r.total} feita. Próxima: ${prox?.cliente || prox?.entrega || 'cliente seguinte'}.`);
+            anunciar(`Entrega ${r.feitas} de ${r.total} confirmada.`);
+          } else anunciar('Entrega confirmada.');
+          return;
+        }
         if (r.motivo === 'indisponivel') { fecharDialogo(); toast(MOTIVOS.indisponivel); return; }
         e.target.cod.setAttribute('aria-invalid', 'true');
         erro.textContent = r.motivo === 'codigo-errado' ? `Código não confere. Confira com o cliente. Restam ${r.restam} tentativas.`
           : r.motivo === 'invalido' ? 'O código tem 4 números.' : MOTIVOS[r.motivo];
-      }));
+      });
+      });
   },
   nota: el => { avaliacao.nota = Math.min(5, Math.max(1, +el.dataset.n)); refresh(); $(`[data-act="nota"][data-n="${avaliacao.nota}"]`)?.focus(); },
   tag: el => {
@@ -1016,7 +1332,7 @@ const ACTS = {
   },
   pularAval: async el => { const r = await corridas.avaliar(el.dataset.id, 0, []); if (!r.ok) avisoFalha(r); },
   sacar: () => {
-    const sd = saldo(S().calls, S().saques);
+    const sd = saldo(S().calls, S().saques, S().turnos);
     if (!S().profile.pix) { toast('Cadastre sua chave Pix no Perfil.'); irAba('perfil'); return; }
     dialogo(`<h3 id="dlg-titulo">Sacar ${brl(sd)}</h3><p class="mudo mb14">Vai pra chave <b class="claro">${esc(S().profile.pix)}</b>. Sem taxa.</p>
       <div class="pilha"><button class="btn btn-sinal" data-act="confirmaSaque">Sacar ${brl(sd)}</button>
@@ -1025,7 +1341,7 @@ const ACTS = {
   },
   confirmaSaque: () => {
     let valor = 0;
-    mudar(s => { valor = saldo(s.calls, s.saques); if (valor <= 0 || !s.profile.pix) return false; s.saques.push({ valor, pix: s.profile.pix, em: Date.now() }); });
+    mudar(s => { valor = saldo(s.calls, s.saques, s.turnos); if (valor <= 0 || !s.profile.pix) return false; s.saques.push({ valor, pix: s.profile.pix, em: Date.now() }); });
     fecharDialogo();
     if (valor > 0) toast(`Saque de ${brl(valor)} enviado.`);
   },
@@ -1099,9 +1415,17 @@ const atualizaPreco = e => {
   const f = e.target.closest('[data-form="chamado"]');
   if (!f) return;
   if (e.target.name === 'volta' && e.isTrusted) e.target.dataset.mexeu = '1';
-  if (e.target.name === 'localCliente') lerLocalCliente(f);
+  if (e.target.name === 'localCliente') { lerLocalCliente(f); calcularRota(f); }
+  if (/^p\d_local$/.test(e.target.name)) calcularRota(f);
   LIVE['em-preco']($('[data-live="em-preco"]'));
 };
+// Turno: mostra quanto fica antes de reservar.
+document.addEventListener('input', e => {
+  const f = e.target.closest('[data-form="turno"]'); if (!f) return;
+  const h = +f.horas.value, v = numero(f.valorHora.value, 0, 1000, 0);
+  f.querySelector('[data-turno-preco]').textContent = `${h} horas a ${brl(v)}: ${brl(r2(h * v))} garantidos pro motoboy.`;
+});
+document.addEventListener('change', e => { if (e.target.name === 'horas') e.target.dispatchEvent(new Event('input', { bubbles: true })); });
 document.addEventListener('input', atualizaPreco);
 document.addEventListener('change', atualizaPreco);
 
@@ -1117,6 +1441,21 @@ document.addEventListener('submit', e => {
   if (!tipo || tipo === 'codigo') return;
   e.preventDefault();
   const d = Object.fromEntries(new FormData(f));
+
+  if (tipo === 'sms') return enviarFormSms(f, d);
+  if (tipo === 'turno') {
+    const [ano, mes, di] = String(d.dia || '').split('-').map(Number), [hh, mm] = String(d.hora || '').split(':').map(Number);
+    const inicio = new Date(ano, mes - 1, di, hh, mm).getTime();
+    if (!Number.isFinite(inicio)) return erroForm(f, 'Escolha o dia e a hora do turno.', 'dia');
+    const botao = f.querySelector('[type="submit"]'); botao.disabled = true;
+    escala.reservar({ empresa: S().empresa.nome, coleta: S().empresa.endereco, tel: S().empresa.tel, lojaGeo: S().empresa.geo,
+      inicio, fim: inicio + (+d.horas || 4) * 3600000, valorHora: numero(d.valorHora, 0, 1000, 0) }).then(r => {
+      botao.disabled = false;
+      if (r.ok) { f.querySelector('[data-erro]').textContent = ''; toast('Turno aberto. Os motoboys já podem pegar.'); return; }
+      erroForm(f, r.texto || (r.motivo === 'recusado' ? 'O servidor recusou o turno. Confira os dados.' : MOTIVOS[r.motivo]));
+    });
+    return;
+  }
 
   if (tipo === 'perfil') {
     const p = limparPerfil({ ...S().profile, ...d });
@@ -1143,19 +1482,61 @@ document.addEventListener('submit', e => {
     const cobrar = numero(d.cobrar, 0, 5000, 0), troco = numero(d.troco, 0, 5000, 0);
     if (cobranca !== 'pago' && !(cobrar > 0)) return erroForm(f, 'Informe quanto o motoboy deve cobrar do cliente.', 'cobrar');
     if (cobranca === 'dinheiro' && troco > 0 && troco < cobrar) return erroForm(f, 'O "troco pra" precisa ser maior que o valor a cobrar.', 'troco');
+    // Entregas a mais da mesma corrida, cada uma com o seu pagamento.
+    lerParadasExtra(f);
+    const extras = [];
+    for (const [i, p] of paradasExtra.entries()) {
+      const entregaP = texto(p.entrega, LIMITES.endereco), cob = COBRANCAS.includes(p.cobranca) ? p.cobranca : 'pago';
+      const cobrarP = numero(p.cobrar, 0, 5000, 0), trocoP = numero(p.troco, 0, 5000, 0);
+      if (!entregaP) return erroForm(f, `Informe o endereço da entrega ${i + 2}, ou tire ela da rota.`, `p${i}_entrega`);
+      if (cob !== 'pago' && !(cobrarP > 0)) return erroForm(f, `Informe quanto cobrar na entrega ${i + 2}.`, `p${i}_cobrar`);
+      if (cob === 'dinheiro' && trocoP > 0 && trocoP < cobrarP) return erroForm(f, `Na entrega ${i + 2}, o "troco pra" precisa ser maior que o valor.`, `p${i}_troco`);
+      extras.push({ entrega: entregaP, cliente: texto(p.cliente, LIMITES.nome), telCliente: texto(p.tel, LIMITES.tel), clienteGeo: extrairGeo(p.local), cobranca: cob, cobrar: cobrarP, troco: trocoP });
+    }
+    const paradas = ordenarParadas(S().empresa.geo, [{ entrega, cliente: texto(d.cliente, LIMITES.nome), telCliente: texto(d.telCliente, LIMITES.tel), clienteGeo, cobranca, cobrar, troco }, ...extras]);
     const usarFav = d.soFavoritos === 'on' && PLANOS[S().empresa.plano].favoritos;
+    // Motoboy do turno em andamento recebe primeiro (independe do plano: a loja já paga o turno).
+    const turno = turnoAgora(S().turnos, S().empresa.nome);
+    const prefs = [...new Set([...(usarFav ? S().empresa.favoritos : []), ...(turno?.motoboy ? [turno.motoboy] : [])])];
+    const prefsUid = [...new Set([...(usarFav ? S().empresa.favoritosUid : []), ...(turno?.motoboyUid ? [turno.motoboyUid] : [])])];
     if (nuvem.nuvemLigada() && nuvem.estadoNuvem().estado !== 'conectado') return erroForm(f, nuvem.estadoNuvem().detalheErro || 'Ainda conectando ao servidor. Espere um instante e tente de novo.');
     const botao = f.querySelector('[type="submit"]'); botao.disabled = true;
     corridas.chamar({ empresa: S().empresa.nome, coleta, tel: S().empresa.tel, entrega, cliente: texto(d.cliente, LIMITES.nome), telCliente: texto(d.telCliente, LIMITES.tel),
       km: dist, obs: texto(d.obs, LIMITES.obs), chuva: d.chuva === 'on', volta: d.volta === 'on', cobranca, cobrar, troco, taxa: taxaAgora(), lojaGeo: S().empresa.geo, clienteGeo, raioKm: S().empresa.raioBusca,
-      preferidos: usarFav ? S().empresa.favoritos : [], preferidosUid: usarFav ? S().empresa.favoritosUid : [] })
+      paradas, preferidos: prefs, preferidosUid: prefsUid, turno: !!turno })
       .then(r => {
         botao.disabled = false;
-        if (r.ok) { toast('Chamado enviado. Avisando os motoboys online.'); irAba('chamados'); return; }
+        if (r.ok) { paradasExtra = []; toast(turno ? `Chamado enviado. Tocando primeiro pra ${turno.motoboy}, do seu turno.` : paradas.length > 1 ? `Chamado com ${paradas.length} entregas enviado.` : 'Chamado enviado. Avisando os motoboys online.'); irAba('chamados'); return; }
         erroForm(f, r.motivo === 'recusado' ? 'O servidor recusou o chamado. Confira os dados e tente de novo.' : MOTIVOS[r.motivo]);
       });
   }
 });
+
+// Login por telefone: 1º toque manda o SMS; 2º confirma o código.
+async function enviarFormSms(f, d) {
+  const botao = f.querySelector('[type="submit"]'), erro = f.querySelector('[data-erro]');
+  erro.textContent = '';
+  botao.disabled = true;
+  try {
+    if (f.dataset.etapa !== 'codigo') {
+      if (nuvem.estadoNuvem().estado !== 'conectado') { erroForm(f, 'Ainda conectando ao servidor. Espere um instante.'); return; }
+      const numero = await nuvem.enviarSms(d.tel, 'recaptcha-sms');
+      f.dataset.etapa = 'codigo';
+      f.querySelector('[data-sms-codigo]').hidden = false;
+      html(botao, `${ic('check')}Confirmar código`);
+      f.codigo.focus();
+      toast(`Código enviado por SMS pra ${telBonito(numero)}.`);
+      return;
+    }
+    if (!/^\d{6}$/.test(String(d.codigo).replace(/\D/g, ''))) { erroForm(f, 'O código tem 6 números.', 'codigo'); return; }
+    const r = await nuvem.confirmarSms(d.codigo);
+    toast(r === 'entrou' ? 'Pronto: você entrou na sua conta. Seus dados estão de volta.' : 'Conta protegida. Agora seu número guarda seus dados.');
+    montar();
+  } catch (e) {
+    erroForm(f, nuvem.erroSms(e), f.dataset.etapa === 'codigo' ? 'codigo' : 'tel');
+    if (e?.code === 'auth/code-expired') { f.dataset.etapa = ''; f.querySelector('[data-sms-codigo]').hidden = true; html(botao, `${ic('fone')}Receber código por SMS`); }
+  } finally { botao.disabled = false; }
+}
 
 // Erros inesperados viram aviso claro, sem expor detalhe técnico na tela.
 addEventListener('error', () => toast('Essa tela travou. Feche e abra o app de novo.'));

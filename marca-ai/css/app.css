@@ -658,3 +658,27 @@ dialog#dialogo[open] .folha{animation:sobe .5s var(--mola)}
 .atalho-instalar svg{width:16px;height:16px}
 .passo-a-passo{margin:10px 0 0 20px;display:grid;gap:10px;font-size:16px}
 .passo-a-passo .em-linha{width:20px;height:20px;vertical-align:-4px;color:var(--sinal-texto)}
+
+/* ============ Fase 2 (29/10): várias paradas, foto da entrega, turnos, relatório e conta ============ */
+.parada-extra{border:1px solid var(--hairline,var(--linha));border-radius:14px;padding:12px 12px 6px;margin:0 0 12px}
+.parada-extra legend{padding:0 6px;font-family:"Saira Condensed";font-weight:800;font-size:17px;color:var(--sinal-texto)}
+.parada-extra .btn{margin-bottom:8px}
+.paradas{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:8px}
+.paradas li{border-left:3px solid var(--linha);padding:4px 0 4px 12px;display:grid;gap:2px}
+.paradas li.agora{border-color:var(--sinal)}
+.paradas li.feita{border-color:var(--verde);opacity:.75}
+.paradas li small{display:block}
+.parada-cab{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.parada-codigo{display:flex;align-items:center;gap:10px;margin-top:4px}
+.codigo.pq{font-size:22px;letter-spacing:5px;padding:0 4px 0 10px}
+.foto-campo{display:block;cursor:pointer}
+.foto-previa,.foto-entrega{display:block;width:100%;max-height:52vh;object-fit:contain;border-radius:12px;margin-top:10px;background:var(--asfalto)}
+.turnos{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:10px}
+.turno{border:1px solid var(--hairline,var(--linha));border-radius:14px;padding:10px 12px;display:grid;gap:3px}
+.turno small{color:var(--mudo);font-size:13px}
+.turno-cab{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.relatorio .grade2{gap:8px}
+.relatorio h3,.bloco h3{font-size:15px;margin:0 0 6px}
+.conta form[hidden]{display:none}
+select.inp{appearance:none;background-image:linear-gradient(45deg,transparent 50%,currentColor 50%),linear-gradient(135deg,currentColor 50%,transparent 50%);background-position:calc(100% - 18px) 55%,calc(100% - 12px) 55%;background-size:6px 6px;background-repeat:no-repeat;padding-right:30px}
+#recaptcha-sms:empty{display:none}

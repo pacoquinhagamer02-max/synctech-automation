@@ -7,7 +7,8 @@ import { TOKEN_RASTREIO } from './regras.js';
 import { FIREBASE, NUVEM_ATIVA } from './config.js';
 
 const app = document.getElementById('app');
-const token = decodeURIComponent(location.hash.slice(1));
+// Link cortado ou com % estranho não pode derrubar a página: vira "link não encontrado".
+const token = (() => { try { return decodeURIComponent(location.hash.slice(1)); } catch { return ''; } })();
 const params = new URLSearchParams(location.search);
 const naNuvem = !params.has('demo') && NUVEM_ATIVA;
 let dados = null, estado = 'carregando'; // carregando | ok | nao-achou | erro
@@ -25,7 +26,7 @@ function titulo(d) {
     case 'aberto': return ['Procurando motoboy', `A ${esc(d.empresa)} já chamou um motoboy pro seu pedido.`];
     case 'aceito': return [`${quem} está indo buscar seu pedido`, `Ele vai até a ${esc(d.empresa)} e depois segue pra você.`];
     case 'coleta': return [`${quem} está na loja`, 'Assim que o pedido sair, você acompanha a moto no mapa.'];
-    case 'coletado': return [eta?.min ? `Chega em ${minTxt(eta.min)}` : 'Seu pedido saiu pra entrega', `${quem} está a caminho${eta ? `, a ${eta.km.toLocaleString('pt-BR', { maximumFractionDigits: 1 })} km` : ''}. Tenha o código de entrega em mãos.`];
+    case 'coletado': return [eta?.min ? `Chega em ${minTxt(eta.min)}` : 'Seu pedido saiu pra entrega', `${quem} está a caminho${eta ? `, a ${eta.km.toLocaleString('pt-BR', { maximumFractionDigits: 1 })} km` : ''}.${d.parada > 0 ? ` Ele leva outros pedidos na mesma rota e o seu é a ${d.parada + 1}ª entrega.` : ''} Tenha o código de entrega em mãos.`];
     case 'entregue': return ['Pedido entregue', `Bom apetite! Entrega feita por ${quem} pelo Marca aí.`];
     case 'cancelado': return ['Entrega cancelada', `Fale com a ${esc(d.empresa)} pra saber o que aconteceu.`];
     default: return ['Acompanhando seu pedido', ''];

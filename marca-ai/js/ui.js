@@ -24,6 +24,11 @@ const regrasTT = {
 };
 const politica = globalThis.trustedTypes?.createPolicy('marcaai', regrasTT) || regrasTT;
 export const urlScript = u => politica.createScriptURL(u);
+// O login por SMS do Firebase exige o reCAPTCHA do Google, que carrega os próprios scripts passando
+// o endereço como texto. A política "default" deixa passar só esses endereços exatos do reCAPTCHA;
+// qualquer outro script (ou HTML) passado como texto continua bloqueado.
+const RECAPTCHA = /^https:\/\/www\.(google\.com\/recaptcha\/(api|enterprise)\.js|gstatic\.com\/recaptcha\/releases\/[\w-]+\/recaptcha__[\w-]+\.js)(\?[\w=&.%-]*)?$/;
+try { globalThis.trustedTypes?.createPolicy('default', { createScriptURL: u => (RECAPTCHA.test(u) ? u : null) }); } catch {}
 export function html(el, conteudo) {
   el.innerHTML = politica.createHTML(conteudo);
   // CSP não permite style="" inline; larguras e alturas dinâmicas entram pelo CSSOM.
