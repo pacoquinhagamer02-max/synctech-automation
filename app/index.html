@@ -1167,8 +1167,12 @@ function renderHome() {
   let martinsGoal = martinsStats ? martinsStats.goal : null;
 
   let fat = faturamentoAtual();
+  let emp = totalEmpresa();
   let kpis = [
-    { label:'Recebido · faturamento de '+fat.nome, val: 'R$'+fat.total.toLocaleString('pt-BR'), delta: fat.itens.length+' pagamento(s) · conta até '+fat.fim, cls:'up' },
+    { label:'Total da empresa (já recebido)', val: 'R$'+emp.total.toLocaleString('pt-BR'), delta: emp.qtd+' pagamento(s) lançados desde '+emp.desde, cls:'up' },
+    { label:'Fechado em '+fat.nome, val: 'R$'+fat.fechado.toLocaleString('pt-BR'), delta: fat.itens.length+' negócio(s) · conta até '+fat.fim, cls:'up' },
+    { label:'Recebido em '+fat.nome, val: 'R$'+fat.recebido.toLocaleString('pt-BR'), delta: 'dinheiro que já entrou', cls:'up' },
+    { label:'A receber em '+fat.nome, val: 'R$'+fat.aReceber.toLocaleString('pt-BR'), delta: fat.aReceber ? 'fechado, ainda vai entrar' : 'nada pendente', cls: fat.aReceber ? 'warn' : 'up' },
     { label:'Clientes fechados', val: fechados.length, delta: 'MRR ~R$'+mrr.toLocaleString('pt-BR'), cls:'up' },
     { label:'Leads em aberto',   val: abertos, delta: 'no funil agora', cls:'up' },
     { label:'Serviços ativos',   val: ativos+'/'+SERVICES.length, delta: (SERVICES.length-ativos)+' pendentes de config', cls: (SERVICES.length-ativos)>0 ? 'warn':'up' },
@@ -1188,18 +1192,21 @@ function renderHome() {
   }).join('');
 
   document.getElementById('home-summary').innerHTML =
-    'Faturamento de <b>'+fat.nome+'</b>: você já recebeu <b>R$'+fat.total.toLocaleString('pt-BR')+'</b>. Essa conta fica aberta até <b>'+fat.fim+'</b> (5º dia útil) e depois vira faturamento de '+fat.proxNome+'.';
+    'A SyncTech já fez <b>R$'+emp.total.toLocaleString('pt-BR')+'</b> no total. Em <b>'+fat.nome+'</b> você fechou <b>R$'+fat.fechado.toLocaleString('pt-BR')+'</b>: <b>R$'+fat.recebido.toLocaleString('pt-BR')+'</b> recebido e <b>R$'+fat.aReceber.toLocaleString('pt-BR')+'</b> a receber. Essa conta fica aberta até <b>'+fat.fim+'</b> (5º dia útil) e depois vira faturamento de '+fat.proxNome+'.';
 
-  document.getElementById('home-recebido-title').textContent = 'Recebido · faturamento de '+fat.nome;
+  document.getElementById('home-recebido-title').textContent = 'Faturamento de '+fat.nome;
   document.getElementById('home-recebido-sub').textContent = 'Conta até '+fat.fim+' (5º dia útil) · depois começa '+fat.proxNome;
   document.getElementById('home-recebido').innerHTML = (fat.itens.length
     ? fat.itens.map(function(r){
         return '<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--border)">' +
           '<div><div style="font-size:0.86rem;font-weight:600">'+escapeHtml(r.client)+'</div><div style="font-size:0.74rem;color:var(--muted)">'+escapeHtml(r.desc)+'</div></div>' +
-          '<div class="report-badge" style="flex-shrink:0">R$'+r.value.toLocaleString('pt-BR')+'</div>' +
+          '<div style="text-align:right;flex-shrink:0"><div class="report-badge">R$'+r.value.toLocaleString('pt-BR')+'</div>' +
+            '<div style="font-size:0.7rem;margin-top:4px;color:'+(r.status==='recebido'?'var(--green)':'var(--yellow)')+'">'+(r.status==='recebido'?'✓ recebido':'⏳ a receber')+'</div></div>' +
         '</div>';
       }).join('') +
-      '<div style="display:flex;justify-content:space-between;align-items:center;padding:11px 0 2px;border-top:1px solid var(--border-s);font-weight:700"><span>Total</span><span>R$'+fat.total.toLocaleString('pt-BR')+'</span></div>'
+      '<div style="display:flex;justify-content:space-between;padding:11px 0 2px;border-top:1px solid var(--border-s);font-size:0.82rem;color:var(--muted)"><span>Recebido</span><span>R$'+fat.recebido.toLocaleString('pt-BR')+'</span></div>' +
+      '<div style="display:flex;justify-content:space-between;padding:4px 0 2px;font-size:0.82rem;color:var(--muted)"><span>A receber</span><span>R$'+fat.aReceber.toLocaleString('pt-BR')+'</span></div>' +
+      '<div style="display:flex;justify-content:space-between;padding:6px 0 2px;font-weight:700"><span>Fechado no mês</span><span>R$'+fat.fechado.toLocaleString('pt-BR')+'</span></div>'
     : '<div style="font-size:0.8rem;color:var(--muted);padding:8px 0">Nenhum pagamento lançado em '+fat.nome+' ainda.</div>');
 
   let avulsosDoMes = AVULSOS.filter(function(a){ return a.month === currentMonthKey(); });
@@ -1665,11 +1672,22 @@ let CLIENTS_FIXED = [
 // ═══════════════ DADOS: RECEBIDO NO MÊS (dinheiro que já entrou) ═══════════════
 // ref = mês de faturamento (MM/AAAA). O faturamento de um mês fica aberto até o
 // 5º dia útil do mês seguinte; depois disso o painel troca sozinho pro mês novo.
+// status: 'recebido' (dinheiro já entrou) ou 'a_receber' (fechado, ainda vai entrar no mês).
+// "Total da empresa" soma tudo que tem status 'recebido', de todos os meses.
 let RECEBIMENTOS = [
-  { client:'Mina Jeje', desc:'Site vendido', value:2000, ref:'11/2026' },
-  { client:'Laís (Depilart)', desc:'Contrato fechado', value:6000, ref:'11/2026' },
-  { client:'Moisés (Barbearia Martins)', desc:'Pagamento recebido', value:1100, ref:'11/2026' },
+  { client:'Mina Jeje', desc:'Site vendido', value:2000, ref:'11/2026', status:'recebido' },
+  { client:'Laís (Depilart)', desc:'Contrato fechado', value:6000, ref:'11/2026', status:'recebido' },
+  { client:'Moisés (Barbearia Martins)', desc:'Pagamento recebido', value:1100, ref:'11/2026', status:'recebido' },
 ];
+function somaValores(lista) { return lista.reduce(function(s,r){ return s+r.value; }, 0); }
+function totalEmpresa() {
+  let recebidos = RECEBIMENTOS.filter(function(r){ return r.status === 'recebido'; });
+  let meses = RECEBIMENTOS.map(function(r){ return r.ref; }).sort(function(a,b){
+    return (a.slice(3)+a.slice(0,2)) < (b.slice(3)+b.slice(0,2)) ? -1 : 1;
+  });
+  let primeiro = meses.length ? MESES_NOME[parseInt(meses[0].slice(0,2),10)-1]+'/'+meses[0].slice(3) : '';
+  return { total: somaValores(recebidos), qtd: recebidos.length, desde: primeiro };
+}
 let MESES_NOME = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 // Feriados nacionais fixos (MM-DD) — não contam como dia útil.
 let FERIADOS_FIXOS = ['01-01','04-21','05-01','09-07','10-12','11-02','11-15','11-20','12-25'];
@@ -1700,7 +1718,10 @@ function faturamentoAtual() {
   return {
     chave: chave, nome: MESES_NOME[refMes0], proxNome: MESES_NOME[proxMes0],
     fim: String(fim.getDate()).padStart(2,'0') + '/' + String(fim.getMonth()+1).padStart(2,'0'),
-    itens: itens, total: itens.reduce(function(s,r){ return s+r.value; }, 0),
+    itens: itens,
+    recebido: somaValores(itens.filter(function(r){ return r.status === 'recebido'; })),
+    aReceber: somaValores(itens.filter(function(r){ return r.status === 'a_receber'; })),
+    fechado: somaValores(itens),
   };
 }
 
