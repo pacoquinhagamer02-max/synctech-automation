@@ -442,6 +442,11 @@ details[open] summary { margin-bottom: 4px; }
         <button class="qa-btn" onclick="goPage('config')">➕ Novo cliente</button>
       </div>
       <div class="card">
+        <h2 class="card-title" id="home-recebido-title">Recebido</h2>
+        <div class="card-sub" id="home-recebido-sub"></div>
+        <div id="home-recebido"></div>
+      </div>
+      <div class="card">
         <h2 class="card-title">Serviços avulsos deste mês</h2>
         <div class="card-sub">Cobrança única, fora dos planos fixos</div>
         <div id="home-avulsos"></div>
@@ -1067,7 +1072,6 @@ let pipelineData = [
   { stage: 'Proposta', leads: [] },
   { stage: 'Fechado', leads: [
     { name:'Moisés Martins',  biz:'Barbearia Martins — R$1.200 fixo + 10% (R$160) por prótese fechada via WhatsApp/Instagram', val:1200, time:'Cliente ativo', src:'wa', phone:'31982800596' },
-    { name:'Padaria Cantinho do Pão', biz:'Padaria Cantinho do Pão — Plano Pro: R$1.000/mês (tráfego pago + aplicativo personalizado)', val:1000, time:'Contrato de 3 meses a assinar em 10/09/2026', src:'wa', phone:'553137913010' },
   ]},
 ];
 
@@ -1162,10 +1166,10 @@ function renderHome() {
   let martinsStats = CLIENTS_FIXED[0] && CLIENTS_FIXED[0].stats ? CLIENTS_FIXED[0].stats : null;
   let martinsGoal = martinsStats ? martinsStats.goal : null;
 
-  let avulsosMes = avulsosMesTotal();
+  let fat = faturamentoAtual();
   let kpis = [
+    { label:'Recebido · faturamento de '+fat.nome, val: 'R$'+fat.total.toLocaleString('pt-BR'), delta: fat.itens.length+' pagamento(s) · conta até '+fat.fim, cls:'up' },
     { label:'Clientes fechados', val: fechados.length, delta: 'MRR ~R$'+mrr.toLocaleString('pt-BR'), cls:'up' },
-    { label:'A receber este mês', val: 'R$'+(mrr+avulsosMes).toLocaleString('pt-BR'), delta: 'R$'+mrr.toLocaleString('pt-BR')+' fixo + R$'+avulsosMes.toLocaleString('pt-BR')+' avulso', cls:'up' },
     { label:'Leads em aberto',   val: abertos, delta: 'no funil agora', cls:'up' },
     { label:'Serviços ativos',   val: ativos+'/'+SERVICES.length, delta: (SERVICES.length-ativos)+' pendentes de config', cls: (SERVICES.length-ativos)>0 ? 'warn':'up' },
   ];
@@ -1184,7 +1188,19 @@ function renderHome() {
   }).join('');
 
   document.getElementById('home-summary').innerHTML =
-    'Você tem <b>'+CLIENTS_FIXED.length+' cliente'+(CLIENTS_FIXED.length===1?'':'s')+' fixo'+(CLIENTS_FIXED.length===1?'':'s')+'</b> e já soma <b>R$'+(mrr+avulsosMes).toLocaleString('pt-BR')+'</b> pra receber este mês.';
+    'Faturamento de <b>'+fat.nome+'</b>: você já recebeu <b>R$'+fat.total.toLocaleString('pt-BR')+'</b>. Essa conta fica aberta até <b>'+fat.fim+'</b> (5º dia útil) e depois vira faturamento de '+fat.proxNome+'.';
+
+  document.getElementById('home-recebido-title').textContent = 'Recebido · faturamento de '+fat.nome;
+  document.getElementById('home-recebido-sub').textContent = 'Conta até '+fat.fim+' (5º dia útil) · depois começa '+fat.proxNome;
+  document.getElementById('home-recebido').innerHTML = (fat.itens.length
+    ? fat.itens.map(function(r){
+        return '<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--border)">' +
+          '<div><div style="font-size:0.86rem;font-weight:600">'+escapeHtml(r.client)+'</div><div style="font-size:0.74rem;color:var(--muted)">'+escapeHtml(r.desc)+'</div></div>' +
+          '<div class="report-badge" style="flex-shrink:0">R$'+r.value.toLocaleString('pt-BR')+'</div>' +
+        '</div>';
+      }).join('') +
+      '<div style="display:flex;justify-content:space-between;align-items:center;padding:11px 0 2px;border-top:1px solid var(--border-s);font-weight:700"><span>Total</span><span>R$'+fat.total.toLocaleString('pt-BR')+'</span></div>'
+    : '<div style="font-size:0.8rem;color:var(--muted);padding:8px 0">Nenhum pagamento lançado em '+fat.nome+' ainda.</div>');
 
   let avulsosDoMes = AVULSOS.filter(function(a){ return a.month === currentMonthKey(); });
   document.getElementById('home-avulsos').innerHTML = avulsosDoMes.length
@@ -1642,65 +1658,51 @@ let CLIENTS_FIXED = [
         { done:true, text:'Tráfego pago ligado — R$15–20/dia, raio 60km (Mariana + Ouro Preto/Itabirito/Congonhas), homens 30–55. Cobrança da gestão (tabela 2026: R$1.000/mês) ainda não decidida — hoje sem custo extra pra ela. O contrato atual de R$1.200 é anterior à tabela nova.' },
       ],
     }},
-    { name:'Padaria Cantinho do Pão', plan:'Plano Pro — R$1.000/mês (valor anterior à tabela de out/2026, onde o Pro é R$2.797), contrato de 3 meses (assinatura prevista 10/09/2026) + R$899 de implantação já quitado. Verba de anúncio custeada pela cliente, direto na plataforma.', links:[
-      { label:'Cardápio-app', url:'https://cantinhodopaomariana.netlify.app/' },
-      { label:'WhatsApp', url:'https://wa.me/553137913010' },
-      { label:'Instagram', url:'https://www.instagram.com/padaria__cantinho_do_pao/' },
-      { label:'Contrato', url:'https://claude.ai/code/artifact/3319631c-c16f-4d5b-a1c9-2062feb25819' },
-      { label:'Proposta', url:'https://claude.ai/code/artifact/96406329-605b-45b0-b6aa-71fb68fd54bd' },
-    ],
-    // Dados reais coletados do Google/Instagram durante a proposta, 05/09/2026 — foto do momento, não é live.
-    stats: {
-      collectedAt: '05/09/2026',
-      followers: 2488,
-      googleRating: 4.5,
-      googleReviews: 74,
-      // Seguidores dia a dia via WebFetch (tarefa synctech-dados-diarios).
-      // É o único dado diário real que existe pra ela hoje — pedidos/vendas
-      // só entram aqui quando PEDIDOS_LOG_URL estiver ligado.
-      history: [
-        { date: '08/09/2026', followers: 2487 },
-        { date: '09/09/2026', followers: 2487 },
-        { date: '23/09/2026', followers: 2485 },
-        { date: '27/09/2026', followers: 2478 },
-        { date: '05/10/2026', followers: 2481 },
-        { date: '13/10/2026', followers: 2474 },
-      ],
-      // Só entra em "active" o que está de fato no ar e sendo entregue. O que está
-      // contratado mas ainda não ligado fica em "pending" — este bloco alimenta o
-      // relatório que a cliente recebe, então não pode inflar entrega.
-      servicesUsed: {
-        active: [
-          'Aplicativo Personalizado — cardápio-app no ar, com carrinho, encomenda de bolo e checkout formatado direto no WhatsApp',
-        ],
-        pending: [
-          'Tráfego Pago (Meta Ads) — incluso no plano, campanha ainda não ativada (verba custeada pela cliente, direto na plataforma)',
-          'Medição de pedidos — registro implementado no app, falta criar a planilha e ligar a URL',
-          'Pagamento por Pix no app — sistema pronto e testado, falta só a chave Pix da padaria',
-          'Nota fiscal (NFC-e) para pedidos do app — aguardando confirmar qual sistema a padaria já usa nas vendas do balcão',
-          'Conteúdo para Instagram — 4 Reels por mês inclusos no contrato, produção ainda não começou',
-          'Relatório mensal — começa no primeiro dia 30 após a assinatura',
-        ],
-        notUsed: 'WhatsApp Bot 24/7 (exige Z-API, serviço pago à parte) · Agendamento Online e Link na Bio (padaria não trabalha com horário marcado) · Instagram Automático, Gestão de Reputação e Email Marketing (não contratados).',
-      },
-      actionPlan: [
-        { done:true,  text:'Cardápio-app publicado com carrinho e checkout formatado direto no WhatsApp (nome, endereço, itens, total) — dois links no ar: domínio limpo (cantinhodopao) e o original (synctech-automation).' },
-        { done:true,  text:'App instalável na tela inicial do celular, com service worker e histórico de pedidos por aparelho.' },
-        { done:true,  text:'Encomenda de bolo inteiro: formulário com sabor, tamanho, data e escrita no bolo, sem preço fixo — pede orçamento e a padaria confirma.' },
-        { done:true,  text:'Revisão de acessibilidade do app: corrigido um problema real de navegação por teclado, garantindo que funcione bem também com teclado e leitores de tela.' },
-        { done:false, text:'ASSINAR o contrato de 3 meses (previsto para 10/09/2026) — proposta aceita, contrato ainda não assinado.' },
-        { done:false, text:'Ligar a medição de pedidos: criar a planilha, publicar o Apps Script e colar a URL em PEDIDOS_LOG_URL. Guia pronto em padaria-cantinho-do-pao/MEDICAO-DE-PEDIDOS.md.' },
-        { done:false, text:'Criar conta de anúncios separada no Business Manager da cliente, com o cartão dela, e ativar a campanha de tráfego pago — segmentação para quem já conhece a padaria mas não sabe que tem entrega.' },
-        { done:false, text:'Gerar/fotografar as 3 fotos que ainda faltam no cardápio (bolo de fubá, café coado, suco natural) — os outros 10 itens já têm foto.' },
-        { done:false, text:'Ativar o pagamento por Pix no app: sistema já pronto e testado, falta só a padaria informar a chave Pix dela.' },
-        { done:false, text:'Nota fiscal (NFC-e) para pedidos do app: aguardando a padaria confirmar qual sistema ela já usa pra emitir nota nas vendas do balcão, pra reaproveitar ou definir o que falta contratar.' },
-        { done:false, text:'Definir com a cliente: taxa e área de entrega, valor mínimo de pedido, e os itens realmente mais vendidos (hoje o app aceita qualquer endereço sem taxa nem mínimo, e o destaque do cardápio é baseado em avaliação, não em venda).' },
-        { done:false, text:'Iniciar a produção dos 4 Reels/mês pro Instagram da padaria, inclusos no contrato — ainda não começou.' },
-      ],
-    }},
   ];
 // Nota: CRM/Avaliação/Dashboard financeiro dela ainda são arquivos locais (barbearia-martins-ferramentas/),
 // sem site publicado — não linkar aqui até estarem hospedados, senão quebra no celular.
+
+// ═══════════════ DADOS: RECEBIDO NO MÊS (dinheiro que já entrou) ═══════════════
+// ref = mês de faturamento (MM/AAAA). O faturamento de um mês fica aberto até o
+// 5º dia útil do mês seguinte; depois disso o painel troca sozinho pro mês novo.
+let RECEBIMENTOS = [
+  { client:'Mina Jeje', desc:'Site vendido', value:2000, ref:'11/2026' },
+  { client:'Laís (Depilart)', desc:'Contrato fechado', value:6000, ref:'11/2026' },
+  { client:'Moisés (Barbearia Martins)', desc:'Pagamento recebido', value:1100, ref:'11/2026' },
+];
+let MESES_NOME = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+// Feriados nacionais fixos (MM-DD) — não contam como dia útil.
+let FERIADOS_FIXOS = ['01-01','04-21','05-01','09-07','10-12','11-02','11-15','11-20','12-25'];
+function quintoDiaUtil(ano, mes0) {
+  let d = new Date(ano, mes0, 1), uteis = 0;
+  while (true) {
+    let dow = d.getDay();
+    let md = String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+    if (dow !== 0 && dow !== 6 && FERIADOS_FIXOS.indexOf(md) === -1) { uteis++; if (uteis === 5) return d; }
+    d.setDate(d.getDate()+1);
+  }
+}
+function chaveMes(ano, mes0) { return String(mes0+1).padStart(2,'0') + '/' + ano; }
+// Mês de faturamento aberto hoje: até o 5º dia útil ainda conta o mês anterior
+// (se ele tiver recebimentos lançados); depois disso, o mês atual.
+function faturamentoAtual() {
+  let hoje = new Date(); hoje.setHours(0,0,0,0);
+  let ano = hoje.getFullYear(), mes0 = hoje.getMonth();
+  let antAno = mes0 === 0 ? ano-1 : ano, antMes0 = mes0 === 0 ? 11 : mes0-1;
+  let chaveAnt = chaveMes(antAno, antMes0);
+  let temAnt = RECEBIMENTOS.some(function(r){ return r.ref === chaveAnt; });
+  let refAno = ano, refMes0 = mes0;
+  if (temAnt && hoje <= quintoDiaUtil(ano, mes0)) { refAno = antAno; refMes0 = antMes0; }
+  let proxAno = refMes0 === 11 ? refAno+1 : refAno, proxMes0 = refMes0 === 11 ? 0 : refMes0+1;
+  let fim = quintoDiaUtil(proxAno, proxMes0);
+  let chave = chaveMes(refAno, refMes0);
+  let itens = RECEBIMENTOS.filter(function(r){ return r.ref === chave; });
+  return {
+    chave: chave, nome: MESES_NOME[refMes0], proxNome: MESES_NOME[proxMes0],
+    fim: String(fim.getDate()).padStart(2,'0') + '/' + String(fim.getMonth()+1).padStart(2,'0'),
+    itens: itens, total: itens.reduce(function(s,r){ return s+r.value; }, 0),
+  };
+}
 
 // ═══════════════ DADOS: SERVIÇOS AVULSOS (cobrança única, sem plano fixo mensal) ═══════════════
 // month no formato MM/AAAA — usado pra somar "quanto entrou esse mês" na aba Avulsos e no KPI do Início.
