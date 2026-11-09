@@ -1675,6 +1675,9 @@ let CLIENTS_FIXED = [
 // status: 'recebido' (dinheiro já entrou) ou 'a_receber' (fechado, ainda vai entrar no mês).
 // "Total da empresa" soma tudo que tem status 'recebido', de todos os meses.
 let RECEBIMENTOS = [
+  { client:'Padaria Cantinho do Pão', desc:'Mensalidade (contrato encerrado)', value:1000, ref:'09/2026', status:'recebido' },
+  { client:'Padaria Cantinho do Pão', desc:'Mensalidade (contrato encerrado)', value:1000, ref:'10/2026', status:'recebido' },
+  { client:'Moisés (Barbearia Martins)', desc:'Pagamento recebido', value:1600, ref:'10/2026', status:'recebido' },
   { client:'Mina Jeje', desc:'Site vendido', value:2000, ref:'11/2026', status:'recebido' },
   { client:'Laís (Depilart)', desc:'Contrato fechado', value:6000, ref:'11/2026', status:'recebido' },
   { client:'Moisés (Barbearia Martins)', desc:'Pagamento recebido', value:1100, ref:'11/2026', status:'recebido' },
@@ -1706,11 +1709,15 @@ function chaveMes(ano, mes0) { return String(mes0+1).padStart(2,'0') + '/' + ano
 function faturamentoAtual() {
   let hoje = new Date(); hoje.setHours(0,0,0,0);
   let ano = hoje.getFullYear(), mes0 = hoje.getMonth();
-  let antAno = mes0 === 0 ? ano-1 : ano, antMes0 = mes0 === 0 ? 11 : mes0-1;
-  let chaveAnt = chaveMes(antAno, antMes0);
-  let temAnt = RECEBIMENTOS.some(function(r){ return r.ref === chaveAnt; });
+  // Fica aberto o último mês lançado até o 5º dia útil do mês seguinte a ele;
+  // passou disso, abre o mês corrente.
   let refAno = ano, refMes0 = mes0;
-  if (temAnt && hoje <= quintoDiaUtil(ano, mes0)) { refAno = antAno; refMes0 = antMes0; }
+  let ultimo = RECEBIMENTOS.map(function(r){ return r.ref.slice(3) + r.ref.slice(0,2); }).sort().pop();
+  if (ultimo) {
+    let uAno = parseInt(ultimo.slice(0,4),10), uMes0 = parseInt(ultimo.slice(4),10)-1;
+    let limite = uMes0 === 11 ? quintoDiaUtil(uAno+1, 0) : quintoDiaUtil(uAno, uMes0+1);
+    if ((uAno < ano || (uAno === ano && uMes0 <= mes0)) && hoje <= limite) { refAno = uAno; refMes0 = uMes0; }
+  }
   let proxAno = refMes0 === 11 ? refAno+1 : refAno, proxMes0 = refMes0 === 11 ? 0 : refMes0+1;
   let fim = quintoDiaUtil(proxAno, proxMes0);
   let chave = chaveMes(refAno, refMes0);
