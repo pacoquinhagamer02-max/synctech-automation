@@ -5,14 +5,14 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%239B5CFF'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='Georgia,serif' font-weight='700' font-size='18' fill='%23ffffff'%3ES%3C/text%3E%3C/svg%3E">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>SyncTech Automation | Atendimento no automático 24h</title>
-<meta name="description" content="WhatsApp Bot, agendamento automático, Instagram e CRM para pequenos negócios. Setup em 7 dias, com site incluído, a partir de R$697/mês.">
+<meta name="description" content="Atendente de IA no WhatsApp, site próprio e Google em dia para pequenos negócios de Mariana, Ouro Preto e região. Atendente pronto em 7 dias, a partir de R$497/mês.">
 <meta name="theme-color" content="#0A0714">
 <link rel="canonical" href="https://pacoquinhagamer02-max.github.io/synctech-automation/">
 
 <meta property="og:type" content="website">
 <meta property="og:locale" content="pt_BR">
 <meta property="og:title" content="SyncTech Automation | Atendimento no automático 24h">
-<meta property="og:description" content="WhatsApp Bot, agendamento automático, Instagram e CRM para pequenos negócios. Setup em 7 dias, com site incluído, a partir de R$697/mês.">
+<meta property="og:description" content="Atendente de IA no WhatsApp, site próprio e Google em dia para pequenos negócios de Mariana, Ouro Preto e região. Atendente pronto em 7 dias, a partir de R$497/mês.">
 <meta property="og:url" content="https://pacoquinhagamer02-max.github.io/synctech-automation/">
 <meta name="twitter:card" content="summary_large_image">
 
@@ -219,17 +219,17 @@ const PROVA = {
     'Case real: +18% em 23 dias',
     'Setup em 7 dias',
     'Atendimento 24/7',
-    'WhatsApp Bot',
-    'Instagram automático',
+    'Atendente de IA no WhatsApp',
+    'Site próprio',
     'Agendamento',
-    'CRM com pipeline',
-    'Tráfego pago',
+    'Google em Dia',
+    'Anúncios',
     'Feito no Brasil'
   ],
   stats: [
     ['+18%',   'Crescimento real em 23 dias'],
     ['24h',    'Atendimento contínuo'],
-    ['R$697',  'A partir de, por mês'],
+    ['R$497',  'A partir de, por mês'],
     ['7 dias', 'Para estar no ar']
   ],
   caso: {
@@ -397,7 +397,7 @@ function BarraProgresso() {
 /* ═══════════════ Navbar ═══════════════ */
 const LINKS = [
   ['Serviços', '#servicos'], ['Calculadora', '#calculadora'], ['iFood x Você', '#ifood'], ['Processo', '#processo'],
-  ['Planos', '#planos'], ['FAQ', '#faq'], ['Contato', '#contato']
+  ['Preços', '#planos'], ['FAQ', '#faq'], ['Contato', '#contato']
 ];
 
 function Navbar() {
@@ -483,7 +483,7 @@ function MockWhatsApp() {
       'Corte Masculino — R$45 (45 min)', 'Corte + Barba — R$70 (75 min)', '',
       'Para amanhã temos: 09:00 · 11:00 · 14:30 · 16:00', '', 'Qual serviço e horário prefere?'] },
     { de: 'cliente', txt: 'Corte + barba às 14h30!', h: '14:23' },
-    { de: 'bot', h: '14:23', linhas: ['Agendado com sucesso!', 'Amanhã · 14h30', 'Corte + Barba · R$70', '', 'Você recebe um lembrete 1h antes. Até lá!'] }
+    { de: 'bot', h: '14:23', linhas: ['Agendado com sucesso!', 'Amanhã · 14h30', 'Corte + Barba · R$70', '', 'Você recebe um lembrete na véspera. Até lá!'] }
   ];
   return html`
     <div data-tilt className="card relative w-full max-w-sm rounded-3xl p-5 shadow-2xl">
@@ -492,7 +492,7 @@ function MockWhatsApp() {
           <${Ico} d=${ICONES.whats} className="h-5 w-5" />
         </div>
         <div className="min-w-0">
-          <p className="truncate font-disp text-sm font-bold">WhatsApp Business — Bot</p>
+          <p className="truncate font-disp text-sm font-bold">SyncTech Atende</p>
           <p className="flex items-center gap-1.5 text-xs text-txt3">
             <span className="pontinho-vivo h-1.5 w-1.5 rounded-full bg-emerald-400"></span>online agora
           </p>
@@ -528,8 +528,8 @@ function Hero() {
             <span className="linha text-txt">no automático.</span>
           </h1>
           <p className="mt-6 max-w-xl text-lg leading-relaxed text-txt2">
-            WhatsApp Bot, agendamento online, Instagram automático e CRM — tudo em um hub que faz
-            seu negócio crescer enquanto você descansa.
+            Um atendente de IA que responde seu WhatsApp, um site que te representa e o Google
+            trazendo cliente novo — tudo pra seu negócio crescer enquanto você descansa.
           </p>
           <div className="mt-9 flex flex-col gap-3 sm:flex-row">
             <${BtnPrimario} href="#contato" glow=${true}>
@@ -569,41 +569,27 @@ function Hero() {
     </section>`;
 }
 
-/* ═══════════════ Serviços — os 14 serviços + 2 em desenvolvimento ═══════════════ */
+/* ═══════════════ Serviços — a oferta de nov/2026 ═══════════════
+   Fonte única: docs/estrategia/Tabela-SyncTech-2026-11.md. Mudou lá, muda aqui. */
+const ATENDE_URL = 'https://synctech-sistemas.pages.dev/atende/';
+const MODULOS_URL = 'https://synctech-sistemas.pages.dev';
+
 const SERVICOS = [
-  { ico: ICONES.whats, nome: 'WhatsApp Bot 24/7', tag: 'Mais popular', grande: true,
-    txt: 'Atende clientes, responde perguntas, agenda horários e fecha vendas automaticamente enquanto você dorme.',
-    itens: ['Responde em segundos, a qualquer hora', 'Agenda e confirma sozinho', 'Qualifica o lead antes de chegar em você', 'Passa pra pessoa quando o caso é complexo'] },
-  { ico: ICONES.insta, nome: 'Instagram Automático', tag: 'Novo',
-    txt: 'Comentou, recebe DM. Seguiu, recebe boas-vindas. Mencionou nos Stories, tem resposta. Agendamento direto pelo DM.' },
-  { ico: ICONES.agenda, nome: 'Agendamento Online', tag: 'Novo',
-    txt: 'Agenda 24h integrada ao WhatsApp. O cliente marca pelo link, pelo site ou pelo bot — com lembrete automático.' },
-  { ico: ICONES.crm, nome: 'CRM com Pipeline',
-    txt: 'Kanban de leads (Novo, Contatado, Fechado) e histórico por cliente: visitas, total gasto, último serviço. Envio em massa por estágio.' },
-  { ico: ICONES.email, nome: 'Email Marketing', tag: 'Em breve',
-    txt: 'Sequências automáticas para clientes e leads. Templates prontos e métricas em tempo real.' },
-  { ico: ICONES.link, nome: 'Link na Bio', tag: 'Novo',
-    txt: 'Página mobile-first pro Instagram: serviços com preço, agendar, WhatsApp e avaliação do Google num link só.' },
-  { ico: ICONES.estrela, nome: 'Gestão de Reputação',
-    txt: 'Pede avaliação depois do atendimento. Nota 1 a 3 vira feedback privado; nota 4 e 5 vai direto pro Google.' },
-  { ico: ICONES.catalogo, nome: 'Catálogo Digital',
-    txt: 'Cardápio ou catálogo visual online. O cliente vê, escolhe e pede direto pelo WhatsApp — sem PDF.' },
-  { ico: ICONES.chat, nome: 'Chat ao Vivo no Site', tag: 'Em breve',
-    txt: 'Widget que captura visitante, responde dúvida e encaminha pro WhatsApp automaticamente.' },
-  { ico: ICONES.grafico, nome: 'Dashboard de Métricas',
-    txt: 'Agendamentos, receita, clientes novos e performance do bot — em tempo real.' },
-  { ico: ICONES.site, nome: 'Site personalizado', tag: 'Novo',
-    txt: 'Página própria do negócio: serviços com preço, endereço, horário e botão de WhatsApp sempre à vista. Nos planos, o Link na Bio sai de graça.' },
-  { ico: ICONES.celular, nome: 'Aplicativo Personalizado',
-    txt: 'Seu negócio vira aplicativo na tela do cliente, sem loja de aplicativo. Pedido, carrinho, Pix com QR Code e "pedir de novo" num toque.' },
-  { ico: ICONES.mapa, nome: 'SEO Local no Google', tag: 'Novo',
-    txt: 'Aparecer quando alguém da sua cidade procura o que você vende. Perfil escrito, palavras locais e 8 publicações por mês.' },
-  { ico: ICONES.folha, nome: 'Relatório de Resultados',
-    txt: 'Todo mês, uma página com o que foi feito e o que saiu disso em número — sem você abrir planilha.' },
-  { ico: ICONES.nota, nome: 'Nota Fiscal no pedido',
-    txt: 'Cada venda feita pelo aplicativo sai com nota fiscal autorizada, sem ninguém digitar nada de novo no caixa.' },
-  { ico: ICONES.alvo, nome: 'Gestão de Tráfego Pago', tag: 'Novo',
-    txt: 'Campanhas no Meta Ads criadas e otimizadas pra trazer cliente novo toda semana. A verba vai direto pra plataforma; você paga só a gestão.' }
+  { ico: ICONES.whats, nome: 'SyncTech Atende — atendente de IA no WhatsApp', tag: 'Produto principal', grande: true,
+    txt: 'Responde seus clientes no WhatsApp a qualquer hora, por texto e por áudio, agenda horário e lembra o cliente na véspera. Quando o caso pede uma pessoa, passa a conversa pra você.',
+    itens: ['Responde em segundos, de madrugada, domingo e feriado', 'Agenda, confirma e lembra na véspera', 'Chama de novo quem pediu preço e não fechou', 'API oficial do WhatsApp: nada de QR code'],
+    href: ATENDE_URL, cta: 'Conhecer o SyncTech Atende' },
+  { ico: ICONES.site, nome: 'Site do seu negócio',
+    txt: 'Essencial: uma página bem feita no celular, com serviços ou cardápio, WhatsApp, mapa e Link na Bio, pronta em 5 dias. Premium: várias páginas, animação e uma função exclusiva do seu ramo, pronto em 10 dias.' },
+  { ico: ICONES.caixa, nome: 'Módulos do seu ramo',
+    txt: 'Sistemas prontos que encaixam no site ou no atendente: fidelidade no celular, cobrança por Pix, orçamento em 2 minutos, vagas de evento, pedido sem iFood e reserva sem Booking.',
+    href: MODULOS_URL, cta: 'Ver as demonstrações' },
+  { ico: ICONES.mapa, nome: 'Google em Dia',
+    txt: 'Seu perfil do Google arrumado e cuidado todo mês: fotos, posts e resposta às avaliações, pra aparecer quando procuram na sua cidade.' },
+  { ico: ICONES.alvo, nome: 'Anúncios',
+    txt: 'Anúncio no Instagram, no Facebook e no Google levando cliente novo direto pro seu WhatsApp. A verba vai direto pra plataforma.' },
+  { ico: ICONES.celular, nome: 'Aplicativo próprio', tag: 'Sob orçamento',
+    txt: 'Seu negócio vira aplicativo na tela do cliente, sem loja de aplicativo: pedido, carrinho e Pix num toque.' }
 ];
 
 function Servicos() {
@@ -612,8 +598,8 @@ function Servicos() {
       <div className="mx-auto max-w-6xl">
         <${Reveal}>
           <${TituloSecao} tag="O hub completo"
-            titulo=${html`14 serviços em uma <span className="texto-gradiente">única mensalidade</span>`}
-            sub="Tudo que seu negócio precisa pra automatizar, atender melhor e vender mais — sem equipe técnica." />
+            titulo=${html`Atender, ser achado e <span className="texto-gradiente">vender mais</span>`}
+            sub="Um atendente de IA no seu WhatsApp, um site que te representa e o Google trazendo cliente novo — sem você precisar de equipe técnica." />
         <//>
         <div className="grid gap-4 md:grid-cols-3">
           ${SERVICOS.map((s, i) => html`
@@ -622,14 +608,14 @@ function Servicos() {
               <article className=${'card relative h-full rounded-3xl p-7 ' + (s.grande ? 'md:p-9' : '')}>
                 ${s.tag && html`
                   <span className=${'absolute right-5 top-5 rounded-full px-3 py-1 text-[10px] font-extrabold uppercase tracking-wide ' +
-                      (s.tag === 'Mais popular' ? 'bg-violeta text-white' : s.tag === 'Em breve' ? 'border border-amber-400/40 bg-amber-400/10 text-amber-300' : 'border border-linha bg-surf text-lilas')}>
+                      (s.tag === 'Produto principal' ? 'bg-violeta text-white' : s.tag === 'Em breve' ? 'border border-amber-400/40 bg-amber-400/10 text-amber-300' : 'border border-linha bg-surf text-lilas')}>
                     ${s.tag}
                   </span>`}
                 <div className=${'mb-5 grid place-items-center rounded-2xl bg-violeta/15 text-violeta ' +
                     (s.grande ? 'h-14 w-14' : 'h-12 w-12')}>
                   <${Ico} d=${s.ico} className=${s.grande ? 'h-7 w-7' : 'h-6 w-6'} />
                 </div>
-                <h3 className=${'pr-24 font-disp font-bold ' + (s.grande ? 'text-2xl md:text-3xl' : 'text-lg')}>${s.nome}</h3>
+                <h3 className=${'font-disp font-bold ' + (s.tag ? 'pr-28 ' : '') + (s.grande ? 'text-2xl md:text-3xl' : 'text-lg')}>${s.nome}</h3>
                 <p className=${'mt-3 leading-relaxed text-txt2 ' + (s.grande ? 'text-lg' : 'text-sm')}>${s.txt}</p>
                 ${s.itens && html`
                   <ul className="mt-7 grid gap-3 sm:grid-cols-2">
@@ -640,6 +626,12 @@ function Servicos() {
                         </span>${it}
                       </li>`)}
                   </ul>`}
+                ${s.href && html`
+                  <a href=${s.href} target="_blank" rel="noopener"
+                     className=${'mt-6 inline-flex items-center gap-2 font-semibold text-lilas underline decoration-violeta/60 underline-offset-4 transition hover:text-violeta ' +
+                       (s.grande ? 'text-base' : 'text-sm')}>
+                    ${s.cta} <${Ico} d=${ICONES.seta} className="h-4 w-4" />
+                  </a>`}
               </article>
             <//>`)}
         </div>
@@ -648,7 +640,8 @@ function Servicos() {
 }
 
 /* ═══════════════ Calculadora de ROI ═══════════════ */
-const CUSTO_MES = 697; // plano Starter, o de entrada. Tem de acompanhar PLANOS[0].mensal.
+const CUSTO_MES = 497;        // SyncTech Atende Essencial, o de entrada. Tem de acompanhar ATENDE[0].mensal.
+const CUSTO_IMPLANTACAO = 1500; // implantação do Atende Essencial, paga uma vez. Acompanha ATENDE[0].implantacao.
 
 function Slider({ rotulo, valor, min, max, passo, onChange, formata, dica }) {
   const pct = ((valor - min) / (max - min)) * 100;
@@ -707,7 +700,7 @@ function Calculadora() {
     const porReativacao = clientes * ((100 - retorno) / 100) * 0.08 * ticket;
     const ganhoMes = porResposta + porReativacao;
     const horasAno = horas * 22 * 12;
-    const sobraAno = (ganhoMes - CUSTO_MES) * 12;
+    const sobraAno = (ganhoMes - CUSTO_MES) * 12 - CUSTO_IMPLANTACAO;
     const roi = ((ganhoMes - CUSTO_MES) / CUSTO_MES) * 100;
     return { ganhoMes, horasAno, sobraAno, roi };
   }, [clientes, ticket, retorno, horas]);
@@ -745,7 +738,7 @@ function Calculadora() {
                 <${CartaoResultado} rotulo="Horas devolvidas por ano" valor=${r.horasAno} sufixo="h"
                                     ativo=${ativo} formata=${num} />
                 <div className="sm:col-span-2">
-                  <${CartaoResultado} rotulo=${'Sobra no ano, já pagando o plano Starter de ' + brl(CUSTO_MES) + '/mês'}
+                  <${CartaoResultado} rotulo=${'Sobra no 1º ano, já pagando o Atende Essencial (' + brl(CUSTO_MES) + '/mês + ' + brl(CUSTO_IMPLANTACAO) + ' de implantação)'}
                                       valor=${r.sobraAno} ativo=${ativo} formata=${brl} />
                 </div>
                 <p className="text-xs leading-relaxed text-txt3 sm:col-span-2">
@@ -767,7 +760,7 @@ function Calculadora() {
 
 /* ═══════════════ Calculadora "quanto o iFood te custa" ═══════════════
    Compara o que a loja paga ao iFood com levar os clientes que já são dela
-   pro canal próprio: Cardápio Online da SyncTech + motoboy pelo Marca aí.
+   pro canal próprio: módulo Pedido Direto da SyncTech + motoboy pelo Marca aí.
    Taxas públicas do iFood em 2026 (guias de mercado; a loja deve conferir no painel dela):
    - iFood entrega: 23% de comissão + 3,2% de pagamento online, R$ 150/mês;
    - loja entrega:  12% de comissão + 3,2% de pagamento online, R$ 110/mês;
@@ -779,7 +772,8 @@ const IFOOD = {
   propria: { rot: 'Eu entrego',      nota: 'com entrega própria',  taxa: 0.12,  pagto: 0.032, mensal: 110 }
 };
 const IFOOD_PISO_MENSAL = 1800;
-const CARDAPIO_MES = 147;          // Catálogo Digital / Cardápio Online avulso (já incluso no Starter)
+const CARDAPIO_MES = 147;          // módulo Pedido Direto (pedido sem iFood): R$ 147/mês
+const CARDAPIO_UNICO = 1200;       // e R$ 1.200 uma vez para montar
 const MARCAAI_PCT = 0.15;          // taxa do Marca aí: 15% do frete, paga pela loja
 const MARCAAI_MIN = 1, MARCAAI_MAX = 3;
 const freteMarcaAi = (km) => 8 + Math.max(0, km - 3) * 2;  // mesma tabela do app Marca aí
@@ -797,7 +791,7 @@ function calcularEconomia({ pedidos, ticket, plano, pct, km }) {
   const depoisIfood = ficam * porPedidoIfood + mensalidade(ficam * ticket);
   const depoisProprio = levados * porPedidoMarcaAi + CARDAPIO_MES;
   const depois = depoisIfood + depoisProprio;
-  return { hoje, depois, economiaMes: hoje - depois, economiaAno: (hoje - depois) * 12,
+  return { hoje, depois, economiaMes: hoje - depois, economiaAno: (hoje - depois) * 12 - CARDAPIO_UNICO,
            porPedidoIfood, porPedidoMarcaAi, levados, frete };
 }
 
@@ -846,7 +840,7 @@ function CalculadoraIfood() {
         <${Reveal}>
           <${TituloSecao} tag="Delivery próprio"
             titulo=${html`Quanto o iFood <span className="text-red-400">te custa</span> — e quanto <span className="texto-gradiente">sobra no seu bolso</span>`}
-            sub="Continue no iFood pra ganhar cliente novo. Quem já pede de você, traga pro seu Cardápio Online com motoboy pelo Marca aí." />
+            sub="Continue no iFood pra ganhar cliente novo. Quem já pede de você, traga pro seu Pedido Direto com motoboy pelo Marca aí." />
         <//>
         <${Reveal} delay=${90}>
           <div ref=${ref} className="card overflow-hidden rounded-3xl p-7 sm:p-10">
@@ -872,9 +866,9 @@ function CalculadoraIfood() {
                                       destaque=${true} ativo=${ativo} formata=${brl} />
                 </div>
                 <${CartaoResultado} rotulo="Hoje você paga ao iFood" valor=${r.hoje} ativo=${ativo} formata=${brl} />
-                <${CartaoResultado} rotulo="Com Cardápio + Marca aí" valor=${r.depois} ativo=${ativo} formata=${brl} />
+                <${CartaoResultado} rotulo="Com Pedido Direto + Marca aí" valor=${r.depois} ativo=${ativo} formata=${brl} />
                 <div className="sm:col-span-2">
-                  <${CartaoResultado} rotulo="Economia em 12 meses" valor=${r.economiaAno} ativo=${ativo} formata=${brl} />
+                  <${CartaoResultado} rotulo="Economia no 1º ano (já descontada a montagem)" valor=${r.economiaAno} ativo=${ativo} formata=${brl} />
                 </div>
                 <div className="card rounded-2xl p-5 sm:col-span-2">
                   <p className="text-xs font-semibold uppercase tracking-wider text-txt3">Em cada pedido levado pro seu canal</p>
@@ -886,11 +880,11 @@ function CalculadoraIfood() {
                   </div>
                 </div>
                 ${!compensa && html`<p className="text-sm font-semibold text-txt2 sm:col-span-2">
-                  Com poucos pedidos no seu canal, o cardápio ainda não se paga. Aumente os pedidos levados pro canal próprio ou fale com a gente.</p>`}
+                  Com poucos pedidos no seu canal, o Pedido Direto ainda não se paga. Aumente os pedidos levados pro canal próprio ou fale com a gente.</p>`}
                 <p className="text-xs leading-relaxed text-txt3 sm:col-span-2">
                   Estimativa com as taxas públicas do iFood em 2026 (${p.nota}: ${String(Math.round(p.taxa * 1000) / 10).replace('.', ',')}% de comissão
                   + 3,2% de pagamento online, mensalidade de ${brl(p.mensal)} acima de ${brl(IFOOD_PISO_MENSAL)}/mês). Confira as suas no painel do iFood.
-                  Do lado da SyncTech: Cardápio Online ${brl(CARDAPIO_MES)}/mês e Marca aí 15% do frete (mínimo ${brl2(MARCAAI_MIN)}, máximo ${brl2(MARCAAI_MAX)} por pedido).
+                  Do lado da SyncTech: Pedido Direto ${brl(CARDAPIO_MES)}/mês (mais ${brl(CARDAPIO_UNICO)} uma vez para montar) e Marca aí 15% do frete (mínimo ${brl2(MARCAAI_MIN)}, máximo ${brl2(MARCAAI_MAX)} por pedido).
                   Não é promessa de resultado.
                 </p>
                 <div className="grid gap-3 sm:col-span-2 sm:grid-cols-2">
@@ -910,14 +904,14 @@ function CalculadoraIfood() {
 /* ═══════════════ Processo ═══════════════ */
 const PASSOS = [
   { t: 'Diagnóstico gratuito', d: 'Conversamos sobre o seu negócio, mapeamos os processos e identificamos onde a automação gera mais resultado.' },
-  { t: 'Configuramos tudo', d: 'Montamos o bot, configuramos os fluxos, personalizamos com a identidade da sua marca e testamos antes de lançar.' },
+  { t: 'Configuramos tudo', d: 'Montamos o atendente, ensinamos as respostas do seu negócio, personalizamos com a identidade da sua marca e testamos antes de lançar.' },
   { t: 'Lançamento assistido', d: 'Ativamos o sistema e acompanhamos os primeiros 30 dias. Suporte via WhatsApp para qualquer ajuste.' },
   { t: 'Resultados em 15 dias', d: 'Mais agendamentos, mais leads e mais vendas nas primeiras semanas. Medimos tudo e otimizamos continuamente.' }
 ];
 
 const LINHA_TEMPO = [
   ['Dia 1',    'Diagnóstico',  'Reunião de 30 min para mapear seu negócio'],
-  ['Dia 2–4',  'Configuração', 'Montamos bot, agenda e Instagram automático'],
+  ['Dia 2–4',  'Configuração', 'Montamos o atendente, a agenda e as respostas'],
   ['Dia 5–6',  'Testes',       'Simulamos clientes reais e ajustamos fluxos'],
   ['Dia 7',    'Lançamento',   'Sistema ativo 24h com suporte na largada']
 ];
@@ -958,7 +952,7 @@ function Processo() {
 
 /* ═══════════════ Comparativo ═══════════════ */
 const COLUNAS = [
-  ['SyncTech', 'R$697/mês · site e serviço inclusos'],
+  ['SyncTech', 'a partir de R$497/mês · implantação feita por nós'],
   ['Trinks / Booksy', 'R$150/mês · ferramenta, você opera'],
   ['WhatsApp manual', 'R$0/mês · o custo é o seu tempo']
 ];
@@ -967,17 +961,15 @@ const COLUNAS = [
 const COMPARA = [
   ['Agendamento online 24/7',        ['v','Incluso'], ['v','Incluso'],         ['x','Não tem']],
   ['Lembretes automáticos',          ['v','Incluso'], ['v','Incluso'],         ['x','Manual e esquece']],
-  ['WhatsApp Bot 24/7',              ['v','Incluso'], ['x','Não tem'],         ['x','Você responde tudo']],
-  ['Instagram automático',           ['v','Incluso'], ['x','Não tem'],         ['x','Não tem']],
-  ['Pede avaliação Google sozinho',  ['v','Incluso'], ['x','Não tem'],         ['x','Não tem']],
-  ['CRM de clientes',                ['v','Incluso'], ['v','Incluso'],         ['x','Planilha manual']],
+  ['Atendente de IA no WhatsApp 24h', ['v','Incluso'], ['x','Não tem'],         ['x','Você responde tudo']],
+  ['Pede avaliação Google sozinho',  ['v','No Profissional'], ['x','Não tem'],  ['x','Não tem']],
   ['Setup feito por especialista',   ['v','Incluso'], ['x','Autoatendimento'], ['x','Você mesmo']],
   ['Suporte em português',           ['v','Incluso'], ['~','Limitado'],        ['x','Não tem']]
 ];
 
 const DIFERENCIAIS = [
-  ['WhatsApp Bot — único no mercado local', 'Trinks e Booksy não têm bot de WhatsApp. A SyncTech responde cliente automaticamente às 2h da manhã, qualifica lead e agenda — sem você tocar no celular.'],
-  ['Avaliação no Google — automática', 'Depois de cada atendimento, o sistema pede avaliação ao cliente. Nenhum concorrente brasileiro faz isso de forma integrada.'],
+  ['Atendente de IA no WhatsApp — único no mercado local', 'Trinks e Booksy não têm atendente de IA no WhatsApp. A SyncTech responde o cliente às 2h da manhã, por texto ou áudio, tira a dúvida e agenda — sem você tocar no celular.'],
+  ['Avaliação no Google — automática', 'Depois de cada atendimento, o atendente pede avaliação ao cliente (no Atende Profissional e no Completo). Nenhum concorrente brasileiro faz isso de forma integrada.'],
   ['Setup em 7 dias — feito pra você', 'Trinks e Booksy são autoatendimento: você aprende, configura e resolve bug. Na SyncTech, a nossa equipe cuida de tudo.']
 ];
 
@@ -1002,7 +994,7 @@ function Comparativo() {
         <${Reveal}>
           <${TituloSecao} tag="Por que a SyncTech"
             titulo=${html`O que os outros <span className="text-red-400">não têm</span> — e a <span className="texto-gradiente">SyncTech tem</span>`}
-            sub="Trinks e Booksy fazem agendamento. A SyncTech faz agendamento + WhatsApp Bot + Instagram + avaliação no Google, tudo automático." />
+            sub="Trinks e Booksy fazem agendamento. A SyncTech faz agendamento + atendente de IA no WhatsApp + avaliação no Google, tudo automático." />
         <//>
         <${Reveal} delay=${90}>
           <div className="card scrollbar-fina overflow-x-auto rounded-3xl">
@@ -1089,176 +1081,74 @@ function Segmentos() {
     </section>`;
 }
 
-/* ═══════════════ Serviços avulsos ═══════════════
-   Mesmos valores de docs/tabela-precos-2026.html e do Hub. Mudou aqui,
-   muda nos três. */
-const AVULSOS_MES = [
-  ['Gestão de Tráfego Pago',    1000, 'Anúncio no Instagram e no Facebook pra trazer cliente novo toda semana.', 'verba à parte'],
-  ['Aplicativo Personalizado',   400, 'Seu negócio vira um app na tela do cliente, com pedido, carrinho e Pix.', 'mais R$ 850 para construir, uma vez'],
-  ['SEO Local no Google',        500, 'Aparecer quando alguém da sua cidade procura o que você vende.', ''],
-  ['Gestão de Reputação',        297, 'Cliente satisfeito vira avaliação. Insatisfeito vira conversa privada.', ''],
-  ['WhatsApp Bot 24 horas',      397, 'Responde, agenda e confirma sozinho, inclusive domingo e de madrugada.', 'requer Z-API'],
-  ['Relatório de Resultados',    197, 'Todo mês, uma página com o que foi feito e o que isso deu em número.', ''],
-  ['Instagram Automático',       297, 'Comentou no post, recebe mensagem. Começou a seguir, recebe boas-vindas.', ''],
-  ['Agendamento Online',         147, 'O cliente marca pelo celular, a qualquer hora, sem falar com ninguém.', ''],
-  ['CRM com Pipeline',           147, 'Nenhum cliente se perde: cada pessoa vira um cartão até fechar.', ''],
-  ['Nota Fiscal no pedido',      197, 'Cada venda feita pelo aplicativo sai com nota fiscal autorizada.', 'requer emissora'],
-  ['Catálogo Digital',           147, 'Seu cardápio online. O pedido chega pronto no seu WhatsApp.', ''],
-  ['Dashboard de Métricas',       97, 'Quanto entrou, quantos clientes novos e o que mais vendeu.', ''],
+/* ═══════════════ Preços ═══════════════
+   Tabela de nov/2026 (docs/estrategia/Tabela-SyncTech-2026-11.md), a mesma
+   do Hub, do agente de WhatsApp e das propostas. Mudou lá, muda aqui. */
+const ATENDE = [
+  { chave: 'essencial', nome: 'Essencial', mensal: 497, implantacao: 1500, conversas: 300, dest: false,
+    desc: 'Pra parar de perder quem manda mensagem fora do horário.',
+    inclui: ['Atende 24h por texto e áudio', 'Agenda, confirma e lembra o cliente na véspera',
+             'Passa a conversa pra você quando precisa'] },
+  { chave: 'profissional', nome: 'Profissional', mensal: 997, implantacao: 2500, conversas: 800, dest: true,
+    desc: 'Pra fazer quem pediu preço voltar e fechar.',
+    inclui: ['Tudo do Essencial', 'Recupera orçamento: chama de novo em 2, 7 e 20 dias',
+             'Pede avaliação no Google depois do atendimento', 'Relatório do mês'] },
+  { chave: 'completo', nome: 'Completo', mensal: 1997, implantacao: 3500, conversas: 2000, dest: false,
+    desc: 'Pra trazer de volta quem sumiu e atender turista.',
+    inclui: ['Tudo do Profissional', 'Campanha mensal para cliente sumido',
+             'Atende em português, inglês e espanhol', 'Google em Dia incluso'] }
 ];
 
-const AVULSOS_UNICO = [
-  ['Site do cliente', 'R$ 2.000', 'Site próprio do negócio, sob medida, com WhatsApp sempre à vista.', 'mais R$ 120/mês de manutenção (3 primeiros meses inclusos)'],
-  ['Link na Bio',     'R$ 297', 'Uma página só sua pro Instagram, com serviços e preço.', 'hospedagem inclusa'],
+/* [nome, preço, complemento do preço, o que vem, link opcional] */
+const OUTROS = [
+  ['Site Essencial', 'R$ 1.000', 'no Pix, uma vez (R$ 1.100 no cartão em até 12x)',
+   'Uma página bem feita no celular: serviços ou cardápio, fotos, WhatsApp, mapa, horário e Link na Bio. Pronto em 5 dias.'],
+  ['Site Premium', 'R$ 2.000', 'no Pix, uma vez (R$ 2.200 no cartão em até 12x)',
+   'Várias páginas, animação, uma função exclusiva do seu ramo e pronto pro Google da cidade. Pronto em 10 dias.'],
+  ['Módulos do ramo', 'a partir de R$ 600', 'uma vez, mais a partir de R$ 97/mês',
+   'Fidelidade, cobrança por Pix, orçamento, vagas de evento, pedido sem iFood e reserva sem Booking.', MODULOS_URL],
+  ['Google em Dia', 'R$ 497', 'por mês',
+   'Perfil do Google cuidado todo mês: fotos, posts, resposta às avaliações. Já vem no Atende Completo.'],
+  ['Anúncios', 'R$ 997', 'por mês, mais a verba',
+   'Anúncio no Instagram, Facebook e Google levando cliente pro seu WhatsApp. Verba sugerida a partir de R$ 20/dia, paga direto à plataforma.'],
+  ['Aplicativo próprio', 'sob orçamento', 'a partir de R$ 850 para construir + R$ 400/mês',
+   'Seu negócio na tela do celular do cliente, com pedido, carrinho e Pix.']
 ];
 
-/* Soma dos mesmos avulsos que cada plano cobre (com os R$120 de
-   manutenção do site). Entrada avulsa: Site R$2.000 + Link na Bio R$297
-   = R$2.297; no plano o site é pago inteiro e só o Link na Bio sai de graça (R$297). */
-const ECONOMIA = [
-  { plano: 'Starter', avulso:  811, mensal:  697, guarda:  114 },
-  { plano: 'Negócio', avulso: 2346, mensal: 1797, guarda:  549 },
-  { plano: 'Pro',     avulso: 3943, mensal: 2797, guarda: 1146 },
-];
-const ENTRADA_DISPENSADA = 297;
-
-/* Mecanismo, não promessa de faturamento: cada linha diz o que passa a
-   acontecer na operação, não quanto o cliente vai ganhar. */
-const PORQUE = [
-  { plano: 'Starter', titulo: 'Parar de perder quem já estava te procurando',
-    antes: 'A mensagem que chega às 22h espera até você abrir. Quem procura seu negócio no Google não acha um site — acha o concorrente.',
-    depois: 'Site no ar, agenda aberta 24 horas e um atendente automático respondendo na hora, qualquer dia.',
-    muda: 'O cliente que decidiu à noite não esfria até amanhã.' },
-  { plano: 'Negócio', titulo: 'Ser achado, fazer voltar e ser indicado',
-    antes: 'Quem pediu preço e não fechou some, e ninguém lembra de responder. A nota do Google não sobe porque ninguém pede avaliação.',
-    depois: 'Cada contato vira um cartão que você arrasta até fechar, a avaliação é pedida sozinha depois do atendimento e o perfil do Google é trabalhado todo mês.',
-    muda: 'Cliente antigo volta, e o novo te acha sem você pagar anúncio.' },
-  { plano: 'Pro', titulo: 'Trazer rosto novo toda semana',
-    antes: 'O movimento depende de quem passa na porta e de quem já te conhece.',
-    depois: 'Anúncio rodando com teto de custo por cliente calculado a partir do seu ticket e da sua margem, mais um aplicativo próprio na tela do cliente.',
-    muda: 'Você passa a escolher quanto movimento quer no mês.' },
-];
-
-/* ═══════════════ Planos ═══════════════ */
-const PLANOS = [
-  { chave: 'starter', nome: 'Starter', mensal: 697, anual: 557, dest: false,
-    desc: 'Atender e vender: site, cardápio, agenda e WhatsApp 24h, no ar em até 7 dias.',
-    inclui: ['Site personalizado (manutenção inclusa)', 'Link na Bio profissional (de graça)',
-             'Catálogo Digital ou Cardápio Online', 'Agendamento Online', 'WhatsApp Bot 24/7',
-             'Suporte via WhatsApp'],
-    emBreve: [], fora: ['SEO Local e Reputação', 'Instagram Automático', 'Tráfego Pago'] },
-  { chave: 'negocio', nome: 'Negócio', mensal: 1797, anual: 1437, dest: true,
-    desc: 'Tudo do Starter mais o que faz o cliente achar você, voltar e indicar.',
-    inclui: ['Tudo do Starter', 'SEO Local no Google e no Maps',
-             'Gestão de Reputação no Google', 'Instagram Automático (DM + comentários)',
-             'CRM com pipeline de vendas',
-             'Relatório mensal + Dashboard de Métricas', 'Suporte prioritário'],
-    emBreve: [], fora: ['Aplicativo próprio', 'Tráfego Pago'] },
-  { chave: 'pro', nome: 'Pro', mensal: 2797, anual: 2237, dest: false,
-    desc: 'Os 14 serviços, inclusive anúncio e aplicativo próprio.',
-    inclui: ['Tudo do Negócio', 'Aplicativo Personalizado (construção de R$ 850 à parte)',
-             'Gestão de Tráfego Pago (verba à parte)', 'Nota Fiscal no pedido (NFC-e)',
-             'Suporte 7 dias por semana', 'Reunião mensal de resultados'],
-    emBreve: ['Email Marketing', 'Chat ao Vivo no Site'], fora: [] }
+const REGRAS = [
+  ['Cliente do Atende não paga a manutenção do site', 'O site tem manutenção de R$ 120/mês (os 3 primeiros meses inclusos). Com o Atende, ela sai de graça.'],
+  ['Site e Atende juntos: R$ 500 de desconto', 'Fechou os dois de uma vez, a implantação do Atende fica R$ 500 mais barata.']
 ];
 
 function Planos() {
-  const [anual, setAnual] = useState(false);
-
   return html`
     <section id="planos" className="relative px-5 py-24 lg:py-32">
       <div className="mx-auto max-w-6xl">
         <${Reveal}>
-          <${TituloSecao} tag="Planos"
-            titulo=${html`Investimento que se paga <span className="texto-gradiente">no primeiro mês</span>`}
-            sub="Sem contratos longos. Cancele quando quiser." />
-        <//>
-
-        <${Reveal} delay=${60}>
-          <div className="mb-12 flex flex-wrap items-center justify-center gap-3">
-            <div className="inline-flex items-center gap-1 rounded-full border border-linha bg-surf p-1.5"
-                 role="group" aria-label="Forma de cobrança">
-              ${[['Mensal', false], ['Anual', true]].map(([rot, v]) => html`
-                <button key=${rot} type="button" onClick=${() => setAnual(v)} aria-pressed=${anual === v}
-                        className=${'rounded-full px-6 py-2.5 text-sm font-bold transition ' +
-                          (anual === v ? 'bg-violeta text-white shadow-lg shadow-violeta/30' : 'text-txt2 hover:text-lilas')}>
-                  ${rot}
-                </button>`)}
-            </div>
-            <span className="rounded-full border border-violeta/50 bg-violeta/15 px-3.5 py-1.5 text-xs font-extrabold text-lilas">
-              Anual economiza 20%
-            </span>
-          </div>
-        <//>
-
-        <${Reveal} delay=${80}>
-          <div className="mb-14">
-            <div className="grid gap-4 md:grid-cols-3">
-              ${PORQUE.map((b) => html`
-                <div key=${b.plano} className="card flex flex-col rounded-3xl p-6">
-                  <p className="text-xs font-extrabold uppercase tracking-wider text-lilas">${b.plano}</p>
-                  <h3 className="mt-2 font-disp text-lg font-bold leading-snug">${b.titulo}</h3>
-                  <div className="mt-5 flex-1 space-y-4 text-sm leading-relaxed">
-                    <div>
-                      <p className="text-[11px] font-bold uppercase tracking-wider text-txt3">Como é hoje</p>
-                      <p className="mt-1 text-txt3">${b.antes}</p>
-                    </div>
-                    <div>
-                      <p className="text-[11px] font-bold uppercase tracking-wider text-lilas">Com o plano</p>
-                      <p className="mt-1 text-txt2">${b.depois}</p>
-                    </div>
-                  </div>
-                  <p className="mt-5 rounded-xl bg-violeta/10 px-4 py-3 text-sm font-semibold leading-snug text-txt">${b.muda}</p>
-                </div>`)}
-            </div>
-
-            <div className="card mt-5 overflow-hidden rounded-3xl">
-              <div className="border-b border-linha px-6 py-5">
-                <h3 className="font-disp text-lg font-bold">E em dinheiro, quanto o plano economiza</h3>
-                <p className="mt-1 text-sm text-txt3">A coluna do meio é a soma das mensalidades dos mesmos serviços contratados um a um, nesta própria página.</p>
-              </div>
-              ${ECONOMIA.map((e) => html`
-                <div key=${e.plano} className="flex flex-wrap items-center gap-x-6 gap-y-2 border-b border-linha px-6 py-4">
-                  <p className="w-20 font-disp font-bold">${e.plano}</p>
-                  <p className="flex-1 text-sm text-txt3">
-                    avulso daria ${brl(e.avulso)}/mês + R$ 2.297 de entrada
-                  </p>
-                  <div className="text-right">
-                    <p className="font-disp text-xl font-bold text-lilas">${brl(e.mensal)}<span className="text-xs font-medium text-txt3">/mês</span></p>
-                    <p className="text-xs font-semibold text-emerald-400">guarda ${brl(e.guarda * 12 + ENTRADA_DISPENSADA)} no primeiro ano</p>
-                  </div>
-                </div>`)}
-              <p className="px-6 py-4 text-xs leading-relaxed text-txt3">
-                No plano, o site é pago inteiro (R$ 2.000 no Pix ou R$ 2.200 no cartão) e o Link na Bio (R$ 297) sai de graça. No Pro, a construção do aplicativo (R$ 850, uma vez) se paga à parte, igual no avulso.
-                Nenhum serviço promete faturamento: o que garantimos é a operação rodando todo dia — o resultado depende do seu negócio.
-              </p>
-            </div>
-          </div>
+          <${TituloSecao} tag="Preços"
+            titulo=${html`Um atendente que não dorme, <span className="texto-gradiente">a partir de R$ 497/mês</span>`}
+            sub="Custa bem menos que uma recepcionista e trabalha de madrugada, domingo e feriado. Sem fidelidade: cancela avisando com 30 dias." />
         <//>
 
         <div className="grid items-start gap-5 lg:grid-cols-3">
-          ${PLANOS.map((p, i) => html`
+          ${ATENDE.map((p, i) => html`
             <${Reveal} key=${p.chave} delay=${i * 90}>
               <article className=${'card relative h-full rounded-3xl p-8 ' +
                   (p.dest ? 'border-violeta shadow-[0_0_54px_-16px_rgba(155,92,255,.85)] lg:-translate-y-3' : '')}>
                 ${p.dest && html`
                   <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-violeta px-4 py-1.5 text-xs font-extrabold uppercase tracking-wide text-white">
-                    Mais popular
+                    O mais escolhido
                   </span>`}
-                <h3 className="font-disp text-xl font-bold">${p.nome}</h3>
+                <p className="text-xs font-extrabold uppercase tracking-wider text-lilas">SyncTech Atende</p>
+                <h3 className="mt-1 font-disp text-xl font-bold">${p.nome}</h3>
                 <p className="mt-2 min-h-[42px] text-sm text-txt2">${p.desc}</p>
 
                 <p className="mt-6 flex flex-wrap items-end gap-x-2 gap-y-1">
-                  <span className="font-disp text-5xl font-extrabold text-txt">${brl(anual ? p.anual : p.mensal)}</span>
+                  <span className="font-disp text-5xl font-extrabold text-txt">${brl(p.mensal)}</span>
                   <span className="mb-1.5 text-sm font-semibold text-txt3">/mês</span>
-                  ${anual && html`
-                    <span className="mb-1.5 text-sm font-semibold text-txt3 line-through">${brl(p.mensal)}</span>`}
                 </p>
-                <p className="mt-2 text-xs text-txt3">
-                  ${anual
-                    ? 'Preço final · economia de ' + brl((p.mensal - p.anual) * 12) + ' no ano'
-                    : 'Preço final · configuração inclusa · Link na Bio de graça'}
-                </p>
+                <p className="mt-2 text-sm text-txt2">+ ${brl(p.implantacao)} de implantação, uma vez</p>
+                <p className="mt-1 text-xs text-txt3">Até ${num(p.conversas)} conversas por mês</p>
 
                 <div className="my-7 h-px bg-linha"></div>
 
@@ -1269,70 +1159,68 @@ function Planos() {
                         <${Ico} d=${ICONES.check} className="h-3 w-3" />
                       </span>${it}
                     </li>`)}
-                  ${(p.emBreve||[]).map((it) => html`
-                    <li key=${it} className="flex items-start gap-2.5 text-sm text-amber-300/90">
-                      <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-amber-400/15 text-amber-300 text-[10px] font-bold">⏳</span>${it} <span className="text-[10px] uppercase tracking-wide text-amber-400/80">(em breve)</span>
-                    </li>`)}
-                  ${p.fora.map((it) => html`
-                    <li key=${it} className="flex items-start gap-2.5 text-sm text-txt3/70">
-                      <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-white/5 text-txt3">
-                        <${Ico} d=${ICONES.x} className="h-3 w-3" />
-                      </span><span className="line-through">${it}</span>
-                    </li>`)}
                 </ul>
 
-                <a href="#contato"
+                <a href=${ATENDE_URL} target="_blank" rel="noopener"
                    className=${'mt-8 flex justify-center rounded-xl px-5 py-3.5 font-bold transition hover:-translate-y-0.5 ' +
                      (p.dest ? 'bg-violeta text-white hover:bg-[#8A46F5]' : 'border border-linha bg-surf2 text-txt hover:border-violeta')}>
-                  Contratar ${p.nome}
+                  Ver o Atende ${p.nome}
                 </a>
               </article>
             <//>`)}
         </div>
 
+        <${Reveal} delay=${270}>
+          <p className="mx-auto mt-6 max-w-3xl text-center text-xs leading-relaxed text-txt3">
+            Nos três: pronto em 7 dias, só pela API oficial do WhatsApp, conversa além da franquia a R$ 0,60
+            e sem fidelidade (cancela avisando com 30 dias).
+          </p>
+        <//>
+
         <${Reveal} delay=${330}>
-          <div className="mx-auto mt-16 max-w-4xl">
+          <div className="mx-auto mt-16 max-w-5xl">
             <div className="text-center">
-              <p className="text-xs font-extrabold uppercase tracking-wider text-lilas">Sem plano, se preferir</p>
-              <h3 className="mt-2 font-disp text-2xl font-bold sm:text-3xl">Cada serviço também é vendido sozinho</h3>
-              <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-txt2">
-                O preço é o mesmo contratado sozinho ou somado a um plano. Sem taxa de adesão e sem fidelidade em nenhum deles.
-              </p>
+              <p className="text-xs font-extrabold uppercase tracking-wider text-lilas">Junto com o Atende, ou sozinho</p>
+              <h3 className="mt-2 font-disp text-2xl font-bold sm:text-3xl">Site, módulos, Google e anúncios</h3>
             </div>
 
-            <div className="card mt-7 overflow-hidden rounded-3xl">
-              ${AVULSOS_MES.map((sv) => html`
-                <div key=${sv[0]} className="flex flex-wrap items-baseline gap-x-4 gap-y-1 border-b border-linha px-6 py-4">
-                  <div className="min-w-[210px] flex-1">
-                    <p className="font-semibold">${sv[0]}</p>
-                    <p className="mt-0.5 text-sm leading-snug text-txt3">${sv[2]}${sv[3] ? ' — ' + sv[3] : ''}</p>
-                  </div>
-                  <p className="whitespace-nowrap font-disp text-xl font-bold text-lilas">
-                    ${brl(sv[1])}<span className="text-xs font-medium text-txt3">/mês</span>
+            <div className="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              ${OUTROS.map(([nome, preco, comp, txt, link]) => html`
+                <div key=${nome} className="card flex flex-col rounded-2xl p-5">
+                  <p className="font-semibold">${nome}</p>
+                  <p className="mt-2 font-disp text-xl font-bold text-lilas">${preco}</p>
+                  <p className="text-xs text-txt3">${comp}</p>
+                  <p className="mt-3 flex-1 text-sm leading-snug text-txt2">${txt}</p>
+                  ${link && html`
+                    <a href=${link} target="_blank" rel="noopener"
+                       className="mt-3 text-sm font-semibold text-lilas underline decoration-violeta/60 underline-offset-4 hover:text-violeta">
+                      Ver as demonstrações
+                    </a>`}
+                </div>`)}
+            </div>
+
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              ${REGRAS.map(([t, d]) => html`
+                <div key=${t} className="rounded-2xl border border-violeta/50 bg-violeta/[.07] p-5">
+                  <p className="flex items-start gap-2.5 font-semibold text-txt">
+                    <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-violeta/25 text-violeta">
+                      <${Ico} d=${ICONES.check} className="h-3 w-3" />
+                    </span>${t}
                   </p>
+                  <p className="mt-1.5 pl-7 text-sm leading-snug text-txt2">${d}</p>
                 </div>`)}
             </div>
 
-            <p className="mt-7 text-center text-xs font-extrabold uppercase tracking-wider text-txt3">
-              Pagamento único — paga uma vez, é seu
+            <p className="mt-5 text-center text-xs leading-relaxed text-txt3">
+              Site: metade ao aceitar, metade quando fica pronto. A prévia do site é feita de graça antes de fechar.
+              Nenhum serviço promete faturamento: o que garantimos é a operação rodando todo dia — o resultado depende do seu negócio.
             </p>
-            <div className="mt-3 grid gap-3 sm:grid-cols-2">
-              ${AVULSOS_UNICO.map((sv) => html`
-                <div key=${sv[0]} className="card rounded-2xl p-5">
-                  <div className="flex items-baseline justify-between gap-3">
-                    <p className="font-semibold">${sv[0]}</p>
-                    <p className="whitespace-nowrap font-disp text-xl font-bold text-lilas">${sv[1]}</p>
-                  </div>
-                  <p className="mt-1.5 text-sm leading-snug text-txt3">${sv[2]}</p>
-                  <p className="mt-1 text-xs text-txt3/80">${sv[3]}</p>
-                </div>`)}
-            </div>
           </div>
         <//>
 
         <${Reveal} delay=${400}>
           <p className="mt-8 text-center text-sm text-txt3">
-            Dúvida sobre qual plano?
+            Dúvida sobre o que faz sentido pro seu negócio?
             <a href="#contato" className="ml-1 font-semibold text-lilas underline decoration-violeta/60 underline-offset-4 hover:text-violeta">
               Fale com a gente
             </a> — fazemos um diagnóstico gratuito.
@@ -1378,11 +1266,11 @@ function CasoReal() {
 /* ═══════════════ FAQ ═══════════════ */
 const PERGUNTAS = [
   ['Preciso ter conhecimento técnico para usar?', 'Não. Cuidamos de toda a configuração, do A ao Z. Você só precisa nos passar as informações do seu negócio (serviços, horários, preços). Em 7 dias está tudo funcionando sem você precisar saber nada de tecnologia.'],
-  ['Como funciona o WhatsApp Bot? Preciso de API paga?', 'Configuramos com o WhatsApp Business do seu número atual, sem precisar de API paga. O bot responde automaticamente as mensagens que chegam, agenda horários e encaminha leads. Para volumes maiores (plano Pro), usamos a API oficial sem custo adicional para você.'],
-  ['Quanto tempo leva para ter resultado?', 'O bot e a agenda começam a funcionar assim que ativados, na primeira semana. No nosso caso real (Barbearia Martins), o crescimento em seguidores e agendamentos apareceu em 23 dias.'],
-  ['Posso cancelar quando quiser?', 'Sim. Não temos fidelidade nem contrato de longo prazo, e não cobramos taxa de configuração nem de adesão. A mensalidade pode ser cancelada a qualquer momento, sem multa.'],
+  ['Como funciona o atendente de IA no WhatsApp? Vou perder meu número?', 'É o SyncTech Atende. Ele usa a API oficial do WhatsApp, o caminho autorizado pela Meta (dona do WhatsApp). Nada de QR code ou aplicativo paralelo, que é o que faz número ser bloqueado. Na maioria dos casos dá pra manter o número que seus clientes já conhecem. Fica pronto em 7 dias e não tem fidelidade: pra cancelar, é só avisar com 30 dias.'],
+  ['Quanto tempo leva para ter resultado?', 'O atendente e a agenda começam a funcionar assim que ativados, na primeira semana. No nosso caso real (Barbearia Martins), o crescimento em seguidores e agendamentos apareceu em 23 dias.'],
+  ['Posso cancelar quando quiser?', 'Sim. Não tem fidelidade nem multa: é só avisar com 30 dias de antecedência. A implantação do atendente e o site são pagos uma vez só, no começo; depois fica só a mensalidade.'],
   ['O sistema funciona para qualquer tipo de negócio?', 'Sim. O sistema foi desenhado pra negócios locais que atendem por WhatsApp e agenda — barbearia, clínica, salão, padaria, pet shop, academia, entre outros. É personalizado pro seu negócio específico durante a configuração.'],
-  ['O que acontece se o bot errar ou não souber responder?', 'O bot identifica quando não consegue resolver e encaminha a conversa para você com um aviso. Você nunca fica sem resposta e o cliente sempre recebe alguma atenção. Com o tempo, o bot aprende e as transferências ficam cada vez mais raras.']
+  ['O que acontece se o atendente errar ou não souber responder?', 'O atendente percebe quando não consegue resolver e passa a conversa pra você com um aviso. O cliente nunca fica sem resposta. E a gente vai ajustando as respostas do seu negócio pra isso acontecer cada vez menos.']
 ];
 
 function FAQ() {
@@ -1490,7 +1378,7 @@ function Contato() {
       ${erro && html`<p id=${id + '-erro'} role="alert" className="mt-2 text-sm text-red-400">${erro}</p>`}
     </div>`;
 
-  const garantias = ['Sem cartão de crédito', 'Resposta em até 2h', 'Cancele quando quiser'];
+  const garantias = ['Sem cartão de crédito', 'Resposta em até 2h', 'Sem fidelidade'];
 
   return html`
     <section id="contato" className="relative px-5 py-24 lg:py-32">
@@ -1550,10 +1438,10 @@ function Contato() {
 /* ═══════════════ Rodapé ═══════════════ */
 const RODAPE = [
   ['Serviços', [
-    ['WhatsApp Bot', '#servicos'], ['Instagram Auto', '#servicos'], ['Agendamento Online', '#servicos'],
-    ['CRM com Pipeline', '#servicos'], ['Catálogo Digital', '#servicos']]],
+    ['SyncTech Atende', '#servicos'], ['Site', '#servicos'], ['Módulos do ramo', '#servicos'],
+    ['Google em Dia', '#servicos'], ['Anúncios', '#servicos']]],
   ['Empresa', [
-    ['Planos', '#planos'], ['Resultado real', '#depoimentos'], ['FAQ', '#faq'], ['Contato', '#contato']]]
+    ['Preços', '#planos'], ['Resultado real', '#depoimentos'], ['FAQ', '#faq'], ['Contato', '#contato']]]
 ];
 
 function Rodape() {

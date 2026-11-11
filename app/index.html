@@ -511,9 +511,10 @@ details[open] summary { margin-bottom: 4px; }
           <div class="form-group">
             <label class="form-label" for="pl-val">Plano estimado</label>
             <select class="form-input" id="pl-val">
-              <option value="697">Starter — R$697/mês</option>
-              <option value="1797" selected>Negócio — R$1.797/mês</option>
-              <option value="2797">Pro — R$2.797/mês</option>
+              <option value="120">Só site — R$120/mês (manutenção)</option>
+              <option value="497">Atende Essencial — R$497/mês</option>
+              <option value="997" selected>Atende Profissional — R$997/mês</option>
+              <option value="1997">Atende Completo — R$1.997/mês</option>
             </select>
           </div>
         </div>
@@ -632,16 +633,16 @@ function doGet(e) {
       <div class="svc-grid2" id="services-grid"></div>
 
       <div id="guide-whatsapp" class="card" style="margin-top:18px">
-        <h2 class="card-title">📱 Ativar WhatsApp Bot 24/7 (Z-API)</h2>
-        <div class="card-sub">3 passos — sem custo de plataforma extra além da Z-API</div>
+        <h2 class="card-title">📱 Ativar o SyncTech Atende (API oficial)</h2>
+        <div class="card-sub">Nada de Z-API nem QR code: o número pode ser bloqueado. O passo a passo está em synctech-whatsapp/PASSO-A-PASSO.md</div>
         <div class="guide-steps">
-          <div class="guide-step"><div class="guide-num">1</div><div><div class="guide-step-title">Crie conta gratuita na Z-API</div><div class="guide-step-desc">Acesse z-api.io → Cadastre-se → Crie uma instância → Escaneie o QR Code com o WhatsApp do negócio.</div></div></div>
-          <div class="guide-step"><div class="guide-num">2</div><div><div class="guide-step-title">Copie Instance ID e Token</div><div class="guide-step-desc">No painel Z-API: Instâncias → clique na instância → API → copie o Instance ID e o Client Token.</div></div></div>
-          <div class="guide-step"><div class="guide-num">3</div><div><div class="guide-step-title">Configure no Make.com</div><div class="guide-step-desc">Cenário: Webhooks (recebe msg) → Filtro de palavra-chave → Z-API (envia resposta). Cole Instance ID e Token na conexão.</div></div></div>
+          <div class="guide-step"><div class="guide-num">1</div><div><div class="guide-step-title">Conversa de 30 min com o dono</div><div class="guide-step-desc">Serviços, preços, horários, perguntas que mais chegam e quando chamar o dono. Conferir se o número atual pode ir para a API.</div></div></div>
+          <div class="guide-step"><div class="guide-num">2</div><div><div class="guide-step-title">Número no WhatsApp Business Platform</div><div class="guide-step-desc">No Business Manager do cliente (verificado), registrar o número e gerar o token permanente.</div></div></div>
+          <div class="guide-step"><div class="guide-num">3</div><div><div class="guide-step-title">Configurar, testar e ligar</div><div class="guide-step-desc">Base de conhecimento do cliente, 2 dias de teste com o dono, no ar no 7º dia.</div></div></div>
         </div>
         <div class="guide-links">
-          <a href="https://www.z-api.io" target="_blank" class="guide-link green">Abrir Z-API →</a>
-          <a href="https://make.com" target="_blank" class="guide-link purple">Abrir Make.com →</a>
+          <a href="https://synctech-sistemas.pages.dev/atende/" target="_blank" rel="noopener" class="guide-link green">Página do Atende →</a>
+          <a href="https://synctech-sistemas.pages.dev/precos/" target="_blank" rel="noopener" class="guide-link purple">Tabela de preços →</a>
         </div>
       </div>
 
@@ -755,9 +756,10 @@ function doGet(e) {
           <div class="form-group">
             <label class="form-label" for="nc-plan">Plano</label>
             <select class="form-input" id="nc-plan">
-              <option value="Starter">Starter — R$697/mês</option>
-              <option value="Negócio" selected>Negócio — R$1.797/mês</option>
-              <option value="Pro">Pro — R$2.797/mês</option>
+              <option value="Só site">Só site — R$120/mês (manutenção)</option>
+              <option value="Atende Essencial">Atende Essencial — R$497/mês</option>
+              <option value="Atende Profissional" selected>Atende Profissional — R$997/mês</option>
+              <option value="Atende Completo">Atende Completo — R$1.997/mês</option>
             </select>
           </div>
           <div class="form-group">
@@ -862,9 +864,9 @@ function doGet(e) {
             <div class="form-group" id="ob-grp-plano">
               <label class="form-label" for="ob-plano">Plano</label>
               <select class="form-input" id="ob-plano">
-                <option value="Starter">Starter &mdash; R$697/m&ecirc;s</option>
-                <option value="Neg&oacute;cio" selected>Neg&oacute;cio &mdash; R$1.797/m&ecirc;s</option>
-                <option value="Pro">Pro &mdash; R$2.797/m&ecirc;s</option>
+                <option value="Atende Essencial">Atende Essencial &mdash; R$497/m&ecirc;s</option>
+                <option value="Atende Profissional" selected>Atende Profissional &mdash; R$997/m&ecirc;s</option>
+                <option value="Atende Completo">Atende Completo &mdash; R$1.997/m&ecirc;s</option>
               </select>
             </div>
           </div>
@@ -1077,7 +1079,7 @@ let pipelineData = [
 
 function svcIc(paths) { return '<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+paths+'</svg>'; }
 let SERVICES = [
-  { icon:svcIc('<path d="M2 8c0-3.3 3-6 7-6s7 2.7 7 6-3 6-7 6c-1 0-2-.15-2.9-.4L3 15l.7-3.3C2.6 10.7 2 9.4 2 8z"/><path d="M9.8 4.8l-2 4h2l-1 4.4 3.4-5.4h-2l1-3z" fill="currentColor" stroke="none"/>'), name:'WhatsApp Bot 24/7',       status:'warn', desc:'Atende, agenda e responde clientes automaticamente. Requer Z-API conectado por cliente.' },
+  { icon:svcIc('<path d="M2 8c0-3.3 3-6 7-6s7 2.7 7 6-3 6-7 6c-1 0-2-.15-2.9-.4L3 15l.7-3.3C2.6 10.7 2 9.4 2 8z"/><path d="M9.8 4.8l-2 4h2l-1 4.4 3.4-5.4h-2l1-3z" fill="currentColor" stroke="none"/>'), name:'SyncTech Atende',  status:'warn', desc:'Atendente de IA no WhatsApp (API oficial). Agente no ar no Cloudflare; falta número próprio + setup da Meta + chave do Claude.' },
   { icon:svcIc('<rect x="2" y="2" width="14" height="14" rx="4"/><circle cx="9" cy="9" r="3.5"/><circle cx="13" cy="5" r="0.9" fill="currentColor" stroke="none"/>'), name:'Instagram Automático',     status:'warn', desc:'Comentário→DM, seguiu→boas-vindas. Requer conta Business + Make.com conectados.' },
   { icon:svcIc('<rect x="2" y="3" width="14" height="13" rx="2"/><path d="M2 7h14M6 1.5v3M12 1.5v3"/><path d="M6.3 11l1.5 1.5L11.7 9"/>'), name:'Agendamento Online',       status:'ok',   desc:'App completo: serviços, calendário, lista de espera e confirmação. Funcionando 100%.' },
   { icon:svcIc('<rect x="2" y="3" width="4" height="12" rx="1"/><rect x="7" y="6.5" width="4" height="8.5" rx="1"/><rect x="12" y="9.5" width="4" height="5.5" rx="1"/>'), name:'CRM com Pipeline',         status:'ok',   desc:'Kanban de leads com WhatsApp direto e histórico por cliente. Funcionando 100%.' },
@@ -1096,34 +1098,24 @@ let SERVICES = [
 ];
 
 // Mesmo conteúdo real da landing page pública (index.html raiz, seção #planos) — não duplicar com números diferentes.
-let PLANS = [
-  { name:'Starter', desc:'Atender e vender: site, cardápio, agenda e WhatsApp 24h.', price:'R$697', setup:'Preço final · site pago inteiro (R$2.000 Pix / R$2.200 cartão) · Link na Bio de graça', features:[
-    { on:true,  text:'Site personalizado (manutenção inclusa)' },
-    { on:true,  text:'Link na Bio profissional (de graça)' },
-    { on:true,  text:'Catálogo Digital ou Cardápio Online' },
-    { on:true,  text:'Agendamento Online' },
-    { on:true,  text:'WhatsApp Bot 24/7' },
-    { on:false, text:'SEO Local e Reputação' },
-    { on:false, text:'Instagram Automático' },
+let PLANS = [ // tabela de 11/11/2026 — docs/estrategia/Tabela-SyncTech-2026-11.md
+  { name:'Atende Essencial', desc:'Atendente de IA no WhatsApp: responde 24h, agenda e lembra.', price:'R$497', setup:'+ R$1.500 de implantação · até 300 conversas/mês · sem fidelidade', features:[
+    { on:true,  text:'Atende 24h por texto e áudio' },
+    { on:true,  text:'Agenda, confirma e lembra na véspera' },
+    { on:true,  text:'Passa pro dono quando precisa' },
+    { on:false, text:'Recupera orçamento e avaliação no Google' },
   ]},
-  { name:'Negócio', badge:'Mais procurado', featured:true, desc:'O que faz o cliente achar você, voltar e indicar.', price:'R$1.797', setup:'Preço final · site pago inteiro · Link na Bio de graça', features:[
-    { on:true, text:'Tudo do Starter' },
-    { on:true, text:'SEO Local no Google e no Maps' },
-    { on:true, text:'Gestão de Reputação no Google' },
-    { on:true, text:'Instagram Auto (DM + comentários)' },
-    { on:true, text:'CRM com pipeline de vendas' },
-    { on:true, text:'Relatório mensal + Dashboard' },
-    { on:true, text:'Suporte prioritário' },
+  { name:'Atende Profissional', badge:'O mais escolhido', featured:true, desc:'O que faz o orçamento fechar e o cliente avaliar.', price:'R$997', setup:'+ R$2.500 de implantação · até 800 conversas/mês', features:[
+    { on:true, text:'Tudo do Essencial' },
+    { on:true, text:'Recupera orçamento (2, 7 e 20 dias)' },
+    { on:true, text:'Pede avaliação no Google' },
+    { on:true, text:'Relatório do resultado todo mês' },
   ]},
-  { name:'Pro', desc:'Os 14 serviços, inclusive anúncio e app próprio.', price:'R$2.797', setup:'Preço final · verba de anúncio à parte · app R$850 para construir', features:[
-    { on:true, text:'Tudo do Negócio' },
-    { on:true, text:'Aplicativo Personalizado' },
-    { on:true, text:'Gestão de Tráfego Pago' },
-    { on:true, text:'Nota Fiscal no pedido (NFC-e)' },
-    { on:true, text:'Suporte 7 dias por semana' },
-    { on:true, text:'Reunião mensal de resultados' },
-    { on:false, soon:true, text:'Email Marketing' },
-    { on:false, soon:true, text:'Chat ao Vivo no Site' },
+  { name:'Atende Completo', desc:'Para quem atende muito e quer o Google cuidado.', price:'R$1.997', setup:'+ R$3.500 de implantação · até 2.000 conversas/mês', features:[
+    { on:true, text:'Tudo do Profissional' },
+    { on:true, text:'Campanha mensal pra quem sumiu' },
+    { on:true, text:'Português, inglês e espanhol' },
+    { on:true, text:'Google em Dia incluso' },
   ]},
 ];
 
@@ -1996,7 +1988,7 @@ let OB_SERVICOS = [
   { id:'catalogo',    nome:'Catálogo / Aplicativo',    hint:'Pedido direto no WhatsApp' },
   { id:'site',        nome:'Site do cliente',          hint:'Página institucional' },
   { id:'trafego',     nome:'Tráfego Pago (Meta Ads)',  hint:'Briefing pronto pro Meta' },
-  { id:'whatsbot',    nome:'WhatsApp Bot 24/7',        hint:'Depende de conta Z-API' },
+  { id:'whatsbot',    nome:'SyncTech Atende (IA no WhatsApp)', hint:'API oficial da Meta' },
   { id:'instagram',   nome:'Instagram Automático',     hint:'Depende de Make.com' },
   { id:'reputacao',   nome:'Gestão de Reputação',      hint:'Avaliação no Google' },
   { id:'crm',         nome:'CRM com Pipeline',         hint:'Ferramenta interna sua' },
@@ -2007,13 +1999,12 @@ let OB_SERVICOS = [
   { id:'notafiscal',  nome:'Nota Fiscal (NFC-e)',      hint:'Depende da contadora' },
 ];
 
-/* Espelha o conteúdo de PLANS, que por sua vez espelha a landing pública.
-   Tráfego Pago e Nota Fiscal entram no Pro desde out/2026 — a landing, o
-   Hub e a tabela de preços passaram a listá-los juntos nesse plano. */
+/* Espelha os planos do SyncTech Atende (tabela de 11/11/2026). Site, Google em Dia,
+   anúncios e módulos entram pelo modo "Serviços avulsos". */
 let OB_PLANOS = {
-  'Starter':  ['site','bio','catalogo','agendamento','whatsbot','dashboard'],
-  'Negócio':  ['site','bio','catalogo','agendamento','whatsbot','dashboard','instagram','crm','reputacao','seolocal','relatorio'],
-  'Pro':      ['site','bio','catalogo','agendamento','whatsbot','dashboard','instagram','crm','reputacao','seolocal','relatorio','trafego','notafiscal'],
+  'Atende Essencial':    ['site','agendamento','whatsbot'],
+  'Atende Profissional': ['site','agendamento','whatsbot','crm','reputacao','relatorio'],
+  'Atende Completo':     ['site','agendamento','whatsbot','crm','reputacao','relatorio','seolocal'],
 };
 function obEl(id){ return document.getElementById(id); }
 function obVal(id){ let e = obEl(id); return e ? e.value.trim() : ''; }
@@ -2678,7 +2669,7 @@ function obFluxoWhatsApp(o) {
   L.push('REGRA DE OURO: o bot nunca insiste. Se a pessoa escrever qualquer coisa');
   L.push('fora do menu duas vezes, passa direto para um humano.');
   L.push('');
-  L.push('ONDE ISSO RODA: precisa de uma conta Z-API conectada ao número do cliente.');
+  L.push('ONDE ISSO RODA: no SyncTech Atende, com o número do cliente na API oficial do WhatsApp (nada de QR code).');
   L.push('É serviço externo pago, contratado no nome do cliente.');
   return L.join('\n');
 }
@@ -2714,7 +2705,7 @@ function obPendencias(o) {
     itens.push('Ser adicionado como <b>administrador no Business Manager</b> do cliente, com conta de anúncio e cartão próprios dele.');
   }
   if (o.ligados.indexOf('whatsbot') !== -1) {
-    itens.push('Conta <b>Z-API</b> conectada ao número do cliente. É serviço externo pago, contratado no nome dele.');
+    itens.push('Número do WhatsApp do cliente no <b>WhatsApp Business Platform (API oficial da Meta)</b>, com o Business Manager dele verificado. Nada de QR code.');
   }
   if (o.ligados.indexOf('instagram') !== -1) {
     itens.push('Instagram <b>Business</b> vinculado a uma Página do Facebook, e acesso como usuário no Business Suite. Nunca pedir a senha.');
@@ -2841,8 +2832,8 @@ function obGerar() {
   }
   if (o.ligados.indexOf('whatsbot') !== -1) {
     OB_GERADO.fluxo = obFluxoWhatsApp(o);
-    cards.push('<div class="ob-card"><h4>Fluxo do WhatsApp Bot</h4>' +
-      '<div class="ob-desc">Mensagens prontas para montar no Make.com com a Z-API.</div>' +
+    cards.push('<div class="ob-card"><h4>Fluxo do SyncTech Atende</h4>' +
+      '<div class="ob-desc">Base de mensagens para configurar o atendente de IA do cliente.</div>' +
       '<div class="ob-txt">' + escapeHtml(OB_GERADO.fluxo) + '</div>' +
       '<button class="copy-btn" type="button" style="margin-top:8px" onclick="obCopiar(\'fluxo\')">Copiar fluxo</button></div>');
   }
