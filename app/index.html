@@ -514,7 +514,7 @@ details[open] summary { margin-bottom: 4px; }
               <option value="120">Só site — R$120/mês (manutenção)</option>
               <option value="497">Atende Essencial — R$497/mês</option>
               <option value="997" selected>Atende Profissional — R$997/mês</option>
-              <option value="1997">Atende Completo — R$1.997/mês</option>
+              <option value="1497">Atende Completo — R$1.497/mês</option>
             </select>
           </div>
         </div>
@@ -759,7 +759,7 @@ function doGet(e) {
               <option value="Só site">Só site — R$120/mês (manutenção)</option>
               <option value="Atende Essencial">Atende Essencial — R$497/mês</option>
               <option value="Atende Profissional" selected>Atende Profissional — R$997/mês</option>
-              <option value="Atende Completo">Atende Completo — R$1.997/mês</option>
+              <option value="Atende Completo">Atende Completo — R$1.497/mês</option>
             </select>
           </div>
           <div class="form-group">
@@ -866,7 +866,7 @@ function doGet(e) {
               <select class="form-input" id="ob-plano">
                 <option value="Atende Essencial">Atende Essencial &mdash; R$497/m&ecirc;s</option>
                 <option value="Atende Profissional" selected>Atende Profissional &mdash; R$997/m&ecirc;s</option>
-                <option value="Atende Completo">Atende Completo &mdash; R$1.997/m&ecirc;s</option>
+                <option value="Atende Completo">Atende Completo &mdash; R$1.497/m&ecirc;s</option>
               </select>
             </div>
           </div>
@@ -1099,19 +1099,19 @@ let SERVICES = [
 
 // Mesmo conteúdo real da landing page pública (index.html raiz, seção #planos) — não duplicar com números diferentes.
 let PLANS = [ // tabela de 11/11/2026 — docs/estrategia/Tabela-SyncTech-2026-11.md
-  { name:'Atende Essencial', desc:'Atendente de IA no WhatsApp: responde 24h, agenda e lembra.', price:'R$497', setup:'+ R$1.500 de implantação · até 300 conversas/mês · sem fidelidade', features:[
+  { name:'Atende Essencial', desc:'Atendente de IA no WhatsApp: responde 24h, agenda e lembra.', price:'R$497', setup:'+ R$997 de implantação · até 300 conversas/mês · sem fidelidade', features:[
     { on:true,  text:'Atende 24h por texto e áudio' },
     { on:true,  text:'Agenda, confirma e lembra na véspera' },
     { on:true,  text:'Passa pro dono quando precisa' },
     { on:false, text:'Recupera orçamento e avaliação no Google' },
   ]},
-  { name:'Atende Profissional', badge:'O mais escolhido', featured:true, desc:'O que faz o orçamento fechar e o cliente avaliar.', price:'R$997', setup:'+ R$2.500 de implantação · até 800 conversas/mês', features:[
+  { name:'Atende Profissional', badge:'O mais escolhido', featured:true, desc:'O que faz o orçamento fechar e o cliente avaliar.', price:'R$997', setup:'+ R$1.497 de implantação · até 800 conversas/mês', features:[
     { on:true, text:'Tudo do Essencial' },
     { on:true, text:'Recupera orçamento (2, 7 e 20 dias)' },
     { on:true, text:'Pede avaliação no Google' },
     { on:true, text:'Relatório do resultado todo mês' },
   ]},
-  { name:'Atende Completo', desc:'Para quem atende muito e quer o Google cuidado.', price:'R$1.997', setup:'+ R$3.500 de implantação · até 2.000 conversas/mês', features:[
+  { name:'Atende Completo', desc:'Para quem atende muito e quer o Google cuidado.', price:'R$1.497', setup:'+ R$1.997 de implantação · até 2.000 conversas/mês', features:[
     { on:true, text:'Tudo do Profissional' },
     { on:true, text:'Campanha mensal pra quem sumiu' },
     { on:true, text:'Português, inglês e espanhol' },

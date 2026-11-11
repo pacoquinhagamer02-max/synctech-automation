@@ -1,6 +1,6 @@
 # Tabela SyncTech — novembro/2026 (Mariana, Ouro Preto e região)
 
-Vigente desde 11/11/2026. Substitui a tabela de 14 serviços avulsos e os planos Starter/Negócio/Pro.
+Vigente desde 11/11/2026 (reajustada pela média de mercado no mesmo dia). Substitui a tabela de 14 serviços avulsos e os planos Starter/Negócio/Pro.
 Esta é a fonte única: agente de WhatsApp, app (Hub), página pública, vitrine de sistemas e propostas copiam daqui.
 
 ## A ideia
@@ -31,9 +31,9 @@ Agendamento, relatório e avaliação agora vêm dentro do Atende; catálogo/car
 
 | | Mensal | Implantação (uma vez) | Conversas/mês |
 |---|---|---|---|
-| **Essencial** | R$ 497 | R$ 1.500 | 300 |
-| **Profissional** (o mais escolhido) | R$ 997 | R$ 2.500 | 800 |
-| **Completo** | R$ 1.997 | R$ 3.500 | 2.000 |
+| **Essencial** | R$ 497 | R$ 997 | 300 |
+| **Profissional** (o mais escolhido) | R$ 997 | R$ 1.497 | 800 |
+| **Completo** | R$ 1.497 | R$ 1.997 | 2.000 |
 
 - **Essencial:** atende 24h por texto e áudio, agenda, confirma e lembra na véspera, e passa para o dono quando precisa.
 - **Profissional:** tudo do Essencial + recupera orçamento (chama de novo em 2, 7 e 20 dias), pede avaliação no Google e manda relatório do mês.
@@ -60,7 +60,7 @@ Agenda Sem Falta, Recupera Orçamentos, Avaliação 5 Estrelas e Reativa Cliente
 
 | | Mensal | O que vem |
 |---|---|---|
-| **Google em Dia** | R$ 497 | Perfil do Google arrumado e cuidado todo mês: fotos, posts, resposta às avaliações, aparecer quando procuram na cidade. Já vem no Atende Completo. |
+| **Google em Dia** | R$ 297 | Perfil do Google arrumado e cuidado todo mês: fotos, posts, resposta às avaliações, aparecer quando procuram na cidade. Já vem no Atende Completo. |
 | **Anúncios** | R$ 997 + verba | Anúncio no Instagram/Facebook/Google levando cliente para o WhatsApp. Verba sugerida a partir de R$ 20/dia, paga direto à plataforma. |
 
 **Aplicativo próprio:** sob orçamento, a partir de R$ 850 para construir + R$ 400/mês.
@@ -68,9 +68,9 @@ Agenda Sem Falta, Recupera Orçamentos, Avaliação 5 Estrelas e Reativa Cliente
 ## 2 regras que fazem o cliente juntar as coisas
 
 1. **Cliente do Atende não paga a manutenção do site** (economiza R$ 120/mês).
-2. **Fechou site e Atende juntos:** R$ 500 de desconto na implantação do Atende.
+2. **Fechou site e Atende juntos:** R$ 300 de desconto na implantação do Atende.
 
-Exemplo de venda típica em Mariana (clínica/salão): Site Premium R$ 2.000 + Atende Profissional R$ 2.500 − R$ 500 = **R$ 4.000 de entrada e R$ 997/mês**, sem manutenção à parte.
+Exemplo de venda típica em Mariana (clínica/salão): Site Premium R$ 2.000 + Atende Profissional R$ 1.497 − R$ 300 = **R$ 3.197 de entrada e R$ 997/mês**, sem manutenção à parte.
 
 ## Por que esses preços para Mariana
 
@@ -78,6 +78,24 @@ Exemplo de venda típica em Mariana (clínica/salão): Site Premium R$ 2.000 + A
 - O Atende Essencial (R$ 497) custa bem menos que uma recepcionista e trabalha de madrugada, domingo e feriado. Esse é o argumento, não o preço baixo.
 - Site Essencial a R$ 1.000 mantém a porta de entrada que já vendeu nos lotes de R$ 1.000.
 - O preço nunca vai na mensagem de WhatsApp: só no PDF da proposta.
+
+## Reajuste pela média de mercado (11/11/2026)
+
+Comparação com o que se cobra no Brasil em 2026 (fontes: Maxbot, Acelera, WSeller, Certu, Hostinger, Loggi, FreelaSemCrise, Trafius, Goomer):
+
+| Item | Mercado | Antes | Agora | Por quê |
+|---|---|---|---|---|
+| Atende Essencial | R$ 97–497 (plataforma) · R$ 497–1.497 (feito pra você) | R$ 497 | **R$ 497** | já na faixa de "feito pra você" |
+| Atende Profissional | R$ 497–1.497 | R$ 997 | **R$ 997** | meio da faixa |
+| Atende Completo | R$ 697–1.497 | R$ 1.997 | **R$ 1.497** | estava acima do teto pra cidade pequena; = Profissional + Google em Dia + extras |
+| Implantação do Atende | ~R$ 1.200 | R$ 1.500 / 2.500 / 3.500 | **R$ 997 / 1.497 / 1.997** | a entrada era a maior barreira; mensalidade é o que dá lucro |
+| Site Essencial | R$ 500–2.000 | R$ 1.000 | **R$ 1.000** | meio da faixa |
+| Site Premium | R$ 1.500–15.000 | R$ 2.000 | **R$ 2.000** | parte de baixo da faixa profissional; propostas enviadas usam esse valor |
+| Manutenção do site | R$ 250+ | R$ 120 | **R$ 120** | só hospedagem e trocas pequenas |
+| Google em Dia | ~R$ 597 junto com SEO + tráfego | R$ 497 | **R$ 297** | sozinho, R$ 497 ficava caro |
+| Anúncios (gestão) | R$ 500 (interior) – R$ 3.000 | R$ 997 | **R$ 997** | abaixo das capitais, acima do iniciante |
+| Módulos | R$ 99–250/mês (Goomer, Loopy, cardápios) | R$ 97 / 147 | **R$ 97 / 147** | mensal já dentro do mercado |
+| Desconto site + Atende | — | R$ 500 | **R$ 300** | acompanha a implantação mais baixa |
 
 ## O que não muda
 

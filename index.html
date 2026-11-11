@@ -641,7 +641,7 @@ function Servicos() {
 
 /* ═══════════════ Calculadora de ROI ═══════════════ */
 const CUSTO_MES = 497;        // SyncTech Atende Essencial, o de entrada. Tem de acompanhar ATENDE[0].mensal.
-const CUSTO_IMPLANTACAO = 1500; // implantação do Atende Essencial, paga uma vez. Acompanha ATENDE[0].implantacao.
+const CUSTO_IMPLANTACAO = 997; // implantação do Atende Essencial, paga uma vez. Acompanha ATENDE[0].implantacao.
 
 function Slider({ rotulo, valor, min, max, passo, onChange, formata, dica }) {
   const pct = ((valor - min) / (max - min)) * 100;
@@ -1085,15 +1085,15 @@ function Segmentos() {
    Tabela de nov/2026 (docs/estrategia/Tabela-SyncTech-2026-11.md), a mesma
    do Hub, do agente de WhatsApp e das propostas. Mudou lá, muda aqui. */
 const ATENDE = [
-  { chave: 'essencial', nome: 'Essencial', mensal: 497, implantacao: 1500, conversas: 300, dest: false,
+  { chave: 'essencial', nome: 'Essencial', mensal: 497, implantacao: 997, conversas: 300, dest: false,
     desc: 'Pra parar de perder quem manda mensagem fora do horário.',
     inclui: ['Atende 24h por texto e áudio', 'Agenda, confirma e lembra o cliente na véspera',
              'Passa a conversa pra você quando precisa'] },
-  { chave: 'profissional', nome: 'Profissional', mensal: 997, implantacao: 2500, conversas: 800, dest: true,
+  { chave: 'profissional', nome: 'Profissional', mensal: 997, implantacao: 1497, conversas: 800, dest: true,
     desc: 'Pra fazer quem pediu preço voltar e fechar.',
     inclui: ['Tudo do Essencial', 'Recupera orçamento: chama de novo em 2, 7 e 20 dias',
              'Pede avaliação no Google depois do atendimento', 'Relatório do mês'] },
-  { chave: 'completo', nome: 'Completo', mensal: 1997, implantacao: 3500, conversas: 2000, dest: false,
+  { chave: 'completo', nome: 'Completo', mensal: 1497, implantacao: 1997, conversas: 2000, dest: false,
     desc: 'Pra trazer de volta quem sumiu e atender turista.',
     inclui: ['Tudo do Profissional', 'Campanha mensal para cliente sumido',
              'Atende em português, inglês e espanhol', 'Google em Dia incluso'] }
@@ -1107,7 +1107,7 @@ const OUTROS = [
    'Várias páginas, animação, uma função exclusiva do seu ramo e pronto pro Google da cidade. Pronto em 10 dias.'],
   ['Módulos do ramo', 'a partir de R$ 600', 'uma vez, mais a partir de R$ 97/mês',
    'Fidelidade, cobrança por Pix, orçamento, vagas de evento, pedido sem iFood e reserva sem Booking.', MODULOS_URL],
-  ['Google em Dia', 'R$ 497', 'por mês',
+  ['Google em Dia', 'R$ 297', 'por mês',
    'Perfil do Google cuidado todo mês: fotos, posts, resposta às avaliações. Já vem no Atende Completo.'],
   ['Anúncios', 'R$ 997', 'por mês, mais a verba',
    'Anúncio no Instagram, Facebook e Google levando cliente pro seu WhatsApp. Verba sugerida a partir de R$ 20/dia, paga direto à plataforma.'],
@@ -1117,7 +1117,7 @@ const OUTROS = [
 
 const REGRAS = [
   ['Cliente do Atende não paga a manutenção do site', 'O site tem manutenção de R$ 120/mês (os 3 primeiros meses inclusos). Com o Atende, ela sai de graça.'],
-  ['Site e Atende juntos: R$ 500 de desconto', 'Fechou os dois de uma vez, a implantação do Atende fica R$ 500 mais barata.']
+  ['Site e Atende juntos: R$ 300 de desconto', 'Fechou os dois de uma vez, a implantação do Atende fica R$ 300 mais barata.']
 ];
 
 function Planos() {
